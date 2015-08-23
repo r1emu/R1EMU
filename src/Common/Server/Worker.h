@@ -17,7 +17,8 @@
  * - If it exists, return the session associated with the entity ID
  * - If it doesn't, create the session
  *
- * @license <license placeholder>
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
  */
 
 #pragma once

@@ -12,7 +12,8 @@
  * @brief Router is the routing component of the network.
  * It accepts packets on a specific port, and routes them to the workers.
  *
- * @license <license placeholder>
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
  */
 
 #pragma once

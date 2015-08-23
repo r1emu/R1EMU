@@ -10,7 +10,8 @@
  * @file Crypto.h
  * @brief Crypto contains cryptographic functions needed for the communication between the client and the server
  *
- * @license <license placeholder>
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
  */
 
 #pragma once

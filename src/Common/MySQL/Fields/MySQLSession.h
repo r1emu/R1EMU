@@ -10,7 +10,8 @@
 * @file MySQLSession.h
 * @brief MySQLSession contains functions for storing and loading a Session in a MySQL database
 *
-* @license <license placeholder>
+* @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
 */
 
 #pragma once

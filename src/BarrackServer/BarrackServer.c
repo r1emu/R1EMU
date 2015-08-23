@@ -10,7 +10,8 @@
  * @file BarrackServer.h
  * @brief This module contains the specific actions to do when using a BarrackServer
  *
- * @license <license placeholder>
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
  */
 
 // ---------- Includes ------------

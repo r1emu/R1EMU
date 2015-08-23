@@ -13,7 +13,8 @@
  *        They don't communicate with other entities on the network.
  *        They never fail.
  *
- * @license <license placeholder>
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
  */
 
 #pragma once

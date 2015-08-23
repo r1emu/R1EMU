@@ -12,7 +12,8 @@
  *
  * Entry point of the Servers
  *
- * @license <license placeholder>
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
  */
 
 // ---------- Includes ------------

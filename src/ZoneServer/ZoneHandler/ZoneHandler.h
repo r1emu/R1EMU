@@ -10,7 +10,8 @@
  * @file ZoneHandler.h
  * @brief ZoneHandler is a module containing all the handlers for the Zone system
  *
- * @license <license placeholder>
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
  */
 
 #pragma once

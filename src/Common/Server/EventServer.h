@@ -10,7 +10,8 @@
  * @file EventServer.h
  * @brief EventServer broadcast the game events to the concerned clients
  *
- * @license <license placeholder>
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
  */
 
 #pragma once

@@ -10,7 +10,8 @@
  * @file PacketType.h
  * @brief PacketType enumerates all the packets used in the game between the client and the server
  *
- * @license <license placeholder>
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
  */
 
 #pragma once

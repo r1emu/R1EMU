@@ -11,7 +11,8 @@
  * @brief PacketStream is a utility module for constructing packets as stream
  *
  *
- * @license <license placeholder>
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
  */
 
 #pragma once

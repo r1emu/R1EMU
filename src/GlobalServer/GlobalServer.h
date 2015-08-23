@@ -13,7 +13,8 @@
  * GlobalServer detains the authority on all the zone servers. It can start or shut them down.
  * It communicates with the nodes that need to communicates with all the zone servers.
  *
- * @license <license placeholder>
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *          See LICENSE file for further information
  */
 
 #pragma once
