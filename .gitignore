@@ -46,3 +46,5 @@ bin/*.txt
 *.depend
 *.mak
 
+# Redis files
+*.rdb
