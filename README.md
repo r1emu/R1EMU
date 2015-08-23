@@ -22,3 +22,4 @@ R1EMU is made by a group of game and code enthusiasts. We are striving to delive
   * [Spl3en](https://github.com/spl3en) [Administrator, Main Developer, Co-Founder]
   * [Plifou](https://github.com/plifou) [Core Developer]
   * [Geographer](https://github.com/geospace) [Core Developer]
+  * [Maxou56800](https://github.com/maxou56800) [Core Developer]
