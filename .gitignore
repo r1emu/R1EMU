@@ -30,3 +30,14 @@
 
 # Debug files
 *.dSYM/
+
+# R1EMU doxygen documentation
+projects/codeblocks/R1EMU/doxygen
+
+# Linux binaries
+bin/BarrackServer
+bin/ZoneServer
+bin/GlobalServer
+
+# Logs
+bin/*.txt
