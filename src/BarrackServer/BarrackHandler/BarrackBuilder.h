@@ -8,9 +8,8 @@
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
  * @file BarrackBuilder.h
- * @brief
- *
- *
+ * @brief BarrackBuilder contains the packet builders.
+ *        In other words, it contains code that builds packet after a request from a client.
  *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
  *          See LICENSE file for further information
@@ -26,6 +25,7 @@
 
 
 // ---------- Defines -------------
+/** BC_NORMAL packets subtypes */
 typedef enum PacketTypeBarrackNormal {
 
     BC_NORMAL_COMMANDER_INFO = 0x0,
