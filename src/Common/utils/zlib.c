@@ -39,18 +39,19 @@ Zlib_compress (
     stream.zalloc = 0;
     stream.zfree = 0;
 
-    if (deflateInit2_ (&stream, 1, Z_DEFLATED, -15, MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY, "1.2.8", 88)) {
-        warning ("Can't init compression.");
+    int result;
+    if ((result = deflateInit2 (&stream, 1, Z_DEFLATED, -15, MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY)) != Z_OK) {
+        warning ("Can't init compression : error code = %x.", result);
         return false;
     }
 
-    if (deflate (&stream, Z_FINISH) != 1) {
-        warning ("Can't compress.");
+    if ((result = deflate (&stream, Z_FINISH) != Z_STREAM_END)) {
+        warning ("Can't compress : error code = %x.", result);
         return false;
     }
 
-    if (deflateEnd (&stream)) {
-        warning ("Can't end compression.");
+    if ((result = deflateEnd (&stream) != Z_OK)) {
+        warning ("Can't end compression : error code = %x", result);
         return false;
     }
 
