@@ -190,10 +190,10 @@ BarrackHandler_startGame (
 
     // Retrieve zone servers IPs from Redis
     // Fake IPs here until we can retrieve the IPs database
-    char *zoneServerIps[] = {
-        "127.0.0.1",
-        "46.105.97.46",
-        "192.168.33.10"
+    uint32_t zoneServerIps[] = {
+        *(uint32_t *) ((char []) {127, 0,   0,   1}),
+        *(uint32_t *) ((char []) {46,  105, 97,  46}),
+        *(uint32_t *) ((char []) {192, 168, 33,  10}),
     };
     int maxServerCount = sizeof_array (zoneServerIps);
     if (clientPacket->routerId >= maxServerCount) {
@@ -207,7 +207,7 @@ BarrackHandler_startGame (
         2004, 2005, 2006
     };
 
-    char *zoneServerIp = zoneServerIps [clientPacket->routerId];
+    uint32_t zoneServerIp = zoneServerIps [clientPacket->routerId];
     int zoneServerPort = zoneServerPorts [clientPacket->routerId];
 
     // Move the GameSession to the target Zone

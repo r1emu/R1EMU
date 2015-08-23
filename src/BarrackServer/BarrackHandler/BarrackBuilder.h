@@ -59,7 +59,7 @@ BarrackBuilder_loginOk (
 void
 BarrackBuilder_startGameOk (
     uint32_t zoneServerId,
-    uint8_t *zoneServerIp,
+    uint32_t zoneServerIp,
     uint32_t zoneServerPort,
     uint16_t mapId,
     uint8_t commanderListId,

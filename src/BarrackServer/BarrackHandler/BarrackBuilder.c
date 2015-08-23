@@ -63,7 +63,7 @@ BarrackBuilder_loginOk (
 void
 BarrackBuilder_startGameOk (
     uint32_t zoneServerId,
-    uint8_t *zoneServerIp,
+    uint32_t zoneServerIp,
     uint32_t zoneServerPort,
     uint16_t mapId,
     uint8_t commanderListId,
@@ -91,7 +91,7 @@ BarrackBuilder_startGameOk (
     {
         ServerPacketHeader_init (&replyPacket.header, packetType);
         replyPacket.zoneServerId = zoneServerId;
-        replyPacket.zoneServerIp = *(uint32_t *) ((char []) {127, 0, 0, 1});
+        replyPacket.zoneServerIp = zoneServerIp;
         replyPacket.zoneServerPort = zoneServerPort;
         replyPacket.mapId = mapId;
         replyPacket.commanderListId = commanderListId;
