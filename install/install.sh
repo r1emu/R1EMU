@@ -113,8 +113,8 @@ make
 
 # Install database
 cd $installPath/../sql-files/
+echo "Installing mysql database (using root user)..."
 mysql -u root -p < install_database.sql
-
 
 echo "Launching redis server ..."
 redis-server &
