@@ -4,7 +4,7 @@ R1EMU is a collaborative software development project revolving around the creat
 
 ## Requirements
 R1EMU requires
-  * Redis v >= ?.?
+  * Redis >= 2.8.19
   * MySQL server
   * ZMQ 4.1.0 rc1
   * czmq 3.0.0 rc1
