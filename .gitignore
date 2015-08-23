@@ -41,3 +41,9 @@ bin/GlobalServer
 
 # Logs
 bin/*.txt
+
+# Codeblocks files
+*.layout
+*.depend
+*.mak
+

@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="x64|x64">
+      <Configuration>x64</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\BarrackServer\BarrackHandler\BarrackHandler.c" />
+    <ClCompile Include="..\..\..\src\BarrackServer\BarrackServer.c" />
+    <ClCompile Include="..\..\..\src\BarrackServer\BarrackWorker\BarrackWorker.c" />
+    <ClCompile Include="..\..\..\src\BarrackServer\main.c" />
+    <ClCompile Include="..\..\..\src\Common\Commander\Commander.c" />
+    <ClCompile Include="..\..\..\src\Common\Crypto\Crypto.c" />
+    <ClCompile Include="..\..\..\src\Common\dbg\dbg.c" />
+    <ClCompile Include="..\..\..\src\Common\Packet\Packet.c" />
+    <ClCompile Include="..\..\..\src\Common\Packet\PacketHandler.c" />
+    <ClCompile Include="..\..\..\src\Common\Packet\PacketStream.c" />
+    <ClCompile Include="..\..\..\src\Common\Packet\PacketType.c" />
+    <ClCompile Include="..\..\..\src\Common\Session\ClientSession.c" />
+    <ClCompile Include="..\..\..\src\Common\Session\SessionTable.c" />
+    <ClCompile Include="..\..\..\src\R1EMU.c" />
+    <ClCompile Include="..\..\..\src\SessionServer\SessionServer.c" />
+    <ClCompile Include="..\..\..\src\SessionServer\SessionWorker\SessionWorker.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\BarrackServer\BarrackHandler\BarrackHandler.h" />
+    <ClInclude Include="..\..\..\src\BarrackServer\BarrackServer.h" />
+    <ClInclude Include="..\..\..\src\BarrackServer\BarrackWorker\BarrackWorker.h" />
+    <ClInclude Include="..\..\..\src\Common\ClientSession\ClientSession.h" />
+    <ClInclude Include="..\..\..\src\Common\Commander\Commander.h" />
+    <ClInclude Include="..\..\..\src\Common\Crypto\Crypto.h" />
+    <ClInclude Include="..\..\..\src\Common\dbg\dbg.h" />
+    <ClInclude Include="..\..\..\src\Common\Packet\Packet.h" />
+    <ClInclude Include="..\..\..\src\Common\Packet\PacketHandler.h" />
+    <ClInclude Include="..\..\..\src\Common\Packet\PacketStream.h" />
+    <ClInclude Include="..\..\..\src\Common\Packet\PacketType.h" />
+    <ClInclude Include="..\..\..\src\Common\Session\ClientSession.h" />
+    <ClInclude Include="..\..\..\src\Common\Session\SessionTable.h" />
+    <ClInclude Include="..\..\..\src\R1EMU.h" />
+    <ClInclude Include="..\..\..\src\SessionServer\SessionServer.h" />
+    <ClInclude Include="..\..\..\src\SessionServer\SessionWorker\SessionWorker.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EF0C8CBF-817A-42A5-AFEE-333AE85E459D}</ProjectGuid>
+    <RootNamespace>R1EMU</RootNamespace>
+    <ProjectName>BarrackServer</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='x64|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='x64|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='x64|x64'">
+    <OutDir>..\..\..\bin\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../../src;../../../include;../../../include/zmq;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libczmq.lib;libzmq.lib;hiredis.lib;Win32_Interop.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='x64|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../../src;../../../include;../../../include/zmq;../../../include/mysql;../../../include/hiredis;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../../lib/x64/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>czmqlib.lib;zmqlib.lib;hiredis.lib;mysqllib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
