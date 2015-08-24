@@ -23,6 +23,8 @@
 #include "PacketType.h"
 
 // ---------- Defines -------------
+#define PACKET_HEADER(x) (typeof(x)[]){x}
+
 #define BUILD_REPLY_PACKET(packetName, msgName)                                             \
     for (bool __sent = false;                                                               \
          !__sent && memset (&packetName, 0, sizeof (packetName));                           \

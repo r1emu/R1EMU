@@ -26,7 +26,6 @@
 #include <czmq.h>
 /** This is only for differenciate ZMQ RAW ROUTER from ZMQ ROUTER */
 #define ZMQ_RAW_ROUTER ZMQ_ROUTER
-#define PACKET_HEADER(x) (typeof(x)[]){x}
 
 /** Global types of the servers of the architecture */
 typedef enum {

@@ -15,6 +15,7 @@
 #include "Router.h"
 #include "Worker.h"
 #include "RouterMonitor.h"
+#include "Common/Packet/Packet.h"
 
 // ------ Structure declaration -------
 typedef struct {

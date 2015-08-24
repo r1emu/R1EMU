@@ -25,6 +25,7 @@
 #include "Common/Redis/Fields/RedisSocketSession.h"
 #include "Common/Redis/Fields/RedisGameSession.h"
 #include "Common/Crypto/Crypto.h"
+#include "Common/Packet/Packet.h"
 
 
 // ------ Structure declaration -------

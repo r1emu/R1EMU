@@ -18,6 +18,7 @@
 #include "Common/Redis/Redis.h"
 #include "Common/Redis/Fields/RedisGameSession.h"
 #include "ZoneServer/ZoneHandler/ZoneBuilder.h"
+#include "Common/Packet/Packet.h"
 
 // ------ Structure declaration -------
 /**

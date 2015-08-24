@@ -21,6 +21,7 @@
 #include "Router.h"
 #include "Common/Session/Session.h"
 #include "Common/Redis/Fields/RedisSession.h"
+#include "Common/Packet/Packet.h"
 
 // ------ Structure declaration -------
 /**
