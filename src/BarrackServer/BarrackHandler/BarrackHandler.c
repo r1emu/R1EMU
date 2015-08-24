@@ -194,6 +194,7 @@ BarrackHandler_startGame (
         *(uint32_t *) ((char []) {127, 0,   0,   1}),
         *(uint32_t *) ((char []) {46,  105, 97,  46}),
         *(uint32_t *) ((char []) {192, 168, 33,  10}),
+        *(uint32_t *) ((char []) {37,  187, 102, 130}),
     };
     int maxServerCount = sizeof_array (zoneServerIps);
     if (clientPacket->routerId >= maxServerCount) {
@@ -204,7 +205,7 @@ BarrackHandler_startGame (
     // Retrieve zone servers ports from Redis
     // Fake ports here until we can retrieve the ports database
     int zoneServerPorts [] = {
-        2004, 2005, 2006
+        2004, 2005, 2006, 2007
     };
 
     uint32_t zoneServerIp = zoneServerIps [clientPacket->routerId];
