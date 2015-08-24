@@ -38,6 +38,14 @@ typedef struct _WorkerStartupInfo WorkerStartupInfo;
 typedef struct _Worker Worker;
 typedef enum _PacketHandlerState PacketHandlerState;
 
+/** @brief Global types of the servers of the architecture */
+typedef enum {
+    SERVER_TYPE_GLOBAL,
+    SERVER_TYPE_BARRACK,
+    SERVER_TYPE_SOCIAL,
+    SERVER_TYPE_ZONE
+} ServerType;
+
 /**
  * @brief PacketHandlerFunction is the generic function prototype that a Worker is going to call when it receives a packet.
  * It takes the packet, calls packet builders based on the packet type, and reply to it using the \reply argument.
@@ -86,7 +94,6 @@ struct _WorkerStartupInfo
 
     /** Packet handlers entries count */
     int packetHandlersCount;
-
 };
 
 /**

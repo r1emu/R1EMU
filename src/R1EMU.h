@@ -27,14 +27,6 @@
 /** This is only for differenciate ZMQ RAW ROUTER from ZMQ ROUTER */
 #define ZMQ_RAW_ROUTER ZMQ_ROUTER
 
-/** Global types of the servers of the architecture */
-typedef enum {
-    SERVER_TYPE_GLOBAL,
-    SERVER_TYPE_BARRACK,
-    SERVER_TYPE_SOCIAL,
-    SERVER_TYPE_ZONE
-} ServerType;
-
 // MySQL environment
 #include <mysql/mysql.h>
 
