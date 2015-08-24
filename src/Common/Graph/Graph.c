@@ -280,10 +280,11 @@ void
 Graph_dump (
     Graph *self
 ) {
-    int loop_counter = 0;
+    int loopCounter = 0;
+    (void) loopCounter;
 
     for (GraphNode *node = zhash_first (self->nodes); node != NULL; node = zhash_next (self->nodes)) {
-        dbg ("- Arcs of nodes %c :", 'A' + loop_counter++);
+        dbg ("- Arcs of nodes %c :", 'A' + loopCounter++);
         for (GraphArc *arc = zlist_first (node->arcs); arc != NULL; arc = zlist_next (node->arcs)) {
             dbg ("   %s -> %s", arc->from->key, arc->to->key);
         }

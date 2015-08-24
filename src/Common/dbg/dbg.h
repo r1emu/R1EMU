@@ -75,24 +75,7 @@ typedef enum {
     } while (0)
 
 
-#if defined(__DBG_ACTIVATED__) && __DBG_ACTIVATED__ == TRUE
-
-    // Colored output
-    #define info_white(format, ...)                                        \
-        dbg_exnl (DBG_LEVEL_DEBUG, stdout, format, ##__VA_ARGS__)
-
-    #define info_green(format, ...)                                        \
-        dbg_exnl (DBG_LEVEL_INFO, stdout, format, ##__VA_ARGS__)
-
-    #define info_yellow(format, ...)                                       \
-        dbg_exnl (DBG_LEVEL_WARNING, stdout, format, ##__VA_ARGS__)
-
-    #define info_red(format, ...)                                          \
-        dbg_exnl (DBG_LEVEL_ERROR, stdout, format, ##__VA_ARGS__)
-
-    #define info_blue(format, ...)                                         \
-        dbg_exnl (DBG_LEVEL_SPECIAL, stdout, format, ##__VA_ARGS__)
-
+#if defined(__DBG_ACTIVATED__)
 
     // Declare debug functions here
     /** Basic level debug function. */
@@ -133,13 +116,28 @@ typedef enum {
 	#define die(format, ...)
 	#define buffer_print(format, ...)
 	#define special(format, ...)
-
 #endif
 
 
 /** Info level debug function. Not a debug information */
 #define info(format, ...)                                          \
     dbg_ex (DBG_LEVEL_INFO, stdout, format "\n", ##__VA_ARGS__)
+
+// Colored output
+#define info_white(format, ...)                                        \
+    dbg_exnl (DBG_LEVEL_DEBUG, stdout, format, ##__VA_ARGS__)
+
+#define info_green(format, ...)                                        \
+    dbg_exnl (DBG_LEVEL_INFO, stdout, format, ##__VA_ARGS__)
+
+#define info_yellow(format, ...)                                       \
+    dbg_exnl (DBG_LEVEL_WARNING, stdout, format, ##__VA_ARGS__)
+
+#define info_red(format, ...)                                          \
+    dbg_exnl (DBG_LEVEL_ERROR, stdout, format, ##__VA_ARGS__)
+
+#define info_blue(format, ...)                                         \
+    dbg_exnl (DBG_LEVEL_SPECIAL, stdout, format, ##__VA_ARGS__)
 
 // ----------- Functions ------------
 

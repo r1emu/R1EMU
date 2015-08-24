@@ -38,7 +38,6 @@
 
 // Debugging environment
 /** If defined, the debugging functions will be included in the executable */
-#define __DBG_ACTIVATED__ TRUE
 #include "Common/dbg/dbg.h"
 
 // Utils

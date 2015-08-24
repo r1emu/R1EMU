@@ -15,6 +15,7 @@
 				<Option parameters="1 127.0.0.1 1 2004 3 127.0.0.1 2003 localhost r1emu r1emu r1emu localhost 6379" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-D__DBG_ACTIVATED__" />
 				</Compiler>
 			</Target>
 			<Target title="Release">

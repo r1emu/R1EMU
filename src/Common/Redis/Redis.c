@@ -138,7 +138,8 @@ Redis_printElements (
 ) {
     char buffer[100];
     for (size_t i = 0; i < nbElements; i++) {
-        char *elementName;
+        char *elementName = NULL;
+        (void) elementName;
 
         if (!elementsName) {
             sprintf (buffer, "%02u", (unsigned int) i);
