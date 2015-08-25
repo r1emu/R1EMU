@@ -96,6 +96,19 @@ rm -rf cbp2make-stl-rev147-all
 rm cbp2make-stl-rev147-all.tar.7z
 
 # =========================================================
+# =============           JSON              ===============
+# =========================================================
+wget http://www.digip.org/jansson/releases/jansson-2.7.tar.gz
+tar -xvf jansson-2.7.tar.gz
+cd jansson-2.7
+cmake -G "Unix Makefiles"
+make
+sudo make install
+cd $installPath
+rm -rf jansson-2.7
+rm jansson-2.7.tar.gz
+
+# =========================================================
 # =============           R1EMU             ===============
 # =========================================================
 
