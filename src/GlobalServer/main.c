@@ -16,64 +16,64 @@
  *          See LICENSE file for further information
  */
 
-// Configuration environment
+// configuration environment
 #define DEFAULT_SERVER_CONF_PATH "../cfg/server.cfg"
 
-#include "Common/Server/ServerFactory.h"
-#include "GlobalServer/GlobalServer.h"
+#include "common/server/server_factory.h"
+#include "global_server/global_server.h"
 
-int main (int argc, char **argv)
+int main(int argc, char **argv)
 {
-    GlobalServer *globalServer;
+     // Get the configuration file
+    char *confFilePath;
 
-    // Force the initialization of the CZMQ layer here.
+    GlobalServer *globalServer;
+    GlobalServerStartupInfo info;
+
+    // force the initialization of the CZMQ layer here.
     if (!(zsys_init ())) {
-        error ("Cannot init CZMQ.");
+        error("Cannot init CZMQ.");
         goto cleanup;
     }
 
-    // Get the configuration file
-    char *confFilePath;
     if (argc >= 2) {
         confFilePath = argv[1];
     } else {
         confFilePath = DEFAULT_SERVER_CONF_PATH;
     }
 
-    GlobalServerStartupInfo info;
-    if (!(GlobalServerStartupInfo_init (&info, confFilePath))) {
-        error ("Cannot initialize GlobalServer init information. (%s)", confFilePath);
+    if (!(globalServerStartupInfoInit(&info, confFilePath))) {
+        error("Cannot initialize GlobalServer init information. (%s)", confFilePath);
         goto cleanup;
     }
 
-    // Initialize the Global Server
-    if (!(globalServer = GlobalServer_new (&info))) {
-        error ("Cannot initialize the GlobalServer properly.");
+    // initialize the Global Server
+    if (!(globalServer = globalServerNew(&info))) {
+        error("Cannot initialize the GlobalServer properly.");
         goto cleanup;
     }
 
-    // Flush the Redis server
-    if (!(GlobalServer_flushRedis (globalServer))) {
-        error ("Cannot flush the Redis server properly.");
+    // flush the Redis server
+    if (!(globalServerFlushRedis(globalServer))) {
+        error("Cannot flush the Redis server properly.");
         goto cleanup;
     }
 
-    // Start the Global Server
-    else if (!GlobalServer_start (globalServer)) {
-        error ("Cannot start the GlobalServer properly.");
+    // start the Global Server
+    else if(!globalServerStart(globalServer)) {
+        error("Cannot start the GlobalServer properly.");
         goto cleanup;
     }
 
 cleanup:
+    // unload the Global Server properly
+    globalServerDestroy (&globalServer);
 
-    // Unload the Global Server properly
-    GlobalServer_destroy (&globalServer);
+    // shutdown the CZMQ layer properly
+    zsys_shutdown();
 
-    // Shutdown the CZMQ layer properly
-    zsys_shutdown ();
-
-    info ("Press any key to exit...");
-    getc (stdout);
+    info("Press any key to exit...");
+    getc(stdout);
 
     return 0;
 }

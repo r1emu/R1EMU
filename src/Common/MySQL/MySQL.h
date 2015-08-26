@@ -1,31 +1,27 @@
 /**
-*
-*   ██████╗   ██╗ ███████╗ ███╗   ███╗ ██╗   ██╗
-*   ██╔══██╗ ███║ ██╔════╝ ████╗ ████║ ██║   ██║
-*   ██████╔╝ ╚██║ █████╗   ██╔████╔██║ ██║   ██║
-*   ██╔══██╗  ██║ ██╔══╝   ██║╚██╔╝██║ ██║   ██║
-*   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
-*   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
-*
-* @file MySQL.h
-* @brief MySQL contains all database related functions
-*
-* @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
+ *
+ *   ██████╗   ██╗ ███████╗ ███╗   ███╗ ██╗   ██╗
+ *   ██╔══██╗ ███║ ██╔════╝ ████╗ ████║ ██║   ██║
+ *   ██████╔╝ ╚██║ █████╗   ██╔████╔██║ ██║   ██║
+ *   ██╔══██╗  ██║ ██╔══╝   ██║╚██╔╝██║ ██║   ██║
+ *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
+ *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
+ *
+ * @file mysql.h
+ * @brief MySQL contains all database related functions
+ *
+ * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
  *          See LICENSE file for further information
-*/
+ */
 
 #pragma once
 
-// ---------- Includes ------------
 #include "R1EMU.h"
 
-// ---------- Defines -------------
 typedef enum MySQLStatus {
-
     SQL_SUCCESS = 0,
     SQL_ERROR = -1,
-
-}   MySQLStatus;
+} MySQLStatus;
 
 #define MAX_QUERY_SIZE 1024
 
@@ -34,44 +30,40 @@ typedef enum MySQLStatus {
 #define MYSQL_PASSWORD_DEFAULT     (char []) {"r1emu"}
 #define MYSQL_DATABASE_DEFAULT     (char []) {"r1emu"}
 
-// ------ Structure declaration -------
-typedef struct MySQLStartupInfo
-{
-    /** The MySQL hostname */
+typedef struct MySQLStartupInfo {
+    // the MySQL hostname
     char *hostname;
 
-    /** The username of the MySQL user with read/write privilege */
+    // the username of the MySQL user with read/write privilege
     char *login;
 
-    /** The password of the MySQL user */
+    // the password of the MySQL user
     char *password;
 
-    /** The database name containing all the data */
+    // the database name containing all the data
     char *database;
 
-}   MySQLStartupInfo;
+} MySQLStartupInfo;
 
 struct MySQL {
-    /** Information about the database connection */
-    MySQLStartupInfo   info;
-    /** Handle to the MySQL connection */
-	MYSQL		*handle;
-	/** Last result */
-	MYSQL_RES	*result;
-};
-typedef struct MySQL MySQL;
+    // information about the database connection
+    MySQLStartupInfo info;
 
-// ----------- Functions ------------
+    // handle to the MySQL connection
+	MYSQL *handle;
+
+	// last result
+	MYSQL_RES *result;
+};
+
+typedef struct MySQL MySQL;
 
 /**
  * @brief Allocate a new MySQL structure.
  * @param info An initialized MySQLStartupInfo.
  * @return A pointer to an allocated MySQL, or NULL if an error occured.
  */
-MySQL *
-MySQL_new (
-    MySQLStartupInfo *info
-);
+MySQL *mySqlNew(MySQLStartupInfo *info);
 
 /**
  * @brief Initialize an allocated MySQL structure.
@@ -79,12 +71,7 @@ MySQL_new (
  * @param info An initialized MySQLStartupInfo.
  * @return true on success, false otherwise.
  */
-bool
-MySQL_init (
-    MySQL *self,
-    MySQLStartupInfo *info
-);
-
+bool mySqlInit(MySQL *self, MySQLStartupInfo *info);
 
 /**
  * @brief Initialize an allocated MySQLStartupInfo structure.
@@ -95,24 +82,14 @@ MySQL_init (
  * @param database The database name containing all the data
  * @return true on success, false otherwise.
  */
-bool
-MySQLStartupInfo_init (
-    MySQLStartupInfo *self,
-    char *hostname,
-    char *login,
-    char *password,
-    char *database
-);
+bool mySqlStartupInfoInit(MySQLStartupInfo *self, char *hostname, char *login, char *password, char *database);
 
 /**
  * @brief : Connect to the MySQL database
  * @param self An allocated MySQL instance
  * @return true on success, false otherwise
  */
-bool
-MySQL_connect (
-    MySQL *self
-);
+bool mySqlConnect(MySQL *self);
 
 /**
  * @brief Send a query to the MySQL server
@@ -120,38 +97,22 @@ MySQL_connect (
  * @param query The SQL formatted query
  * @return a MySQLStatus
  */
-MySQLStatus
-MySQL_query (
-	MySQL *self,
-	const char *query,
-	...
-);
-
+MySQLStatus mySqlQuery(MySQL *self, const char *query, ...);
 
 /**
  * @brief Free the result of the last query
  * @param self An allocated MySQL
  */
-void
-MySQL_freeResult (
-	MySQL *self
-);
+void mySqlFreeResult(MySQL *self);
 
 /**
  * @brief Free the members of the MySQLStartupInfo structure
  * @param self A pointer to an allocated MySQLStartupInfo.
  */
-void
-MySQLStartupInfo_free (
-    MySQLStartupInfo *self
-);
+void mySqlStartupInfoFree(MySQLStartupInfo *self);
 
 /**
  * @brief Free an allocated MySQL structure and nullify the content of the pointer
  * @param self A pointer to an allocated MySQL
  */
-void
-MySQL_destroy (
-    MySQL **_self
-);
-
+void mySqlDestroy(MySQL **_self);

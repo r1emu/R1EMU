@@ -161,7 +161,7 @@ Router_initBackend (
 // ------ Extern function implementation ------
 
 Router *
-Router_new (
+routerNew (
     RouterStartupInfo *info
 ) {
     Router *self;
@@ -170,8 +170,8 @@ Router_new (
         return NULL;
     }
 
-    if (!Router_init (self, info)) {
-        Router_destroy (&self);
+    if (!routerInit (self, info)) {
+        routerDestroy (&self);
         error ("Router failed to initialize.");
         return NULL;
     }
@@ -180,12 +180,12 @@ Router_new (
 }
 
 bool
-Router_init (
+routerInit (
     Router *self,
     RouterStartupInfo *info
 ) {
     // Get a private copy of the Router Information
-    if (!(RouterStartupInfo_init (
+    if (!(routerStartupInfoInit (
             &self->info, info->routerId, info->ip,
             info->ports, info->portsCount, info->workersCount,
             &info->redisInfo, &info->sqlInfo))
@@ -245,7 +245,7 @@ Router_init (
 }
 
 bool
-RouterStartupInfo_init (
+routerStartupInfoInit (
     RouterStartupInfo *self,
     uint16_t routerId,
     char *ip,
@@ -270,12 +270,12 @@ RouterStartupInfo_init (
     self->portsCount = portsCount;
     self->workersCount = workersCount;
 
-    if (!(RedisStartupInfo_init (&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
+    if (!(redisStartupInfoInit (&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
         error ("Cannot initialize Redis Start up info.");
         return false;
     }
 
-    if (!(MySQLStartupInfo_init (&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
+    if (!(mySqlStartupInfoInit (&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
         error ("Cannot initialize MySQL start up info.");
         return false;
     }
@@ -595,13 +595,13 @@ Router_initMonitor (
     info ("Binded to the Router Monitor endpoint %s", zsys_sprintf (ROUTER_MONITOR_SUBSCRIBER_ENDPOINT, self->info.routerId));
 
     RouterMonitorStartupInfo *routerMonitorInfo;
-    if (!(routerMonitorInfo = RouterMonitorStartupInfo_new (self->frontend, self->info.routerId, &self->info.redisInfo, &self->info.sqlInfo))) {
+    if (!(routerMonitorInfo = routerMonitorStartupInfoNew (self->frontend, self->info.routerId, &self->info.redisInfo, &self->info.sqlInfo))) {
         error ("Cannot allocate a new Router Monitor Info.");
         return false;
     }
 
     zactor_t *monitorActor;
-    if ((monitorActor = zactor_new (RouterMonitor_start, routerMonitorInfo)) == NULL) {
+    if ((monitorActor = zactor_new (routerMonitorStart, routerMonitorInfo)) == NULL) {
         error ("Cannot create a new thread for the Router Monitor.");
         return false;
     }
@@ -677,7 +677,7 @@ Router_initEventServerSubscriber (
 }
 
 bool
-Router_start (
+routerStart (
     Router *self
 ) {
     zloop_t *reactor;
@@ -728,14 +728,14 @@ Router_start (
 }
 
 int
-Router_getId (
+routerGetId (
     Router *self
 ) {
     return self->info.routerId;
 }
 
 void
-RouterStartupInfo_free (
+routerStartupInfoFree (
     RouterStartupInfo *self
 ) {
     free (self->ip);
@@ -743,7 +743,7 @@ RouterStartupInfo_free (
 }
 
 void
-Router_destroy (
+routerDestroy (
     Router **_self
 ) {
     Router *self = *_self;
@@ -766,7 +766,7 @@ Router_destroy (
         zlist_destroy (&self->readyWorkers);
     }
 
-    RouterStartupInfo_free (&self->info);
+    routerStartupInfoFree (&self->info);
 
     free (self);
     *_self = NULL;

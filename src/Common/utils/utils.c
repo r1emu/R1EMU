@@ -43,7 +43,7 @@ void *dumpToMem (
         isLocal = true;
     }
 
-    while ((dumpPos = str_getline (dump, buffer, sizeof(buffer) - 1, dumpPos)) != -1)
+    while ((dumpPos = strGetLine (dump, buffer, sizeof(buffer) - 1, dumpPos)) != -1)
     {
         char *strPos = buffer;
         if ((strPos = strstr (buffer, "]  ")) != NULL) {

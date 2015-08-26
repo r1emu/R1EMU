@@ -11,52 +11,29 @@
  *          See LICENSE file for further information
  */
 
+#include "session.h"
 
-// ---------- Includes ------------
-#include "Session.h"
-
-
-// ------ Structure declaration -------
-
-
-// ------ Static declaration -------
-
-
-// ------ Extern function implementation -------
-
-Session *
-Session_new (
-    void
-) {
+Session *sessionNew (void) {
     Session *self;
 
-    if ((self = calloc (1, sizeof (Session))) == NULL) {
+    if ((self = calloc(1, sizeof(Session))) == NULL) {
         return NULL;
     }
 
-    if (!Session_init (self)) {
-        Session_destroy (&self);
-        error ("Session failed to initialize.");
+    if (!sessionInit(self)) {
+        sessionDestroy(&self);
+        error("Session failed to initialize.");
         return NULL;
     }
 
     return self;
 }
 
-
-bool
-Session_init (
-    Session *self
-) {
-
+bool sessionInit(Session *self) {
     return true;
 }
 
-
-void
-Session_destroy (
-    Session **_self
-) {
+void sessionDestroy(Session **_self) {
     Session *self = *_self;
 
     free (self);

@@ -10,35 +10,15 @@
  * @file string.h
  * @brief
  *
- *
- *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
  *          See LICENSE file for further information
  */
 
 #pragma once
 
-// ---------- Includes ------------
 #include "R1EMU.h"
 
-// ---------- Defines -------------
+int strGetLine(char *str, char *dest, int maxlen, int pos);
 
-
-// ------ Structure declaration -------
-
-// ----------- Functions ------------
-
-int
-str_getline (
-    char *str,
-    char *dest,
-    int maxlen,
-    int pos
-);
-
-// Credits : http://stackoverflow.com/a/9210560/468242
-char **
-str_split (
-    char* a_str,
-    const char a_delim
-);
+// credits: http://stackoverflow.com/a/9210560/468242
+char **strSplit(char* a_str, const char a_delim);

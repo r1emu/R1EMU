@@ -23,7 +23,7 @@
 // ------ Extern function implementation ------
 
 MySQL *
-MySQL_new (
+mySqlNew (
     MySQLStartupInfo *info
 ) {
     MySQL *self;
@@ -32,8 +32,8 @@ MySQL_new (
         return NULL;
     }
 
-    if (!MySQL_init (self, info)) {
-        MySQL_destroy (&self);
+    if (!mySqlInit (self, info)) {
+        mySqlDestroy (&self);
         error ("MySQL failed to initialize.");
         return NULL;
     }
@@ -42,20 +42,20 @@ MySQL_new (
 }
 
 bool
-MySQL_init (
+mySqlInit (
     MySQL *self,
     MySQLStartupInfo *info
 ) {
     self->result = NULL;
     self->handle = mysql_init (NULL);
 
-    MySQLStartupInfo_init (&self->info, info->hostname, info->login, info->password, info->database);
+    mySqlStartupInfoInit (&self->info, info->hostname, info->login, info->password, info->database);
 
     return true;
 }
 
 bool
-MySQLStartupInfo_init (
+mySqlStartupInfoInit (
     MySQLStartupInfo *self,
     char *hostname,
     char *login,
@@ -71,7 +71,7 @@ MySQLStartupInfo_init (
 }
 
 bool
-MySQL_connect (
+mySqlConnect (
     MySQL *self
 ) {
     MySQLStartupInfo *info = &self->info;
@@ -89,7 +89,7 @@ MySQL_connect (
 }
 
 MySQLStatus
-MySQL_query (
+mySqlQuery (
 	MySQL *self,
 	const char* query,
 	...
@@ -101,7 +101,7 @@ MySQL_query (
 		return SQL_ERROR;
 	}
 
-	MySQL_freeResult(self);
+	mySqlFreeResult(self);
 
 	va_start (args, query);
 		vsnprintf (buf, MAX_QUERY_SIZE - 1, query, args);
@@ -119,7 +119,7 @@ MySQL_query (
 }
 
 void
-MySQL_freeResult (
+mySqlFreeResult (
 	MySQL *self
 ) {
 	if (self && self->result) {
@@ -129,7 +129,7 @@ MySQL_freeResult (
 }
 
 void
-MySQLStartupInfo_free (
+mySqlStartupInfoFree (
     MySQLStartupInfo *self
 ) {
     free (self->hostname);
@@ -139,13 +139,13 @@ MySQLStartupInfo_free (
 }
 
 void
-MySQL_destroy (
+mySqlDestroy (
     MySQL **_self
 ) {
     MySQL *self = *_self;
 
-    MySQLStartupInfo_free (&self->info);
-    MySQL_freeResult (self);
+    mySqlStartupInfoFree (&self->info);
+    mySqlFreeResult (self);
     mysql_close (self->handle);
 
     free (self);

@@ -40,7 +40,7 @@ struct Server
 // ------ Extern function implementation -------
 
 Server *
-Server_new (
+serverNew (
     ServerStartupInfo *info
 ) {
     Server *self;
@@ -49,8 +49,8 @@ Server_new (
         return NULL;
     }
 
-    if (!Server_init (self, info)) {
-        Server_destroy (&self);
+    if (!serverInit (self, info)) {
+        serverDestroy (&self);
         error ("Server failed to initialize.");
         return NULL;
     }
@@ -59,18 +59,18 @@ Server_new (
 }
 
 bool
-Server_init (
+serverInit (
     Server *self,
     ServerStartupInfo *info
 ) {
     // Make a private copy
-    if (!(ServerStartupInfo_init (&self->info, info->serverType, &info->routerInfo, info->workersInfo, info->workersInfoCount))) {
+    if (!(serverStartupInfoInit (&self->info, info->serverType, &info->routerInfo, info->workersInfo, info->workersInfoCount))) {
         error ("Cannot init the ServerStartupInfo");
         return false;
     }
 
     // Initialize router
-    if (!(self->router = Router_new (&info->routerInfo))) {
+    if (!(self->router = routerNew (&info->routerInfo))) {
         error ("Cannot allocate a new Router.");
         return false;
     }
@@ -84,7 +84,7 @@ Server_init (
     for (uint16_t workerId = 0; workerId < info->routerInfo.workersCount; workerId++)
     {
         // Allocate a new worker
-        if (!(self->workers[workerId] = Worker_new (&info->workersInfo[workerId]))) {
+        if (!(self->workers[workerId] = workerNew (&info->workersInfo[workerId]))) {
             error ("Cannot allocate a new worker");
             return false;
         }
@@ -94,7 +94,7 @@ Server_init (
 }
 
 bool
-ServerStartupInfo_init (
+serverStartupInfoInit (
     ServerStartupInfo *self,
     ServerType serverType,
     RouterStartupInfo *routerInfo,
@@ -118,7 +118,7 @@ ServerStartupInfo_init (
 
 
 bool
-Server_createProcess (
+serverCreateProcess (
     ServerStartupInfo *self,
     char *executableName
 ) {
@@ -173,7 +173,7 @@ Server_createProcess (
             return false;
         }
     #else
-        char **argv = str_split (commandLine, ' ');
+        char **argv = strSplit (commandLine, ' ');
         if (fork () == 0) {
             if (execv (executableName, (char * const *) argv) == -1) {
                 error ("Cannot launch Zone Server executable : %s.", executableName);
@@ -187,20 +187,20 @@ Server_createProcess (
 }
 
 bool
-Server_start (
+serverStart (
     Server *self
 ) {
     // Start all the Workers
     for (int i = 0; i < self->info.routerInfo.workersCount; i++) {
-        if (!(Worker_start (self->workers[i]))) {
-            error ("[routerId=%d][WorkerId=%d] Cannot start the Worker", Router_getId (self->router), i);
+        if (!(workerStart (self->workers[i]))) {
+            error ("[routerId=%d][WorkerId=%d] Cannot start the Worker", routerGetId (self->router), i);
             return false;
         }
     }
 
     // Start the Router
-    if (!(Router_start (self->router))) {
-        error ("[routerId=%d] Cannot start the router.", Router_getId (self->router));
+    if (!(routerStart (self->router))) {
+        error ("[routerId=%d] Cannot start the router.", routerGetId (self->router));
         return false;
     }
 
@@ -208,31 +208,31 @@ Server_start (
 }
 
 uint16_t
-Server_getRouterId (
+serverGetRouterId (
     Server *self
 ) {
     return self->info.routerInfo.routerId;
 }
 
 void
-Server_free (
+serverFree (
     Server *self
 ) {
     for (int i = 0; i < self->info.workersInfoCount; i++) {
-        Worker_destroy (&self->workers[i]);
+        workerDestroy (&self->workers[i]);
     }
 
-    Router_destroy (&self->router);
+    routerDestroy (&self->router);
 }
 
 void
-Server_destroy (
+serverDestroy (
     Server **_self
 ) {
     Server *self = *_self;
 
     if (self) {
-        Server_free (self);
+        serverFree (self);
         free (self);
     }
 

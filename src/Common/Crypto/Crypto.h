@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file Crypto.h
+ * @file crypto.h
  * @brief Crypto contains cryptographic functions needed for the communication between the client and the server
  *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
@@ -16,16 +16,8 @@
 
 #pragma once
 
-// ---------- Includes ------------
 #include "R1EMU.h"
-#include "Common/Packet/Packet.h"
-
-// ---------- Defines -------------
-
-
-
-// ----------- Functions ------------
-
+#include "common/packet/packet.h"
 
 /**
  * @brief Unwrap the client packet header and decrypt the packet.
@@ -33,8 +25,4 @@
  * @param[in] packetSize A pointer to the crypted packet size
  * @return true on success, false otherwise
  */
-bool
-Crypto_decryptPacket (
-    uint8_t **packet,
-    size_t *packetSize
-);
+bool cryptoDecryptPacket(uint8_t **packet, size_t *packetSize);

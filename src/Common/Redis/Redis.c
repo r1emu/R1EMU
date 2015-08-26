@@ -37,7 +37,7 @@ struct Redis
 // ------ Extern function implementation -------
 
 Redis *
-Redis_new (
+redisNew (
     RedisStartupInfo *info
 ) {
     Redis *self;
@@ -46,8 +46,8 @@ Redis_new (
         return NULL;
     }
 
-    if (!Redis_init (self, info)) {
-        Redis_destroy (&self);
+    if (!redisInit (self, info)) {
+        redisDestroy (&self);
         error ("Redis failed to initialize.");
         return NULL;
     }
@@ -56,17 +56,17 @@ Redis_new (
 }
 
 bool
-Redis_init (
+redisInit (
     Redis *self,
     RedisStartupInfo *info
 ) {
-    RedisStartupInfo_init (&self->info, info->hostname, info->port);
+    redisStartupInfoInit (&self->info, info->hostname, info->port);
 
     return true;
 }
 
 bool
-RedisStartupInfo_init (
+redisStartupInfoInit (
     RedisStartupInfo *self,
     char *hostname,
     int port
@@ -78,7 +78,7 @@ RedisStartupInfo_init (
 }
 
 bool
-Redis_connect (
+redisConnect (
     Redis *self
 ) {
     RedisStartupInfo *info = &self->info;
@@ -102,11 +102,11 @@ Redis_connect (
 }
 
 bool
-Redis_flushDatabase (
+redisFlushDatabase (
     Redis *self
 ) {
     redisReply *reply = NULL;
-    reply = Redis_commandDbg (self, "FLUSHALL");
+    reply = redisCommandDbg (self, "FLUSHALL");
 
     if (!reply) {
         error ("Redis error encountered : The request is invalid.");
@@ -131,7 +131,7 @@ Redis_flushDatabase (
 }
 
 void
-Redis_printElements (
+redisPrintElements (
     redisReply **elements,
     size_t nbElements,
     const char **elementsName
@@ -153,7 +153,7 @@ Redis_printElements (
 }
 
 size_t
-Redis_anyElementIsNull (
+redisAnyElementIsNull (
     redisReply **elements,
     size_t nbElements
 ) {
@@ -167,7 +167,7 @@ Redis_anyElementIsNull (
 }
 
 redisReply *
-Redis_commandDbg (
+redisCommandDbg (
     Redis *self,
     char * format,
     ...
@@ -184,7 +184,7 @@ Redis_commandDbg (
 }
 
 void
-Redis_replyDestroy (
+redisReplyDestroy (
     redisReply **reply
 ) {
     if (*reply) {
@@ -263,19 +263,19 @@ Redis_set (
 */
 
 void
-RedisStartupInfo_free (
+redisStartupInfoFree (
     RedisStartupInfo *self
 ) {
     free (self->hostname);
 }
 
 void
-Redis_destroy (
+redisDestroy (
     Redis **_self
 ) {
     Redis *self = *_self;
 
-    RedisStartupInfo_free (&self->info);
+    redisStartupInfoFree (&self->info);
 
     if (self->context) {
         redisFree (self->context);

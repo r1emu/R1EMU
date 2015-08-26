@@ -26,7 +26,7 @@
 
 
 int
-str_getline (
+strGetLine (
     char *str,
     char *dest,
     int maxlen,
@@ -61,7 +61,7 @@ str_getline (
 }
 
 char **
-str_split (
+strSplit (
     char* a_str,
     const char a_delim
 ) {

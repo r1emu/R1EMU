@@ -24,7 +24,7 @@
 // ------ Extern function implementation ------
 
 void
-ClientPacket_unwrapHeader (
+clientPacketUnwrapHeader (
     uint8_t **packet,
     size_t *packetSize,
     ClientPacketHeader *header,
@@ -43,7 +43,7 @@ ClientPacket_unwrapHeader (
 }
 
 void
-CryptPacket_unwrapHeader (
+cryptPacketUnwrapHeader (
     uint8_t **packet,
     size_t *packetSize,
     CryptPacketHeader *header
@@ -55,7 +55,7 @@ CryptPacket_unwrapHeader (
 }
 
 void
-CryptPacket_getHeader (
+cryptPacketGetHeader (
     uint8_t *packet,
     CryptPacketHeader *header
 ) {
@@ -63,27 +63,27 @@ CryptPacket_getHeader (
 }
 
 void
-PacketNormalHeader_init (
+packetNormalHeaderInit (
     PacketNormalHeader *normalHeader,
     uint32_t subtype,
     uint32_t packetSize
 ) {
-    VariableSizePacketHeader_init (&normalHeader->variableSizeHeader, BC_NORMAL, packetSize);
+    variableSizePacketHeaderInit (&normalHeader->variableSizeHeader, BC_NORMAL, packetSize);
     normalHeader->subtype = subtype;
 }
 
 void
-VariableSizePacketHeader_init (
+variableSizePacketHeaderInit (
     VariableSizePacketHeader *variableSizeHeader,
     uint16_t packetType,
     uint32_t packetSize
 ) {
-    ServerPacketHeader_init (&variableSizeHeader->serverHeader, packetType);
+    serverPacketHeaderInit (&variableSizeHeader->serverHeader, packetType);
     variableSizeHeader->packetSize = packetSize;
 }
 
 void
-ServerPacketHeader_init (
+serverPacketHeaderInit (
     ServerPacketHeader *serverHeader,
     uint16_t packetType
 ) {

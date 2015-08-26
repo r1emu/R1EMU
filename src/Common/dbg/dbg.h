@@ -13,9 +13,9 @@
  * Provides debug functions with multiple levels and dump utilities.
  *
  */
+
 #pragma once
 
-// ---------- Includes ------------
 #include <stdio.h>
 #include <czmq.h>
 
@@ -27,8 +27,6 @@ typedef enum {
     DBG_LEVEL_SPECIAL,
 } DbgLevel;
 
-
-// ---------- Defines -------------
 /** Get the name of the module object from the filename. __FILE__ differs between GCC on MinGW and Linux. */
 #ifdef WIN32
 #define __FILENAME__ (((strrchr(__FILE__, '\\')) != NULL) ? &(strrchr(__FILE__, '\\'))[1] : __FILE__)
@@ -108,8 +106,7 @@ typedef enum {
         buffer_print_ex (buffer, size, prefix)
 
 #else
-
-    // Don't output anything if __DBG_ACTIVATED__ is not enabled
+    // don't output anything if __DBG_ACTIVATED__ is not enabled
 	#define dbg(format, ...)
 	#define warning(format, ...)
 	#define error(format, ...)
@@ -117,7 +114,6 @@ typedef enum {
 	#define buffer_print(format, ...)
 	#define special(format, ...)
 #endif
-
 
 /** Info level debug function. Not a debug information */
 #define info(format, ...)                                          \
@@ -139,8 +135,6 @@ typedef enum {
 #define info_blue(format, ...)                                         \
     dbg_exnl (DBG_LEVEL_SPECIAL, stdout, format, ##__VA_ARGS__)
 
-// ----------- Functions ------------
-
 /**
  * @brief Output a formated message to a chosen stream
  * @param level The debug level
@@ -148,11 +142,7 @@ typedef enum {
  * @param format the format of the message
  * @return
  */
-void _dbg (
-    int level,
-    char *format,
-    ...
-);
+void _dbg(int level, char *format, ...);
 
 /**
  * @brief Dump a buffer in the standard output
@@ -161,51 +151,27 @@ void _dbg (
  * @param prefix A string printed before each line of the dump (optional)
  * @return
  */
-void
-_buffer_print (
-    void *buffer,
-    int bufferSize,
-    char *prefix
-);
-
+void _buffer_print(void *buffer, int bufferSize, char *prefix);
 
 /**
  * @brief Redirect the default output of the debug messages to a chosen FILE
  * @param output The destination stream of the debug messages
  */
-void
-dbg_set_output (
-    FILE *output
-);
-
+void dbg_set_output(FILE *output);
 
 /**
  * @brief Close the custom debug file
  */
-void
-dbg_close (
-    void
-);
+void dbg_close(void);
 
-
-// Crash handlers
+// crash handlers
 #ifdef WIN32
-LONG WINAPI
-crashHandler (
-    EXCEPTION_POINTERS *ExceptionInfo
-);
+LONG WINAPI crashHandler(EXCEPTION_POINTERS *ExceptionInfo);
 #else
 #include <ucontext.h>
 #include <execinfo.h>
-void
-print_trace (
-    void
-);
 
-void
-crashHandler (
-    int sig,
-    siginfo_t *siginfo,
-    void *_context
-);
+void print_trace(void);
+void crashHandler(int sig, siginfo_t *siginfo, void *_context);
+
 #endif // WIN32

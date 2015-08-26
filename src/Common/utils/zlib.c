@@ -23,7 +23,7 @@
 
 // ------ Extern function implementation -------
 bool
-Zlib_compress (
+zlibCompress (
     Zlib *self,
     void *data,
     size_t dataSize
@@ -62,7 +62,7 @@ Zlib_compress (
 }
 
 bool
-Zlib_decompress (
+zlibDecompress (
     Zlib *self,
     void *data,
     size_t dataSize

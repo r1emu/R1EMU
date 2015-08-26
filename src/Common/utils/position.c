@@ -24,7 +24,7 @@
 // ------ Extern function implementation -------
 
 bool
-Math_isWithin2DManhattanDistance (
+mathIsWithin2DManhattanDistance (
     PositionXZ *pos1,
     PositionXZ *pos2,
     float distance
@@ -36,7 +36,7 @@ Math_isWithin2DManhattanDistance (
 }
 
 bool
-Math_isWithin2DCircleDistance (
+mathIsWithin2DCircleDistance (
     PositionXZ *pos1,
     PositionXZ *pos2,
     float distance

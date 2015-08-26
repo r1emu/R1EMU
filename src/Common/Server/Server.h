@@ -7,10 +7,8 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file Server.h
+ * @file server.h
  * @brief
- *
- *
  *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
  *          See LICENSE file for further information
@@ -18,17 +16,14 @@
 
 #pragma once
 
-// ---------- Includes ------------
 #include "R1EMU.h"
-#include "Router.h"
-#include "Worker.h"
+#include "router.h"
+#include "worker.h"
 
-// ---------- Defines -------------
-/** Router unique IDs */
-#define BARRACK_SERVER_ROUTER_ID ((uint16_t) -1)
-#define SOCIAL_SERVER_ROUTER_ID  ((uint16_t) -2)
+// router unique IDs
+#define BARRACK_SERVER_ROUTER_ID((uint16_t) -1)
+#define SOCIAL_SERVER_ROUTER_ID ((uint16_t) -2)
 
-// ------ Structure declaration -------
 typedef struct Server Server;
 
 typedef struct {
@@ -36,21 +31,14 @@ typedef struct {
     WorkerStartupInfo *workersInfo;
     int workersInfoCount;
     ServerType serverType;
-}   ServerStartupInfo;
-
-
-// ----------- Functions ------------
+} ServerStartupInfo;
 
 /**
  * @brief Allocate a new Server structure.
  * @param info An allocated ServerStartupInfo already initialized
  * @return A pointer to an allocated Server, or NULL if an error occured.
  */
-Server *
-Server_new (
-    ServerStartupInfo *info
-);
-
+Server *serverNew(ServerStartupInfo *info);
 
 /**
  * @brief Initialize an allocated Server structure.
@@ -58,12 +46,7 @@ Server_new (
  * @param info An allocated ServerStartupInfo already initialized
  * @return true on success, false otherwise.
  */
-bool
-Server_init (
-    Server *self,
-    ServerStartupInfo *info
-);
-
+bool serverInit(Server *self, ServerStartupInfo *info);
 
 /**
  * @brief Initialize an allocated ServerStartupInfo structure.
@@ -74,26 +57,19 @@ Server_init (
  * @param workersInfoCount The workersInfo elements count.
  * @return true on success, false otherwise.
  */
-bool
-ServerStartupInfo_init (
+bool serverStartupInfoInit(
     ServerStartupInfo *self,
     ServerType serverType,
     RouterStartupInfo *routerInfo,
     WorkerStartupInfo *workersInfo,
-    int workersInfoCount
-);
-
+    int workersInfoCount);
 
 /**
  * @brief Start a new Server
  * @param self An allocated Server to start
  * @return true on success, false otherwise.
  */
-bool
-Server_start (
-    Server *self
-);
-
+bool serverStart(Server *self);
 
 /**
  * @brief Launch a new Server process
@@ -101,37 +77,23 @@ Server_start (
  * @param executableName The executable name to launch
  * @return true on success, false otherwise.
  */
-bool
-Server_createProcess (
-    ServerStartupInfo *info,
-    char *executableName
-);
+bool serverCreateProcess(ServerStartupInfo *info, char *executableName);
 
 /**
  * @brief Get the routerId of the Server
  * @param self A pointer to an allocated Server.
  * @return The Router ID.
  */
-uint16_t
-Server_getRouterId (
-    Server *self
-);
+uint16_t serverGetRouterId(Server *self);
 
 /**
  * @brief Free an allocated Server structure.
  * @param self A pointer to an allocated Server.
  */
-void
-Server_free (
-    Server *self
-);
+void serverFree(Server *self);
 
 /**
  * @brief Free an allocated Server structure and nullify the content of the pointer.
  * @param self A pointer to an allocated Server.
  */
-void
-Server_destroy (
-    Server **self
-);
-
+void serverDestroy(Server **self);

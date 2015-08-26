@@ -26,7 +26,7 @@
 #define EPOCH_DIFF 11644473600LL
 
 uint64_t
-getfiletime (
+getFileTime (
     void
 ) {
     struct timeval tv;

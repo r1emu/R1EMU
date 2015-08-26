@@ -16,10 +16,9 @@
  *          See LICENSE file for further information
  */
 
-// ---------- Includes ------------
-#include "Worker.h"
-#include "Router.h"
-#include "EventServer.h"
+#include "worker.h"
+#include "router.h"
+#include "event_server.h"
 #include "Common/utils/random.h"
 #include "Common/Redis/Fields/RedisSession.h"
 #include "Common/Redis/Fields/RedisSocketSession.h"
@@ -177,7 +176,7 @@ Worker_getCryptedPacketInfo (
 // ------ Extern function implementation -------
 
 Worker *
-Worker_new (
+workerNew (
     WorkerStartupInfo *info
 ) {
     Worker *self;
@@ -186,8 +185,8 @@ Worker_new (
         return NULL;
     }
 
-    if (!Worker_init (self, info)) {
-        Worker_destroy (&self);
+    if (!workerInit (self, info)) {
+        workerDestroy (&self);
         error ("Worker failed to initialize.");
         return NULL;
     }
@@ -196,12 +195,12 @@ Worker_new (
 }
 
 bool
-Worker_init (
+workerInit (
     Worker *self,
     WorkerStartupInfo *info
 ) {
     // Make a private copy of the WorkerStartupInfo
-    if (!(WorkerStartupInfo_init (
+    if (!(workerStartupInfoInit (
         &self->info, info->workerId, info->routerId, info->serverType,
         info->globalServerIp, info->globalServerPort,
         &info->sqlInfo, &info->redisInfo,
@@ -214,12 +213,12 @@ Worker_init (
     // ===================================
     //          Initialize MySQL
     // ===================================
-    if (!(self->sqlConn = MySQL_new (&info->sqlInfo))) {
+    if (!(self->sqlConn = mySqlNew (&info->sqlInfo))) {
         error ("Cannot initialize a new MySQL connection.");
         return false;
     }
 
-    if (!(MySQL_connect (self->sqlConn))) {
+    if (!(mySqlConnect (self->sqlConn))) {
         error ("Cannot connect to the MySQL server.");
         return false;
     }
@@ -227,24 +226,24 @@ Worker_init (
     // ===================================
     //     Initialize Redis connection
     // ===================================
-    if (!(self->redis = Redis_new (&info->redisInfo))) {
+    if (!(self->redis = redisNew (&info->redisInfo))) {
         error ("Cannot initialize a new Redis connection.");
         return false;
     }
 
-    if (!(Redis_connect (self->redis))) {
+    if (!(redisConnect (self->redis))) {
         error ("Cannot connect to the Redis server.");
         return false;
     }
 
     // Initialize random seed
-    self->seed = R1EMU_seed_random (self->info.routerId);
+    self->seed = r1emuSeedRandom (self->info.routerId);
 
     return true;
 }
 
 bool
-WorkerStartupInfo_init (
+workerStartupInfoInit (
     WorkerStartupInfo *self,
     uint16_t workerId,
     uint16_t routerId,
@@ -267,12 +266,12 @@ WorkerStartupInfo_init (
 
     self->globalServerPort = globalServerPort;
 
-    if (!(RedisStartupInfo_init (&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
+    if (!(redisStartupInfoInit (&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
         error ("Cannot initialize Redis Start up info.");
         return false;
     }
 
-    if (!(MySQLStartupInfo_init (&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
+    if (!(mySqlStartupInfoInit (&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
         error ("Cannot initialize MySQL start up info.");
         return false;
     }
@@ -309,7 +308,7 @@ Worker_processClientPacket (
     uint8_t sessionKeyStr [SOCKET_SESSION_ID_SIZE];
 
     // Generate the socketId key
-    SocketSession_genSessionKey (zframe_data (sessionKeyFrame), sessionKeyStr);
+    socketSessionDestroyGenSessionKey (zframe_data (sessionKeyFrame), sessionKeyStr);
 
     // Request the Session
     RedisSessionKey sessionKey = {
@@ -318,7 +317,7 @@ Worker_processClientPacket (
             .sessionKey = sessionKeyStr
         }
     };
-    if (!(Redis_getSession (self->redis, &sessionKey, &session))) {
+    if (!(redisGetSession (self->redis, &sessionKey, &session))) {
         error ("Cannot retrieve a Game Session.");
         result = false;
         goto cleanup;
@@ -401,7 +400,7 @@ Worker_processOneRequest (
 ) {
     // Decrypt the packet
     if (isCrypted) {
-        if (!(Crypto_decryptPacket (&packet, &packetSize))) {
+        if (!(cryptoDecryptPacket (&packet, &packetSize))) {
             error ("Cannot decrypt the client packet.");
             return false;
         }
@@ -419,7 +418,7 @@ Worker_processOneRequest (
         break;
 
         case PACKET_HANDLER_UPDATE_SESSION:
-            if (!(Redis_updateSession (self->redis, session))) {
+            if (!(redisUpdateSession (self->redis, session))) {
                 error ("Cannot update the Session.");
                 return false;
             }
@@ -432,7 +431,7 @@ Worker_processOneRequest (
                     .sessionKey = session->socket.sessionKey
                 }
             };
-            if (!(Redis_flushSession (self->redis, &sessionKey))) {
+            if (!(redisFlushSession (self->redis, &sessionKey))) {
                 error ("Cannot delete the Session.");
                 return false;
             }
@@ -459,7 +458,7 @@ Worker_handlePacket (
 
     // Read the packet
     ClientPacketHeader header;
-    ClientPacket_unwrapHeader (&packet, &packetSize, &header, isCrypted);
+    clientPacketUnwrapHeader (&packet, &packetSize, &header, isCrypted);
 
     // Get the corresponding packet handler
     if (header.type > handlersCount) {
@@ -503,7 +502,7 @@ Worker_getCryptedPacketInfo (
             }
 
             // Unwrap the crypt packet header, and check the cryptHeader size
-            CryptPacket_getHeader (packet, cryptHeader);
+            cryptPacketGetHeader (packet, cryptHeader);
             if ((packetSize - sizeof (CryptPacketHeader)) < cryptHeader->plainSize) {
                 error ("The real packet plainSize (0x%x) is inferior to the header plainSize (0x%x). Ignore request.",
                     packetSize - sizeof (CryptPacketHeader), cryptHeader->plainSize);
@@ -530,10 +529,10 @@ Worker_getCryptedPacketInfo (
 
 
 bool
-Worker_start (
+workerStart (
     Worker *self
 ) {
-    if (zthread_new (Worker_mainLoop, self) != 0) {
+    if (zthread_new (workerMainLoop, self) != 0) {
         error ("Cannot create Server worker ID = %d.", self->info.workerId);
         return false;
     }
@@ -543,7 +542,7 @@ Worker_start (
 
 
 void *
-Worker_mainLoop (
+workerMainLoop (
     void *arg
 ) {
     zpoller_t *poller = NULL;
@@ -757,7 +756,7 @@ cleanup:
 }
 
 bool
-Worker_dispatchEvent (
+workerDispatchEvent (
     Worker *self,
     EventServerType eventType,
     void *event,
@@ -791,27 +790,27 @@ void
 WorkerStartupInfo_free (
     WorkerStartupInfo *self
 ) {
-    MySQLStartupInfo_free (&self->sqlInfo);
-    RedisStartupInfo_free (&self->redisInfo);
+    mySqlStartupInfoFree (&self->sqlInfo);
+    redisStartupInfoFree (&self->redisInfo);
     free (self->globalServerIp);
 }
 
 void
-Worker_free (
+workerFree (
     Worker *self
 ) {
-    Redis_destroy (&self->redis);
-    MySQL_destroy (&self->sqlConn);
+    redisDestroy (&self->redis);
+    mySqlDestroy (&self->sqlConn);
 }
 
 void
-Worker_destroy (
+workerDestroy (
     Worker **_self
 ) {
     Worker *self = *_self;
 
     if (self) {
-        Worker_free (self);
+        workerFree (self);
         free (self);
     }
 

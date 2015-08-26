@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file Commander.h
+ * @file commander.h
  * @brief Commander contains all character related functions
  *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
@@ -16,15 +16,11 @@
 
 #pragma once
 
-// ---------- Includes ------------
 #include "R1EMU.h"
 
-// ---------- Defines -------------
 #define COMMANDER_NAME_SIZE 64
 #define COMMANDER_FAMILY_NAME_SIZE 64
 #define COMMANDER_HEIGHT_JUMP 350.0f
-
-// ------ Structure declaration -------
 
 #pragma pack(push, 1)
 /**
@@ -58,7 +54,6 @@ typedef struct CommanderEquipment {
 /**
  * @brief CommanderInfo is the struct of a commander.
  */
-
 typedef struct Commander
 {
     uint8_t commanderName [COMMANDER_NAME_SIZE+1];
@@ -74,7 +69,7 @@ typedef struct Commander
     CommanderEquipment equipment;
     uint16_t hairType;
     uint16_t pose;
-}   Commander;
+} Commander;
 
 typedef struct CommanderInfo
 {
@@ -93,7 +88,7 @@ typedef struct CommanderInfo
     uint32_t maxStamina;
     uint16_t unk6;
     uint16_t unk7;
-}   CommanderInfo;
+} CommanderInfo;
 #pragma pack(pop)
 
 typedef struct CommanderCreateInfo {
@@ -127,8 +122,7 @@ typedef enum CommanderClassId
     COMMANDER_CLASS_CLERIC  = 10005,
     COMMANDER_CLASS_MAGE    = 10006,
 
-}   CommanderClassId;
-
+} CommanderClassId;
 
 typedef enum CommanderGender
 {
@@ -136,29 +130,19 @@ typedef enum CommanderGender
     COMMANDER_GENDER_FEMALE = 2,
     COMMANDER_GENDER_BOTH   = 3,
 
-}   CommanderGender;
-
+} CommanderGender;
 
 typedef enum CommanderHair
 {
     COMMANDER_HAIR_COUNT
-}   CommanderHair;
-
-// ----------- Functions ------------
+} CommanderHair;
 
 /**
  * @brief Initialize a commander with basic information
  */
-
-void
-CommanderInfo_init (
-    CommanderInfo *commander
-);
+void commanderInfoInit(CommanderInfo *commander);
 
 /**
  * @brief Dump a CommanderInfo in the console
  */
-void
-CommanderInfo_print (
-    CommanderInfo *commander
-);
+void commanderInfoPrint(CommanderInfo *commander);

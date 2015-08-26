@@ -18,7 +18,7 @@
 
 #pragma once
 
-// Integers printf format
+// integers printf format
 #include <inttypes.h>
 
 // CZMQ environment
@@ -30,15 +30,15 @@
 // MySQL environment
 #include <mysql/mysql.h>
 
-// Redis environment
+// redis environment
 #include <hiredis.h>
 
 // zlib environment
 #include <zlib.h>
 
-// Debugging environment
+// debugging environment
 /** If defined, the debugging functions will be included in the executable */
 #include "Common/dbg/dbg.h"
 
-// Utils
+// utils
 #include "Common/utils/utils.h"

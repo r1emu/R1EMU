@@ -39,7 +39,7 @@ static uint32_t mix (uint32_t a, uint32_t b, uint32_t c)
 
 // ------ Extern function implementation
 int
-rand_r (
+randR (
     unsigned int *seed
 ) {
     // http://fossies.org/dox/glibc-2.21/rand__r_8c_source.html
@@ -61,7 +61,7 @@ rand_r (
 }
 
 uint32_t
-R1EMU_seed_random (
+r1emuSeedRandom (
     uint32_t customData
 ) {
     int pid, tid;
@@ -82,18 +82,18 @@ R1EMU_seed_random (
 }
 
 uint32_t
-R1EMU_generate_random (
+r1emuGenerateRandom (
     uint32_t *seed
 ) {
-    return rand_r (seed);
+    return randR (seed);
 }
 
 uint64_t
-R1EMU_generate_random64 (
+r1emuGenerateRandom64 (
     uint32_t *seed
 ) {
-    uint32_t low  = R1EMU_generate_random (seed);
-    uint64_t high = R1EMU_generate_random (seed);
+    uint32_t low  = r1emuGenerateRandom (seed);
+    uint64_t high = r1emuGenerateRandom (seed);
     high <<= (sizeof (uint32_t) * 8 - 1);
     return high | low;
 }
