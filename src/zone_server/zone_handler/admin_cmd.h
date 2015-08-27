@@ -7,10 +7,8 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file R1EMU.h
- * @brief Global variables shared between all the files
- *
- *  It also contains utilities functions.
+ * @file admin_cmd.h
+ * @brief
  *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
  *          See LICENSE file for further information
@@ -18,27 +16,16 @@
 
 #pragma once
 
-// integers printf format
-#include <inttypes.h>
+#include "R1EMU.h"
+#include "common/session/session.h"
+#include "common/server/worker.h"
 
-// CZMQ environment
-#include <zmq.h>
-#include <czmq.h>
-/** This is only for differenciate ZMQ RAW ROUTER from ZMQ ROUTER */
-#define ZMQ_RAW_ROUTER ZMQ_ROUTER
+/**
+ * @brief : Decide which admin commands is going to be executed based on the command line
+ */
+void adminCmdProcess(Worker *self, char *command, Session *session,zmsg_t *replyMsg);
 
-// MySQL environment
-#include <mysql/mysql.h>
-
-// redis environment
-#include <hiredis.h>
-
-// zlib environment
-#include <zlib.h>
-
-// debugging environment
-/** If defined, the debugging functions will be included in the executable */
-#include "common/dbg/dbg.h"
-
-// utils
-#include "common/utils/utils.h"
+/**
+ * @brief : Spawn a commander at the place of the current commander.
+ */
+void adminCmdSpawnPc(Worker *self, Session *session, zmsg_t *replyMsg);

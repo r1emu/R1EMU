@@ -2,27 +2,27 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="GlobalServer" />
+		<Option title="global_server" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="../../../bin/GlobalServer" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../bin/global_server" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../../bin/" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
-				<Option compiler="gcc" />
+				<Option compiler="mingw64" />
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-D__DBG_ACTIVATED__" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="../../../bin/GlobalServer" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../bin/global_server" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../../bin/" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
-				<Option compiler="gcc" />
+				<Option compiler="mingw64" />
 			</Target>
 		</Build>
 		<Compiler>
@@ -49,182 +49,182 @@
 			<Add directory="../../../lib/x64" />
 			<Add directory="/usr/local/mysql/lib/" />
 		</Linker>
-		<Unit filename="../../../src/BarrackServer/BarrackHandler/BarrackBuilder.c">
+		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_builder.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/BarrackServer/BarrackHandler/BarrackBuilder.h" />
-		<Unit filename="../../../src/BarrackServer/BarrackHandler/BarrackHandler.c">
+		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_builder.h" />
+		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_handler.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/BarrackServer/BarrackHandler/BarrackHandler.h" />
-		<Unit filename="../../../src/BarrackServer/BarrackServer.c">
+		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_handler.h" />
+		<Unit filename="../../../src/barrack_server/barrack_server.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/BarrackServer/BarrackServer.h" />
-		<Unit filename="../../../src/Common/Commander/Commander.c">
+		<Unit filename="../../../src/barrack_server/barrack_server.h" />
+		<Unit filename="../../../src/common/commander/commander.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Commander/Commander.h" />
-		<Unit filename="../../../src/Common/Crypto/Crypto.c">
+		<Unit filename="../../../src/common/commander/commander.h" />
+		<Unit filename="../../../src/common/crypto/crypto.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Crypto/Crypto.h" />
-		<Unit filename="../../../src/Common/Graph/Graph.c">
+		<Unit filename="../../../src/common/crypto/crypto.h" />
+		<Unit filename="../../../src/common/graph/graph.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Graph/Graph.h" />
-		<Unit filename="../../../src/Common/MySQL/Fields/MySQLSession.c">
+		<Unit filename="../../../src/common/graph/graph.h" />
+		<Unit filename="../../../src/common/mysql/fields/mysql_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/MySQL/Fields/MySQLSession.h" />
-		<Unit filename="../../../src/Common/MySQL/MySQL.c">
+		<Unit filename="../../../src/common/mysql/fields/mysql_session.h" />
+		<Unit filename="../../../src/common/mysql/mysql.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/MySQL/MySQL.h" />
-		<Unit filename="../../../src/Common/Packet/Packet.c">
+		<Unit filename="../../../src/common/mysql/mysql.h" />
+		<Unit filename="../../../src/common/packet/packet.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Packet/Packet.h" />
-		<Unit filename="../../../src/Common/Packet/PacketStream.c">
+		<Unit filename="../../../src/common/packet/packet.h" />
+		<Unit filename="../../../src/common/packet/packet_stream.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Packet/PacketStream.h" />
-		<Unit filename="../../../src/Common/Packet/PacketType.c">
+		<Unit filename="../../../src/common/packet/packet_stream.h" />
+		<Unit filename="../../../src/common/packet/packet_type.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Packet/PacketType.h" />
-		<Unit filename="../../../src/Common/Redis/Fields/RedisGameSession.c">
+		<Unit filename="../../../src/common/packet/packet_type.h" />
+		<Unit filename="../../../src/common/redis/fields/redis_game_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Redis/Fields/RedisGameSession.h" />
-		<Unit filename="../../../src/Common/Redis/Fields/RedisSession.c">
+		<Unit filename="../../../src/common/redis/fields/redis_game_session.h" />
+		<Unit filename="../../../src/common/redis/fields/redis_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Redis/Fields/RedisSession.h" />
-		<Unit filename="../../../src/Common/Redis/Fields/RedisSocketSession.c">
+		<Unit filename="../../../src/common/redis/fields/redis_session.h" />
+		<Unit filename="../../../src/common/redis/fields/redis_socket_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Redis/Fields/RedisSocketSession.h" />
-		<Unit filename="../../../src/Common/Redis/Redis.c">
+		<Unit filename="../../../src/common/redis/fields/redis_socket_session.h" />
+		<Unit filename="../../../src/common/redis/redis.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Redis/Redis.h" />
-		<Unit filename="../../../src/Common/Server/EventHandler.c">
+		<Unit filename="../../../src/common/redis/redis.h" />
+		<Unit filename="../../../src/common/server/event_handler.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Server/EventHandler.h" />
-		<Unit filename="../../../src/Common/Server/EventServer.c">
+		<Unit filename="../../../src/common/server/event_handler.h" />
+		<Unit filename="../../../src/common/server/event_server.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Server/EventServer.h" />
-		<Unit filename="../../../src/Common/Server/Router.c">
+		<Unit filename="../../../src/common/server/event_server.h" />
+		<Unit filename="../../../src/common/server/router.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Server/Router.h" />
-		<Unit filename="../../../src/Common/Server/RouterMonitor.c">
+		<Unit filename="../../../src/common/server/router.h" />
+		<Unit filename="../../../src/common/server/router_monitor.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Server/RouterMonitor.h" />
-		<Unit filename="../../../src/Common/Server/Server.c">
+		<Unit filename="../../../src/common/server/router_monitor.h" />
+		<Unit filename="../../../src/common/server/server.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Server/Server.h" />
-		<Unit filename="../../../src/Common/Server/ServerFactory.c">
+		<Unit filename="../../../src/common/server/server.h" />
+		<Unit filename="../../../src/common/server/server_factory.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Server/ServerFactory.h" />
-		<Unit filename="../../../src/Common/Server/Worker.c">
+		<Unit filename="../../../src/common/server/server_factory.h" />
+		<Unit filename="../../../src/common/server/worker.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Server/Worker.h" />
-		<Unit filename="../../../src/Common/Session/AccountSession.c">
+		<Unit filename="../../../src/common/server/worker.h" />
+		<Unit filename="../../../src/common/session/account_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Session/AccountSession.h" />
-		<Unit filename="../../../src/Common/Session/BarrackSession.c">
+		<Unit filename="../../../src/common/session/account_session.h" />
+		<Unit filename="../../../src/common/session/barrack_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Session/BarrackSession.h" />
-		<Unit filename="../../../src/Common/Session/CommanderSession.c">
+		<Unit filename="../../../src/common/session/barrack_session.h" />
+		<Unit filename="../../../src/common/session/commander_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Session/CommanderSession.h" />
-		<Unit filename="../../../src/Common/Session/GameSession.c">
+		<Unit filename="../../../src/common/session/commander_session.h" />
+		<Unit filename="../../../src/common/session/game_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Session/GameSession.h" />
-		<Unit filename="../../../src/Common/Session/Session.c">
+		<Unit filename="../../../src/common/session/game_session.h" />
+		<Unit filename="../../../src/common/session/session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Session/Session.h" />
-		<Unit filename="../../../src/Common/Session/SocketSession.c">
+		<Unit filename="../../../src/common/session/session.h" />
+		<Unit filename="../../../src/common/session/socket_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/Session/SocketSession.h" />
-		<Unit filename="../../../src/Common/dbg/dbg.c">
+		<Unit filename="../../../src/common/session/socket_session.h" />
+		<Unit filename="../../../src/common/dbg/dbg.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/dbg/dbg.h" />
-		<Unit filename="../../../src/Common/utils/math.c">
+		<Unit filename="../../../src/common/dbg/dbg.h" />
+		<Unit filename="../../../src/common/utils/math.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/utils/math.h" />
-		<Unit filename="../../../src/Common/utils/position.c">
+		<Unit filename="../../../src/common/utils/math.h" />
+		<Unit filename="../../../src/common/utils/position.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/utils/position.h" />
-		<Unit filename="../../../src/Common/utils/random.c">
+		<Unit filename="../../../src/common/utils/position.h" />
+		<Unit filename="../../../src/common/utils/random.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/utils/random.h" />
-		<Unit filename="../../../src/Common/utils/string.c">
+		<Unit filename="../../../src/common/utils/random.h" />
+		<Unit filename="../../../src/common/utils/string.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/utils/string.h" />
-		<Unit filename="../../../src/Common/utils/time.c">
+		<Unit filename="../../../src/common/utils/string.h" />
+		<Unit filename="../../../src/common/utils/time.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/utils/time.h" />
-		<Unit filename="../../../src/Common/utils/utils.c">
+		<Unit filename="../../../src/common/utils/time.h" />
+		<Unit filename="../../../src/common/utils/utils.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/utils/utils.h" />
-		<Unit filename="../../../src/Common/utils/zlib.c">
+		<Unit filename="../../../src/common/utils/utils.h" />
+		<Unit filename="../../../src/common/utils/zlib.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/Common/utils/zlib.h" />
-		<Unit filename="../../../src/GlobalServer/GlobalServer.c">
+		<Unit filename="../../../src/common/utils/zlib.h" />
+		<Unit filename="../../../src/global_server/global_server.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/GlobalServer/GlobalServer.h" />
-		<Unit filename="../../../src/GlobalServer/main.c">
+		<Unit filename="../../../src/global_server/global_server.h" />
+		<Unit filename="../../../src/global_server/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/R1EMU.h" />
-		<Unit filename="../../../src/SocialServer/SocialHandler/SocialHandler.c">
+		<Unit filename="../../../src/social_server/social_handler/social_handler.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/SocialServer/SocialHandler/SocialHandler.h" />
-		<Unit filename="../../../src/SocialServer/SocialServer.c">
+		<Unit filename="../../../src/social_server/social_handler/social_handler.h" />
+		<Unit filename="../../../src/social_server/social_server.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/SocialServer/SocialServer.h" />
-		<Unit filename="../../../src/ZoneServer/ZoneHandler/AdminCmd.c">
+		<Unit filename="../../../src/social_server/social_server.h" />
+		<Unit filename="../../../src/zone_server/zone_handler/admin_cmd.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/ZoneServer/ZoneHandler/AdminCmd.h" />
-		<Unit filename="../../../src/ZoneServer/ZoneHandler/ZoneBuilder.c">
+		<Unit filename="../../../src/zone_server/zone_handler/admin_cmd.h" />
+		<Unit filename="../../../src/zone_server/zone_handler/zone_builder.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/ZoneServer/ZoneHandler/ZoneBuilder.h" />
-		<Unit filename="../../../src/ZoneServer/ZoneHandler/ZoneHandler.c">
+		<Unit filename="../../../src/zone_server/zone_handler/zone_builder.h" />
+		<Unit filename="../../../src/zone_server/zone_handler/zone_handler.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/ZoneServer/ZoneHandler/ZoneHandler.h" />
-		<Unit filename="../../../src/ZoneServer/ZoneServer.c">
+		<Unit filename="../../../src/zone_server/zone_handler/zone_handler.h" />
+		<Unit filename="../../../src/zone_server/zone_server.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/ZoneServer/ZoneServer.h" />
+		<Unit filename="../../../src/zone_server/zone_server.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
