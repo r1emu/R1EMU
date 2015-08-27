@@ -43,13 +43,13 @@ Server *serverFactoryCreateServer (
         sqlHostname, sqlUsername, sqlPassword, sqlDatabase,
         redisHostname, redisPort
     ))) {
-        error ("Cannot build a ServerStartupInfo.");
+        error("Cannot build a ServerStartupInfo.");
         return NULL;
     }
 
     // Allocate a new server
     if (!(server = serverNew (&serverInfo))) {
-        error ("Cannot allocate a new Server.");
+        error("Cannot allocate a new Server.");
         return NULL;
     }
 
@@ -77,28 +77,28 @@ serverFactoryInitServerInfo (
     // Initialize MySQL start up information
     MySQLStartupInfo sqlInfo;
     if (!(mySqlStartupInfoInit (&sqlInfo, sqlHostname, sqlUsername, sqlPassword, sqlDatabase))) {
-        error ("Cannot initialize correctly the MySQL start up information.");
+        error("Cannot initialize correctly the MySQL start up information.");
         return false;
     }
 
     // Initialize Redis start up information
     RedisStartupInfo redisInfo;
-    if (!(redisStartupInfoInit (&redisInfo, redisHostname, redisPort))) {
-        error ("Cannot initialize correctly the Redis start up information.");
+    if (!(redisStartupInfoInit(&redisInfo, redisHostname, redisPort))) {
+        error("Cannot initialize correctly the Redis start up information.");
         return false;
     }
 
     // Initialize Router start up information
     RouterStartupInfo routerInfo;
     if (!(routerStartupInfoInit (&routerInfo, routerId, routerIp, ports, portsCount, workersCount, &redisInfo, &sqlInfo))) {
-        error ("Cannot initialize correctly the Router start up information.");
+        error("Cannot initialize correctly the Router start up information.");
         return false;
     }
 
     // Initialize Worker start up information
     WorkerStartupInfo *workersInfo;
-    if (!(workersInfo = malloc (sizeof (WorkerStartupInfo) * workersCount))) {
-        error ("Cannot allocate an array of %d WorkerStartUpInfo.", workersCount);
+    if (!(workersInfo = malloc (sizeof(WorkerStartupInfo) * workersCount))) {
+        error("Cannot allocate an array of %d WorkerStartUpInfo.", workersCount);
         return false;
     }
 
@@ -124,7 +124,7 @@ serverFactoryInitServerInfo (
         break;
 
         default :
-            error ("Unknown serverType : %d !", serverType);
+            error("Unknown serverType : %d !", serverType);
         break;
     }
 
@@ -137,14 +137,14 @@ serverFactoryInitServerInfo (
             &sqlInfo, &redisInfo,
             packetHandlers, packetHandlersCount)
         )) {
-            error ("Cannot initialize a Worker.");
+            error("Cannot initialize a Worker.");
             return false;
         }
     }
 
     // Initialize Server start up information
     if (!(serverStartupInfoInit (serverInfo, serverType, &routerInfo, workersInfo, workersCount))) {
-        error ("Cannot initialize correctly the Server start up information.");
+        error("Cannot initialize correctly the Server start up information.");
         return false;
     }
 

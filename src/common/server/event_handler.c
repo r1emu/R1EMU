@@ -118,7 +118,9 @@ bool eventHandlerJump(EventServer *self, GameEventJump *event) {
     zlist_t *clientsAround = NULL;
 
     // update client position and get the clients around
-    if (!(eventServerUpdateClientPosition(self, &event->updatePosEvent, &event->updatePosEvent.commanderInfo.pos, &clientsAround))) {
+    if (!(eventServerUpdateClientPosition(
+        self, &event->updatePosEvent, &event->updatePosEvent.commanderInfo.pos, &clientsAround)))
+    {
         error("Cannot update player %s position.", event->updatePosEvent.sessionKey);
         status = false;
         goto cleanup;
@@ -130,11 +132,7 @@ bool eventHandlerJump(EventServer *self, GameEventJump *event) {
     // build the packet for the clients around
     msg = zmsg_new();
 
-    zoneBuilderJump(
-        event->updatePosEvent.commanderInfo.pcId,
-        event->height,
-        msg
-    );
+    zoneBuilderJump(event->updatePosEvent.commanderInfo.pcId, event->height, msg);
 
     // send the packet
     zframe_t *frame = zmsg_first(msg);
@@ -180,7 +178,7 @@ bool eventHandlerChat(EventServer *self, GameEventChat *event) {
     zframe_t *frame = zmsg_first (msg);
 
     if (!(eventServerSendToClients (self, clientsAround, zframe_data(frame), zframe_size (frame)))) {
-        error ("Failed to send the packet to the clients.");
+        error("Failed to send the packet to the clients.");
         status = false;
         goto cleanup;
     }

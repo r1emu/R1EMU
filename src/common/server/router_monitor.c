@@ -75,13 +75,13 @@ routerMonitorNew (
 ) {
     RouterMonitor *self;
 
-    if ((self = calloc (1, sizeof (RouterMonitor))) == NULL) {
+    if ((self = calloc(1, sizeof(RouterMonitor))) == NULL) {
         return NULL;
     }
 
     if (!routerMonitorInit (self, info)) {
         routerMonitorDestroy (&self);
-        error ("RouterMonitor failed to initialize.");
+        error("RouterMonitor failed to initialize.");
         return NULL;
     }
 
@@ -99,17 +99,17 @@ routerMonitorInit (
 
     // Allocate the connected clients hashtable
     if (!(self->connected = zhash_new ())) {
-        error ("Cannot allocate a new connected clients hashtable.");
+        error("Cannot allocate a new connected clients hashtable.");
         return false;
     }
 
     if (!(self->redis = redisNew (&self->info.redisInfo))) {
-        error ("Cannot initialize the Redis connection.");
+        error("Cannot initialize the Redis connection.");
         return false;
     }
 
     if (!(self->sql = mySqlNew (&self->info.sqlInfo))) {
-        error ("Cannot initialize the MySQL connection.");
+        error("Cannot initialize the MySQL connection.");
         return false;
     }
 
@@ -126,13 +126,13 @@ routerMonitorStartupInfoNew (
 ) {
     RouterMonitorStartupInfo *self;
 
-    if ((self = calloc (1, sizeof (RouterMonitorStartupInfo))) == NULL) {
+    if ((self = calloc(1, sizeof(RouterMonitorStartupInfo))) == NULL) {
         return NULL;
     }
 
     if (!routerMonitorStartupInfoInit (self, frontend, routerId, redisInfo, sqlInfo)) {
         routerMonitorStartupInfoDestroy (&self);
-        error ("RouterMonitorStartupInfo failed to initialize.");
+        error("RouterMonitorStartupInfo failed to initialize.");
         return NULL;
     }
 
@@ -151,13 +151,13 @@ routerMonitorStartupInfoInit (
     self->frontend = frontend;
     self->routerId = routerId;
 
-    if (!(redisStartupInfoInit (&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
-        error ("Cannot initialize Redis Start up info.");
+    if (!(redisStartupInfoInit(&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
+        error("Cannot initialize Redis Start up info.");
         return false;
     }
 
     if (!(mySqlStartupInfoInit (&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
-        error ("Cannot initialize MySQL start up info.");
+        error("Cannot initialize MySQL start up info.");
         return false;
     }
 
@@ -177,7 +177,7 @@ RouterMonitor_monitor (
     zframe_t *header;
 
     // Receive the message from the Router
-    if (!(msg = zmsg_recv (monitor))) {
+    if (!(msg = zmsg_recv(monitor))) {
         // Interrupt
         result = 0;
         goto cleanup;
@@ -185,7 +185,7 @@ RouterMonitor_monitor (
 
     // Get the frame header of the message
     if (!(header = zmsg_first (msg))) {
-        error ("Frame header cannot be retrieved.");
+        error("Frame header cannot be retrieved.");
         result = -1;
         goto cleanup;
     }
@@ -195,7 +195,7 @@ RouterMonitor_monitor (
 
         // Get the socket file descriptor
         zframe_t *fdFrame = zmsg_next (msg);
-        uint64_t fdClient = strtoull (zframe_data (fdFrame), NULL, 10);
+        uint64_t fdClient = strtoull(zframe_data (fdFrame), NULL, 10);
 
         // Check if this file descriptor is still used
         uint8_t fdClientKey [ROUTER_MONITOR_FDKEY_SIZE];
@@ -206,7 +206,7 @@ RouterMonitor_monitor (
         if ((clientFrame = zhash_lookup (self->connected, fdClientKey)) != NULL) {
             uint8_t sessionKey [ROUTER_MONITOR_FDKEY_SIZE];
             socketSessionDestroyGenSessionKey (zframe_data (clientFrame), sessionKey);
-            error ("The client FD=%d just connected, but another client has still this FD (previously : %s)",
+            error("The client FD=%d just connected, but another client has still this FD (previously : %s)",
                    fdClient, sessionKey);
             // TODO : Decide what to do in this case
             result = 0;
@@ -219,7 +219,7 @@ RouterMonitor_monitor (
 
         // Get the socket file descriptor
         zframe_t *fdFrame = zmsg_next (msg);
-        uint64_t fdClient = strtoull (zframe_data (fdFrame), NULL, 10);
+        uint64_t fdClient = strtoull(zframe_data (fdFrame), NULL, 10);
 
         // Check if this file descriptor is already used
         uint8_t fdClientKey [ROUTER_MONITOR_FDKEY_SIZE];
@@ -230,8 +230,8 @@ RouterMonitor_monitor (
             // The client just disconnected, but no client has been registred using this fd
             // It happens when the client connects but send no data to the server
             // TODO : Decide what to do in this case, probably nothing
-            warning ("Cannot find the clientFrame when disconnecting.");
-            dbg ("DISCONNECTED : Key = %s", fdClientKey);
+            warning("Cannot find the clientFrame when disconnecting.");
+            dbg("DISCONNECTED : Key = %s", fdClientKey);
         }
         else {
             // Everything is okay here, disconnect gracefully the client
@@ -251,13 +251,13 @@ RouterMonitor_monitor (
             zhash_delete (self->connected, fdClientKey);
             zframe_destroy (&clientFrame);
 
-            info ("%s session successfully flushed !", sessionKeyStr);
+            info("%s session successfully flushed !", sessionKeyStr);
         }
     }
 
 cleanup:
     // Cleanup
-    zmsg_destroy (&msg);
+    zmsg_destroy(&msg);
 
     return result;
 }
@@ -275,7 +275,7 @@ RouterMonitor_subscribe (
     int result = 0;
 
     // Receive the message from the Router
-    if (!(msg = zmsg_recv (monitor))) {
+    if (!(msg = zmsg_recv(monitor))) {
         // Interrupt
         result = 0;
         goto cleanup;
@@ -283,7 +283,7 @@ RouterMonitor_subscribe (
 
     // Get the frame header of the message
     if (!(header = zmsg_first (msg))) {
-        error ("Frame header cannot be retrieved.");
+        error("Frame header cannot be retrieved.");
         result = -1;
         goto cleanup;
     }
@@ -313,9 +313,9 @@ RouterMonitor_subscribe (
                 if (!zframe_eq (clientFrame, zmsg_next (msg))) {
                     // Huho.
                     // TODO : Decide what to do
-                    error ("==================================================================");
-                    error ("The registred fd changed identity. That's really not a good thing.");
-                    error ("==================================================================");
+                    error("==================================================================");
+                    error("The registred fd changed identity. That's really not a good thing.");
+                    error("==================================================================");
                     result = -1;
                     goto cleanup;
                 } else {
@@ -325,12 +325,12 @@ RouterMonitor_subscribe (
         } break;
 
         default:
-            warning ("Server subscriber received an unknown header : %x", packetHeader);
+            warning("Server subscriber received an unknown header : %x", packetHeader);
         break;
     }
 
 cleanup:
-    zmsg_destroy (&msg);
+    zmsg_destroy(&msg);
 
     return result;
 }
@@ -350,19 +350,19 @@ routerMonitorStart (
 
     // Connect to the Redis database
     if (!(redisConnection (self.redis))) {
-        error ("Cannot connect to Redis.");
+        error("Cannot connect to Redis.");
         goto cleanup;
     }
 
     // Connect to the MySQL database
     if (!(mySqlConnect (self.sql))) {
-        error ("Cannot connect to MySQL.");
+        error("Cannot connect to MySQL.");
         goto cleanup;
     }
 
     // Set up the Server Monitor Actor
     if (!(servermon = zactor_new (zmonitor, self.info.frontend))) {
-        error ("Cannot allocate a new server monitor actor.");
+        error("Cannot allocate a new server monitor actor.");
         goto cleanup;
     }
     zstr_sendx (servermon, "LISTEN", "ACCEPTED", "DISCONNECTED", NULL);
@@ -371,40 +371,40 @@ routerMonitorStart (
 
     // Set up the Server Monitor Subscriber that will receive request from the Router
     if (!(requests = zsock_new (ZMQ_SUB))) {
-        error ("Cannot allocate a request subscriber socket.");
+        error("Cannot allocate a request subscriber socket.");
         goto cleanup;
     }
 
     if (zsock_connect (requests, ROUTER_MONITOR_SUBSCRIBER_ENDPOINT, self.info.routerId) != 0) {
-        error ("Failed to connect to the monitor subscriber endpoint %d.", self.info.routerId);
+        error("Failed to connect to the monitor subscriber endpoint %d.", self.info.routerId);
         goto cleanup;
     }
-    info ("Monitor Subscriber connected to %s", zsys_sprintf (ROUTER_MONITOR_SUBSCRIBER_ENDPOINT, self.info.routerId));
-    zsock_set_subscribe (requests, "");
+    info("Monitor Subscriber connected to %s", zsys_sprintf(ROUTER_MONITOR_SUBSCRIBER_ENDPOINT, self.info.routerId));
+    zsock_set_subscribe(requests, "");
 
     // ====================================
     //   Prepare a reactor and fire it up
     // ====================================
-    if (!(reactor = zloop_new ())) {
-        error ("Cannot allocate a new reactor.");
+    if (!(reactor = zloop_new())) {
+        error("Cannot allocate a new reactor.");
         goto cleanup;
     }
 
     // Attach a callback to frontend and backend sockets
-    if (zloop_reader (reactor, (zsock_t *) servermon, RouterMonitor_monitor, &self) == -1
-    ||  zloop_reader (reactor, requests, RouterMonitor_subscribe, &self) == -1
+    if (zloop_reader(reactor, (zsock_t *) servermon, RouterMonitor_monitor, &self) == -1
+    ||  zloop_reader(reactor, requests, RouterMonitor_subscribe, &self) == -1
     ) {
-        error ("Cannot register the sockets with the reactor.");
+        error("Cannot register the sockets with the reactor.");
         goto cleanup;
     }
 
-    info ("Router Monitor is ready and running.");
+    info("Router Monitor is ready and running.");
     // Signal to the parent thread that the monitor is ready
     zsock_signal (pipe, 0);
-    zframe_send ((zframe_t *[]) {zframe_new (PACKET_HEADER (ROUTER_MONITOR_READY), sizeof (ROUTER_MONITOR_READY))}, pipe, 0);
+    zframe_send ((zframe_t *[]) {zframe_new (PACKET_HEADER (ROUTER_MONITOR_READY), sizeof(ROUTER_MONITOR_READY))}, pipe, 0);
 
     if (zloop_start (reactor) != 0) {
-        error ("An error occurred in the reactor.");
+        error("An error occurred in the reactor.");
         goto cleanup;
     }
 
@@ -441,14 +441,14 @@ routerMonitorDestroy (
 
     if (self) {
         routerMonitorFree (self);
-        free (self);
+        free(self);
     }
 
     *_self = NULL;
 }
 
 void
-RouterMonitorStartupInfo_free (
+RouterMonitorStartupInfo_free(
     RouterMonitorStartupInfo *self
 ) {
     redisStartupInfoFree (&self->redisInfo);
@@ -462,8 +462,8 @@ routerMonitorStartupInfoDestroy (
     RouterMonitorStartupInfo *self = *_self;
 
     if (self) {
-        RouterMonitorStartupInfo_free (self);
-        free (self);
+        RouterMonitorStartupInfo_free(self);
+        free(self);
     }
 
     *_self = NULL;

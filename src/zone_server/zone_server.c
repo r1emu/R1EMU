@@ -63,6 +63,6 @@ bool zoneServerStart(ZoneServer *self) {
 void zoneServerDestroy(ZoneServer **_self) {
     ZoneServer *self = *_self;
 
-    free (self);
+    free(self);
     *_self = NULL;
 }

@@ -25,13 +25,13 @@ barrackSessionNew (
 ) {
     BarrackSession *self;
 
-    if ((self = calloc (1, sizeof (BarrackSession))) == NULL) {
+    if ((self = calloc(1, sizeof(BarrackSession))) == NULL) {
         return NULL;
     }
 
     if (!barrackSessionInit (self)) {
         barrackSessionDestroy (&self);
-        error ("BarrackSession failed to initialize.");
+        error("BarrackSession failed to initialize.");
         return NULL;
     }
 
@@ -42,7 +42,7 @@ bool
 barrackSessionInit (
     BarrackSession *self
 ) {
-    memset (self, 0, sizeof (BarrackSession));
+    memset(self, 0, sizeof(BarrackSession));
 
     self->charactersCreatedCount = 0;
 
@@ -53,7 +53,7 @@ void
 barrackSessionPrint (
     BarrackSession *self
 ) {
-    dbg ("==== BarrackSession %p ====", self);
+    dbg("==== BarrackSession %p ====", self);
 }
 
 void
@@ -68,5 +68,5 @@ void
 barrackSessionFree (
     BarrackSession *self
 ) {
-    free (self);
+    free(self);
 }

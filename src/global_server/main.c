@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 
 cleanup:
     // unload the Global Server properly
-    globalServerDestroy (&globalServer);
+    globalServerDestroy(&globalServer);
 
     // shutdown the CZMQ layer properly
     zsys_shutdown();

@@ -75,77 +75,69 @@ EventServer *eventServerNew(EventServerStartupInfo *info) {
 }
 
 bool eventServerInit(EventServer *self, EventServerStartupInfo *info) {
-    memcpy(&self->info, info, sizeof (self->info));
+    memcpy(&self->info, info, sizeof(self->info));
 
     // create a unique publisher for the EventServer
     if (!(self->workers = zsock_new(ZMQ_SUB))) {
-        error ("Cannot allocate a new Server SUBSCRIBER");
+        error("Cannot allocate a new Server SUBSCRIBER");
         return false;
     }
 
     // create a connection to the router
     if (!(self->router = zsock_new(ZMQ_PUB))) {
-        error ("Cannot create zsock to the router.");
+        error("Cannot create zsock to the router.");
         return false;
     }
 
     // initialize Redis connection
     if (!(self->redis = redisNew(&info->redisInfo))) {
-        error ("Cannot initialize a new Redis connection.");
+        error("Cannot initialize a new Redis connection.");
         return false;
     }
 
     // initialize hashtable of clients around
     if (!(self->clientsGraph = graphNew())) {
-        error ("Cannot allocate a new clients Graph.");
+        error("Cannot allocate a new clients Graph.");
         return false;
     }
 
     return true;
 }
 
-GraphNodeClient *
-graphNodeClientNew (
-    void
-) {
+GraphNodeClient *graphNodeClientNew (void) {
     GraphNodeClient *self;
 
-    if ((self = calloc (1, sizeof (GraphNodeClient))) == NULL) {
+    if ((self = calloc(1, sizeof(GraphNodeClient))) == NULL) {
         return NULL;
     }
 
     if (!graphNodeClientInit (self)) {
         graphNodeClientDestroy (&self);
-        error ("GraphNodeClient failed to initialize.");
+        error("GraphNodeClient failed to initialize.");
         return NULL;
     }
 
     return self;
 }
 
+bool graphNodeClientInit (GraphNodeClient *self) {
 
-bool
-graphNodeClientInit (
-    GraphNodeClient *self
-) {
     return true;
 }
 
-bool
-eventServerStartupInfoInit (
-    EventServerStartupInfo *self,
+bool eventServerStartupInfoInit (EventServerStartupInfo *self,
     uint16_t routerId,
     uint16_t workersCount,
     char *redisHostname,
     int redisPort
 ) {
-    memset (self, 0, sizeof (EventServerStartupInfo));
+    memset(self, 0, sizeof(EventServerStartupInfo));
 
     self->routerId = routerId;
     self->workersCount = workersCount;
 
-    if (!(redisStartupInfoInit (&self->redisInfo, redisHostname, redisPort))) {
-        error ("Cannot initialize Redis startup.");
+    if (!(redisStartupInfoInit(&self->redisInfo, redisHostname, redisPort))) {
+        error("Cannot initialize Redis startup.");
         return false;
     }
 
@@ -161,7 +153,7 @@ EventServer_handleEvent (
 
     // Get the event type frame
     if (!(eventTypeFrame = zmsg_first (msg))) {
-        error ("Event type cannot be retrieved.");
+        error("Event type cannot be retrieved.");
         return false;
     }
 
@@ -199,13 +191,13 @@ EventServer_handleEvent (
         } break;
 
         default :
-            error ("Unknown event type received : %d", eventType);
+            error("Unknown event type received : %d", eventType);
             result = false;
         break;
     }
 
     if (!result) {
-        error ("Event type = %d failed.", eventType);
+        error("Event type = %d failed.", eventType);
         return false;
     }
 
@@ -230,14 +222,14 @@ EventServer_subscribe (
     zframe_t *header;
 
     // Receive the message from the publisher socket
-    if (!(msg = zmsg_recv (self->workers))) {
+    if (!(msg = zmsg_recv(self->workers))) {
         // Interrupt
         return false;
     }
 
     // Get the header frame of the message
     if (!(header = zmsg_pop (msg))) {
-        error ("Frame header cannot be retrieved.");
+        error("Frame header cannot be retrieved.");
         return false;
     }
 
@@ -249,18 +241,18 @@ EventServer_subscribe (
     {
         case EVENT_SERVER_EVENT :
             if (!(EventServer_handleEvent (self, msg))) {
-                error ("Cannot handle the event properly.");
+                error("Cannot handle the event properly.");
                 return false;
             }
         break;
 
         default:
-            warning ("Server subscriber received an unknown header : %x", packetHeader);
+            warning("Server subscriber received an unknown header : %x", packetHeader);
         break;
     }
 
     // Cleanup
-    zmsg_destroy (&msg);
+    zmsg_destroy(&msg);
 
     return true;
 }
@@ -276,10 +268,10 @@ eventServerSendToClients (
     zmsg_t *msg = NULL;
 
     if ((!(msg = zmsg_new ()))
-    ||  zmsg_addmem (msg, PACKET_HEADER (ROUTER_WORKER_MULTICAST), sizeof (ROUTER_WORKER_MULTICAST)) != 0
+    ||  zmsg_addmem (msg, PACKET_HEADER (ROUTER_WORKER_MULTICAST), sizeof(ROUTER_WORKER_MULTICAST)) != 0
     ||  zmsg_addmem (msg, packet, packetLen) != 0
     ) {
-        error ("Cannot build the multicast packet.");
+        error("Cannot build the multicast packet.");
         result = false;
         goto cleanup;
     }
@@ -290,21 +282,21 @@ eventServerSendToClients (
         // Add all the clients to the packet
         uint8_t identityBytes[5];
         socketSessionDestroyGenId (identityKey, identityBytes);
-        if (zmsg_addmem (msg, identityBytes, sizeof (identityBytes)) != 0) {
-            error ("Cannot add the identity in the message.");
+        if (zmsg_addmem (msg, identityBytes, sizeof(identityBytes)) != 0) {
+            error("Cannot add the identity in the message.");
             result = false;
             goto cleanup;
         }
     }
 
     if (zmsg_send (&msg, self->router) != 0) {
-        error ("Cannot send the multicast packet to the Router.");
+        error("Cannot send the multicast packet to the Router.");
         result = false;
         goto cleanup;
     }
 
 cleanup:
-    zmsg_destroy (&msg);
+    zmsg_destroy(&msg);
     return result;
 }
 
@@ -334,7 +326,7 @@ eventServerUpdateClientPosition (
         self, mapId, sessionKey, &PositionXYZToXZ (newPosition),
         COMMANDER_RANGE_AROUND
     ))) {
-        error ("Cannot get clients within range");
+        error("Cannot get clients within range");
         status = false;
         goto cleanup;
     }
@@ -355,7 +347,7 @@ eventServerUpdateClientPosition (
 
     if (zlist_size (redisClientsAround) > 0)
     {
-        pcEnterList = zlist_new ();
+        pcEnterList = zlist_new();
 
         // Compare the list from Redis to the list of neighbors from the proximity graph
         for (uint8_t *redisSocketIdClientAround = zlist_first (redisClientsAround);
@@ -364,7 +356,7 @@ eventServerUpdateClientPosition (
         ) {
             GraphNode *graphClientAroundNode;
             if (!(graphClientAroundNode = eventServerGetClientNode (self, redisSocketIdClientAround))) {
-                error ("Cannot get the neighbour node %s.", redisSocketIdClientAround);
+                error("Cannot get the neighbour node %s.", redisSocketIdClientAround);
                 status = false;
                 goto cleanup;
             }
@@ -374,7 +366,7 @@ eventServerUpdateClientPosition (
                 // It means that the current client has just entered in the neighbour client zone !
                 // Mutually link them together in the graph, and warn the game clients of the arrival of a new client
                 eventServerLinkClients (self, nodeCurrentClient, graphClientAroundNode);
-                zlist_append (pcEnterList, redisSocketIdClientAround);
+                zlist_append(pcEnterList, redisSocketIdClientAround);
             }
 
             GraphNodeClient *graphNeighbourClient = graphClientAroundNode->user_data;
@@ -387,7 +379,7 @@ eventServerUpdateClientPosition (
             zoneBuilderEnterPc (commanderInfo, pcEnterMsg);
             zframe_t *pcEnterFrame = zmsg_first (pcEnterMsg);
             if (!(eventServerSendToClients (self, redisClientsAround, zframe_data (pcEnterFrame), zframe_size (pcEnterFrame)))) {
-                error ("Failed to send the packet to the clients.");
+                error("Failed to send the packet to the clients.");
                 status = false;
                 goto cleanup;
             }
@@ -406,7 +398,7 @@ eventServerUpdateClientPosition (
             GameSession gameSession;
             curPcEnterMsg = zmsg_new ();
             if (!(eventServerGetGameSessionBySocketId (self, self->info.routerId, enterPcSocketId, &gameSession))) {
-                error ("Cannot get game session from %s.", enterPcSocketId);
+                error("Cannot get game session from %s.", enterPcSocketId);
                 status = false;
                 goto cleanup;
             }
@@ -414,17 +406,17 @@ eventServerUpdateClientPosition (
             zoneBuilderEnterPc (&gameSession.commanderSession.currentCommander, curPcEnterMsg);
             zframe_t *pcEnterFrame = zmsg_first (curPcEnterMsg);
             if (!(eventServerSendToClient (self, sessionKey, zframe_data (pcEnterFrame), zframe_size (pcEnterFrame)))) {
-                error ("Failed to send the packet to the clients.");
+                error("Failed to send the packet to the clients.");
                 status = false;
                 goto cleanup;
             }
 
-            zmsg_destroy (&curPcEnterMsg);
+            zmsg_destroy(&curPcEnterMsg);
         }
     }
 
     // Check for ZC_LEAVE and build a list of clients involved
-    pcLeaveList = zlist_new ();
+    pcLeaveList = zlist_new();
     for (GraphArc *neighbourArc = zlist_first (nodeCurrentClient->arcs);
         neighbourArc != NULL;
         neighbourArc = zlist_next (nodeCurrentClient->arcs)
@@ -434,7 +426,7 @@ eventServerUpdateClientPosition (
         if (neighbourClient->around == false) {
             // The neighbour is still marked as "not around" : The current commander left its screen zone
             eventServerUnlinkClients (self, nodeCurrentClient, neighbourNode);
-            zlist_append (pcLeaveList, neighbourNode->key);
+            zlist_append(pcLeaveList, neighbourNode->key);
         }
     }
 
@@ -447,7 +439,7 @@ eventServerUpdateClientPosition (
 
         // Also, send to the current player the list of left players
         if (!(eventServerSendToClients (self, pcLeaveList, zframe_data (pcLeaveFrame), zframe_size (pcLeaveFrame)))) {
-            error ("Failed to send the packet to the clients.");
+            error("Failed to send the packet to the clients.");
             status = false;
             goto cleanup;
         }
@@ -460,7 +452,7 @@ eventServerUpdateClientPosition (
             GameSession gameSession;
             curPcLeaveMsg = zmsg_new ();
             if (!(eventServerGetGameSessionBySocketId (self, self->info.routerId, leftPcSocketId, &gameSession))) {
-                error ("Cannot get game session from %s.", leftPcSocketId);
+                error("Cannot get game session from %s.", leftPcSocketId);
                 status = false;
                 goto cleanup;
             }
@@ -468,22 +460,22 @@ eventServerUpdateClientPosition (
             zoneBuilderLeave (gameSession.commanderSession.currentCommander.pcId, curPcLeaveMsg);
             zframe_t *pcLeaveFrame = zmsg_first (curPcLeaveMsg);
             if (!(eventServerSendToClient (self, sessionKey, zframe_data (pcLeaveFrame), zframe_size (pcLeaveFrame)))) {
-                error ("Failed to send the packet to the clients.");
+                error("Failed to send the packet to the clients.");
                 status = false;
                 goto cleanup;
             }
 
-            zmsg_destroy (&curPcLeaveMsg);
+            zmsg_destroy(&curPcLeaveMsg);
         }
     }
 
 cleanup:
     zlist_destroy (&pcLeaveList);
     zlist_destroy (&pcEnterList);
-    zmsg_destroy (&pcLeaveMsg);
-    zmsg_destroy (&curPcLeaveMsg);
-    zmsg_destroy (&pcEnterMsg);
-    zmsg_destroy (&curPcEnterMsg);
+    zmsg_destroy(&pcLeaveMsg);
+    zmsg_destroy(&curPcLeaveMsg);
+    zmsg_destroy(&pcEnterMsg);
+    zmsg_destroy(&curPcEnterMsg);
     return status;
 }
 
@@ -498,10 +490,10 @@ eventServerSendToClient (
     zmsg_t *msg = NULL;
 
     if ((!(msg = zmsg_new ()))
-    ||  zmsg_addmem (msg, PACKET_HEADER (ROUTER_WORKER_MULTICAST), sizeof (ROUTER_WORKER_MULTICAST)) != 0
+    ||  zmsg_addmem (msg, PACKET_HEADER (ROUTER_WORKER_MULTICAST), sizeof(ROUTER_WORKER_MULTICAST)) != 0
     ||  zmsg_addmem (msg, packet, packetLen) != 0
     ) {
-        error ("Cannot build the multicast packet.");
+        error("Cannot build the multicast packet.");
         result = false;
         goto cleanup;
     }
@@ -509,20 +501,20 @@ eventServerSendToClient (
     // Add the client identity to the packet
     uint8_t identityBytes[5];
     socketSessionDestroyGenId (identityKey, identityBytes);
-    if (zmsg_addmem (msg, identityBytes, sizeof (identityBytes)) != 0) {
-        error ("Cannot add the identity in the message.");
+    if (zmsg_addmem (msg, identityBytes, sizeof(identityBytes)) != 0) {
+        error("Cannot add the identity in the message.");
         result = false;
         goto cleanup;
     }
 
     if (zmsg_send (&msg, self->router) != 0) {
-        error ("Cannot send the multicast packet to the Router.");
+        error("Cannot send the multicast packet to the Router.");
         result = false;
         goto cleanup;
     }
 
 cleanup:
-    zmsg_destroy (&msg);
+    zmsg_destroy(&msg);
     return result;
 }
 
@@ -554,8 +546,8 @@ eventServerGetClientsAround (
     GraphNode *node;
     zlist_t *clients = NULL;
 
-    if (!(clients = zlist_new ())) {
-        error ("Cannot allocate a new clients list.");
+    if (!(clients = zlist_new())) {
+        error("Cannot allocate a new clients list.");
         status = false;
         goto cleanup;
     }
@@ -563,14 +555,14 @@ eventServerGetClientsAround (
 
     // Get the node associated with the sessionKey
     if (!(node = eventServerGetClientNode (self, sessionKey))) {
-        error ("Cannot get the node %s.", sessionKey);
+        error("Cannot get the node %s.", sessionKey);
         return NULL;
     }
 
     // Add the neighbors keys to the clients list
     for (GraphArc *arc = zlist_first (node->arcs); arc != NULL; arc = zlist_next (node->arcs)) {
         GraphNode *nodeAround = arc->to;
-        zlist_append (clients, nodeAround->key);
+        zlist_append(clients, nodeAround->key);
     }
 
 cleanup:
@@ -583,25 +575,25 @@ eventServerStart (
 ) {
     // Start Redis
     if (!(redisConnection (self->redis))) {
-        error ("Cannot connect to the Redis Server.");
+        error("Cannot connect to the Redis Server.");
         return false;
     }
 
     // Bind the connection to the router
-    if (zsock_bind (self->router, ROUTER_SUBSCRIBER_ENDPOINT, self->info.routerId) != 0) {
-        error ("Failed to bind to the subscriber endpoint.");
+    if (zsock_bind(self->router, ROUTER_SUBSCRIBER_ENDPOINT, self->info.routerId) != 0) {
+        error("Failed to bind to the subscriber endpoint.");
         return false;
     }
 
     // Initialize subscribers
     for (int workerId = 0; workerId < self->info.workersCount; workerId++) {
         if (zsock_connect (self->workers, EVENT_SERVER_SUBSCRIBER_ENDPOINT, self->info.routerId, workerId) != 0) {
-            error ("Failed to connect to the subscriber endpoint %d:%d.", self->info.routerId, workerId);
+            error("Failed to connect to the subscriber endpoint %d:%d.", self->info.routerId, workerId);
             return false;
         }
-        info ("EventServer subscribed to %s", zsys_sprintf (EVENT_SERVER_SUBSCRIBER_ENDPOINT, self->info.routerId, workerId));
+        info("EventServer subscribed to %s", zsys_sprintf(EVENT_SERVER_SUBSCRIBER_ENDPOINT, self->info.routerId, workerId));
         // Subscribe to all messages, without any filter
-        zsock_set_subscribe (self->workers, "");
+        zsock_set_subscribe(self->workers, "");
     }
 
     // Listen to the subscriber socket
@@ -609,7 +601,7 @@ eventServerStart (
         // Things to do between two messages ?
     }
 
-    info ("EventServer exits...");
+    info("EventServer exits...");
     return true;
 }
 
@@ -640,16 +632,16 @@ eventServerGetClientNode (
 
     if (!(clientNode = graphGetNode (self->clientsGraph, sessionKey))) {
         // Client node doesn't exist, create it
-        info ("Add client %s in the graph", sessionKey);
+        info("Add client %s in the graph", sessionKey);
         if (!(clientNode = graphNodeNew (sessionKey, NULL))) {
-            error ("Cannot allocate a new client node.");
+            error("Cannot allocate a new client node.");
             return NULL;
         }
 
         clientNode->user_data = graphNodeClientNew ();
         // Add it to the hashtable
         if (!(graphInsertNode (self->clientsGraph, clientNode))) {
-            error ("Cannot insert a new client node.");
+            error("Cannot insert a new client node.");
             return NULL;
         }
     }
@@ -672,7 +664,7 @@ eventServerDestroy (
 
     if (self) {
         eventServerFree (self);
-        free (self);
+        free(self);
     }
 
     *_self = NULL;
@@ -693,7 +685,7 @@ graphNodeClientDestroy (
 
     if (self) {
         graphNodeClientFree (self);
-        free (self);
+        free(self);
     }
 
     *_self = NULL;

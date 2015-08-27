@@ -13,13 +13,13 @@
 
 #include "mysql_session.h"
 
-void mySqlFlushSession (MySQL *self, Session *session) {
+void mySqlFlushSession(MySQL *self, Session *session) {
     MYSQL_ROW count;
 
     // flush the commander
     if (mySqlQuery(self, "SELECT count(*) FROM commander WHERE commander_id = %u",
                    session->game.commanderSession.currentCommander.commanderId)) {
-        error("SQL Error : %s" , mysql_error (self->handle));
+        error("SQL Error : %s" , mysql_error(self->handle));
     }
     else {
         count = mysql_fetch_row(self->result);
@@ -65,7 +65,7 @@ void mySqlFlushSession (MySQL *self, Session *session) {
                 session->game.commanderSession.currentCommander.currentHP,
                 session->game.commanderSession.currentCommander.currentSP))
             {
-                error ("SQL Error : %s" , mysql_error (self->handle));
+                error("SQL Error : %s" , mysql_error(self->handle));
             }
             dbg("Inserting a new commander");
         }

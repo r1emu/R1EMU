@@ -25,13 +25,13 @@ commanderSessionNew (
 ) {
     CommanderSession *self;
 
-    if ((self = calloc (1, sizeof (CommanderSession))) == NULL) {
+    if ((self = calloc(1, sizeof(CommanderSession))) == NULL) {
         return NULL;
     }
 
     if (!commanderSessionInit (self, commanderInfo)) {
         commanderSessionDestroy (&self);
-        error ("CommanderSession failed to initialize.");
+        error("CommanderSession failed to initialize.");
         return NULL;
     }
 
@@ -43,9 +43,9 @@ commanderSessionInit (
     CommanderSession *self,
     CommanderInfo *commanderInfo
 ) {
-    memset (self, 0, sizeof (CommanderSession));
+    memset(self, 0, sizeof(CommanderSession));
 
-    memcpy (&self->currentCommander, commanderInfo, sizeof (CommanderInfo));
+    memcpy(&self->currentCommander, commanderInfo, sizeof(CommanderInfo));
 
     return true;
 }
@@ -54,7 +54,7 @@ void
 commanderSessionPrint (
     CommanderSession *self
 ) {
-    dbg ("==== CommanderSession %p ====", self);
+    dbg("==== CommanderSession %p ====", self);
     commanderInfoPrint (&self->currentCommander);
 }
 
@@ -70,5 +70,5 @@ void
 commanderSessionFree (
     CommanderSession *self
 ) {
-    free (self);
+    free(self);
 }

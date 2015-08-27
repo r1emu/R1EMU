@@ -36,127 +36,110 @@ struct Redis
 
 // ------ Extern function implementation -------
 
-Redis *
-redisNew (
-    RedisStartupInfo *info
-) {
+Redis *redisNew(RedisStartupInfo *info) {
+
     Redis *self;
 
-    if ((self = calloc (1, sizeof (Redis))) == NULL) {
+    if ((self = calloc(1, sizeof(Redis))) == NULL) {
         return NULL;
     }
 
     if (!redisInit (self, info)) {
         redisDestroy (&self);
-        error ("Redis failed to initialize.");
+        error("Redis failed to initialize.");
         return NULL;
     }
 
     return self;
 }
 
-bool
-redisInit (
-    Redis *self,
-    RedisStartupInfo *info
-) {
-    redisStartupInfoInit (&self->info, info->hostname, info->port);
+bool redisInit(Redis *self, RedisStartupInfo *info) {
+
+    redisStartupInfoInit(&self->info, info->hostname, info->port);
 
     return true;
 }
 
-bool
-redisStartupInfoInit (
-    RedisStartupInfo *self,
-    char *hostname,
-    int port
-) {
-    self->hostname = strdup (hostname);
+bool redisStartupInfoInit(RedisStartupInfo *self, char *hostname, int port) {
+
+    self->hostname = strdup(hostname);
     self->port = port;
 
     return true;
 }
 
-bool
-redisConnection (
-    Redis *self
-) {
+bool redisConnection(Redis *self) {
+
     RedisStartupInfo *info = &self->info;
 
-    info ("Connecting to the Redis Server (%s:%d)...", info->hostname, info->port);
+    info("Connecting to the Redis Server (%s:%d)...", info->hostname, info->port);
 
     while (1) {
         self->context = redisConnectWithTimeout (info->hostname, info->port, (struct timeval) {.tv_sec = 3, .tv_usec = 0});
 
         if (self->context != NULL && self->context->err) {
-            warning ("Redis server not detected (%s)... Retrying in 3 seconds.", self->context->errstr);
-            zclock_sleep (3000);
+            warning("Redis server not detected (%s)... Retrying in 3 seconds.", self->context->errstr);
+            zclock_sleep(3000);
         } else {
             // Connection OK
             break;
         }
     }
 
-    info ("Connected to the Redis Server !");
+    info("Connected to the Redis Server !");
     return true;
 }
 
-bool
-redisFlushDatabase (
-    Redis *self
-) {
+bool redisFlushDatabase(Redis *self) {
     redisReply *reply = NULL;
-    reply = redisCommandDbg (self, "FLUSHALL");
+    reply = redisCommandDbg(self, "FLUSHALL");
 
     if (!reply) {
-        error ("Redis error encountered : The request is invalid.");
+        error("Redis error encountered : The request is invalid.");
         return false;
     }
 
     switch (reply->type)
     {
         case REDIS_REPLY_ERROR:
-            error ("Redis error encountered : %s", reply->str);
+            error("Redis error encountered : %s", reply->str);
             return false;
-        break;
+            break;
 
         case REDIS_REPLY_STATUS:
-            // info ("Redis status : %s", reply->str);
-        break;
+            // info("Redis status : %s", reply->str);
+            break;
 
-        default : error ("Unexpected Redis status (%d).", reply->type); return false;
+        default :
+            error("Unexpected Redis status (%d).", reply->type);
+            return false;
+            break;
     }
 
     return true;
 }
 
-void
-redisPrintElements (
-    redisReply **elements,
-    size_t nbElements,
-    const char **elementsName
-) {
+void redisPrintElements(redisReply **elements, size_t nbElements, const char **elementsName) {
+
     char buffer[100];
+
     for (size_t i = 0; i < nbElements; i++) {
         char *elementName = NULL;
         (void) elementName;
 
         if (!elementsName) {
-            sprintf (buffer, "%02u", (unsigned int) i);
+            sprintf(buffer, "%02u", (unsigned int) i);
             elementName = buffer;
         } else {
             elementName = (char *) elementsName[i];
         }
 
-        dbg ("[%s] = <%s>", elementName, elements[i]->str);
+        dbg("[%s] = <%s>", elementName, elements[i]->str);
     }
 }
 
-size_t
-redisAnyElementIsNull (
-    redisReply **elements,
-    size_t nbElements
-) {
+size_t redisAnyElementIsNull(redisReply **elements, size_t nbElements) {
+
     for (size_t i = 0; i < nbElements; i++) {
         if (elements[i]->type == REDIS_REPLY_NIL) {
             return i;
@@ -166,27 +149,22 @@ redisAnyElementIsNull (
     return -1;
 }
 
-redisReply *
-redisCommandDbg (
-    Redis *self,
-    char * format,
-    ...
-) {
+redisReply *redisCommandDbg(Redis *self, char * format, ...) {
+
     char buffer [1024*1024];
     va_list args;
 
-    va_start (args, format);
-        vsnprintf (buffer, sizeof(buffer), format, args);
-    va_end (args);
+    va_start(args, format);
+        vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
 
-    // special ("%s", buffer);
-    return redisCommand (self->context, buffer);
+    // special("%s", buffer);
+    return redisCommand(self->context, buffer);
 }
 
 void
-redisReplyDestroy (
-    redisReply **reply
-) {
+redisReplyDestroy(redisReply **reply) {
+
     if (*reply) {
         freeReplyObject (*reply);
         *reply = NULL;
@@ -194,85 +172,79 @@ redisReplyDestroy (
 }
 
 /*
-bool
-Redis_set (
-    Redis *self,
-    SocketSession *socketSession,
-    ...
-) {
+bool redisSet(Redis *self, SocketSession *socketSession, ...) {
     va_list args;
 
-	va_start (args, socketSession);
+	va_start(args, socketSession);
 
 	char * token = va_arg (args, char *);
 	int tokenLen;
 	int curPos;
 
     // Build the Redis command
-	sprintf (self->commandBuffer, "HMSET zone%x:map%x:acc%llx ",
+	sprintf(self->commandBuffer, "HMSET zone%x:map%x:acc%llx ",
         socketSession->routerId, socketSession->mapId, socketSession->accountId); // Identifiers
 
     // Current position to the buffer = end of the HMSET key
-    curPos = strlen (self->commandBuffer);
+    curPos = strlen(self->commandBuffer);
 
     // Iterate through all the tokens
     while (token != NULL) {
-        tokenLen = strlen (token);
+        tokenLen = strlen(token);
         char *value = va_arg (args, char *);
-        int valueLen = strlen (value);
+        int valueLen = strlen(value);
 
         // Check for BoF
         if (curPos + tokenLen + valueLen + 3 >= REDIS_COMMAND_BUFFER_SIZE) {
             // CurPos + value + token + 2*space + 1*'\0'.
-            error ("Redis command buffer overflow.");
+            error("Redis command buffer overflow.");
             return false;
         }
 
         // Concatenate the token + value at the end of the command
-        curPos += sprintf (&self->commandBuffer[curPos], "%s %s ", token, value);
+        curPos += sprintf(&self->commandBuffer[curPos], "%s %s ", token, value);
 
         token = va_arg (args, char *);
     }
-	va_end (args);
+	va_end(args);
 
 	self->commandBuffer[curPos] = '\0';
 
 	redisReply *reply = Redis_commandDbg (self, self->commandBuffer);
 
     if (!reply) {
-        error ("Redis error encountered : The request is invalid.");
+        error("Redis error encountered : The request is invalid.");
         return false;
     }
 
     switch (reply->type)
     {
         case REDIS_REPLY_ERROR:
-            error ("Redis error encountered : %s", reply->str);
+            error("Redis error encountered : %s", reply->str);
             return false;
-        break;
+            break;
 
         case REDIS_REPLY_STATUS:
-            // info ("Redis status : %s", reply->str);
-        break;
+            // info("Redis status : %s", reply->str);
+            break;
 
-        default : error ("Unexpected Redis status : %d.", reply->type); return false;
+        default :
+            error("Unexpected Redis status : %d.", reply->type);
+            return false;
+            break;
     }
 
 	return true;
 }
 */
 
-void
-redisStartupInfoFree (
-    RedisStartupInfo *self
-) {
-    free (self->hostname);
+void redisStartupInfoFree(RedisStartupInfo *self) {
+
+    free(self->hostname);
 }
 
-void
-redisDestroy (
-    Redis **_self
-) {
+void redisDestroy(Redis **_self) {
+
     Redis *self = *_self;
 
     redisStartupInfoFree (&self->info);
@@ -281,6 +253,6 @@ redisDestroy (
         redisFree (self->context);
     }
 
-    free (self);
+    free(self);
     *_self = NULL;
 }

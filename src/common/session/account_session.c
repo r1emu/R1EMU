@@ -27,13 +27,13 @@ accountSessionNew (
 ) {
     AccountSession *self;
 
-    if ((self = calloc (1, sizeof (AccountSession))) == NULL) {
+    if ((self = calloc(1, sizeof(AccountSession))) == NULL) {
         return NULL;
     }
 
     if (!accountSessionInit (self, accountLogin, socketId, accountPrivilege)) {
         accountSessionDestroy (&self);
-        error ("AccountSession failed to initialize.");
+        error("AccountSession failed to initialize.");
         return NULL;
     }
 
@@ -47,10 +47,10 @@ accountSessionInit (
     uint8_t *socketId,
     AccountSessionPrivileges privilege
 ) {
-    memset (self, 0, sizeof (AccountSession));
+    memset(self, 0, sizeof(AccountSession));
 
-    memcpy (self->login, login, sizeof (self->login));
-    memcpy (self->sessionKey, socketId, sizeof (self->sessionKey));
+    memcpy(self->login, login, sizeof(self->login));
+    memcpy(self->sessionKey, socketId, sizeof(self->sessionKey));
     self->privilege = privilege;
 
     return true;
@@ -60,7 +60,7 @@ void
 accountSessionPrint (
     AccountSession *self
 ) {
-    dbg ("==== AccountSession %p ====", self);
+    dbg("==== AccountSession %p ====", self);
 }
 
 void
@@ -75,5 +75,5 @@ void
 accountSessionFree (
     AccountSession *self
 ) {
-    free (self);
+    free(self);
 }

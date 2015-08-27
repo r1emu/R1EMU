@@ -36,6 +36,6 @@ bool sessionInit(Session *self) {
 void sessionDestroy(Session **_self) {
     Session *self = *_self;
 
-    free (self);
+    free(self);
     *_self = NULL;
 }

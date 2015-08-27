@@ -33,9 +33,9 @@ static PacketHandlerState SocialHandler_login        (Worker *self, Session *ses
  */
 const PacketHandler socialHandlers [PACKET_TYPE_COUNT] = {
     #define REGISTER_PACKET_HANDLER(packetName, handler) \
-        [packetName] = {handler, STRINGIFY (packetName)}
+        [packetName] = {handler, STRINGIFY(packetName)}
 
-    REGISTER_PACKET_HANDLER (CS_LOGIN, SocialHandler_login),
+    REGISTER_PACKET_HANDLER(CS_LOGIN, SocialHandler_login),
 
     #undef REGISTER_PACKET_HANDLER
 };
@@ -56,17 +56,17 @@ SocialHandler_login (
     } CsLoginPacket;
     #pragma pack(pop)
 
-    if (sizeof (CsLoginPacket) != packetSize) {
-        error ("The packet size received isn't correct. (packet size = %d, correct size = %d)",
-            packetSize, sizeof (CsLoginPacket));
+    if (sizeof(CsLoginPacket) != packetSize) {
+        error("The packet size received isn't correct. (packet size = %d, correct size = %d)",
+            packetSize, sizeof(CsLoginPacket));
 
         return PACKET_HANDLER_ERROR;
     }
 
     CsLoginPacket *clientPacket = (CsLoginPacket *) packet;
-    dbg ("accountLogin = %s", clientPacket->accountLogin);
-    buffer_print (clientPacket->md5, 17, "md5 = ");
-    dbg ("accountId = %llx", clientPacket->accountId);
+    dbg("accountLogin = %s", clientPacket->accountLogin);
+    buffer_print(clientPacket->md5, 17, "md5 = ");
+    dbg("accountId = %llx", clientPacket->accountId);
 
     // Authenticate here
     // TODO

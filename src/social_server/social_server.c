@@ -53,7 +53,7 @@ bool socialServerStart(SocialServer *self) {
     special("======================");
 
     if (!(serverStart(self->server))) {
-        error ("Cannot start the Server.");
+        error("Cannot start the Server.");
         return false;
     }
 
@@ -63,6 +63,6 @@ bool socialServerStart(SocialServer *self) {
 void socialServerDestroy(SocialServer **_self) {
     SocialServer *self = *_self;
 
-    free (self);
+    free(self);
     *_self = NULL;
 }

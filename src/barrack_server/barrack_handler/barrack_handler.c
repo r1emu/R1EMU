@@ -73,7 +73,7 @@ static PacketHandlerState BarrackHandler_login(
         uint8_t login[ACCOUNT_SESSION_LOGIN_MAXSIZE];
         uint8_t md5Password[17];
         uint8_t unk1[5];
-    } *clientPacket =(void *) packet;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     if (sizeof(*clientPacket) != packetSize) {
@@ -124,7 +124,7 @@ static PacketHandlerState BarrackHandler_loginByPassport(
         uint16_t unk5;
         uint64_t clientId;
         uint32_t clientId2;
-    } *clientPacket =(void *) packet;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     if (sizeof(*clientPacket) != packetSize) {
@@ -170,7 +170,7 @@ static PacketHandlerState BarrackHandler_startGame(
     struct {
         uint16_t routerId;
         uint8_t commanderListId;
-    } *clientPacket =(void *) packet;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     if (sizeof(*clientPacket) != packetSize) {
@@ -248,7 +248,7 @@ BarrackHandler_commanderMove(
         uint8_t commanderListId;
         PositionXYZ position;
         float angleDestX, angleDestY;
-    } *clientPacket =(void *) packet;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     if (sizeof(*clientPacket) != packetSize) {
@@ -342,15 +342,14 @@ static PacketHandlerState BarrackHandler_barracknameChange(
     zmsg_t *reply)
 {
     #pragma pack(push, 1)
-    typedef struct{
+    struct{
         uint8_t barrackName[64];
-    }  CbBarrackNameChangePacket;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
-    CbBarrackNameChangePacket *clientPacket =(CbBarrackNameChangePacket *) packet;
 
-    if (sizeof(CbBarrackNameChangePacket) != packetSize) {
+    if (sizeof(*clientPacket) != packetSize) {
         error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(CbBarrackNameChangePacket));
+            packetSize, sizeof(*clientPacket));
         return PACKET_HANDLER_ERROR;
     }
 
@@ -367,7 +366,7 @@ static PacketHandlerState BarrackHandler_barracknameChange(
 
     for (size_t i = 0; i < barrackNameLen; i++) {
          if (!isprint(clientPacket->barrackName[i])) {
-            dbg("Wrong barrack name size in BC_BARRACKNAME_CHANGE");
+            dbg("Wrong barrack name character in BC_BARRACKNAME_CHANGE");
             return PACKET_HANDLER_ERROR;
          }
     }
@@ -376,10 +375,7 @@ static PacketHandlerState BarrackHandler_barracknameChange(
     strncpy(commander->familyName, clientPacket->barrackName, sizeof(commander->familyName));
 
     // Build the reply packet
-    barrackBuilderBarrackNameChange(
-        commander->familyName,
-        reply
-    );
+    barrackBuilderBarrackNameChange(commander->familyName, reply);
 
     return PACKET_HANDLER_UPDATE_SESSION;
 }
@@ -419,7 +415,7 @@ static PacketHandlerState BarrackHandler_commanderCreate(
         float unk5;
         float unk6;
         uint8_t hairType;
-    }  *clientPacket =(void *) packet;
+    }  *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     if (sizeof(*clientPacket) != packetSize) {
@@ -443,7 +439,7 @@ static PacketHandlerState BarrackHandler_commanderCreate(
         default:
             error("Invalid commander Job ID(%x)", clientPacket->jobId);
             return PACKET_HANDLER_ERROR;
-        break;
+            break;
         case COMMANDER_JOB_WARRIOR:
             commander->classId = COMMANDER_CLASS_WARRIOR;
             break;

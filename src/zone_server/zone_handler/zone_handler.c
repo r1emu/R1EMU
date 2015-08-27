@@ -100,7 +100,7 @@ ZoneHandler_chat(
     struct {
         uint16_t msgSize;
         uint8_t msgText[chatTextSize];
-    } *clientPacket =(void *) packet;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     if (sizeof(*clientPacket) != packetSize) {
@@ -183,7 +183,7 @@ static PacketHandlerState ZoneHandler_skillGround(
         uint32_t unk5;
         uint8_t unk6;
         uint8_t unk7;
-    } *clientPacket =(void *) packet;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     if (sizeof(*clientPacket) != packetSize) {
@@ -222,7 +222,7 @@ static PacketHandlerState ZoneHandler_campInfo(
     #pragma pack(push, 1)
     struct {
         uint64_t accountId;
-    } *clientPacket =(void *) packet;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     // Check packet size
@@ -321,7 +321,7 @@ ZoneHandler_moveStop(
         PositionXYZ position;
         PositionXZ direction;
         float timestamp;
-    } *clientPacket =(void *) packet;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     /*  u1 posX     posY     posZ     dirX     dirZ     time
@@ -378,7 +378,7 @@ ZoneHandler_keyboardMove(
         float movementSpeed;
         uint8_t unk8;
         float timestamp;
-    } *clientPacket =(void *) packet;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     /*  u1 posX     posY     posZ     dirX     dirZ     u7 mspeed   u8 time
@@ -535,7 +535,7 @@ static PacketHandlerState ZoneHandler_connect(
         uint32_t zoneServerIndex;
         uint16_t unk3;
         uint8_t channelListId;
-    } *clientPacket =(void *) packet;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     // TODO : Reverse CZ_CONNECT correctly
@@ -618,7 +618,7 @@ static PacketHandlerState ZoneHandler_jump(
     #pragma pack(push, 1)
     struct {
         uint8_t unk1;
-    } *clientPacket =(void *) packet;
+    } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     if (sizeof(*clientPacket) != packetSize) {

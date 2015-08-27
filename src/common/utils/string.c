@@ -32,7 +32,7 @@ strGetLine (
     int maxlen,
     int pos
 ) {
-	int len = strlen (str);
+	int len = strlen(str);
 	int i;
 	int bufpos = 0;
 	char c;

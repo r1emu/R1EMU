@@ -94,6 +94,6 @@ r1emuGenerateRandom64 (
 ) {
     uint32_t low  = r1emuGenerateRandom (seed);
     uint64_t high = r1emuGenerateRandom (seed);
-    high <<= (sizeof (uint32_t) * 8 - 1);
+    high <<= (sizeof(uint32_t) * 8 - 1);
     return high | low;
 }

@@ -47,10 +47,10 @@ void *dumpToMem (
     {
         char *strPos = buffer;
         if ((strPos = strstr (buffer, "]  ")) != NULL) {
-            strPos += strlen ("]  ");
+            strPos += strlen("]  ");
         }
         else if ((strPos = strstr (buffer, "] ")) != NULL) {
-            strPos += strlen ("] ");
+            strPos += strlen("] ");
         }
 
         char *end = strstr (strPos, " | ");
@@ -58,7 +58,7 @@ void *dumpToMem (
 
         while (strPos < end) {
             char *newPos;
-            uint8_t octet = strtoul (strPos, &newPos, 16);
+            uint8_t octet = strtoul(strPos, &newPos, 16);
             if (strPos == newPos)
                 break;
             memoryBytes[memPos++] = octet;
@@ -68,12 +68,12 @@ void *dumpToMem (
 
     if (!isLocal) {
         if (*memSize != memPos) {
-            dbg ("Warning : memSize != bytes written (%lu != %lu).", (long unsigned) *memSize, (long unsigned) memPos);
+            dbg("Warning : memSize != bytes written (%lu != %lu).", (long unsigned) *memSize, (long unsigned) memPos);
             *memSize = memPos;
         }
     } else {
         memory = malloc (memPos);
-        memcpy (memory, localMem, memPos);
+        memcpy(memory, localMem, memPos);
         *memSize = memPos;
     }
 
@@ -91,7 +91,7 @@ compareMem (
     uint8_t *mem1 = _mem1;
     uint8_t *mem2 = _mem2;
 
-    dbg ("Compare mem : %p (%d bytes) VS %p (%d bytes)", mem1, memSize1, mem2, memSize2);
+    dbg("Compare mem : %p (%d bytes) VS %p (%d bytes)", mem1, memSize1, mem2, memSize2);
 
     for (int i = 0; i < min; i++) {
         // Hex Dump

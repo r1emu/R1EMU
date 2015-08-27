@@ -45,7 +45,7 @@ Graph *graphNew(void) {
         return NULL;
     }
 
-    if (!graphInit (self)) {
+    if (!graphInit(self)) {
         graphDestroy(&self);
         error("Graph failed to initialize.");
         return NULL;
@@ -85,7 +85,7 @@ static bool graphArcInit(GraphArc *self, GraphNode *from, GraphNode *to) {
     self->user_data = NULL;
 
     // add the current arc to the arcs list : from -> self
-    zlist_append (self->from->arcs, self);
+    zlist_append(self->from->arcs, self);
 
     return true;
 }
@@ -120,12 +120,13 @@ bool graphNodeInit(GraphNode *self, char *hashKey, void *user_data) {
 }
 
 bool graphLink(Graph *self, GraphNode *node1, GraphNode *node2) {
+
     if (!(graphAddArc(self, node1, node2))) {
-        error ("Cannot link node 1 to node 2.");
+        error("Cannot link node 1 to node 2.");
         return false;
     }
     if (!(graphAddArc(self, node2, node1))) {
-        error ("Cannot link node 2 to node 1.");
+        error("Cannot link node 2 to node 1.");
         return false;
     }
 
@@ -211,7 +212,7 @@ void graphDump(Graph *self) {
     (void)loopCounter;
 
     for (GraphNode *node = zhash_first(self->nodes); node != NULL; node = zhash_next(self->nodes)) {
-        dbg ("- Arcs of nodes %c :", 'A' + loopCounter++);
+        dbg("- Arcs of nodes %c :", 'A' + loopCounter++);
         for (GraphArc *arc = zlist_first(node->arcs); arc != NULL; arc = zlist_next(node->arcs)) {
             dbg("   %s -> %s", arc->from->key, arc->to->key);
         }

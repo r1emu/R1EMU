@@ -40,12 +40,12 @@ void barrackBuilderLoginOk(
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        serverPacketHeaderInit (&replyPacket.header, packetType);
+        serverPacketHeaderInit(&replyPacket.header, packetType);
         replyPacket.unk1 = 0x3E9; // from iCBT1
         replyPacket.accountId = accountId;
         replyPacket.accountPrivileges = accountPrivileges;
-        strncpy(replyPacket.accountLogin, accountLogin, sizeof (replyPacket.accountLogin));
-        strncpy(replyPacket.sessionKey, sessionKey, sizeof (replyPacket.sessionKey));
+        strncpy(replyPacket.accountLogin, accountLogin, sizeof(replyPacket.accountLogin));
+        strncpy(replyPacket.sessionKey, sessionKey, sizeof(replyPacket.sessionKey));
     }
 }
 
@@ -78,7 +78,7 @@ void barrackBuilderStartGameOk(
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        serverPacketHeaderInit (&replyPacket.header, packetType);
+        serverPacketHeaderInit(&replyPacket.header, packetType);
         replyPacket.zoneServerId = zoneServerId;
         replyPacket.zoneServerIp = zoneServerIp;
         replyPacket.zoneServerPort = zoneServerPort;
@@ -125,9 +125,9 @@ void barrackBuilderNormalUnk1(uint64_t accountId, zmsg_t *replyMsg) {
     } replyPacket;
     #pragma pack(pop)
 
-    BUILD_REPLY_PACKET (replyPacket, replyMsg)
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        packetNormalHeaderInit (&replyPacket.normalHeader, BC_NORMAL_UNKNOWN_1, sizeof (replyPacket));
+        packetNormalHeaderInit(&replyPacket.normalHeader, BC_NORMAL_UNKNOWN_1, sizeof(replyPacket));
         replyPacket.accountId = accountId;
         replyPacket.unk1 = 0; // ICBT
         replyPacket.unk2 = 0;
@@ -144,7 +144,7 @@ void barrackBuilderIesModifyList(zmsg_t *replyMsg) {
 
     // PacketType packetType = BC_IES_MODIFY_LIST;
     // CHECK_SERVER_PACKET_SIZE (replyPacket, packetType);
-    // BUILD_REPLY_PACKET (replyPacket, replyMsg)
+    // BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         size_t memSize;
 
@@ -236,9 +236,10 @@ void barrackBuilderPetInformation(zmsg_t *replyMsg) {
     } replyPacket;
     #pragma pack(pop)
 
+    PacketType packetType = BC_NORMAL_PET_INFORMATION;
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        packetNormalHeaderInit(&replyPacket.normalHeader, BC_NORMAL_PET_INFORMATION, sizeof(replyPacket));
+        packetNormalHeaderInit(&replyPacket.normalHeader, packetType, sizeof(replyPacket));
         replyPacket.petsCount = 0;
     }
 }
@@ -274,10 +275,10 @@ void barrackBuilderZoneTraffics(zmsg_t *replyMsg) {
     int mapAvailableCount = 1;
 
     // array of zone server availables for each map
-	int *zoneServerCounts = alloca (sizeof (*zoneServerCounts) * mapAvailableCount);
+	int *zoneServerCounts = alloca(sizeof(*zoneServerCounts) * mapAvailableCount);
 
     // array of mapId for each map
-    int *mapsId = alloca (sizeof (*mapsId) * mapAvailableCount);
+    int *mapsId = alloca(sizeof(*mapsId) * mapAvailableCount);
 
     // fill the arrays here
     for (int mapIndex = 0; mapIndex < mapAvailableCount; mapIndex++) {
@@ -291,11 +292,11 @@ void barrackBuilderZoneTraffics(zmsg_t *replyMsg) {
     size_t outPacketSize = sizeof(ZoneTrafficsPacket) + (sizeof(SingleMapTraffic) * mapAvailableCount);
 
     for (int mapIndex = 0; mapIndex < mapAvailableCount; mapIndex++) {
-        outPacketSize += sizeof (SingleZoneTraffic) * zoneServerCounts[mapIndex];
+        outPacketSize += sizeof(SingleZoneTraffic) * zoneServerCounts[mapIndex];
     }
 
     // allocate on the stack the memory for the packet
-    uint8_t *stackBuffer = alloca (sizeof(*stackBuffer) * outPacketSize);
+    uint8_t *stackBuffer = alloca(sizeof(*stackBuffer) * outPacketSize);
     memset(stackBuffer, 0, outPacketSize);
 
     // construct the packet
@@ -310,8 +311,8 @@ void barrackBuilderZoneTraffics(zmsg_t *replyMsg) {
         packetStreamAppend(&stream, &zoneServerCounts[mapIndex], sizeof_struct_member(SingleMapTraffic, zoneServerCount));
 
         for (int zoneServerIndex = 0; zoneServerIndex < zoneServerCounts[mapIndex]; zoneServerIndex++) {
-            packetStreamAppend(&stream, &zoneServerIndex, sizeof_struct_member (SingleZoneTraffic, zoneListId));
-            packetStreamAppend(&stream, &currentPlayersCount, sizeof_struct_member (SingleZoneTraffic, currentPlayersCount));
+            packetStreamAppend(&stream, &zoneServerIndex, sizeof_struct_member(SingleZoneTraffic, zoneListId));
+            packetStreamAppend(&stream, &currentPlayersCount, sizeof_struct_member(SingleZoneTraffic, currentPlayersCount));
         }
     }
 

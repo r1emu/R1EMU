@@ -24,61 +24,44 @@
 
 // ------ Extern function implementation ------
 
-PacketStream *
-packetStreamNew (
-    uint8_t *buffer
-) {
+PacketStream *packetStreamNew(uint8_t *buffer) {
     PacketStream *self;
 
-    if ((self = calloc (1, sizeof (PacketStream))) == NULL) {
+    if ((self = calloc(1, sizeof(PacketStream))) == NULL) {
         return NULL;
     }
 
-    if (!packetStreamInit (self, buffer)) {
+    if (!packetStreamInit(self, buffer)) {
         packetStreamDestroy (&self);
-        error ("PacketStream failed to initialize.");
+        error("PacketStream failed to initialize.");
         return NULL;
     }
 
     return self;
 }
 
-
 bool
-packetStreamInit (
-    PacketStream *self,
-    uint8_t *buffer
-) {
+packetStreamInit(PacketStream *self, uint8_t *buffer) {
     self->buffer = buffer;
     self->position = 0;
     return true;
 }
 
 void
-packetStreamAppend (
-    PacketStream *self,
-    void *data,
-    size_t dataSize
-) {
-    memcpy (&self->buffer[self->position], data, dataSize);
+packetStreamAppend(PacketStream *self, void *data, size_t dataSize) {
+    memcpy(&self->buffer[self->position], data, dataSize);
     self->position += dataSize;
 }
 
-
 void
-packetStreamAddOffset (
-    PacketStream *self,
-    unsigned int offset
-) {
+packetStreamAddOffset(PacketStream *self, unsigned int offset) {
     self->position += offset;
 }
 
 void
-packetStreamDestroy (
-    PacketStream **_self
-) {
+packetStreamDestroy(PacketStream **_self) {
     PacketStream *self = *_self;
 
-    free (self);
+    free(self);
     *_self = NULL;
 }

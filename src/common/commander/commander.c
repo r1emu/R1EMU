@@ -41,14 +41,14 @@ void commanderInit(Commander *commander) {
 
     commander->accountId = -1;
     commander->classId = -1; // Cleric
-    commander->unk4 = SWAP_UINT16 (0x2220); // ICBT
+    commander->unk4 = SWAP_UINT16(0x2220); // ICBT
     commander->jobId = -1;
     commander->gender = -1;
     commander->unk5 = 0; // ICBT
     commander->level = 1;
-    commanderEquipmentInit (&commander->equipment);
+    commanderEquipmentInit(&commander->equipment);
     commander->hairType = -1;
-    commander->pose = SWAP_UINT16 (0x0000); // Idle (ICBT)
+    commander->pose = SWAP_UINT16(0x0000); // Idle (ICBT)
 }
 
 void commanderInfoInit(CommanderInfo *commanderInfo) {
@@ -56,7 +56,7 @@ void commanderInfoInit(CommanderInfo *commanderInfo) {
 
     commanderInit(&commanderInfo->base);
 
-    commanderInfo->pos = PositionXYZ_decl (27.0, 30.0, 29.0);
+    commanderInfo->pos = PositionXYZ_decl(27.0, 30.0, 29.0);
     commanderInfo->currentXP = 0;
     commanderInfo->maxXP = 0xC; // ICBT
     commanderInfo->pcId = -1;
@@ -68,8 +68,8 @@ void commanderInfoInit(CommanderInfo *commanderInfo) {
     commanderInfo->maxSP = 105;
     commanderInfo->currentStamina = 25000;
     commanderInfo->maxStamina = 25000;
-    commanderInfo->unk6 = SWAP_UINT16 (0x0020);
-    commanderInfo->unk7 = SWAP_UINT16 (0x5910); // ICBT
+    commanderInfo->unk6 = SWAP_UINT16(0x0020);
+    commanderInfo->unk7 = SWAP_UINT16(0x5910); // ICBT
 }
 
 void commanderEquipmentPrint(CommanderEquipment *equipment) {
@@ -111,7 +111,7 @@ void commanderPrint(Commander *commander) {
 }
 
 void commanderInfoPrint(CommanderInfo *commanderInfo) {
-    commanderPrint (&commanderInfo->base);
+    commanderPrint(&commanderInfo->base);
     dbg("posX = %f %f %f (%x %x %x)",
          commanderInfo->pos.x, commanderInfo->pos.y, commanderInfo->pos.z,
          commanderInfo->pos.x, commanderInfo->pos.y, commanderInfo->pos.z);

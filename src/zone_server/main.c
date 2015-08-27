@@ -26,7 +26,7 @@
 int main (int argc, char **argv)
 {
     if (argc <= 1) {
-        info ("Please launch GlobalServer instead of ZoneServer. (argc=%d)", argc);
+        info("Please launch GlobalServer instead of ZoneServer. (argc=%d)", argc);
         exit (0);
     }
 
@@ -42,25 +42,25 @@ int main (int argc, char **argv)
     sa.sa_flags = SA_SIGINFO;
     sigemptyset(&sa.sa_mask);
     sa.sa_sigaction = crashHandler;
-    sigaction (SIGSEGV, &sa, NULL);
-    sigaction (SIGABRT, &sa, NULL);
+    sigaction(SIGSEGV, &sa, NULL);
+    sigaction(SIGABRT, &sa, NULL);
     #endif
 
     // === Read the command line arguments ===
-    uint16_t routerId = atoi (*++argv);
+    uint16_t routerId = atoi(*++argv);
     char *routerIp = *++argv;
-    int portsCount = atoi (*++argv);
+    int portsCount = atoi(*++argv);
     int *ports;
-    if (!(ports = malloc (sizeof (int) * portsCount))) {
-        error ("Cannot allocate the port array.");
+    if (!(ports = malloc (sizeof(int) * portsCount))) {
+        error("Cannot allocate the port array.");
         return -1;
     }
     for (int i = 0; i < portsCount; i++) {
-        ports[i] = atoi (*++argv);
+        ports[i] = atoi(*++argv);
     }
-    uint16_t workersCount = atoi (*++argv);
+    uint16_t workersCount = atoi(*++argv);
     char *globalServerIp = *++argv;
-    int globalServerPort = atoi (*++argv);
+    int globalServerPort = atoi(*++argv);
     char *sqlHostname = *++argv;
     char *sqlUsername = *++argv;
     char *sqlPassword = *++argv;
@@ -72,24 +72,24 @@ int main (int argc, char **argv)
 
     // Set a custom output for linux for each servers
     #ifndef WIN32
-    dbg_set_output(fopen(zsys_sprintf("ZoneServer%d_output.txt", routerId), "w+"));
+    dbgSetOutput(fopen(zsys_sprintf("ZoneServer%d_output.txt", routerId), "w+"));
     #else
     // For Windows, change the console title
     switch (serverType) {
         case SERVER_TYPE_BARRACK:
-            SetConsoleTitle (zsys_sprintf ("Barrack (%d)", routerId));
+            SetConsoleTitle(zsys_sprintf("Barrack (%d)", routerId));
         break;
 
         case SERVER_TYPE_ZONE:
-            SetConsoleTitle (zsys_sprintf ("Zone (%d)", routerId));
+            SetConsoleTitle(zsys_sprintf("Zone (%d)", routerId));
         break;
 
         case SERVER_TYPE_SOCIAL:
-            SetConsoleTitle (zsys_sprintf ("Social (%d)", routerId));
+            SetConsoleTitle(zsys_sprintf("Social (%d)", routerId));
         break;
 
         default :
-            SetConsoleTitle (zsys_sprintf ("UNKNOWN (%d)", routerId));
+            SetConsoleTitle(zsys_sprintf("UNKNOWN (%d)", routerId));
         break;
     }
     #endif
@@ -98,15 +98,15 @@ int main (int argc, char **argv)
     EventServer *eventServer;
     EventServerStartupInfo eventServerInfo;
     if (!(eventServerStartupInfoInit(&eventServerInfo, routerId, workersCount, redisHostname, redisPort))) {
-        error ("Cannot initialize the event server.");
+        error("Cannot initialize the event server.");
         return -1;
     }
     if (!(eventServer = eventServerNew(&eventServerInfo))) {
-        error ("Cannot create the event server.");
+        error("Cannot create the event server.");
         return -1;
     }
     if ((zthread_new((zthread_detached_fn *) eventServerStart, eventServer)) != 0) {
-        error ("Cannot start the event server.");
+        error("Cannot start the event server.");
         return -1;
     }
 
@@ -121,7 +121,7 @@ int main (int argc, char **argv)
         sqlHostname, sqlUsername, sqlPassword, sqlDatabase,
         redisHostname, redisPort
     ))) {
-        error ("Cannot create a Server.");
+        error("Cannot create a Server.");
         return -1;
     }
 
@@ -133,15 +133,15 @@ int main (int argc, char **argv)
             if ((barrackServer = barrackServerNew(server))) {
 
                 // Start the Barrack Server
-                if (!barrackServerStart (barrackServer)) {
-                    error ("Cannot start the BarrackServer properly.");
+                if (!barrackServerStart(barrackServer)) {
+                    error("Cannot start the BarrackServer properly.");
                 }
 
                 // Unload the Barrack Server properly
-                barrackServerDestroy (&barrackServer);
+                barrackServerDestroy(&barrackServer);
             }
             else {
-                error ("Cannot initialize the BarrackServer properly.");
+                error("Cannot initialize the BarrackServer properly.");
             }
         break;
 
@@ -151,11 +151,11 @@ int main (int argc, char **argv)
 
                 // Start the Zone Server
                 if (!zoneServerStart(zoneServer)) {
-                    error ("Cannot start the Zone Server properly.");
+                    error("Cannot start the Zone Server properly.");
                 }
 
                 // Unload the Zone Server properly
-                zoneServerDestroy (&zoneServer);
+                zoneServerDestroy(&zoneServer);
             }
             else {
                 error("Cannot initialize the Zone Server properly.");
@@ -168,19 +168,19 @@ int main (int argc, char **argv)
 
                 // Start the Social Server
                 if (!socialServerStart(socialServer)) {
-                    error ("Cannot start the Social Server properly.");
+                    error("Cannot start the Social Server properly.");
                 }
 
                 // Unload the Social Server properly
-                socialServerDestroy (&socialServer);
+                socialServerDestroy(&socialServer);
             }
             else {
-                error ("Cannot initialize the Social Server properly.");
+                error("Cannot initialize the Social Server properly.");
             }
         break;
 
         default :
-            error ("Cannot start an unknown serverType.");
+            error("Cannot start an unknown serverType.");
         break;
     }
 
@@ -188,7 +188,7 @@ int main (int argc, char **argv)
     zsys_shutdown();
 
     // Close the custom debug file if necessary
-    dbg_close();
+    dbgClose();
 
     return 0;
 }

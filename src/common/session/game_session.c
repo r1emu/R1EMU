@@ -25,13 +25,13 @@ gameSessionNew (
 ) {
     GameSession *self;
 
-    if ((self = calloc (1, sizeof (GameSession))) == NULL) {
+    if ((self = calloc(1, sizeof(GameSession))) == NULL) {
         return NULL;
     }
 
     if (!gameSessionInit (self, commanderInfo)) {
         gameSessionDestroy (&self);
-        error ("GameSession failed to initialize.");
+        error("GameSession failed to initialize.");
         return NULL;
     }
 
@@ -43,7 +43,7 @@ gameSessionInit (
     GameSession *self,
     CommanderInfo *commanderInfo
 ) {
-    memset (self, 0, sizeof (GameSession));
+    memset(self, 0, sizeof(GameSession));
 
     commanderSessionInit (&self->commanderSession, commanderInfo);
     barrackSessionInit (&self->barrackSession);
@@ -55,7 +55,7 @@ void
 gameSessionPrint (
     GameSession *self
 ) {
-    dbg ("==== GameSession %p ====", self);
+    dbg("==== GameSession %p ====", self);
     barrackSessionPrint (&self->barrackSession);
     commanderSessionPrint (&self->commanderSession);
 }
@@ -72,5 +72,5 @@ void
 gameSessionFree (
     GameSession *self
 ) {
-    free (self);
+    free(self);
 }

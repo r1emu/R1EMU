@@ -21,7 +21,7 @@
 #define ZLIB_MAGIC_HEADER 0xFA8D
 
 #define ZLIB_GET_COMPRESSED_PACKET_SIZE(_zlib, _pktSize) \
-    (_zlib)->header.size + sizeof (ZlibHeader) + (_pktSize - sizeof (Zlib));
+    (_zlib)->header.size + sizeof(ZlibHeader) + (_pktSize - sizeof(Zlib));
 
 typedef struct {
 uint16_t magic;

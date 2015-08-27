@@ -34,13 +34,13 @@ socketSessionNew (
 ) {
     SocketSession *self;
 
-    if ((self = calloc (1, sizeof (SocketSession))) == NULL) {
+    if ((self = calloc(1, sizeof(SocketSession))) == NULL) {
         return NULL;
     }
 
-    if (!socketSessionInit (self, accountId, routerId, mapId, socketId, authenticated)) {
+    if (!socketSessionInit(self, accountId, routerId, mapId, socketId, authenticated)) {
         socketSessionDestroy (&self);
-        error ("SocketSession failed to initialize.");
+        error("SocketSession failed to initialize.");
         return NULL;
     }
 
@@ -49,7 +49,7 @@ socketSessionNew (
 
 
 bool
-socketSessionInit (
+socketSessionInit(
     SocketSession *self,
     uint64_t accountId,
     uint16_t routerId,
@@ -60,7 +60,7 @@ socketSessionInit (
     self->accountId = accountId;
     self->routerId = routerId;
     self->mapId = mapId;
-    memcpy (self->sessionKey, sessionKey, sizeof (self->sessionKey));
+    memcpy(self->sessionKey, sessionKey, sizeof(self->sessionKey));
 
     self->authenticated = authenticated;
 
@@ -82,7 +82,7 @@ socketSessionDestroyGenId (
     uint8_t *sessionKey,
     uint8_t sessionId[5]
 ) {
-    uint64_t identity = strtoull (sessionKey, NULL, 16);
+    uint64_t identity = strtoull(sessionKey, NULL, 16);
     // Format the sessionId from the session key
     // Swap the bytes
     sessionId[0] = (identity >> 32) & 0xFF;
@@ -96,11 +96,11 @@ void
 socketSessionDestroyPrint (
     SocketSession *self
 ) {
-    dbg ("==== SocketSession %p ====", self);
-    dbg ("sessionKey = <%s>", self->sessionKey);
-    dbg ("accountId = <%llx>", self->accountId);
-    dbg ("routerId = <%x>", self->routerId);
-    dbg ("authenticated = <%x>", self->authenticated);
+    dbg("==== SocketSession %p ====", self);
+    dbg("sessionKey = <%s>", self->sessionKey);
+    dbg("accountId = <%llx>", self->accountId);
+    dbg("routerId = <%x>", self->routerId);
+    dbg("authenticated = <%x>", self->authenticated);
 }
 
 
@@ -110,6 +110,6 @@ socketSessionDestroy (
 ) {
     SocketSession *self = *_self;
 
-    free (self);
+    free(self);
     *_self = NULL;
 }

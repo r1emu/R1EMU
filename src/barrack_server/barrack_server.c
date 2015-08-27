@@ -29,13 +29,13 @@ struct BarrackServer
 BarrackServer *barrackServerNew(Server *server) {
     BarrackServer *self;
 
-    if ((self = calloc (1, sizeof (BarrackServer))) == NULL) {
+    if ((self = calloc(1, sizeof(BarrackServer))) == NULL) {
         return NULL;
     }
 
     if (!barrackServerInit(self, server)) {
         barrackServerDestroy(&self);
-        error ("BarrackServer failed to initialize.");
+        error("BarrackServer failed to initialize.");
         return NULL;
     }
 
@@ -48,12 +48,12 @@ bool barrackServerInit(BarrackServer *self, Server *server) {
 }
 
 bool barrackServerStart(BarrackServer *self) {
-    special ("======================");
-    special ("=== Barrack server ===");
-    special ("======================");
+    special("======================");
+    special("=== Barrack server ===");
+    special("======================");
 
     if (!(serverStart (self->server))) {
-        error ("Cannot start the Server.");
+        error("Cannot start the Server.");
         return false;
     }
 
@@ -63,7 +63,7 @@ bool barrackServerStart(BarrackServer *self) {
 void barrackServerDestroy(BarrackServer **_self) {
     BarrackServer *self = *_self;
 
-    serverDestroy (&self->server);
-    free (self);
+    serverDestroy(&self->server);
+    free(self);
     *_self = NULL;
 }

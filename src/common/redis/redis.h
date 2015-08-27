@@ -28,9 +28,9 @@
 #define REDIS_PORT_DEFAULT       6379
 
 // accessors helpers
-#define COPY_REDIS_STR(_str, _x) strncpy (_str, reply->element[REDIS_GAME_SESSION_##_x]->str, sizeof (_str));
-#define GET_REDIS_32(_x) strtoul (reply->element[REDIS_GAME_SESSION_##_x]->str, NULL, 16)
-#define GET_REDIS_64(_x) strtoull (reply->element[REDIS_GAME_SESSION_##_x]->str, NULL, 16)
+#define COPY_REDIS_STR(_str, _x) strncpy (_str, reply->element[REDIS_GAME_SESSION_##_x]->str, sizeof(_str));
+#define GET_REDIS_32(_x) strtoul(reply->element[REDIS_GAME_SESSION_##_x]->str, NULL, 16)
+#define GET_REDIS_64(_x) strtoull(reply->element[REDIS_GAME_SESSION_##_x]->str, NULL, 16)
 #define GET_REDIS_FLOAT(_x) strtof (reply->element[REDIS_GAME_SESSION_##_x]->str, NULL)
 
 typedef struct Redis Redis;
