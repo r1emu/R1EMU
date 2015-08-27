@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file crypto.h
+ * @file Crypto.h
  * @brief Crypto contains cryptographic functions needed for the communication between the client and the server
  *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
@@ -16,8 +16,21 @@
 
 #pragma once
 
+// ---------- Includes ------------
 #include "R1EMU.h"
-#include "common/packet/packet.h"
+#include "Common/Packet/Packet.h"
+
+// ---------- Defines -------------
+
+
+
+// ----------- Functions ------------
+
+
+/**
+ * @brief Initialize client crypto components
+ */
+bool cryptoInit(void);
 
 /**
  * @brief Unwrap the client packet header and decrypt the packet.

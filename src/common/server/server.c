@@ -17,6 +17,7 @@
 #include "Router.h"
 #include "Worker.h"
 #include "common/utils/string.h"
+#include "common/crypto/crypto.h"
 
 
 // ------ Structure declaration -------
@@ -66,6 +67,12 @@ serverInit (
     // Make a private copy
     if (!(serverStartupInfoInit (&self->info, info->serverType, &info->routerInfo, info->workersInfo, info->workersInfoCount))) {
         error("Cannot init the ServerStartupInfo");
+        return false;
+    }
+
+    // Initialize crypto module for decrypting packet
+    if (!(cryptoInit())) {
+        error ("Cannot initialize crypto module.");
         return false;
     }
 

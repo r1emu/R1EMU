@@ -18,6 +18,7 @@
 
 #include "R1EMU.h"
 #include "packet_type.h"
+#include "common/crypto/bf/blowfish.h"
 
 #define PACKET_HEADER(x) (typeof(x)[]){x}
 
@@ -37,17 +38,24 @@
         }                                                                                   \
     } while (0);
 
-#define CHECK_CLIENT_PACKET_SIZE(packet, packetType)                                        \
-    do {                                                                                    \
-        size_t __clientPacketSize = packetTypeInfo.packets[packetType].size                 \
-                                  - sizeof(ClientPacketHeader);                             \
-        if (packetTypeInfo.packets[packetType].size != 0                                    \
-         && sizeof(packet) != __clientPacketSize) {                                         \
-            error("The packet size sent isn't the equal to the one in PacketType.h");       \
-            error("The packet size is %d bytes. The waited size is %d bytes.",              \
-                sizeof(packet), __clientPacketSize);                                        \
-        }                                                                                   \
-    } while (0);
+#define CHECK_CLIENT_PACKET_SIZE(packet, packetSize, packetType)                                    \
+    do {                                                                                            \
+        size_t __clientPacketSize = packetTypeInfo.packets[packetType].size                         \
+                                  - sizeof(ClientPacketHeader);                                     \
+        if (packetTypeInfo.packets[packetType].size != 0                                            \
+         && sizeof(packet) != __clientPacketSize) {                                                 \
+            error("The packet size sent isn't the equal to the one in PacketType.h");               \
+            error("The packet size is %d bytes. The waited size is %d bytes.",                      \
+                sizeof(packet), __clientPacketSize);                                                \
+                                                                                                    \
+                return PACKET_HANDLER_ERROR;                                                        \
+        }                                                                                           \
+        if (packetSize > (sizeof (packet) + BF_BLOCK) || packetSize < sizeof (packet) ) {           \
+            error("The packet size received isn't correct. (packet size = %d, correct size = %d)",  \
+                packetSize, sizeof (packet));                                                       \
+            return PACKET_HANDLER_ERROR;                                                            \
+        }                                                                                           \
+    } while (0)
 
 /**
  * @brief ClientPacketHeader is the header of each packet sent by the client.

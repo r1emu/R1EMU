@@ -25,9 +25,9 @@
 int main(int argc, char **argv)
 {
      // Get the configuration file
-    char *confFilePath;
+    char *confFilePath = NULL;
 
-    GlobalServer *globalServer;
+    GlobalServer *globalServer = NULL;
     GlobalServerStartupInfo info;
 
     // force the initialization of the CZMQ layer here.

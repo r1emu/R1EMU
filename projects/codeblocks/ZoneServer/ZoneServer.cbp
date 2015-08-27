@@ -50,6 +50,7 @@
 			<Add directory="../../../lib/x64" />
 			<Add directory="/usr/local/mysql/lib/" />
 		</Linker>
+		<Unit filename="../../../src/R1EMU.h" />
 		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_builder.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -67,14 +68,27 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/commander/commander.h" />
+		<Unit filename="../../../src/common/crypto/bf/bf_ecb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/crypto/bf/bf_enc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/crypto/bf/bf_skey.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../src/common/crypto/crypto.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/crypto/crypto.h" />
-		<Unit filename="../../../src/common/Graph/Graph.c">
+		<Unit filename="../../../src/common/dbg/dbg.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/common/Graph/Graph.h" />
+		<Unit filename="../../../src/common/dbg/dbg.h" />
+		<Unit filename="../../../src/common/graph/graph.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/graph/graph.h" />
 		<Unit filename="../../../src/common/mysql/fields/mysql_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -163,10 +177,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/session/socket_session.h" />
-		<Unit filename="../../../src/common/dbg/dbg.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../../src/common/dbg/dbg.h" />
 		<Unit filename="../../../src/common/utils/admin_cmd.h" />
 		<Unit filename="../../../src/common/utils/math.c">
 			<Option compilerVar="CC" />
@@ -197,7 +207,6 @@
 		</Unit>
 		<Unit filename="../../../src/common/utils/zlib.h" />
 		<Unit filename="../../../src/global_server/global_server.h" />
-		<Unit filename="../../../src/R1EMU.h" />
 		<Unit filename="../../../src/social_server/social_handler/social_handler.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -206,6 +215,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/social_server/social_server.h" />
+		<Unit filename="../../../src/zone_server/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../src/zone_server/zone_handler/admin_cmd.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -218,9 +230,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/zone_server/zone_server.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../../src/zone_server/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

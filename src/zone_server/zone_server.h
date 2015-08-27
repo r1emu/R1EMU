@@ -19,7 +19,7 @@
 #include "R1EMU.h"
 #include "common/server/server.h"
 
-#define ZONE_SERVER_EXECUTABLE_NAME         "ZoneServer"
+#define ZONE_SERVER_EXECUTABLE_NAME         "zone_server"
 
 // configuration default values
 #define ZONE_SERVER_PORTS_DEFAULT           (char []) {"2004"}

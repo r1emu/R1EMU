@@ -103,12 +103,7 @@ ZoneHandler_chat(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CHAT);
 
     // The chat message sent by the client should always finish by a null byte
     clientPacket->msgText[chatTextSize-1] = '\0';
@@ -146,12 +141,7 @@ static PacketHandlerState ZoneHandler_restSit(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_REST_SIT);
 
     // notify the players around
     GameEventRestSit event = {
@@ -186,12 +176,7 @@ static PacketHandlerState ZoneHandler_skillGround(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_SKILL_GROUND);
 
     /*   CzSkillGroundPacket :
          u1 skillId  unk2     x        y        z        x2       y2       z2       u3       u4       u5       u6 u7
@@ -225,14 +210,7 @@ static PacketHandlerState ZoneHandler_campInfo(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    // Check packet size
-    CHECK_CLIENT_PACKET_SIZE(*clientPacket, CZ_CAMPINFO);
-
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CAMPINFO);
 
     zoneBuilderCampInfo(session->socket.accountId, replyMsg);
 
@@ -324,6 +302,8 @@ ZoneHandler_moveStop(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_MOVE_STOP);
+
     /*  u1 posX     posY     posZ     dirX     dirZ     time
         00 36E203C4 74768243 826F39C4 FFFFFF3F 00000000 D0651543
         00 22F402C4 74768243 826F39C4 FFFFFF3F 00000000 60941543
@@ -337,12 +317,6 @@ ZoneHandler_moveStop(
         00 22F402C4 74768243 FE4337C4 00000000 FFFF7F3F 0A6B1743
         00 22F402C4 74768243 8E0636C4 00000000 FFFF7F3F D3951743
     */
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
 
     // Notify the players around
     GameEventMoveStop event = {
@@ -388,12 +362,7 @@ ZoneHandler_keyboardMove(
         00 5CEE19C4 74768243 5C2E7DC4 1D566733 FFFF7F3F 01 00000000 00 8174FA42
         00 8C5112C4 74768243 78A374C4 FFFF7F3F 00000000 01 00000000 00 727CC244
     */
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_KEYBOARD_MOVE);
 
     // TODO : Check coordinates
 
@@ -437,6 +406,8 @@ ZoneHandler_gameReady(
     size_t packetSize,
     zmsg_t *replyMsg)
 {
+    // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_GAME_READY);
+
     CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
 
     zoneBuilderItemInventoryList(replyMsg);
@@ -539,15 +510,7 @@ static PacketHandlerState ZoneHandler_connect(
     #pragma pack(pop)
 
     // TODO : Reverse CZ_CONNECT correctly
-    /*
-    CHECK_CLIENT_PACKET_SIZE(*clientPacket, CZ_CONNECT);
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
-    */
+    // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CONNECT);
 
     // Get the Game Session that the Barrack Server moved
     RedisGameSessionKey gameKey = {
@@ -621,12 +584,7 @@ static PacketHandlerState ZoneHandler_jump(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_JUMP);
 
     // Notify the players around
     GameEventJump event = {

@@ -76,12 +76,7 @@ static PacketHandlerState BarrackHandler_login(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_LOGIN);
 
     // authenticate here
     // TODO
@@ -127,12 +122,7 @@ static PacketHandlerState BarrackHandler_loginByPassport(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_LOGIN_BY_PASSPORT);
 
     // authenticate here
     // TODO
@@ -173,12 +163,7 @@ static PacketHandlerState BarrackHandler_startGame(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_START_GAME);
 
     // Retrieve zone servers IPs from Redis
     // Fake IPs here until we can retrieve the IPs database
@@ -251,12 +236,7 @@ BarrackHandler_commanderMove(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_MOVE);
 
     CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
 
@@ -282,7 +262,10 @@ BarrackHandler_startBarrack(
     Session *session,
     uint8_t *packet,
     size_t packetSize,
-    zmsg_t *reply) {
+    zmsg_t *reply)
+{
+    // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_START_BARRACK);
+
     // IES Modify List
     /*
     BarrackBuilder_iesModifyList(
@@ -323,6 +306,8 @@ static PacketHandlerState BarrackHandler_currentBarrack(
     size_t packetSize,
     zmsg_t *reply)
 {
+    // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_CURRENT_BARRACK);
+
     //  [CLIENT SEND] Packet type : <CB_CURRENT_BARRACK>
     //   =================================================
     //    4E00 03000000 F7030000 D1A8014400000000 03000068 42F0968F 41000070 4111E334 3FCF2635 BF
@@ -347,11 +332,7 @@ static PacketHandlerState BarrackHandler_barracknameChange(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_BARRACKNAME_CHANGE);
 
     CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
     Commander *commander = &commanderInfo->base;
@@ -387,6 +368,8 @@ static PacketHandlerState BarrackHandler_commanderDestroy(
     size_t packetSize,
     zmsg_t *reply)
 {
+    // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_DESTROY);
+
     uint8_t commanderDestroyMask = 0xFF; // Destroy all characters!
 
     // Update session
@@ -418,12 +401,7 @@ static PacketHandlerState BarrackHandler_commanderCreate(
     }  *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    if (sizeof(*clientPacket) != packetSize) {
-        error("The packet size received isn't correct.(packet size = %d, correct size = %d)",
-            packetSize, sizeof(*clientPacket));
-
-        return PACKET_HANDLER_ERROR;
-    }
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_CREATE);
 
     CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
     Commander *commander = &commanderInfo->base;

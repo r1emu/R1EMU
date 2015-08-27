@@ -49,6 +49,7 @@
 			<Add directory="../../../lib/x64" />
 			<Add directory="/usr/local/mysql/lib/" />
 		</Linker>
+		<Unit filename="../../../src/R1EMU.h" />
 		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_builder.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -65,10 +66,23 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/commander/commander.h" />
+		<Unit filename="../../../src/common/crypto/bf/bf_ecb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/crypto/bf/bf_enc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/crypto/bf/bf_skey.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../src/common/crypto/crypto.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/crypto/crypto.h" />
+		<Unit filename="../../../src/common/dbg/dbg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/dbg/dbg.h" />
 		<Unit filename="../../../src/common/graph/graph.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -161,10 +175,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/session/socket_session.h" />
-		<Unit filename="../../../src/common/dbg/dbg.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../../src/common/dbg/dbg.h" />
 		<Unit filename="../../../src/common/utils/math.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -200,7 +210,6 @@
 		<Unit filename="../../../src/global_server/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/R1EMU.h" />
 		<Unit filename="../../../src/social_server/social_handler/social_handler.c">
 			<Option compilerVar="CC" />
 		</Unit>
