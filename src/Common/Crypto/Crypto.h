@@ -27,6 +27,9 @@
 // ----------- Functions ------------
 
 
+bool
+Crypto_init ();
+
 /**
  * @brief Unwrap the client packet header and decrypt the packet.
  * @param[in,out] packet The packet ciphered. After this call, the packet is decrypted.

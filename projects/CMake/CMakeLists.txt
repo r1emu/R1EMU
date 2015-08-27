@@ -27,6 +27,9 @@ target_link_libraries(zone_handlers common)
 
 set(COMMON_SRC
     ${ROOT_PATH}/Common/Commander/Commander.c
+    ${ROOT_PATH}/Common/Crypto/bf/bf_ecb.c
+    ${ROOT_PATH}/Common/Crypto/bf/bf_enc.c
+    ${ROOT_PATH}/Common/Crypto/bf/bf_skey.c
     ${ROOT_PATH}/Common/Crypto/Crypto.c
     ${ROOT_PATH}/Common/dbg/dbg.c
     ${ROOT_PATH}/Common/Graph/Graph.c
