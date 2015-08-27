@@ -12,10 +12,10 @@
  */
 
 // ---------- Includes ------------
-#include "Router.h"
-#include "Worker.h"
-#include "RouterMonitor.h"
-#include "Common/Packet/Packet.h"
+#include "router.h"
+#include "worker.h"
+#include "router_monitor.h"
+#include "common/packet/packet.h"
 
 // ------ Structure declaration -------
 typedef struct {

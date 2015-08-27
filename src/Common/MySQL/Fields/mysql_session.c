@@ -11,26 +11,21 @@
  *          See LICENSE file for further information
 */
 
-// ---------- Includes ------------
-#include "MySQLSession.h"
+#include "mysql_session.h"
 
-void
-mySqlFlushSession (
-    MySQL *self,
-    Session *session
-) {
+void mySqlFlushSession (MySQL *self, Session *session) {
     MYSQL_ROW count;
 
-    // Flush the commander
-    if (mySqlQuery (self, "SELECT count(*) FROM commander WHERE commander_id = %u", session->game.commanderSession.currentCommander.commanderId)) {
-        error ("SQL Error : %s" , mysql_error (self->handle));
+    // flush the commander
+    if (mySqlQuery(self, "SELECT count(*) FROM commander WHERE commander_id = %u",
+                   session->game.commanderSession.currentCommander.commanderId)) {
+        error("SQL Error : %s" , mysql_error (self->handle));
     }
     else {
-        count = mysql_fetch_row (self->result);
+        count = mysql_fetch_row(self->result);
 
-        if (atoi (count[0]) == 0)
-        {
-            // Insert a new Commander
+        if (atoi(count[0]) == 0) {
+            // insert a new Commander
             if (mySqlQuery (self,
                 "INSERT INTO commander ("
                 "`commander_id`, `account_id`, `name`, `family_name`, `class`, "
@@ -68,15 +63,15 @@ mySqlFlushSession (
                 session->game.commanderSession.currentCommander.pos.z,
                 session->game.commanderSession.currentCommander.currentXP,
                 session->game.commanderSession.currentCommander.currentHP,
-                session->game.commanderSession.currentCommander.currentSP
-            )) {
+                session->game.commanderSession.currentCommander.currentSP))
+            {
                 error ("SQL Error : %s" , mysql_error (self->handle));
             }
-            dbg ("Inserting a new commander");
+            dbg("Inserting a new commander");
         }
         else {
-            // Update the commander
-            dbg ("Updating the commander");
+            // update the commander
+            dbg("Updating the commander");
         }
     }
 }

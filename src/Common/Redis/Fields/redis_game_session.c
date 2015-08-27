@@ -13,9 +13,9 @@
 
 
 // ---------- Includes ------------
-#include "RedisGameSession.h"
-#include "RedisSocketSession.h"
-#include "Common/utils/math.h"
+#include "redis_game_session.h"
+#include "redis_socket_session.h"
+#include "common/utils/math.h"
 
 
 // ------ Structure declaration -------

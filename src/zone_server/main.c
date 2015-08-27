@@ -17,11 +17,11 @@
  */
 
 // ---------- Includes ------------
-#include "ZoneServer/ZoneServer.h"
-#include "BarrackServer/BarrackServer.h"
-#include "SocialServer/SocialServer.h"
-#include "Common/Server/EventServer.h"
-#include "Common/Server/ServerFactory.h"
+#include "zone_server/zone_server.h"
+#include "barrack_server/barrack_server.h"
+#include "social_server/social_server.h"
+#include "common/server/event_server.h"
+#include "common/server/server_factory.h"
 
 int main (int argc, char **argv)
 {
@@ -72,7 +72,7 @@ int main (int argc, char **argv)
 
     // Set a custom output for linux for each servers
     #ifndef WIN32
-    dbg_set_output (fopen (zsys_sprintf ("ZoneServer%d_output.txt", routerId), "w+"));
+    dbg_set_output(fopen(zsys_sprintf("ZoneServer%d_output.txt", routerId), "w+"));
     #else
     // For Windows, change the console title
     switch (serverType) {
@@ -97,22 +97,22 @@ int main (int argc, char **argv)
     // === Build the Event Server ===
     EventServer *eventServer;
     EventServerStartupInfo eventServerInfo;
-    if (!(EventServerStartupInfo_init (&eventServerInfo, routerId, workersCount, redisHostname, redisPort))) {
+    if (!(eventServerStartupInfoInit(&eventServerInfo, routerId, workersCount, redisHostname, redisPort))) {
         error ("Cannot initialize the event server.");
         return -1;
     }
-    if (!(eventServer = EventServer_new (&eventServerInfo))) {
+    if (!(eventServer = eventServerNew(&eventServerInfo))) {
         error ("Cannot create the event server.");
         return -1;
     }
-    if ((zthread_new ((zthread_detached_fn *) EventServer_start, eventServer)) != 0) {
+    if ((zthread_new((zthread_detached_fn *) eventServerStart, eventServer)) != 0) {
         error ("Cannot start the event server.");
         return -1;
     }
 
     // === Build the Zone Server ===
     Server *server;
-    if (!(server = ServerFactory_createServer (
+    if (!(server = serverFactoryCreateServer(
         serverType,
         routerId, routerIp,
         portsCount, ports,
@@ -130,15 +130,15 @@ int main (int argc, char **argv)
     {
         case SERVER_TYPE_BARRACK:
             // Initialize the Barrack Server
-            if ((barrackServer = BarrackServer_new (server))) {
+            if ((barrackServer = barrackServerNew(server))) {
 
                 // Start the Barrack Server
-                if (!BarrackServer_start (barrackServer)) {
+                if (!barrackServerStart (barrackServer)) {
                     error ("Cannot start the BarrackServer properly.");
                 }
 
                 // Unload the Barrack Server properly
-                BarrackServer_destroy (&barrackServer);
+                barrackServerDestroy (&barrackServer);
             }
             else {
                 error ("Cannot initialize the BarrackServer properly.");
@@ -147,32 +147,32 @@ int main (int argc, char **argv)
 
         case SERVER_TYPE_ZONE:
             // Initialize the Zone Server
-            if ((zoneServer = ZoneServer_new (server))) {
+            if ((zoneServer = zoneServerNew(server))) {
 
                 // Start the Zone Server
-                if (!ZoneServer_start (zoneServer)) {
+                if (!zoneServerStart(zoneServer)) {
                     error ("Cannot start the Zone Server properly.");
                 }
 
                 // Unload the Zone Server properly
-                ZoneServer_destroy (&zoneServer);
+                zoneServerDestroy (&zoneServer);
             }
             else {
-                error ("Cannot initialize the Zone Server properly.");
+                error("Cannot initialize the Zone Server properly.");
             }
         break;
 
         case SERVER_TYPE_SOCIAL:
             // Initialize the Social Server
-            if ((socialServer = SocialServer_new (server))) {
+            if ((socialServer = socialServerNew(server))) {
 
                 // Start the Social Server
-                if (!SocialServer_start (socialServer)) {
+                if (!socialServerStart(socialServer)) {
                     error ("Cannot start the Social Server properly.");
                 }
 
                 // Unload the Social Server properly
-                SocialServer_destroy (&socialServer);
+                socialServerDestroy (&socialServer);
             }
             else {
                 error ("Cannot initialize the Social Server properly.");
@@ -185,10 +185,10 @@ int main (int argc, char **argv)
     }
 
     // Shutdown the CZMQ layer properly
-    zsys_shutdown ();
+    zsys_shutdown();
 
     // Close the custom debug file if necessary
-    dbg_close ();
+    dbg_close();
 
     return 0;
 }

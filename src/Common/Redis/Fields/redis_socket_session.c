@@ -13,8 +13,8 @@
 
 
 // ---------- Includes ------------
-#include "RedisSocketSession.h"
-#include "RedisGameSession.h"
+#include "redis_socket_session.h"
+#include "redis_game_session.h"
 
 
 // ------ Structure declaration -------

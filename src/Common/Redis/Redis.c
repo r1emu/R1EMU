@@ -13,10 +13,10 @@
 
 
 // ---------- Includes ------------
-#include "Redis.h"
+#include "redis.h"
 
 // GameSession Fields
-#include "Fields/RedisGameSession.h"
+#include "fields/redis_game_session.h"
 
 // ------ Structure declaration -------
 /**
@@ -78,7 +78,7 @@ redisStartupInfoInit (
 }
 
 bool
-redisConnect (
+redisConnection (
     Redis *self
 ) {
     RedisStartupInfo *info = &self->info;

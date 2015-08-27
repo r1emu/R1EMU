@@ -11,20 +11,9 @@
  *          See LICENSE file for further information
  */
 
-// ---------- Includes ------------
-#include "Packet.h"
+#include "packet.h"
 
-
-// ------ Structure declaration -------
-
-
-// ------ Static declaration -------
-
-
-// ------ Extern function implementation ------
-
-void
-clientPacketUnwrapHeader (
+void clientPacketUnwrapHeader (
     uint8_t **packet,
     size_t *packetSize,
     ClientPacketHeader *header,

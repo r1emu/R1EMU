@@ -19,12 +19,12 @@
 #include "worker.h"
 #include "router.h"
 #include "event_server.h"
-#include "Common/utils/random.h"
-#include "Common/Redis/Fields/RedisSession.h"
-#include "Common/Redis/Fields/RedisSocketSession.h"
-#include "Common/Redis/Fields/RedisGameSession.h"
-#include "Common/Crypto/Crypto.h"
-#include "Common/Packet/Packet.h"
+#include "common/utils/random.h"
+#include "common/redis/fields/redis_session.h"
+#include "common/redis/fields/redis_socket_session.h"
+#include "common/redis/fields/redis_game_session.h"
+#include "common/crypto/crypto.h"
+#include "common/packet/packet.h"
 
 
 // ------ Structure declaration -------
@@ -231,7 +231,7 @@ workerInit (
         return false;
     }
 
-    if (!(redisConnect (self->redis))) {
+    if (!(redisConnection (self->redis))) {
         error ("Cannot connect to the Redis server.");
         return false;
     }

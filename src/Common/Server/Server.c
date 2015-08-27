@@ -16,7 +16,7 @@
 #include "Server.h"
 #include "Router.h"
 #include "Worker.h"
-#include "Common/utils/string.h"
+#include "common/utils/string.h"
 
 
 // ------ Structure declaration -------

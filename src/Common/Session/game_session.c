@@ -17,7 +17,7 @@
  */
 
 // ---------- Includes ------------
-#include "GameSession.h"
+#include "game_session.h"
 
 GameSession *
 gameSessionNew (

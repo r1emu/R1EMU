@@ -13,7 +13,7 @@
 
 
 // ---------- Includes ------------
-#include "SocketSession.h"
+#include "socket_session.h"
 
 
 // ------ Structure declaration -------

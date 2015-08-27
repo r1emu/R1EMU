@@ -13,13 +13,13 @@
 
 
 // ---------- Includes ------------
-#include "SocialHandler.h"
-#include "Common/Packet/Packet.h"
-#include "Common/Commander/Commander.h"
-#include "Common/Packet/PacketStream.h"
-#include "Common/Redis/Fields/RedisGameSession.h"
-#include "Common/Server/Worker.h"
-#include "BarrackServer/BarrackServer.h"
+#include "social_handler.h"
+#include "common/packet/packet.h"
+#include "common/commander/commander.h"
+#include "common/packet/packet_stream.h"
+#include "common/redis/fields/redis_game_session.h"
+#include "common/server/worker.h"
+#include "barrack_server/barrack_server.h"
 
 
 // ------ Static declaration -------

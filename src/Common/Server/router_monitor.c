@@ -17,11 +17,11 @@
  */
 
 // ------ Includes -------
-#include "RouterMonitor.h"
-#include "Router.h"
-#include "Common/Session/Session.h"
-#include "Common/Redis/Fields/RedisSession.h"
-#include "Common/Packet/Packet.h"
+#include "router_monitor.h"
+#include "router.h"
+#include "common/session/session.h"
+#include "common/redis/fields/redis_session.h"
+#include "common/packet/packet.h"
 
 // ------ Structure declaration -------
 /**
@@ -349,7 +349,7 @@ routerMonitorStart (
     zloop_t *reactor = NULL;
 
     // Connect to the Redis database
-    if (!(redisConnect (self.redis))) {
+    if (!(redisConnection (self.redis))) {
         error ("Cannot connect to Redis.");
         goto cleanup;
     }

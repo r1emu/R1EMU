@@ -582,7 +582,7 @@ eventServerStart (
     EventServer *self
 ) {
     // Start Redis
-    if (!(redisConnect (self->redis))) {
+    if (!(redisConnection (self->redis))) {
         error ("Cannot connect to the Redis Server.");
         return false;
     }

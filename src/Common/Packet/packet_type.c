@@ -13,7 +13,7 @@
 
 
 // ---------- Includes ------------
-#include "PacketType.h"
+#include "packet_type.h"
 
 
 // ------ Structure declaration -------

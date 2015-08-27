@@ -21,7 +21,7 @@
 #include "worker.h"
 
 // router unique IDs
-#define BARRACK_SERVER_ROUTER_ID((uint16_t) -1)
+#define BARRACK_SERVER_ROUTER_ID ((uint16_t) -1)
 #define SOCIAL_SERVER_ROUTER_ID ((uint16_t) -2)
 
 typedef struct Server Server;

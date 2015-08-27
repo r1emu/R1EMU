@@ -71,7 +71,7 @@ bool globalServerInit(GlobalServer *self, GlobalServerStartupInfo *info) {
         return false;
     }
 
-    if (!(redisConnect(self->redis))) {
+    if (!(redisConnection(self->redis))) {
         error ("Cannot connect to Redis.");
         return false;
     }

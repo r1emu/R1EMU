@@ -96,7 +96,7 @@ static PacketHandlerState BarrackHandler_login(
 
     info("AccountID %llx generated !", session->socket.accountId);
 
-    BarrackBuilder_loginOk(
+    barrackBuilderLoginOk(
         session->socket.accountId,
         session->game.accountSession.login,
         "*0FC621B82495C18DEC8D8D956C82297BEAAAA858",
@@ -148,7 +148,7 @@ static PacketHandlerState BarrackHandler_loginByPassport(
     // ==================================
     info("Account %s generated !", session->game.accountSession.login);
 
-    BarrackBuilder_loginOk(
+    barrackBuilderLoginOk(
         session->socket.accountId,
         session->game.accountSession.login,
         "*0FC621B82495C18DEC8D8D956C82297BEAAAA858",
@@ -220,7 +220,7 @@ static PacketHandlerState BarrackHandler_startGame(
     }
 
     // Build the answer packet
-    BarrackBuilder_startGameOk(
+    barrackBuilderStartGameOk(
         self->info.routerId,
         zoneServerIp,
         zoneServerPort,
@@ -266,7 +266,7 @@ BarrackHandler_commanderMove(
     memcpy(&commanderInfo->pos, &clientPacket->position, sizeof(PositionXZ));
 
     // Build packet
-    BarrackBuilder_commanderMoveOk(
+    barrackBuilderCommanderMoveOk(
         session->socket.accountId,
         clientPacket->commanderListId,
         &commanderInfo->pos,
@@ -329,7 +329,7 @@ static PacketHandlerState BarrackHandler_currentBarrack(
     //    size pktType  checksum     accountId               float    float    float    float
 
     barrackBuilderPetInformation(reply);
-    BarrackBuilder_zoneTraffics(reply);
+    barrackBuilderZoneTraffics(reply);
 
     return PACKET_HANDLER_OK;
 }

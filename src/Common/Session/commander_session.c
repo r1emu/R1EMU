@@ -17,7 +17,7 @@
  */
 
 // ---------- Includes ------------
-#include "CommanderSession.h"
+#include "commander_session.h"
 
 CommanderSession *
 commanderSessionNew (

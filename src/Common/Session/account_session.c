@@ -17,7 +17,7 @@
  */
 
 // ---------- Includes ------------
-#include "AccountSession.h"
+#include "account_session.h"
 
 AccountSession *
 accountSessionNew (

@@ -69,7 +69,7 @@ bool redisStartupInfoInit(RedisStartupInfo *self, char *ip, int port);
  * @param self An allocated Redis instance
  * @return true on success, false otherwise
  */
-bool redisConnect(Redis *self);
+bool redisConnection(Redis *self);
 
 /**
  * @brief : Flush the Redis database

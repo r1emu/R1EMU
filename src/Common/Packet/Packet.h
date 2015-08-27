@@ -17,7 +17,7 @@
 #pragma once
 
 #include "R1EMU.h"
-#include "PacketType.h"
+#include "packet_type.h"
 
 #define PACKET_HEADER(x) (typeof(x)[]){x}
 

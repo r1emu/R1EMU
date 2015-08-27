@@ -27,7 +27,7 @@
 #include "event_server.h"
 #include "common/mysql/mysql.h"
 #include "common/redis/redis.h"
-#include "common/session/sssion.h"
+#include "common/session/session.h"
 
 typedef struct _PacketHandler PacketHandler;
 typedef struct _WorkerStartupInfo WorkerStartupInfo;

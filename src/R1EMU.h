@@ -38,7 +38,7 @@
 
 // debugging environment
 /** If defined, the debugging functions will be included in the executable */
-#include "Common/dbg/dbg.h"
+#include "common/dbg/dbg.h"
 
 // utils
-#include "Common/utils/utils.h"
+#include "common/utils/utils.h"

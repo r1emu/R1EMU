@@ -17,7 +17,7 @@
  */
 
 // ---------- Includes ------------
-#include "BarrackSession.h"
+#include "barrack_session.h"
 
 BarrackSession *
 barrackSessionNew (

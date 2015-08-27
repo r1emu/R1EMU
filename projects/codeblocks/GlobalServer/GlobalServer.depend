@@ -1,16 +1,16 @@
 # depslib dependency file v1.0
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\barrackserver\barrackhandler\barrackbuilder.c
-	"BarrackBuilder.h"
-	"Common/Server/Worker.h"
-	"Common/Packet/Packet.h"
-	"Common/Packet/PacketStream.h"
-	"Common/Packet/PacketType.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\barrack_server\barrack_handler\barrack_builder.c
+	"barrack_builder.h"
+	"common/server/worker.h"
+	"common/packet/packet.h"
+	"common/packet/packet_stream.h"
+	"common/packet/packet_type.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\barrackserver\barrackhandler\barrackbuilder.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\barrack_server\barrack_handler\barrack_builder.h
 	"R1EMU.h"
-	"Common/Commander/Commander.h"
-	"Common/Session/GameSession.h"
-	"Common/Server/Worker.h"
+	"common/commander/commander.h"
+	"common/session/game_session.h"
+	"common/server/worker.h"
 
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\r1emu.h
 	<inttypes.h>
@@ -19,8 +19,8 @@
 	<mysql/mysql.h>
 	<hiredis.h>
 	<zlib.h>
-	"Common/dbg/dbg.h"
-	"Common/utils/utils.h"
+	"common/dbg/dbg.h"
+	"common/utils/utils.h"
 
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\include\zmq\zmq.h
 	<errno.h>
@@ -348,120 +348,120 @@
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\commander\commander.h
 	"R1EMU.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\gamesession.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\game_session.h
 	"R1EMU.h"
-	"Common/Commander/Commander.h"
-	"Common/Session/SocketSession.h"
-	"Common/Session/BarrackSession.h"
-	"Common/Session/CommanderSession.h"
-	"Common/Session/AccountSession.h"
+	"common/commander/commander.h"
+	"common/session/socket_session.h"
+	"common/session/barrack_session.h"
+	"common/session/commander_session.h"
+	"common/session/account_session.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\socketsession.h
-	"R1EMU.h"
-
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\barracksession.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\socket_session.h
 	"R1EMU.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\commandersession.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\barrack_session.h
 	"R1EMU.h"
-	"Common/Commander/Commander.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\accountsession.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\commander_session.h
 	"R1EMU.h"
-	"Common/Session/SocketSession.h"
+	"common/commander/commander.h"
+
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\account_session.h
+	"R1EMU.h"
+	"common/session/socket_session.h"
 
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\worker.h
 	"R1EMU.h"
-	"EventServer.h"
-	"Common/MySQL/MySQL.h"
-	"Common/Redis/Redis.h"
-	"Common/Session/Session.h"
+	"event_server.h"
+	"common/mysql/mysql.h"
+	"common/redis/redis.h"
+	"common/session/session.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\eventserver.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\event_server.h
 	"R1EMU.h"
-	"Common/Graph/Graph.h"
-	"Common/Session/Session.h"
-	"Common/Server/Router.h"
+	"common/Graph/Graph.h"
+	"common/session/session.h"
+	"common/server/router.h"
 
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\graph\graph.h
 	"R1EMU.h"
 
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\session.h
 	"R1EMU.h"
-	"Common/Session/SocketSession.h"
-	"Common/Session/GameSession.h"
+	"common/session/socket_session.h"
+	"common/session/game_session.h"
 
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\router.h
 	"R1EMU.h"
-	"Common/Redis/Redis.h"
-	"Common/MySQL/MySQL.h"
+	"common/redis/redis.h"
+	"common/mysql/mysql.h"
 
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\redis.h
 	"R1EMU.h"
-	"Common/Commander/Commander.h"
-	"Common/Session/SocketSession.h"
-	"Common/Session/GameSession.h"
+	"common/commander/commander.h"
+	"common/session/socket_session.h"
+	"common/session/game_session.h"
 
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\mysql\mysql.h
 	"R1EMU.h"
 
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\packet\packet.h
 	"R1EMU.h"
-	"PacketType.h"
+	"packet_type.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\packet\packettype.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\packet\packet_type.h
 	"R1EMU.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\packet\packetstream.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\packet\packet_stream.h
 	"R1EMU.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\barrackserver\barrackhandler\barrackhandler.c
-	"BarrackHandler.h"
-	"BarrackBuilder.h"
-	"Common/utils/random.h"
-	"Common/Packet/Packet.h"
-	"Common/Server/Worker.h"
-	"Common/Commander/Commander.h"
-	"Common/Packet/PacketStream.h"
-	"Common/Redis/Fields/RedisGameSession.h"
-	"Common/Redis/Fields/RedisSocketSession.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\barrack_server\barrack_handler\barrack_handler.c
+	"barrack_handler.h"
+	"barrack_builder.h"
+	"common/utils/random.h"
+	"common/packet/packet.h"
+	"common/server/worker.h"
+	"common/commander/commander.h"
+	"common/packet/packet_stream.h"
+	"common/redis/fields/redis_game_session.h"
+	"common/redis/fields/redis_socket_session.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\barrackserver\barrackhandler\barrackhandler.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\barrack_server\barrack_handler\barrack_handler.h
 	"R1EMU.h"
-	"Common/Packet/PacketType.h"
-	"Common/Server/Worker.h"
+	"common/packet/packet_type.h"
+	"common/server/worker.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redisgamesession.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redis_game_session.h
 	"R1EMU.h"
-	"Common/Redis/Redis.h"
-	"Common/Session/Session.h"
+	"common/redis/redis.h"
+	"common/session/session.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redissocketsession.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redis_socket_session.h
 	"R1EMU.h"
-	"Common/Redis/Redis.h"
+	"common/redis/redis.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\barrackserver\barrackserver.c
-	"BarrackServer.h"
-	"Common/Server/Server.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\barrack_server\barrack_server.c
+	"barrack_server.h"
+	"common/server/server.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\barrackserver\barrackserver.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\barrack_server\barrack_server.h
 	"R1EMU.h"
-	"Common/Server/Server.h"
+	"common/server/server.h"
 
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\server.h
 	"R1EMU.h"
-	"Router.h"
-	"Worker.h"
+	"router.h"
+	"worker.h"
 
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\commander\commander.c
-	"Commander.h"
+	"commander.h"
 
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\crypto\crypto.c
-	"Crypto.h"
+	"crypto.h"
 
 1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\crypto\crypto.h
 	"R1EMU.h"
-	"Common/Packet/Packet.h"
+	"common/packet/packet.h"
 
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\dbg\dbg.c
 	"dbg.h"
@@ -473,144 +473,144 @@
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\graph\graph.c
 	"Graph.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\mysql\fields\mysqlsession.c
-	"MySQLSession.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\mysql\fields\mysql_session.c
+	"mysql_session.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\mysql\fields\mysqlsession.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\mysql\fields\mysql_session.h
 	"R1EMU.h"
-	"Common/MySQL/MySQL.h"
-	"Common/Session/Session.h"
+	"common/mysql/mysql.h"
+	"common/session/session.h"
 
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\mysql\mysql.c
-	"MySQL.h"
+	"mysql.h"
 
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\packet\packet.c
-	"Packet.h"
+	"packet.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\packet\packetstream.c
-	"PacketStream.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\packet\packet_stream.c
+	"packet_stream.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\packet\packettype.c
-	"PacketType.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\packet\packet_type.c
+	"packet_type.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redisgamesession.c
-	"RedisGameSession.h"
-	"RedisSocketSession.h"
-	"Common/utils/math.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redis_game_session.c
+	"redis_game_session.h"
+	"redis_socket_session.h"
+	"common/utils/math.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redissession.c
-	"RedisSession.h"
-	"RedisSocketSession.h"
-	"RedisGameSession.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redis_session.c
+	"redis_session.h"
+	"redis_socket_session.h"
+	"redis_game_session.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redissession.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redis_session.h
 	"R1EMU.h"
-	"Common/Session/Session.h"
-	"Common/Redis/Redis.h"
-	"Common/Redis/Fields/RedisSocketSession.h"
+	"common/session/session.h"
+	"common/redis/redis.h"
+	"common/redis/fields/redis_socket_session.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redissocketsession.c
-	"RedisSocketSession.h"
-	"RedisGameSession.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\fields\redis_socket_session.c
+	"redis_socket_session.h"
+	"redis_game_session.h"
 
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\redis\redis.c
-	"Redis.h"
-	"Fields/RedisGameSession.h"
+	"redis.h"
+	"fields/redis_game_session.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\eventhandler.c
-	"EventHandler.h"
-	"ZoneServer/ZoneHandler/ZoneBuilder.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\event_handler.c
+	"event_handler.h"
+	"zone_server/zone_handler/zone_builder.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\eventhandler.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\event_handler.h
 	"R1EMU.h"
-	"EventServer.h"
+	"event_server.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\zoneserver\zonehandler\zonebuilder.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\zone_server\zone_handler\zone_builder.h
 	"R1EMU.h"
-	"Common/Commander/Commander.h"
-	"Common/Server/Worker.h"
+	"common/commander/commander.h"
+	"common/server/worker.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\eventserver.c
-	"EventServer.h"
-	"EventHandler.h"
-	"Common/Graph/Graph.h"
-	"Common/Redis/Redis.h"
-	"Common/Redis/Fields/RedisGameSession.h"
-	"ZoneServer/ZoneHandler/ZoneBuilder.h"
-	"Common/Packet/Packet.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\event_server.c
+	"event_server.h"
+	"event_handler.h"
+	"common/Graph/Graph.h"
+	"common/redis/redis.h"
+	"common/redis/fields/redis_game_session.h"
+	"zone_server/zone_handler/zone_builder.h"
+	"common/packet/packet.h"
 
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\router.c
-	"Router.h"
-	"Worker.h"
-	"RouterMonitor.h"
-	"Common/Packet/Packet.h"
+	"router.h"
+	"worker.h"
+	"router_monitor.h"
+	"common/packet/packet.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\routermonitor.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\router_monitor.h
 	"R1EMU.h"
-	"Common/Redis/Redis.h"
-	"Common/MySQL/MySQL.h"
+	"common/redis/redis.h"
+	"common/mysql/mysql.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\routermonitor.c
-	"RouterMonitor.h"
-	"Router.h"
-	"Common/Session/Session.h"
-	"Common/Redis/Fields/RedisSession.h"
-	"Common/Packet/Packet.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\router_monitor.c
+	"router_monitor.h"
+	"router.h"
+	"common/session/session.h"
+	"common/redis/fields/redis_session.h"
+	"common/packet/packet.h"
 
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\server.c
-	"Server.h"
-	"Router.h"
-	"Worker.h"
-	"Common/utils/string.h"
+	"server.h"
+	"router.h"
+	"worker.h"
+	"common/utils/string.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\serverfactory.c
-	"ServerFactory.h"
-	"ZoneServer/ZoneHandler/ZoneHandler.h"
-	"BarrackServer/BarrackHandler/BarrackHandler.h"
-	"SocialServer/SocialHandler/SocialHandler.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\server_factory.c
+	"server_factory.h"
+	"zone_server/zone_handler/zone_handler.h"
+	"barrack_server/barrack_handler/barrack_handler.h"
+	"social_server/social_handler/social_handler.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\serverfactory.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\server_factory.h
 	"R1EMU.h"
-	"Common/Server/Server.h"
+	"common/server/server.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\zoneserver\zonehandler\zonehandler.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\zone_server\zone_handler\zone_handler.h
 	"R1EMU.h"
-	"Common/Packet/PacketType.h"
-	"Common/Server/Worker.h"
+	"common/packet/packet_type.h"
+	"common/server/worker.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\socialserver\socialhandler\socialhandler.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\social_server\social_handler\social_handler.h
 	"R1EMU.h"
-	"Common/Packet/PacketType.h"
-	"Common/Server/Worker.h"
+	"common/packet/packet_type.h"
+	"common/server/worker.h"
 
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\server\worker.c
-	"Worker.h"
-	"Router.h"
-	"EventServer.h"
-	"Common/utils/random.h"
-	"Common/Redis/Fields/RedisSession.h"
-	"Common/Redis/Fields/RedisSocketSession.h"
-	"Common/Redis/Fields/RedisGameSession.h"
-	"Common/Crypto/Crypto.h"
-	"Common/Packet/Packet.h"
+	"worker.h"
+	"router.h"
+	"event_server.h"
+	"common/utils/random.h"
+	"common/redis/fields/redis_session.h"
+	"common/redis/fields/redis_socket_session.h"
+	"common/redis/fields/redis_game_session.h"
+	"common/crypto/crypto.h"
+	"common/packet/packet.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\accountsession.c
-	"AccountSession.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\account_session.c
+	"account_session.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\barracksession.c
-	"BarrackSession.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\barrack_session.c
+	"barrack_session.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\commandersession.c
-	"CommanderSession.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\commander_session.c
+	"commander_session.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\gamesession.c
-	"GameSession.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\game_session.c
+	"game_session.h"
 
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\session.c
-	"Session.h"
+	"session.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\socketsession.c
-	"SocketSession.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\session\socket_session.c
+	"socket_session.h"
 
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\utils\math.c
 	"math.h"
@@ -639,75 +639,75 @@
 1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\common\utils\zlib.c
 	"zlib.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\globalserver\globalserver.c
-	"GlobalServer.h"
-	"ZoneServer/ZoneServer.h"
-	"SocialServer/SocialServer.h"
-	"BarrackServer/BarrackServer.h"
-	"Common/Server/ServerFactory.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\global_server\global_server.c
+	"global_server.h"
+	"zone_server/zone_server.h"
+	"social_server/social_server.h"
+	"barrack_server/barrack_server.h"
+	"common/server/server_factory.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\globalserver\globalserver.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\global_server\global_server.h
 	"R1EMU.h"
-	"Common/Redis/Redis.h"
-	"Common/MySQL/MySQL.h"
-	"Common/Server/Server.h"
+	"common/redis/redis.h"
+	"common/mysql/mysql.h"
+	"common/server/server.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\zoneserver\zoneserver.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\zone_server\zone_server.h
 	"R1EMU.h"
-	"Common/Server/Server.h"
+	"common/server/server.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\socialserver\socialserver.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\social_server\social_server.h
 	"R1EMU.h"
-	"Common/Server/Server.h"
+	"common/server/server.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\globalserver\main.c
-	"Common/Server/ServerFactory.h"
-	"GlobalServer/GlobalServer.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\global_server\main.c
+	"common/server/server_factory.h"
+	"global_server/global_server.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\socialserver\socialhandler\socialhandler.c
-	"SocialHandler.h"
-	"Common/Packet/Packet.h"
-	"Common/Commander/Commander.h"
-	"Common/Packet/PacketStream.h"
-	"Common/Redis/Fields/RedisGameSession.h"
-	"Common/Server/Worker.h"
-	"BarrackServer/BarrackServer.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\social_server\social_handler\social_handler.c
+	"social_handler.h"
+	"common/packet/packet.h"
+	"common/commander/commander.h"
+	"common/packet/packet_stream.h"
+	"common/redis/fields/redis_game_session.h"
+	"common/server/worker.h"
+	"barrack_server/barrack_server.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\socialserver\socialserver.c
-	"SocialServer.h"
-	"Common/Server/Server.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\social_server\social_server.c
+	"social_server.h"
+	"common/server/server.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\zoneserver\zonehandler\admincmd.c
-	"AdminCmd.h"
-	"Common/Commander/Commander.h"
-	"Common/Redis/Fields/RedisGameSession.h"
-	"Common/Redis/Fields/RedisSocketSession.h"
-	"ZoneServer/ZoneHandler/ZoneBuilder.h"
-	"Common/Session/Session.h"
-	"Common/Server/Worker.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\zone_server\zone_handler\admin_cmd.c
+	"admin_cmd.h"
+	"common/commander/commander.h"
+	"common/redis/fields/redis_game_session.h"
+	"common/redis/fields/redis_socket_session.h"
+	"zone_server/zone_handler/zone_builder.h"
+	"common/session/session.h"
+	"common/server/worker.h"
 
-1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\zoneserver\zonehandler\admincmd.h
+1440534723 c:\users\hiero\documents\r1emu-master\r1emu\src\zone_server\zone_handler\admin_cmd.h
 	"R1EMU.h"
-	"Common/Session/Session.h"
-	"Common/Server/Worker.h"
+	"common/session/session.h"
+	"common/server/worker.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\zoneserver\zonehandler\zonebuilder.c
-	"ZoneBuilder.h"
-	"Common/utils/time.h"
-	"Common/Server/Worker.h"
-	"Common/Packet/Packet.h"
-	"Common/Packet/PacketType.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\zone_server\zone_handler\zone_builder.c
+	"zone_builder.h"
+	"common/utils/time.h"
+	"common/server/worker.h"
+	"common/packet/packet.h"
+	"common/packet/packet_type.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\zoneserver\zonehandler\zonehandler.c
-	"ZoneHandler.h"
-	"ZoneBuilder.h"
-	"AdminCmd.h"
-	"Common/Packet/Packet.h"
-	"Common/Redis/Fields/RedisGameSession.h"
-	"Common/Redis/Fields/RedisSocketSession.h"
-	"Common/Server/EventHandler.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\zone_server\zone_handler\zone_handler.c
+	"zone_handler.h"
+	"zone_builder.h"
+	"admin_cmd.h"
+	"common/packet/packet.h"
+	"common/redis/fields/redis_game_session.h"
+	"common/redis/fields/redis_socket_session.h"
+	"common/server/event_handler.h"
 
-1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\zoneserver\zoneserver.c
-	"ZoneServer.h"
-	"Common/Server/Server.h"
+1440534723 source:c:\users\hiero\documents\r1emu-master\r1emu\src\zone_server\zone_server.c
+	"zone_server.h"
+	"common/server/server.h"
 

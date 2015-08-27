@@ -20,7 +20,7 @@
 #include "common/redis/redis.h"
 #include "common/mysql/mysql.h"
 
-#define ROUTER_MONITOR_FDKEY_SIZE((sizeof(uint64_t) * 2) + 1)
+#define ROUTER_MONITOR_FDKEY_SIZE ((sizeof(uint64_t) * 2) + 1)
 #define ROUTER_MONITOR_SUBSCRIBER_ENDPOINT "inproc://routerMonitorSubscriber-%d"
 
 /** All the Router Monitor Packet headers */
