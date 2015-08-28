@@ -182,7 +182,7 @@ RouterMonitor_monitor (
 
         zframe_t *clientFrame;
         // Check if it already exists in the table
-        if ((clientFrame = zhash_lookup (self->connected, fdClientKey)) != NULL) {
+        if ((clientFrame = zhash_lookup(self->connected, fdClientKey)) != NULL) {
             uint8_t sessionKey [ROUTER_MONITOR_FDKEY_SIZE];
             socketSessionGenSessionKey (zframe_data (clientFrame), sessionKey);
             error("The client FD=%d just connected, but another client has still this FD (previously : %s)",
@@ -205,7 +205,7 @@ RouterMonitor_monitor (
         routerMonitorGenKey (fdClient, fdClientKey);
 
         zframe_t *clientFrame;
-        if ((clientFrame = zhash_lookup (self->connected, fdClientKey)) == NULL) {
+        if ((clientFrame = zhash_lookup(self->connected, fdClientKey)) == NULL) {
             // The client just disconnected, but no client has been registred using this fd
             // It happens when the client connects but send no data to the server
             // TODO : Decide what to do in this case, probably nothing
@@ -283,7 +283,7 @@ RouterMonitor_subscribe (
             routerMonitorGenKey (fdClient, fdClientKey);
 
             zframe_t *clientFrame;
-            if ((clientFrame = zhash_lookup (self->connected, fdClientKey)) == NULL) {
+            if ((clientFrame = zhash_lookup(self->connected, fdClientKey)) == NULL) {
                 // The client just sent its first message, add the identity frame to the hashtable
                 clientFrame = zframe_dup (zmsg_next (msg));
                 zhash_insert(self->connected, fdClientKey, clientFrame);
