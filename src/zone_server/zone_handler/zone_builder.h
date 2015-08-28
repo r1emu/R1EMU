@@ -22,6 +22,8 @@
 #include "R1EMU.h"
 #include "common/commander/commander.h"
 #include "common/server/worker.h"
+#include "common/commander/inventory.h"
+#include "common/item/item.h"
 
 typedef enum PacketTypeZoneNormal {
     ZC_NORMAL_UNKNOWN_1 = 0x11,
@@ -348,3 +350,8 @@ void zoneBuilderPcMoveStop(
     PositionXZ *direction,
     float timestamp,
     zmsg_t *replyMsg);
+
+/**
+ * @brief Add an item in the current commander inventory
+ */
+void zoneBuilderItemAdd(ItemPkt *item, uint32_t inventoryIndex, InventoryAddType addType, zmsg_t *replyMsg);
