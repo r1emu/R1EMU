@@ -91,9 +91,9 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 }
 
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
-    uint32_t itemId = strtol (args, &args, 10);
+    uint32_t itemId = strtol(args, &args, 10);
     args++;
-    uint32_t amount = strtol (args, &args, 10);
+    uint32_t amount = strtol(args, &args, 10);
 
     ItemPkt item = {
         .uniqueId = r1emuGenerateRandom64(&self->seed),
