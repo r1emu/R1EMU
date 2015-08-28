@@ -281,7 +281,7 @@ eventServerSendToClients (
     for (identityKey = zlist_first (clients); identityKey != NULL; identityKey = zlist_next (clients)) {
         // Add all the clients to the packet
         uint8_t identityBytes[5];
-        socketSessionDestroyGenId (identityKey, identityBytes);
+        socketSessionGenId (identityKey, identityBytes);
         if (zmsg_addmem (msg, identityBytes, sizeof(identityBytes)) != 0) {
             error("Cannot add the identity in the message.");
             result = false;
@@ -500,7 +500,7 @@ eventServerSendToClient (
 
     // Add the client identity to the packet
     uint8_t identityBytes[5];
-    socketSessionDestroyGenId (identityKey, identityBytes);
+    socketSessionGenId (identityKey, identityBytes);
     if (zmsg_addmem (msg, identityBytes, sizeof(identityBytes)) != 0) {
         error("Cannot add the identity in the message.");
         result = false;

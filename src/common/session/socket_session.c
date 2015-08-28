@@ -78,7 +78,7 @@ socketSessionGenSessionKey (
 }
 
 void
-socketSessionDestroyGenId (
+socketSessionGenId (
     uint8_t *sessionKey,
     uint8_t sessionId[5]
 ) {
@@ -93,7 +93,7 @@ socketSessionDestroyGenId (
 }
 
 void
-socketSessionDestroyPrint (
+socketSessionPrint (
     SocketSession *self
 ) {
     dbg("==== SocketSession %p ====", self);
