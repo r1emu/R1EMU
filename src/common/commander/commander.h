@@ -67,7 +67,8 @@ typedef struct CommanderPkt
     uint8_t unk5;
     uint32_t level;
     CommanderEquipment equipment;
-    uint16_t hairType;
+    uint8_t hairId;
+    uint8_t unk6;
     uint16_t pose;
 } CommanderPkt;
 
@@ -90,22 +91,6 @@ typedef struct CommanderInfo
     uint16_t unk7;
 } CommanderInfo;
 #pragma pack(pop)
-
-typedef struct CommanderCreateInfo {
-    CommanderPkt commander;
-    uint64_t socialInfoId;
-    uint16_t commanderPosition;
-    uint16_t mapId;
-    uint32_t unk4;
-    uint32_t unk5;
-    uint32_t maxXP;
-    uint32_t unk6;
-    PositionXYZ pos;
-    PositionXZ dir;
-    PositionXYZ pos2;
-    PositionXZ dir2;
-    uint32_t unk8;
-} CommanderCreateInfo;
 
 typedef enum CommanderJobId
 {

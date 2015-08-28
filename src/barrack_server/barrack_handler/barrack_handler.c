@@ -397,7 +397,7 @@ static PacketHandlerState BarrackHandler_commanderCreate(
         float unk4;
         float unk5;
         float unk6;
-        uint8_t hairType;
+        uint8_t hairId;
     }  *clientPacket = (void *) packet;
     #pragma pack(pop)
 
@@ -454,7 +454,7 @@ static PacketHandlerState BarrackHandler_commanderCreate(
     }
 
     // Hair type
-    commander->hairType = clientPacket->hairType;
+    commander->hairId = clientPacket->hairId;
 
     // PCID
     session->game.commanderSession.currentCommander.pcId = r1emuGenerateRandom(&self->seed);

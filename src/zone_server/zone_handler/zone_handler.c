@@ -130,18 +130,8 @@ static PacketHandlerState zoneHandlerChat(
         // normal message : Dispatch a GameEventChat
         size_t gameEventSize = sizeof(GameEventChat) + chatTextSize;
         GameEventChat *event = alloca(gameEventSize);
-        event->pcId = session->game.commanderSession.currentCommander.pcId;
+        memcpy(&event->commander, &session->game.commanderSession.currentCommander, sizeof(event->commander));
         memcpy(event->sessionKey, session->socket.sessionKey, sizeof(event->sessionKey));
-        memcpy(
-            event->familyName,
-            session->game.commanderSession.currentCommander.base.familyName,
-            sizeof(event->familyName)
-        );
-        memcpy(
-            event->commanderName,
-            session->game.commanderSession.currentCommander.base.commanderName,
-            sizeof(event->commanderName)
-        );
         memcpy(event->chatText, clientPacket->msgText, chatTextSize);
         workerDispatchEvent(self, EVENT_SERVER_TYPE_CHAT, event, gameEventSize);
     }

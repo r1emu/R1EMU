@@ -294,12 +294,7 @@ void zoneBuilderJump(uint32_t targetPcId, float height, zmsg_t *replyMsg);
 /**
  * Makes a normal chat message
  */
-void zoneBuilderChat(
-    uint32_t targetPcId,
-    uint8_t *familyName,
-    uint8_t *commanderName,
-    uint8_t *chatText,
-    zmsg_t *replyMsg);
+void zoneBuilderChat(CommanderInfo *commander, uint8_t *chatText, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown Contains information about quest position?

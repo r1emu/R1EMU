@@ -1344,12 +1344,8 @@ void zoneBuilderMoveSpeed(uint32_t targetPcId, float movementSpeed, zmsg_t *repl
     }
 }
 
-void zoneBuilderChat(uint32_t targetPcId,
-    uint8_t *familyName,
-    uint8_t *commanderName,
-    uint8_t *chatText,
-    zmsg_t *replyMsg)
-{
+void zoneBuilderChat(CommanderInfo *commander, uint8_t *chatText, zmsg_t *replyMsg) {
+
     size_t chatTextLen = strlen(chatText) + 1;
 
     #pragma pack(push, 1)
@@ -1357,13 +1353,15 @@ void zoneBuilderChat(uint32_t targetPcId,
         VariableSizePacketHeader variableSizeHeader;
         uint32_t pcId;
         uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
-        uint8_t commanderName[COMMANDER_NAME_SIZE];
-        uint16_t unk1; // 0000
-        uint16_t unk2; // A30F
-        uint32_t unk3; // 01000000
-        uint32_t unk4; // 022E5600
-        uint32_t unk5; // 30950900
-        uint32_t unk6; // 00000000
+        uint8_t commanderName[COMMANDER_NAME_SIZE+1];
+        uint8_t unk1;
+        uint16_t jobId;
+        uint32_t unk2;
+        uint8_t gender;
+        uint8_t hairId;
+        uint16_t unk3;
+        uint32_t headTop;
+        float displayTime;
         uint8_t chatText[chatTextLen];
     } replyPacket;
     #pragma pack(pop)
@@ -1374,16 +1372,18 @@ void zoneBuilderChat(uint32_t targetPcId,
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
-        replyPacket.pcId = targetPcId;
-        memcpy(replyPacket.familyName, familyName, sizeof(replyPacket.familyName));
-        memcpy(replyPacket.commanderName, commanderName, sizeof(replyPacket.commanderName));
+        replyPacket.pcId = commander->pcId;
+        memcpy(replyPacket.familyName, commander->base.familyName, sizeof(replyPacket.familyName));
+        memcpy(replyPacket.commanderName, commander->base.commanderName, sizeof(replyPacket.commanderName));
+        replyPacket.unk1 = 0x4F;
+        replyPacket.jobId = commander->base.jobId;
+        replyPacket.unk2 = 1;
+        replyPacket.gender = commander->base.gender;
+        replyPacket.hairId = commander->base.hairId;
+        replyPacket.unk3 = 0;
+        replyPacket.headTop = commander->base.equipment.head_top;
+        replyPacket.displayTime = 0;
         memcpy(replyPacket.chatText, chatText, sizeof(replyPacket.chatText));
-        replyPacket.unk1 = 0;
-        replyPacket.unk2 = SWAP_UINT16(0xA30F);
-        replyPacket.unk3 = SWAP_UINT32(0x01000000);
-        replyPacket.unk4 = SWAP_UINT32(0x022E5600);
-        replyPacket.unk5 = SWAP_UINT32(0x30950900);
-        replyPacket.unk6 = 0;
     }
 }
 
