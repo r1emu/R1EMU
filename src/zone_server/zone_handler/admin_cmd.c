@@ -91,7 +91,6 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 }
 
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
-    special ("!? %s", args);
     uint32_t itemId = strtol(args, &args, 10);
     args++;
     uint32_t amount = strtol(args, &args, 10);
