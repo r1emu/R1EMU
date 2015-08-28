@@ -20,5 +20,4 @@
 
 int strGetLine(char *str, char *dest, int maxlen, int pos);
 
-// credits: http://stackoverflow.com/a/9210560/468242
-char **strSplit(char* a_str, const char a_delim);
+char **strSplit(const char *s, char c);
