@@ -13,7 +13,7 @@
 
 #include "server_factory.h"
 #include "zone_server/zone_handler/zone_handler.h"
-#include "barrack_server/Barrack_handler/barrack_handler.h"
+#include "barrack_server/barrack_handler/barrack_handler.h"
 #include "social_server/social_handler/social_handler.h"
 
 Server *serverFactoryCreateServer (

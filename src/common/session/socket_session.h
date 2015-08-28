@@ -85,13 +85,13 @@ void socketSessionGenSessionKey(uint8_t *sessionId, uint8_t sessionKey[SOCKET_SE
  * @param[out] sessionId The sessionId generated
  * @return
  */
-void socketSessionDestroyGenId(uint8_t *sessionKey, uint8_t sessionId[5]);
+void socketSessionGenId(uint8_t *sessionKey, uint8_t sessionId[5]);
 
 /**
  * @brief Prints a SocketSession structure.
  * @param self An allocated SocketSession
  */
-void socketSessionDestroyPrint(SocketSession *self);
+void socketSessionPrint(SocketSession *self);
 
 /**
  * @brief Free an allocated SocketSession structure and nullify the content of the pointer.

@@ -12,11 +12,13 @@
  */
 
 // ---------- Includes ------------
+#define _GNU_SOURCE
 #include "dbg.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <execinfo.h>
 
 // ------ Structure declaration -------
 zmutex_t *mutex = NULL;
@@ -139,7 +141,7 @@ void printTrace(void) {
     char **strings;
 
     size = backtrace(array, sizeof(array) / sizeof(*(array)));
-    strings = backtraceSymbols(array, size);
+    strings = backtrace_symbols(array, size);
 
     error("Obtained %zd stack frames.", size);
 
