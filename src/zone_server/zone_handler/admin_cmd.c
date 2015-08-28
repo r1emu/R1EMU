@@ -82,28 +82,26 @@ void adminCmdJump(Session *session, zmsg_t *replyMsg, char *args) {
         // we must add a random with the map max x/y
     }
     else {
-        char *argsParse;
+        char **arg;
+        int argc;
 
         info("Jump with argument: %s", args);
-        argsParse = strtok(args, " ");
-        int argc = 0;
-        while (argsParse != NULL) {
-            argc++;
-            argsParse = strtok(NULL, " ");
-        }
+        arg = strSplit(args, ' ');
+        argc = 0;
+        while (arg[++argc] != NULL);
         if (argc != 3) {
             info("Wrong number of argument, must be 3.");
         }
         else {
             PositionXYZ position;
-            argsParse = strtok(args, " ");
-            position.x = atoi(argsParse);
-            argsParse = strtok(NULL, " ");
-            position.y = atoi(argsParse);
-            argsParse = strtok(NULL, " ");
-            position.z = atoi(argsParse);
-            argsParse = strtok(NULL, " ");
+            position.x = atof(arg[0]);
+            info("x = %.6f", position.x);
+            position.y = atof(arg[1]);
+            info("y = %.6f", position.y);
+            position.z = atof(arg[2]);
+            info("z = %.6f", position.z);
             zoneBuilderSetPos(session->game.commanderSession.currentCommander.pcId, &position, replyMsg);
         }
+        free(arg);
     }
 }
