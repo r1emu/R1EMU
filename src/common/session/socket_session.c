@@ -68,7 +68,7 @@ socketSessionInit(
 }
 
 void
-socketSessionDestroyGenSessionKey (
+socketSessionGenSessionKey (
     uint8_t *sessionId,
     uint8_t sessionKey[SOCKET_SESSION_ID_SIZE]
 ) {

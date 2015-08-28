@@ -42,7 +42,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, zmsg_t *replyMsg) {
     uint64_t sessionKey = r1emuGenerateRandom64(&self->seed);
     uint8_t sessionKeyStr[SOCKET_SESSION_ID_SIZE];
 
-    socketSessionDestroyGenSessionKey((uint8_t *)&sessionKey, sessionKeyStr);
+    socketSessionGenSessionKey((uint8_t *)&sessionKey, sessionKeyStr);
     sprintf(sessionKeyStr, "%.10I64x", sessionKey);
     socketSessionInit(&fakeSocketSession, fakePc.base.accountId, self->info.routerId, session->socket.mapId, sessionKeyStr, true);
 

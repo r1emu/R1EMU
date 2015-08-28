@@ -308,7 +308,7 @@ Worker_processClientPacket (
     uint8_t sessionKeyStr [SOCKET_SESSION_ID_SIZE];
 
     // Generate the socketId key
-    socketSessionDestroyGenSessionKey (zframe_data (sessionKeyFrame), sessionKeyStr);
+    socketSessionGenSessionKey (zframe_data (sessionKeyFrame), sessionKeyStr);
 
     // Request the Session
     RedisSessionKey sessionKey = {

@@ -77,7 +77,7 @@ bool socketSessionInit(
  * @param[out] sessionKey The sessionKey generated
  * @return
  */
-void socketSessionDestroyGenSessionKey(uint8_t *sessionId, uint8_t sessionKey[SOCKET_SESSION_ID_SIZE]);
+void socketSessionGenSessionKey(uint8_t *sessionId, uint8_t sessionKey[SOCKET_SESSION_ID_SIZE]);
 
 /**
  * @brief Format a session id from the session key

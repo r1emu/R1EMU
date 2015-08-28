@@ -205,7 +205,7 @@ RouterMonitor_monitor (
         // Check if it already exists in the table
         if ((clientFrame = zhash_lookup (self->connected, fdClientKey)) != NULL) {
             uint8_t sessionKey [ROUTER_MONITOR_FDKEY_SIZE];
-            socketSessionDestroyGenSessionKey (zframe_data (clientFrame), sessionKey);
+            socketSessionGenSessionKey (zframe_data (clientFrame), sessionKey);
             error("The client FD=%d just connected, but another client has still this FD (previously : %s)",
                    fdClient, sessionKey);
             // TODO : Decide what to do in this case
@@ -236,7 +236,7 @@ RouterMonitor_monitor (
         else {
             // Everything is okay here, disconnect gracefully the client
             uint8_t sessionKeyStr [SOCKET_SESSION_ID_SIZE];
-            socketSessionDestroyGenSessionKey (zframe_data (clientFrame), sessionKeyStr);
+            socketSessionGenSessionKey (zframe_data (clientFrame), sessionKeyStr);
 
             // Flush the session here
             RedisSessionKey sessionKey = {
