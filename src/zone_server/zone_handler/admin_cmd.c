@@ -128,6 +128,7 @@ void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) 
             info("y = %.6f", position.y);
             position.z = atof(arg[2]);
             info("z = %.6f", position.z);
+            session->game.commanderSession.currentCommander.pos = position;
             zoneBuilderSetPos(session->game.commanderSession.currentCommander.pcId, &position, replyMsg);
         }
         free(arg);
