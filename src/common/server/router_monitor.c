@@ -81,7 +81,7 @@ bool routerMonitorInit (RouterMonitor *self, RouterMonitorStartupInfo *info) {
     routerMonitorStartupInfoDestroy (&info);
 
     // Allocate the connected clients hashtable
-    if (!(self->connected = zhash_new ())) {
+    if (!(self->connected = zhash_new())) {
         error("Cannot allocate a new connected clients hashtable.");
         return false;
     }
@@ -286,7 +286,7 @@ RouterMonitor_subscribe (
             if ((clientFrame = zhash_lookup (self->connected, fdClientKey)) == NULL) {
                 // The client just sent its first message, add the identity frame to the hashtable
                 clientFrame = zframe_dup (zmsg_next (msg));
-                zhash_insert (self->connected, fdClientKey, clientFrame);
+                zhash_insert(self->connected, fdClientKey, clientFrame);
             } else {
                 // Check if the fd <=> identity association is always the same
                 if (!zframe_eq (clientFrame, zmsg_next (msg))) {

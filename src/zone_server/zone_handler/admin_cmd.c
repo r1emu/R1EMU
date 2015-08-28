@@ -25,10 +25,10 @@ void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *repl
 
     if (adminCommands == NULL) {
         // initialize the admin commands hashtable
-        adminCommands = zhash_new ();
-        zhash_insert (adminCommands, "spawn",   adminCmdSpawnPc);
-        zhash_insert (adminCommands, "jump",    adminCmdJump);
-        zhash_insert (adminCommands, "itemAdd", adminCmdAddItem);
+        adminCommands = zhash_new();
+        zhash_insert(adminCommands, "spawn",   adminCmdSpawnPc);
+        zhash_insert(adminCommands, "jump",    adminCmdJump);
+        zhash_insert(adminCommands, "itemAdd", adminCmdAddItem);
     }
 
     void (*handler) (Worker *self, Session *session, char *args, zmsg_t *replyMsg);
