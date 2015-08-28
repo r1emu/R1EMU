@@ -193,7 +193,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             /// Write the reply to the session
             CommanderSession *commanderSession = &gameSession->commanderSession;
             CommanderInfo *cInfo = &commanderSession->currentCommander;
-            Commander *commander = &cInfo->base;
+            CommanderPkt *commander = &cInfo->base;
             CommanderEquipment *equipment = &commander->equipment;
 
             // Account
@@ -312,7 +312,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
     redisReply *reply = NULL;
 
     CommanderInfo *cInfo = &gameSession->commanderSession.currentCommander;
-    Commander *commander = &cInfo->base;
+    CommanderPkt *commander = &cInfo->base;
     CommanderEquipment *equipment = &commander->equipment;
 
     reply = redisCommandDbg(self,

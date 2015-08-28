@@ -36,7 +36,7 @@ void commanderEquipmentInit(CommanderEquipment *equipment) {
     equipment->necklace = 0xa;
 }
 
-void commanderInit(Commander *commander) {
+void commanderInit(CommanderPkt *commander) {
     memset(commander, 0, sizeof(*commander));
 
     commander->accountId = -1;
@@ -95,7 +95,7 @@ void commanderEquipmentPrint(CommanderEquipment *equipment) {
     dbg("necklace = %d (%x)", equipment->necklace, equipment->necklace);
 }
 
-void commanderPrint(Commander *commander) {
+void commanderPrint(CommanderPkt *commander) {
     dbg("commanderName = %s", commander->commanderName);
     dbg("familyName = %s", commander->familyName);
     dbg("accountId = %llu (%llx)", commander->accountId, commander->accountId);

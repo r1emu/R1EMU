@@ -335,7 +335,7 @@ static PacketHandlerState BarrackHandler_barracknameChange(
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_BARRACKNAME_CHANGE);
 
     CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
-    Commander *commander = &commanderInfo->base;
+    CommanderPkt *commander = &commanderInfo->base;
 
     // Check if the barrack name is not empty and contains only ASCII characters
     size_t barrackNameLen = strlen(clientPacket->barrackName);
@@ -404,7 +404,7 @@ static PacketHandlerState BarrackHandler_commanderCreate(
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_CREATE);
 
     CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
-    Commander *commander = &commanderInfo->base;
+    CommanderPkt *commander = &commanderInfo->base;
 
     // CharName
     strncpy(commander->commanderName, clientPacket->commanderName, sizeof(commander->commanderName));

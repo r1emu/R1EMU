@@ -651,7 +651,7 @@ void zoneBuilderEnterPc(CommanderInfo *commanderInfo, zmsg_t *replyMsg) {
         uint32_t titleAchievmentId; // 24B42B1B
         uint32_t unk9; // FFFFFFFF
         uint8_t unk10; // 00
-        Commander commander;
+        CommanderPkt commander;
         uint8_t partyName[48+1]; // "None"
     } replyPacket;
     #pragma pack(pop)

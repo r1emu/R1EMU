@@ -52,9 +52,9 @@ typedef struct CommanderEquipment {
 
 #pragma pack(push, 1)
 /**
- * @brief CommanderInfo is the struct of a commander.
+ * @brief CommanderPkt is the struct of a commander sent to the client
  */
-typedef struct Commander
+typedef struct CommanderPkt
 {
     uint8_t commanderName [COMMANDER_NAME_SIZE+1];
     uint8_t familyName [COMMANDER_FAMILY_NAME_SIZE];
@@ -69,11 +69,11 @@ typedef struct Commander
     CommanderEquipment equipment;
     uint16_t hairType;
     uint16_t pose;
-} Commander;
+} CommanderPkt;
 
 typedef struct CommanderInfo
 {
-    Commander base;
+    CommanderPkt base;
     PositionXYZ pos;
     uint32_t currentXP;
     uint32_t maxXP;
@@ -92,7 +92,7 @@ typedef struct CommanderInfo
 #pragma pack(pop)
 
 typedef struct CommanderCreateInfo {
-    Commander commander;
+    CommanderPkt commander;
     uint64_t socialInfoId;
     uint16_t commanderPosition;
     uint16_t mapId;
