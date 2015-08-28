@@ -12,13 +12,15 @@
  */
 
 // ---------- Includes ------------
+#ifndef WIN32
 #define _GNU_SOURCE
+#include <execinfo.h>
+#endif
 #include "dbg.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <execinfo.h>
 
 // ------ Structure declaration -------
 zmutex_t *mutex = NULL;
