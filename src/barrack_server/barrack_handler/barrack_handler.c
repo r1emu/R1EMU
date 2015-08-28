@@ -472,7 +472,7 @@ static PacketHandlerState BarrackHandler_commanderCreate(
     commanderInfo->pos = PositionXYZ_decl(19.0, 28.0, 29.0);
 
     // Default MapId : West Siauliai Woods
-    session->game.commanderSession.mapId = 0x3FD;
+    session->game.commanderSession.mapId = 1002;
 
     // Add the character to the account
     session->game.barrackSession.charactersCreatedCount++;

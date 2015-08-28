@@ -578,8 +578,7 @@ static PacketHandlerState zoneHandlerConnect(
         return PACKET_HANDLER_ERROR;
     }
 
-    // Position : Official starting point position(tutorial map)
-    session->game.commanderSession.currentCommander.pos = PositionXYZ_decl(-628.0f, 260.0f, -1025.0f);
+    session->game.commanderSession.currentCommander.pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
 
     zoneBuilderConnectOk(
         session->game.commanderSession.currentCommander.pcId,

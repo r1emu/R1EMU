@@ -22,6 +22,8 @@
 #include "R1EMU.h"
 
 // ---------- Defines -------------
+#define INVENTORY_MAX_SIZE 5000
+
 typedef enum {
     INVENTORY_TYPE_COMMANDER = 0,
     INVENTORY_TYPE_WAREHOUSE = 1,
