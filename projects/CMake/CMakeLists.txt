@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.0)
 project(R1Emu)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
 
@@ -47,7 +47,7 @@ set(COMMON_SRC
     ${ROOT_PATH}/common/server/router.c
     ${ROOT_PATH}/common/server/router_monitor.c
     ${ROOT_PATH}/common/server/server.c
-    ${ROOT_PATH}/common/server/serverFactory.c
+    ${ROOT_PATH}/common/server/server_factory.c
     ${ROOT_PATH}/common/server/worker.c
     ${ROOT_PATH}/common/session/account_session.c
     ${ROOT_PATH}/common/session/barrack_session.c

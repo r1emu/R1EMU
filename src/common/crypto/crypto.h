@@ -18,7 +18,7 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
-#include "Common/Packet/Packet.h"
+#include "common/packet/packet.h"
 
 // ---------- Defines -------------
 
