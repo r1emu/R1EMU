@@ -40,7 +40,7 @@ void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *repl
 
     handler = zhash_lookup(adminCommands, commandName);
     if (!handler) {
-        warning ("No admin command '%s' found.", commandName);
+        warning ("No admin command '%s' found. (entire command : '%s')", commandName, command);
         return;
     }
 
