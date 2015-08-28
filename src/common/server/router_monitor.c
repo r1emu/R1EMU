@@ -46,12 +46,7 @@ struct RouterMonitor {
  * @param self The RouterMonitor
  * @return 0 on success, -1 on error
  */
-static int
-RouterMonitor_monitor (
-    zloop_t *loop,
-    zsock_t *monitor,
-    void *_self
-);
+static int RouterMonitor_monitor(zloop_t *loop, zsock_t *monitor, void *_self);
 
 /**
  * @brief Router Subscriber handler
@@ -60,19 +55,11 @@ RouterMonitor_monitor (
  * @param self The RouterMonitor
  * @return 0 on success, -1 on error
  */
-static int
-RouterMonitor_subscribe (
-    zloop_t *loop,
-    zsock_t *monitor,
-    void *_self
-);
-
+static int RouterMonitor_subscribe(zloop_t *loop, zsock_t *monitor, void *_self);
 
 // ------ Extern functions implementation -------
-RouterMonitor *
-routerMonitorNew (
-    RouterMonitorStartupInfo *info
-) {
+RouterMonitor *routerMonitorNew(RouterMonitorStartupInfo *info) {
+
     RouterMonitor *self;
 
     if ((self = calloc(1, sizeof(RouterMonitor))) == NULL) {
@@ -88,12 +75,8 @@ routerMonitorNew (
     return self;
 }
 
+bool routerMonitorInit (RouterMonitor *self, RouterMonitorStartupInfo *info) {
 
-bool
-routerMonitorInit (
-    RouterMonitor *self,
-    RouterMonitorStartupInfo *info
-) {
     routerMonitorStartupInfoInit (&self->info, info->frontend, info->routerId, &info->redisInfo, &info->sqlInfo);
     routerMonitorStartupInfoDestroy (&info);
 
@@ -116,14 +99,12 @@ routerMonitorInit (
     return true;
 }
 
-
-RouterMonitorStartupInfo *
-routerMonitorStartupInfoNew (
+RouterMonitorStartupInfo *routerMonitorStartupInfoNew(
     zsock_t *frontend,
     uint16_t routerId,
     RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo
-) {
+    MySQLStartupInfo *sqlInfo)
+{
     RouterMonitorStartupInfo *self;
 
     if ((self = calloc(1, sizeof(RouterMonitorStartupInfo))) == NULL) {
@@ -139,15 +120,13 @@ routerMonitorStartupInfoNew (
     return self;
 }
 
-
-bool
-routerMonitorStartupInfoInit (
+bool routerMonitorStartupInfoInit (
     RouterMonitorStartupInfo *self,
     zsock_t *frontend,
     uint16_t routerId,
     RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo
-) {
+    MySQLStartupInfo *sqlInfo)
+{
     self->frontend = frontend;
     self->routerId = routerId;
 
@@ -156,7 +135,7 @@ routerMonitorStartupInfoInit (
         return false;
     }
 
-    if (!(mySqlStartupInfoInit (&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
+    if (!(mySqlStartupInfoInit(&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
         error("Cannot initialize MySQL start up info.");
         return false;
     }

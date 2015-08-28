@@ -76,7 +76,7 @@ serverFactoryInitServerInfo (
 ) {
     // Initialize MySQL start up information
     MySQLStartupInfo sqlInfo;
-    if (!(mySqlStartupInfoInit (&sqlInfo, sqlHostname, sqlUsername, sqlPassword, sqlDatabase))) {
+    if (!(mySqlStartupInfoInit(&sqlInfo, sqlHostname, sqlUsername, sqlPassword, sqlDatabase))) {
         error("Cannot initialize correctly the MySQL start up information.");
         return false;
     }

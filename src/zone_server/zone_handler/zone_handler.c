@@ -20,41 +20,41 @@
 #include "common/server/event_handler.h"
 
 /** Connect to the zone server */
-static PacketHandlerState ZoneHandler_connect        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerConnect        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** Client is ready to enter the zone */
-static PacketHandlerState ZoneHandler_gameReady      (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerGameReady      (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** Jump handler */
-static PacketHandlerState ZoneHandler_jump           (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerJump           (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On air handler */
-static PacketHandlerState ZoneHandler_onAir          (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerOnAir          (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On ground handler */
-static PacketHandlerState ZoneHandler_onGround       (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerOnGround       (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On move with keyboard handler */
-static PacketHandlerState ZoneHandler_keyboardMove   (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerKeyboardMove   (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On stop commander movement */
-static PacketHandlerState ZoneHandler_moveStop       (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerMoveStop       (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On movement information */
-static PacketHandlerState ZoneHandler_movementInfo   (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerMovementInfo   (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On commander rotation */
-static PacketHandlerState ZoneHandler_rotate         (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerRotate         (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On commander head rotation */
-static PacketHandlerState ZoneHandler_headRotate     (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerHeadRotate     (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** @unknown */
-static PacketHandlerState ZoneHandler_campInfo       (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerCampInfo       (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On log out */
-static PacketHandlerState ZoneHandler_czQuickSlotList(Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerCzQuickSlotList(Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On log out */
-static PacketHandlerState ZoneHandler_itemUse        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerItemUse        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On log out */
-static PacketHandlerState ZoneHandler_iNeedParty     (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerINeedParty     (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On log out */
-static PacketHandlerState ZoneHandler_logout         (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerLogout         (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On cast a spell on the ground */
-static PacketHandlerState ZoneHandler_skillGround    (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerSkillGround    (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On commander sit */
-static PacketHandlerState ZoneHandler_restSit        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerRestSit        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On commander chat */
-static PacketHandlerState ZoneHandler_chat           (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+static PacketHandlerState zoneHandlerChat           (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 
 /**
  * @brief zoneHandlers is a global table containing all the zone handlers.
@@ -63,30 +63,29 @@ const PacketHandler zoneHandlers[PACKET_TYPE_COUNT] = {
     #define REGISTER_PACKET_HANDLER(packetName, handler) \
        [packetName] = {handler, STRINGIFY(packetName)}
 
-    REGISTER_PACKET_HANDLER(CZ_CONNECT, ZoneHandler_connect),
-    REGISTER_PACKET_HANDLER(CZ_GAME_READY, ZoneHandler_gameReady),
-    REGISTER_PACKET_HANDLER(CZ_JUMP, ZoneHandler_jump),
-    REGISTER_PACKET_HANDLER(CZ_ON_AIR, ZoneHandler_onAir),
-    REGISTER_PACKET_HANDLER(CZ_ON_GROUND, ZoneHandler_onGround),
-    REGISTER_PACKET_HANDLER(CZ_KEYBOARD_MOVE, ZoneHandler_keyboardMove),
-    REGISTER_PACKET_HANDLER(CZ_MOVE_STOP, ZoneHandler_moveStop),
-    REGISTER_PACKET_HANDLER(CZ_MOVEMENT_INFO, ZoneHandler_movementInfo),
-    REGISTER_PACKET_HANDLER(CZ_ROTATE, ZoneHandler_rotate),
-    REGISTER_PACKET_HANDLER(CZ_HEAD_ROTATE, ZoneHandler_headRotate),
-    REGISTER_PACKET_HANDLER(CZ_CAMPINFO, ZoneHandler_campInfo),
-    REGISTER_PACKET_HANDLER(CZ_QUICKSLOT_LIST, ZoneHandler_czQuickSlotList),
-    REGISTER_PACKET_HANDLER(CZ_LOGOUT, ZoneHandler_logout),
-    REGISTER_PACKET_HANDLER(CZ_ITEM_USE, ZoneHandler_itemUse),
-    REGISTER_PACKET_HANDLER(CZ_I_NEED_PARTY, ZoneHandler_iNeedParty),
-    REGISTER_PACKET_HANDLER(CZ_SKILL_GROUND, ZoneHandler_skillGround),
-    REGISTER_PACKET_HANDLER(CZ_REST_SIT, ZoneHandler_restSit),
-    REGISTER_PACKET_HANDLER(CZ_CHAT, ZoneHandler_chat),
+    REGISTER_PACKET_HANDLER(CZ_CONNECT, zoneHandlerConnect),
+    REGISTER_PACKET_HANDLER(CZ_GAME_READY, zoneHandlerGameReady),
+    REGISTER_PACKET_HANDLER(CZ_JUMP, zoneHandlerJump),
+    REGISTER_PACKET_HANDLER(CZ_ON_AIR, zoneHandlerOnAir),
+    REGISTER_PACKET_HANDLER(CZ_ON_GROUND, zoneHandlerOnGround),
+    REGISTER_PACKET_HANDLER(CZ_KEYBOARD_MOVE, zoneHandlerKeyboardMove),
+    REGISTER_PACKET_HANDLER(CZ_MOVE_STOP, zoneHandlerMoveStop),
+    REGISTER_PACKET_HANDLER(CZ_MOVEMENT_INFO, zoneHandlerMovementInfo),
+    REGISTER_PACKET_HANDLER(CZ_ROTATE, zoneHandlerRotate),
+    REGISTER_PACKET_HANDLER(CZ_HEAD_ROTATE, zoneHandlerHeadRotate),
+    REGISTER_PACKET_HANDLER(CZ_CAMPINFO, zoneHandlerCampInfo),
+    REGISTER_PACKET_HANDLER(CZ_QUICKSLOT_LIST, zoneHandlerCzQuickSlotList),
+    REGISTER_PACKET_HANDLER(CZ_LOGOUT, zoneHandlerLogout),
+    REGISTER_PACKET_HANDLER(CZ_ITEM_USE, zoneHandlerItemUse),
+    REGISTER_PACKET_HANDLER(CZ_I_NEED_PARTY, zoneHandlerINeedParty),
+    REGISTER_PACKET_HANDLER(CZ_SKILL_GROUND, zoneHandlerSkillGround),
+    REGISTER_PACKET_HANDLER(CZ_REST_SIT, zoneHandlerRestSit),
+    REGISTER_PACKET_HANDLER(CZ_CHAT, zoneHandlerChat),
 
     #undef REGISTER_PACKET_HANDLER
 };
 
-static PacketHandlerState
-ZoneHandler_chat(
+static PacketHandlerState zoneHandlerChat(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -119,8 +118,16 @@ ZoneHandler_chat(
         GameEventChat *event = alloca(gameEventSize);
         event->pcId = session->game.commanderSession.currentCommander.pcId;
         memcpy(event->sessionKey, session->socket.sessionKey, sizeof(event->sessionKey));
-        memcpy(event->familyName, session->game.commanderSession.currentCommander.base.familyName, sizeof(event->familyName));
-        memcpy(event->commanderName, session->game.commanderSession.currentCommander.base.commanderName, sizeof(event->commanderName));
+        memcpy(
+            event->familyName,
+            session->game.commanderSession.currentCommander.base.familyName,
+            sizeof(event->familyName)
+        );
+        memcpy(
+            event->commanderName,
+            session->game.commanderSession.currentCommander.base.commanderName,
+            sizeof(event->commanderName)
+        );
         memcpy(event->chatText, clientPacket->msgText, chatTextSize);
         workerDispatchEvent(self, EVENT_SERVER_TYPE_CHAT, event, gameEventSize);
     }
@@ -128,7 +135,7 @@ ZoneHandler_chat(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState ZoneHandler_restSit(
+static PacketHandlerState zoneHandlerRestSit(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -154,7 +161,7 @@ static PacketHandlerState ZoneHandler_restSit(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState ZoneHandler_skillGround(
+static PacketHandlerState zoneHandlerSkillGround(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -197,7 +204,7 @@ static PacketHandlerState ZoneHandler_skillGround(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState ZoneHandler_campInfo(
+static PacketHandlerState zoneHandlerCampInfo(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -217,7 +224,7 @@ static PacketHandlerState ZoneHandler_campInfo(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState ZoneHandler_itemUse(
+static PacketHandlerState zoneHandlerItemUse(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -228,7 +235,7 @@ static PacketHandlerState ZoneHandler_itemUse(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState ZoneHandler_iNeedParty(
+static PacketHandlerState zoneHandlerINeedParty(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -242,7 +249,7 @@ static PacketHandlerState ZoneHandler_iNeedParty(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState ZoneHandler_logout(
+static PacketHandlerState zoneHandlerLogout(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -253,7 +260,7 @@ static PacketHandlerState ZoneHandler_logout(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState ZoneHandler_headRotate(
+static PacketHandlerState zoneHandlerHeadRotate(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -264,7 +271,7 @@ static PacketHandlerState ZoneHandler_headRotate(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState ZoneHandler_rotate(
+static PacketHandlerState zoneHandlerRotate(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -275,7 +282,7 @@ static PacketHandlerState ZoneHandler_rotate(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState ZoneHandler_movementInfo(
+static PacketHandlerState zoneHandlerMovementInfo(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -285,8 +292,7 @@ static PacketHandlerState ZoneHandler_movementInfo(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState
-ZoneHandler_moveStop(
+static PacketHandlerState zoneHandlerMoveStop(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -335,8 +341,7 @@ ZoneHandler_moveStop(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState
-ZoneHandler_keyboardMove(
+static PacketHandlerState zoneHandlerKeyboardMove(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -386,7 +391,7 @@ ZoneHandler_keyboardMove(
     return PACKET_HANDLER_UPDATE_SESSION;
 }
 
-static PacketHandlerState ZoneHandler_czQuickSlotList(
+static PacketHandlerState zoneHandlerCzQuickSlotList(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -398,8 +403,7 @@ static PacketHandlerState ZoneHandler_czQuickSlotList(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState
-ZoneHandler_gameReady(
+static PacketHandlerState zoneHandlerGameReady(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -489,7 +493,7 @@ ZoneHandler_gameReady(
     return PACKET_HANDLER_UPDATE_SESSION;
 }
 
-static PacketHandlerState ZoneHandler_connect(
+static PacketHandlerState zoneHandlerConnect(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -524,7 +528,10 @@ static PacketHandlerState ZoneHandler_connect(
     }
 
     // Check the client packet here(authentication)
-    if (strncmp(session->game.accountSession.login, clientPacket->login, sizeof(session->game.accountSession.login)) != 0) {
+    if (strncmp(session->game.accountSession.login,
+                clientPacket->login,
+                sizeof(session->game.accountSession.login)) != 0)
+    {
         error("Wrong account authentication.(clientPacket account = <%s>, Session account = <%s>",
             clientPacket->login, session->game.accountSession.login);
         return PACKET_HANDLER_ERROR;
@@ -571,7 +578,7 @@ static PacketHandlerState ZoneHandler_connect(
     return PACKET_HANDLER_UPDATE_SESSION;
 }
 
-static PacketHandlerState ZoneHandler_jump(
+static PacketHandlerState zoneHandlerJump(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -600,7 +607,7 @@ static PacketHandlerState ZoneHandler_jump(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState ZoneHandler_onAir(
+static PacketHandlerState zoneHandlerOnAir(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -611,7 +618,7 @@ static PacketHandlerState ZoneHandler_onAir(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState ZoneHandler_onGround(
+static PacketHandlerState zoneHandlerOnGround(
     Worker *self,
     Session *session,
     uint8_t *packet,
