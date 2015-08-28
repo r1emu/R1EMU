@@ -109,8 +109,8 @@ static PacketHandlerState zoneHandlerChat(
 
     // Check for custom admin commands
     if (session->game.accountSession.privilege <= ACCOUNT_SESSION_PRIVILEGES_ADMIN
-    &&(strncmp(clientPacket->msgText, "/cmd ", sizeof(clientPacket->msgText)) == 0)) {
-        adminCmdProcess(self, clientPacket->msgText + strlen("/cmd "), session, replyMsg);
+    && (strncmp(clientPacket->msgText, "/", strlen("/")) == 0)) {
+        adminCmdProcess(self, clientPacket->msgText + strlen("/"), session, replyMsg);
     }
     else {
         // normal message : Dispatch a GameEventChat

@@ -23,9 +23,14 @@
 /**
  * @brief : Decide which admin commands is going to be executed based on the command line
  */
-void adminCmdProcess(Worker *self, char *command, Session *session,zmsg_t *replyMsg);
+void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *replyMsg);
 
 /**
  * @brief : Spawn a commander at the place of the current commander.
  */
 void adminCmdSpawnPc(Worker *self, Session *session, zmsg_t *replyMsg);
+
+/**
+ * @brief : Makes the current commander teleport to a random coordinate or to x, y, z.
+ */
+void adminCmdJump(Session *session, zmsg_t *replyMsg, char *args);

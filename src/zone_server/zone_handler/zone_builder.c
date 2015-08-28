@@ -1075,6 +1075,8 @@ void zoneBuilderSetPos(uint32_t targetPcId, PositionXYZ *position, zmsg_t *reply
     PacketType packetType = ZC_SET_POS;
     CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
 
+    info("Launched set_pos with position %d %d %d", position->x, position ->y, position->z);
+
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);

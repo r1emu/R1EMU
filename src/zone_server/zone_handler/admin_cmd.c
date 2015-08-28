@@ -23,6 +23,14 @@ void adminCmdProcess(Worker *self, char *command, Session *session,zmsg_t *reply
     if (strncmp(command, "spawn", strlen("spawn")) == 0) {
         adminCmdSpawnPc(self, session, replyMsg);
     }
+    else if (strncmp(command, "jump", strlen("jump")) == 0) {
+        if (strlen(command) > strlen("jump") + 1) {
+            adminCmdJump(session, replyMsg, command + strlen("jump") + 1);
+        }
+        else {
+            adminCmdJump(session, replyMsg, NULL);
+        }
+    }
 }
 
 void adminCmdSpawnPc(Worker *self, Session *session, zmsg_t *replyMsg) {
@@ -66,4 +74,36 @@ void adminCmdSpawnPc(Worker *self, Session *session, zmsg_t *replyMsg) {
 
     redisUpdateGameSession(self->redis, &gameKey, sessionKeyStr, &fakeGameSession);
     info("Fake PC spawned.(SocketId=%s, Acc=%I64x, PcID=%#x)", sessionKeyStr, fakePc.base.accountId, fakePc.pcId);
+}
+
+void adminCmdJump(Session *session, zmsg_t *replyMsg, char *args) {
+    if (args == NULL) {
+        info("Jump without argument!");
+        // we must add a random with the map max x/y
+    }
+    else {
+        char *argsParse;
+
+        info("Jump with argument: %s", args);
+        argsParse = strtok(args, " ");
+        int argc = 0;
+        while (argsParse != NULL) {
+            argc++;
+            argsParse = strtok(NULL, " ");
+        }
+        if (argc != 3) {
+            info("Wrong number of argument, must be 3.");
+        }
+        else {
+            PositionXYZ position;
+            argsParse = strtok(args, " ");
+            position.x = atoi(argsParse);
+            argsParse = strtok(NULL, " ");
+            position.y = atoi(argsParse);
+            argsParse = strtok(NULL, " ");
+            position.z = atoi(argsParse);
+            argsParse = strtok(NULL, " ");
+            zoneBuilderSetPos(session->game.commanderSession.currentCommander.pcId, &position, replyMsg);
+        }
+    }
 }
