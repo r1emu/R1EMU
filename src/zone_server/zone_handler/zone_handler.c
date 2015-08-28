@@ -55,6 +55,8 @@ static PacketHandlerState zoneHandlerSkillGround    (Worker *self, Session *sess
 static PacketHandlerState zoneHandlerRestSit        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On commander chat */
 static PacketHandlerState zoneHandlerChat           (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+/** On commander chat log */
+static PacketHandlerState zoneHandlerChatLog        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 
 /**
  * @brief zoneHandlers is a global table containing all the zone handlers.
@@ -81,9 +83,21 @@ const PacketHandler zoneHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CZ_SKILL_GROUND, zoneHandlerSkillGround),
     REGISTER_PACKET_HANDLER(CZ_REST_SIT, zoneHandlerRestSit),
     REGISTER_PACKET_HANDLER(CZ_CHAT, zoneHandlerChat),
+    REGISTER_PACKET_HANDLER(CZ_CHAT_LOG, zoneHandlerChatLog),
 
     #undef REGISTER_PACKET_HANDLER
 };
+
+static PacketHandlerState zoneHandlerChatLog(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *replyMsg)
+{
+    warning ("Not implemented yet.");
+    return PACKET_HANDLER_OK;
+}
 
 static PacketHandlerState zoneHandlerChat(
     Worker *self,
