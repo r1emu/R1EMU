@@ -37,18 +37,16 @@ void zoneBuilderRestSit(uint32_t targetPcId, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderItemAdd(ItemPkt *item, uint32_t inventoryIndex, InventoryAddType addType, zmsg_t *replyMsg) {
+void zoneBuilderItemAdd(ItemPkt *item, InventoryAddType addType, zmsg_t *replyMsg) {
 
     #pragma pack(push, 1)
     struct {
-        ServerPacketHeader header;
+        VariableSizePacketHeader variableSizeHeader;
         ItemPkt item;
         uint16_t unk1; // 06 00
         uint8_t addType;
         float notificationDelay;
         uint16_t unk2; // 00 00
-        uint16_t unk3; // A6 0E
-        float unk4; // 00 60 EA 46
     } replyPacket;
     #pragma pack(pop)
 
@@ -57,14 +55,14 @@ void zoneBuilderItemAdd(ItemPkt *item, uint32_t inventoryIndex, InventoryAddType
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        serverPacketHeaderInit(&replyPacket.header, packetType);
+        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof (replyPacket));
         replyPacket.item = *item;
         replyPacket.unk1 = SWAP_UINT16(0x0600);
         replyPacket.addType = addType;
         replyPacket.notificationDelay = 0.0f;
         replyPacket.unk2 = 0;
-        replyPacket.unk3 = SWAP_UINT16(0xA60E);
-        replyPacket.unk4 = 30000.0;
+        //replyPacket.unk3 = SWAP_UINT16(0xA60E);
+        //replyPacket.unk4 = 30000.0;
     }
 }
 

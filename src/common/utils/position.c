@@ -46,3 +46,8 @@ mathIsWithin2DCircleDistance (
 
     return (square(dx) + square(dz)) < (square(distance));
 }
+
+
+void positionXYZDump (PositionXYZ *position) {
+    dbg ("x = %f / y = %f / z = %f", position->x, position->y, position->z);
+}

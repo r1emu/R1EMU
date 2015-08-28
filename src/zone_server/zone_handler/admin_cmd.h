@@ -28,9 +28,15 @@ void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *repl
 /**
  * @brief : Spawn a commander at the place of the current commander.
  */
-void adminCmdSpawnPc(Worker *self, Session *session, zmsg_t *replyMsg);
+void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
 
 /**
  * @brief : Makes the current commander teleport to a random coordinate or to x, y, z.
  */
-void adminCmdJump(Session *session, zmsg_t *replyMsg, char *args);
+void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+
+/**
+ * @brief : Add any item in the commander inventory
+ *          /addItem <itemId> <quantity>
+ */
+void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg);

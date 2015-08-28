@@ -354,4 +354,4 @@ void zoneBuilderPcMoveStop(
 /**
  * @brief Add an item in the current commander inventory
  */
-void zoneBuilderItemAdd(ItemPkt *item, uint32_t inventoryIndex, InventoryAddType addType, zmsg_t *replyMsg);
+void zoneBuilderItemAdd(ItemPkt *item, InventoryAddType addType, zmsg_t *replyMsg);

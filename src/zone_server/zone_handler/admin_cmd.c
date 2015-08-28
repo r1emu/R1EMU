@@ -19,21 +19,35 @@
 #include "common/session/session.h"
 #include "common/server/worker.h"
 
-void adminCmdProcess(Worker *self, char *command, Session *session,zmsg_t *replyMsg) {
-    if (strncmp(command, "spawn", strlen("spawn")) == 0) {
-        adminCmdSpawnPc(self, session, replyMsg);
+zhash_t *adminCommands = NULL;
+
+void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *replyMsg) {
+
+    if (adminCommands == NULL) {
+        // initialize the admin commands hashtable
+        adminCommands = zhash_new ();
+        zhash_insert (adminCommands, "spawn",   adminCmdSpawnPc);
+        zhash_insert (adminCommands, "jump",    adminCmdJump);
+        zhash_insert (adminCommands, "itemAdd", adminCmdAddItem);
     }
-    else if (strncmp(command, "jump", strlen("jump")) == 0) {
-        if (strlen(command) > strlen("jump") + 1) {
-            adminCmdJump(session, replyMsg, command + strlen("jump") + 1);
-        }
-        else {
-            adminCmdJump(session, replyMsg, NULL);
-        }
+
+    void (*handler) (Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+    char *commandName = strtok(command, " ");
+    if (!commandName) {
+        warning ("Cannot read command '%s'", command);
+        return;
     }
+
+    handler = zhash_lookup (adminCommands, commandName);
+    if (!handler) {
+        warning ("No admin command '%s' found.", commandName);
+        return;
+    }
+
+    handler(self, session, command + strlen (commandName) + 1, replyMsg);
 }
 
-void adminCmdSpawnPc(Worker *self, Session *session, zmsg_t *replyMsg) {
+void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
     // add a fake commander with a fake account
     CommanderInfo fakePc;
     commanderInfoInit(&fakePc);
@@ -76,8 +90,22 @@ void adminCmdSpawnPc(Worker *self, Session *session, zmsg_t *replyMsg) {
     info("Fake PC spawned.(SocketId=%s, Acc=%I64x, PcID=%#x)", sessionKeyStr, fakePc.base.accountId, fakePc.pcId);
 }
 
-void adminCmdJump(Session *session, zmsg_t *replyMsg, char *args) {
-    if (args == NULL) {
+void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    uint32_t itemId = strtol (args, &args, 10);
+    args++;
+    uint32_t amount = strtol (args, &args, 10);
+
+    ItemPkt item = {
+        .uniqueId = r1emuGenerateRandom64(&self->seed),
+        .amount = (!amount) ? 1 : amount,
+        .inventoryIndex = 1,
+        .id = itemId
+    };
+    zoneBuilderItemAdd(&item, INVENTORY_ADD_PICKUP, replyMsg);
+}
+
+void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    if (strlen (args) == 0) {
         info("Jump without argument!");
         // we must add a random with the map max x/y
     }
@@ -103,6 +131,7 @@ void adminCmdJump(Session *session, zmsg_t *replyMsg, char *args) {
             argsParse = strtok(NULL, " ");
             position.z = atoi(argsParse);
             argsParse = strtok(NULL, " ");
+            positionXYZDump (&position);
             zoneBuilderSetPos(session->game.commanderSession.currentCommander.pcId, &position, replyMsg);
         }
     }
