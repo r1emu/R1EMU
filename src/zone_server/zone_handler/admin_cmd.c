@@ -97,14 +97,17 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 }
 
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+
     uint32_t itemId = strtol(args, &args, 10);
     args++;
     uint32_t amount = strtol(args, &args, 10);
 
+    uint32_t itemPosition = 1;
+
     ItemPkt item = {
         .uniqueId = r1emuGenerateRandom64(&self->seed),
         .amount = (!amount) ? 1 : amount,
-        .inventoryIndex = INVENTORY_MAX_SIZE * INVENTORY_CAT_CONSUMABLE + 1,
+        .inventoryIndex = INVENTORY_MAX_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition,
         .id = itemId
     };
     zoneBuilderItemAdd(&item, INVENTORY_ADD_PICKUP, replyMsg);
