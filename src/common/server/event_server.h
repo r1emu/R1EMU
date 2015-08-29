@@ -191,15 +191,13 @@ bool eventServerGetClientsAround(
  * @brief Send the same packet to multiple clients
  * @param self An allocated EventServer
  * @param clients A list of clients socket identity
- * @param packet The packet to send
- * @param packetLen the length of the packet
+ * @param msg the message to broadcast
  * @return true on success, false otherwise
  */
 bool eventServerSendToClients(
     EventServer *self,
     zlist_t *clients,
-    uint8_t *packet,
-    size_t packetLen);
+    zmsg_t *msg);
 
 /**
  * @brief Send a packet to one client

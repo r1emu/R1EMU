@@ -56,9 +56,7 @@ bool eventHandlerCommanderMove(EventServer *self, GameEventCommanderMove *event)
         );
 
         // send the packet
-        zframe_t *frame = zmsg_first(msg);
-
-        if (!(eventServerSendToClients(self, clientsAround, zframe_data(frame), zframe_size(frame)))) {
+        if (!(eventServerSendToClients(self, clientsAround, msg))) {
             error("Failed to send the packet to the clients.");
             status = false;
             goto cleanup;
@@ -96,9 +94,7 @@ bool eventHandlerMoveStop(EventServer *self, GameEventMoveStop *event) {
         );
 
         // send the packet
-        zframe_t *frame = zmsg_first(msg);
-
-        if (!(eventServerSendToClients(self, clientsAround, zframe_data(frame), zframe_size(frame)))) {
+        if (!(eventServerSendToClients(self, clientsAround, msg))) {
             error("Failed to send the packet to the clients.");
             status = false;
             goto cleanup;
@@ -135,9 +131,7 @@ bool eventHandlerJump(EventServer *self, GameEventJump *event) {
     zoneBuilderJump(event->updatePosEvent.commanderInfo.pcId, event->height, msg);
 
     // send the packet
-    zframe_t *frame = zmsg_first(msg);
-
-    if (!(eventServerSendToClients(self, clientsAround, zframe_data(frame), zframe_size(frame)))) {
+    if (!(eventServerSendToClients(self, clientsAround, msg))) {
         error("Failed to send the packet to the clients.");
         status = false;
         goto cleanup;
@@ -172,10 +166,9 @@ bool eventHandlerChat(EventServer *self, GameEventChat *event) {
         event->chatText,
         msg
     );
-    // Send the packet
-    zframe_t *frame = zmsg_first (msg);
 
-    if (!(eventServerSendToClients (self, clientsAround, zframe_data(frame), zframe_size (frame)))) {
+    // send the packet
+    if (!(eventServerSendToClients(self, clientsAround, msg))) {
         error("Failed to send the packet to the clients.");
         status = false;
         goto cleanup;
@@ -211,9 +204,7 @@ bool eventHandlerRestSit(EventServer *self, GameEventRestSit *event) {
     );
 
     // send the packet
-    zframe_t *frame = zmsg_first (msg);
-
-    if (!(eventServerSendToClients (self, clientsAround, zframe_data(frame), zframe_size (frame)))) {
+    if (!(eventServerSendToClients(self, clientsAround, msg))) {
         error("Failed to send the packet to the clients.");
         status = false;
         goto cleanup;
