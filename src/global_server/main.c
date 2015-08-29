@@ -72,8 +72,7 @@ cleanup:
     // shutdown the CZMQ layer properly
     zsys_shutdown();
 
-    info("Press any key to exit...");
-    getc(stdout);
+    pause();
 
     return 0;
 }
