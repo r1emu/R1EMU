@@ -165,7 +165,9 @@ void adminCmdWhere(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
     char message[MAX_LEN];
     PositionXYZ position;
     position = session->game.commanderSession.currentCommander.pos;
-    snprintf(message, MAX_LEN, "[%hu] x = %.0f, y = %.0f, z = %.0f", session->game.commanderSession.mapId, position.x, position.y, position.z);
+    snprintf(message, MAX_LEN, "[%hu] x = %.0f, y = %.0f, z = %.0f",
+        session->game.commanderSession.mapId,
+        position.x, position.y, position.z);
 
     zoneBuilderChat(&session->game.commanderSession.currentCommander, message, replyMsg);
 }
