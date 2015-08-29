@@ -52,3 +52,7 @@ void adminCmdTest(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
  */
 bool adminCmdInit(void);
 
+/**
+ * @brief : Returns the player's position
+ */
+void adminCmdWhere(Worker *self, Session *session, char *args, zmsg_t *replyMsg);

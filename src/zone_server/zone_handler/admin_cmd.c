@@ -32,6 +32,7 @@ bool adminCmdInit(void) {
     zhash_insert(adminCommands, "jump",    adminCmdJump);
     zhash_insert(adminCommands, "itemAdd", adminCmdAddItem);
     zhash_insert(adminCommands, "test",    adminCmdTest);
+    zhash_insert(adminCommands, "where",   adminCmdWhere);
 
     return true;
 }
@@ -154,4 +155,14 @@ void adminCmdTest(Worker *self, Session *session, char *args, zmsg_t *replyMsg) 
     );
 
     zmsg_add(replyMsg, zframe_new(memory, memSize));
+}
+
+void adminCmdWhere(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    const uint16_t MAX_LEN = 128;
+    char message[MAX_LEN];
+    PositionXYZ position;
+    position = session->game.commanderSession.currentCommander.pos;
+    snprintf(message, MAX_LEN, "[%hu] x = %.0f, y = %.0f, z = %.0f", session->game.commanderSession.mapId, position.x, position.y, position.z);
+
+    zoneBuilderChat(&session->game.commanderSession.currentCommander, message, replyMsg);
 }
