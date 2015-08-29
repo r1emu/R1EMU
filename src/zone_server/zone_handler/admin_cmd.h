@@ -40,3 +40,9 @@ void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
  *          /addItem <itemId> <quantity>
  */
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+
+/**
+ * @brief : A test command
+ *          /test
+ */
+void adminCmdTest(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
