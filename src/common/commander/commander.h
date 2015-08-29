@@ -52,9 +52,9 @@ typedef struct CommanderEquipment {
 
 #pragma pack(push, 1)
 /**
- * @brief CommanderInfo is the struct of a commander.
+ * @brief CommanderPkt is the struct of a commander sent to the client
  */
-typedef struct Commander
+typedef struct CommanderPkt
 {
     uint8_t commanderName [COMMANDER_NAME_SIZE+1];
     uint8_t familyName [COMMANDER_FAMILY_NAME_SIZE];
@@ -67,13 +67,14 @@ typedef struct Commander
     uint8_t unk5;
     uint32_t level;
     CommanderEquipment equipment;
-    uint16_t hairType;
+    uint8_t hairId;
+    uint8_t unk6;
     uint16_t pose;
-} Commander;
+} CommanderPkt;
 
 typedef struct CommanderInfo
 {
-    Commander base;
+    CommanderPkt base;
     PositionXYZ pos;
     uint32_t currentXP;
     uint32_t maxXP;
@@ -91,28 +92,12 @@ typedef struct CommanderInfo
 } CommanderInfo;
 #pragma pack(pop)
 
-typedef struct CommanderCreateInfo {
-    Commander commander;
-    uint64_t socialInfoId;
-    uint16_t commanderPosition;
-    uint16_t mapId;
-    uint32_t unk4;
-    uint32_t unk5;
-    uint32_t maxXP;
-    uint32_t unk6;
-    PositionXYZ pos;
-    PositionXZ dir;
-    PositionXYZ pos2;
-    PositionXZ dir2;
-    uint32_t unk8;
-} CommanderCreateInfo;
-
 typedef enum CommanderJobId
 {
-    COMMANDER_JOB_WARRIOR = 0x3E9,
-    COMMANDER_JOB_ARCHER  = 0xBB9,
-    COMMANDER_JOB_MAGE    = 0x7D1,
-    COMMANDER_JOB_CLERIC  = 0xFA1
+    COMMANDER_JOB_WARRIOR = 1001,
+    COMMANDER_JOB_MAGE    = 2001,
+    COMMANDER_JOB_ARCHER  = 3001,
+    COMMANDER_JOB_CLERIC  = 4001
 }   CommanderJobId;
 
 typedef enum CommanderClassId

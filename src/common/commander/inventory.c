@@ -13,41 +13,56 @@
 
 
 // ---------- Includes ------------
-#include "position.h"
+#include "inventory.h"
 
 
 // ------ Structure declaration -------
+/**
+ * @brief Inventory contains
+ */
+struct Inventory
+{
+
+};
 
 // ------ Static declaration -------
 
 
 // ------ Extern function implementation -------
 
-bool
-mathIsWithin2DManhattanDistance (
-    PositionXZ *pos1,
-    PositionXZ *pos2,
-    float distance
-) {
-    float dx = abs (pos2->x - pos1->x);
-    float dz = abs (pos2->z - pos1->z);
+Inventory *inventoryNew(void) {
+    Inventory *self;
 
-    return (dx < distance && dz < distance);
+    if((self = malloc(sizeof(Inventory))) == NULL) {
+        return NULL;
+    }
+
+    if(!inventoryInit(self)) {
+        inventoryDestroy(&self);
+        error("Inventory failed to initialize.");
+        return NULL;
+    }
+
+    return self;
 }
 
-bool
-mathIsWithin2DCircleDistance (
-    PositionXZ *pos1,
-    PositionXZ *pos2,
-    float distance
-) {
-    float dx = abs (pos2->x - pos1->x);
-    float dz = abs (pos2->z - pos1->z);
+bool inventoryInit(Inventory *self) {
+    memset(self, 0, sizeof(Inventory));
 
-    return (square(dx) + square(dz)) < (square(distance));
+    return true;
 }
 
+void inventoryFree(Inventory *self) {
+    // TODO
+}
 
-void positionXYZDump (PositionXYZ *position) {
-    dbg ("x = %f / y = %f / z = %f", position->x, position->y, position->z);
+void inventoryDestroy(Inventory **_self) {
+    Inventory *self = *_self;
+
+    if(self) {
+        inventoryFree(self);
+        free(self);
+    }
+
+    *_self = NULL;
 }

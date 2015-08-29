@@ -13,9 +13,9 @@
 
 
 // ---------- Includes ------------
-#include "Server.h"
-#include "Router.h"
-#include "Worker.h"
+#include "server.h"
+#include "router.h"
+#include "worker.h"
 #include "common/utils/string.h"
 #include "common/crypto/crypto.h"
 

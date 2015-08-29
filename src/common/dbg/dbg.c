@@ -12,6 +12,10 @@
  */
 
 // ---------- Includes ------------
+#ifndef WIN32
+#define _GNU_SOURCE
+#include <execinfo.h>
+#endif
 #include "dbg.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -139,7 +143,7 @@ void printTrace(void) {
     char **strings;
 
     size = backtrace(array, sizeof(array) / sizeof(*(array)));
-    strings = backtraceSymbols(array, size);
+    strings = backtrace_symbols(array, size);
 
     error("Obtained %zd stack frames.", size);
 

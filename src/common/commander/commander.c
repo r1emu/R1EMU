@@ -36,18 +36,18 @@ void commanderEquipmentInit(CommanderEquipment *equipment) {
     equipment->necklace = 0xa;
 }
 
-void commanderInit(Commander *commander) {
+void commanderInit(CommanderPkt *commander) {
     memset(commander, 0, sizeof(*commander));
 
     commander->accountId = -1;
-    commander->classId = -1; // Cleric
+    commander->classId = COMMANDER_CLASS_CLERIC;
     commander->unk4 = SWAP_UINT16(0x2220); // ICBT
-    commander->jobId = -1;
-    commander->gender = -1;
+    commander->jobId = COMMANDER_JOB_CLERIC; // Cleric
+    commander->gender = COMMANDER_GENDER_FEMALE; // Female
     commander->unk5 = 0; // ICBT
     commander->level = 1;
     commanderEquipmentInit(&commander->equipment);
-    commander->hairType = -1;
+    commander->hairId = 0x10;
     commander->pose = SWAP_UINT16(0x0000); // Idle (ICBT)
 }
 
@@ -95,7 +95,7 @@ void commanderEquipmentPrint(CommanderEquipment *equipment) {
     dbg("necklace = %d (%x)", equipment->necklace, equipment->necklace);
 }
 
-void commanderPrint(Commander *commander) {
+void commanderPrint(CommanderPkt *commander) {
     dbg("commanderName = %s", commander->commanderName);
     dbg("familyName = %s", commander->familyName);
     dbg("accountId = %llu (%llx)", commander->accountId, commander->accountId);
@@ -106,7 +106,7 @@ void commanderPrint(Commander *commander) {
     dbg("unk5 = %d (%x)", commander->unk5, commander->unk5);
     dbg("level = %d (%x)", commander->level, commander->level);
     commanderEquipmentPrint(&commander->equipment);
-    dbg("hairType = %d (%x)", commander->hairType, commander->hairType);
+    dbg("hairId = %d (%x)", commander->hairId, commander->hairId);
     dbg("pose = %d (%x)", commander->pose, commander->pose);
 }
 

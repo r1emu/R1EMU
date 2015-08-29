@@ -33,7 +33,36 @@ void zoneBuilderRestSit(uint32_t targetPcId, zmsg_t *replyMsg) {
     {
         replyPacket.header.type = packetType;
         replyPacket.pcId = targetPcId;
-        replyPacket.isSit = 0;
+        replyPacket.isSit = false;
+    }
+}
+
+void zoneBuilderItemAdd(ItemPkt *item, InventoryAddType addType, zmsg_t *replyMsg) {
+
+    #pragma pack(push, 1)
+    struct {
+        VariableSizePacketHeader variableSizeHeader;
+        ItemPkt item;
+        uint16_t unk1; // 06 00
+        uint8_t addType;
+        float notificationDelay;
+        uint16_t unk2; // 00 00
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_ITEM_ADD;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof (replyPacket));
+        replyPacket.item = *item;
+        replyPacket.unk1 = SWAP_UINT16(0x0600);
+        replyPacket.addType = addType;
+        replyPacket.notificationDelay = 0.0f;
+        replyPacket.unk2 = 0;
+        //replyPacket.unk3 = SWAP_UINT16(0xA60E);
+        //replyPacket.unk4 = 30000.0;
     }
 }
 
@@ -67,7 +96,7 @@ void zoneBuilderSkillReady(
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        replyPacket.header.type = packetType;
+        serverPacketHeaderInit(&replyPacket.header, packetType);
         replyPacket.pcId = targetPcId;
         replyPacket.skillId = skillId;
         replyPacket.unk3 = 1.0;
@@ -99,7 +128,7 @@ void zoneBuilderPlayAni(zmsg_t *replyMsg) {
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        replyPacket.header.type = packetType;
+        serverPacketHeaderInit(&replyPacket.header, packetType);
         replyPacket.unkSchrageId1 = SWAP_UINT32(0x48010000);
         replyPacket.unkSchrageId2 = SWAP_UINT32(0x271826);
         replyPacket.isUnk1 = 1;
@@ -132,7 +161,7 @@ void zoneBuilderSkillCast(
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        replyPacket.header.type = packetType;
+        serverPacketHeaderInit(&replyPacket.header, packetType);
         replyPacket.pcId = targetPcId;
         replyPacket.unk2 = 0xECC7;
         replyPacket.unk3 = 0;
@@ -622,7 +651,7 @@ void zoneBuilderEnterPc(CommanderInfo *commanderInfo, zmsg_t *replyMsg) {
         uint32_t titleAchievmentId; // 24B42B1B
         uint32_t unk9; // FFFFFFFF
         uint8_t unk10; // 00
-        Commander commander;
+        CommanderPkt commander;
         uint8_t partyName[48+1]; // "None"
     } replyPacket;
     #pragma pack(pop)
@@ -1315,12 +1344,8 @@ void zoneBuilderMoveSpeed(uint32_t targetPcId, float movementSpeed, zmsg_t *repl
     }
 }
 
-void zoneBuilderChat(uint32_t targetPcId,
-    uint8_t *familyName,
-    uint8_t *commanderName,
-    uint8_t *chatText,
-    zmsg_t *replyMsg)
-{
+void zoneBuilderChat(CommanderInfo *commander, uint8_t *chatText, zmsg_t *replyMsg) {
+
     size_t chatTextLen = strlen(chatText) + 1;
 
     #pragma pack(push, 1)
@@ -1328,13 +1353,15 @@ void zoneBuilderChat(uint32_t targetPcId,
         VariableSizePacketHeader variableSizeHeader;
         uint32_t pcId;
         uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
-        uint8_t commanderName[COMMANDER_NAME_SIZE];
-        uint16_t unk1; // 0000
-        uint16_t unk2; // A30F
-        uint32_t unk3; // 01000000
-        uint32_t unk4; // 022E5600
-        uint32_t unk5; // 30950900
-        uint32_t unk6; // 00000000
+        uint8_t commanderName[COMMANDER_NAME_SIZE+1];
+        uint8_t unk1;
+        uint16_t jobId;
+        uint32_t unk2;
+        uint8_t gender;
+        uint8_t hairId;
+        uint16_t unk3;
+        uint32_t headTop;
+        float displayTime;
         uint8_t chatText[chatTextLen];
     } replyPacket;
     #pragma pack(pop)
@@ -1345,16 +1372,18 @@ void zoneBuilderChat(uint32_t targetPcId,
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
-        replyPacket.pcId = targetPcId;
-        memcpy(replyPacket.familyName, familyName, sizeof(replyPacket.familyName));
-        memcpy(replyPacket.commanderName, commanderName, sizeof(replyPacket.commanderName));
+        replyPacket.pcId = commander->pcId;
+        memcpy(replyPacket.familyName, commander->base.familyName, sizeof(replyPacket.familyName));
+        memcpy(replyPacket.commanderName, commander->base.commanderName, sizeof(replyPacket.commanderName));
+        replyPacket.unk1 = 0x4F;
+        replyPacket.jobId = commander->base.jobId;
+        replyPacket.unk2 = 1;
+        replyPacket.gender = commander->base.gender;
+        replyPacket.hairId = commander->base.hairId;
+        replyPacket.unk3 = 0;
+        replyPacket.headTop = commander->base.equipment.head_top;
+        replyPacket.displayTime = 0;
         memcpy(replyPacket.chatText, chatText, sizeof(replyPacket.chatText));
-        replyPacket.unk1 = 0;
-        replyPacket.unk2 = SWAP_UINT16(0xA30F);
-        replyPacket.unk3 = SWAP_UINT32(0x01000000);
-        replyPacket.unk4 = SWAP_UINT32(0x022E5600);
-        replyPacket.unk5 = SWAP_UINT32(0x30950900);
-        replyPacket.unk6 = 0;
     }
 }
 

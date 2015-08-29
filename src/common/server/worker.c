@@ -271,7 +271,7 @@ workerStartupInfoInit (
         return false;
     }
 
-    if (!(mySqlStartupInfoInit (&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
+    if (!(mySqlStartupInfoInit(&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
         error("Cannot initialize MySQL start up info.");
         return false;
     }
@@ -308,7 +308,7 @@ Worker_processClientPacket (
     uint8_t sessionKeyStr [SOCKET_SESSION_ID_SIZE];
 
     // Generate the socketId key
-    socketSessionDestroyGenSessionKey (zframe_data (sessionKeyFrame), sessionKeyStr);
+    socketSessionGenSessionKey (zframe_data (sessionKeyFrame), sessionKeyStr);
 
     // Request the Session
     RedisSessionKey sessionKey = {

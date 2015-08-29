@@ -261,11 +261,13 @@ bool
 eventServerSendToClients (
     EventServer *self,
     zlist_t *clients,
-    uint8_t *packet,
-    size_t packetLen
+    zmsg_t *broadcastMsg
 ) {
     bool result = true;
     zmsg_t *msg = NULL;
+    zframe_t *frame = zmsg_first (broadcastMsg);
+    uint8_t *packet = zframe_data (frame);
+    size_t packetLen = zframe_size (frame);
 
     if ((!(msg = zmsg_new ()))
     ||  zmsg_addmem (msg, PACKET_HEADER (ROUTER_WORKER_MULTICAST), sizeof(ROUTER_WORKER_MULTICAST)) != 0
@@ -281,7 +283,7 @@ eventServerSendToClients (
     for (identityKey = zlist_first (clients); identityKey != NULL; identityKey = zlist_next (clients)) {
         // Add all the clients to the packet
         uint8_t identityBytes[5];
-        socketSessionDestroyGenId (identityKey, identityBytes);
+        socketSessionGenId (identityKey, identityBytes);
         if (zmsg_addmem (msg, identityBytes, sizeof(identityBytes)) != 0) {
             error("Cannot add the identity in the message.");
             result = false;
@@ -377,8 +379,7 @@ eventServerUpdateClientPosition (
         if (zlist_size (pcEnterList) > 0) {
             pcEnterMsg = zmsg_new ();
             zoneBuilderEnterPc (commanderInfo, pcEnterMsg);
-            zframe_t *pcEnterFrame = zmsg_first (pcEnterMsg);
-            if (!(eventServerSendToClients (self, redisClientsAround, zframe_data (pcEnterFrame), zframe_size (pcEnterFrame)))) {
+            if (!(eventServerSendToClients (self, redisClientsAround, pcEnterMsg))) {
                 error("Failed to send the packet to the clients.");
                 status = false;
                 goto cleanup;
@@ -435,10 +436,9 @@ eventServerUpdateClientPosition (
     {
         pcLeaveMsg = zmsg_new ();
         zoneBuilderLeave (commanderInfo->pcId, pcLeaveMsg);
-        zframe_t *pcLeaveFrame = zmsg_first (pcLeaveMsg);
 
         // Also, send to the current player the list of left players
-        if (!(eventServerSendToClients (self, pcLeaveList, zframe_data (pcLeaveFrame), zframe_size (pcLeaveFrame)))) {
+        if (!(eventServerSendToClients (self, pcLeaveList, pcLeaveMsg))) {
             error("Failed to send the packet to the clients.");
             status = false;
             goto cleanup;
@@ -500,7 +500,7 @@ eventServerSendToClient (
 
     // Add the client identity to the packet
     uint8_t identityBytes[5];
-    socketSessionDestroyGenId (identityKey, identityBytes);
+    socketSessionGenId (identityKey, identityBytes);
     if (zmsg_addmem (msg, identityBytes, sizeof(identityBytes)) != 0) {
         error("Cannot add the identity in the message.");
         result = false;

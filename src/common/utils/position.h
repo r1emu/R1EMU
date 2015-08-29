@@ -66,3 +66,8 @@ bool mathIsWithin2DManhattanDistance(PositionXZ *pos1, PositionXZ *pos2, float d
  * References : http://en.wikipedia.org/wiki/Euclidean_distance
  */
 bool mathIsWithin2DCircleDistance(PositionXZ *pos1, PositionXZ *pos2, float distance);
+
+/**
+ * @brief Print a position in the console
+ */
+void positionXYZDump (PositionXYZ *position);

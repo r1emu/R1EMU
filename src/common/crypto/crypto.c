@@ -12,7 +12,7 @@
  */
 
 // ---------- Includes ------------
-#include "Crypto.h"
+#include "crypto.h"
 #include "schedule.h"
 #include "bf/blowfish.h"
 

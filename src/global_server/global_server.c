@@ -119,7 +119,8 @@ bool globalServerStartupInfoInit(GlobalServerStartupInfo *self, char *confFilePa
     // ===================================
     // read the zone ports array
     if (!(portsArray = zconfig_resolve(conf, "zoneServer/portsArray", NULL))) {
-        warning("Public Zone ports cannot be read for Global Server. Defaults ports have been used : %s", ZONE_SERVER_PORTS_DEFAULT);
+        warning("Public Zone ports cannot be read for Global Server. Defaults ports have been used : %s",
+            ZONE_SERVER_PORTS_DEFAULT);
         portsArray = ZONE_SERVER_PORTS_DEFAULT;
     }
 
@@ -189,7 +190,8 @@ bool globalServerStartupInfoInit(GlobalServerStartupInfo *self, char *confFilePa
     // ===================================
     // read the social ports array
     if (!(portsArray = zconfig_resolve(conf, "socialServer/portsArray", NULL))) {
-        warning("Public Social ports cannot be read for Global Server. Defaults ports have been used : %s", SOCIAL_SERVER_PORTS_DEFAULT);
+        warning("Public Social ports cannot be read for Global Server. Defaults ports have been used : %s",
+            SOCIAL_SERVER_PORTS_DEFAULT);
         portsArray = SOCIAL_SERVER_PORTS_DEFAULT;
     }
 

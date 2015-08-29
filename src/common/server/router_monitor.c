@@ -46,12 +46,7 @@ struct RouterMonitor {
  * @param self The RouterMonitor
  * @return 0 on success, -1 on error
  */
-static int
-RouterMonitor_monitor (
-    zloop_t *loop,
-    zsock_t *monitor,
-    void *_self
-);
+static int RouterMonitor_monitor(zloop_t *loop, zsock_t *monitor, void *_self);
 
 /**
  * @brief Router Subscriber handler
@@ -60,19 +55,11 @@ RouterMonitor_monitor (
  * @param self The RouterMonitor
  * @return 0 on success, -1 on error
  */
-static int
-RouterMonitor_subscribe (
-    zloop_t *loop,
-    zsock_t *monitor,
-    void *_self
-);
-
+static int RouterMonitor_subscribe(zloop_t *loop, zsock_t *monitor, void *_self);
 
 // ------ Extern functions implementation -------
-RouterMonitor *
-routerMonitorNew (
-    RouterMonitorStartupInfo *info
-) {
+RouterMonitor *routerMonitorNew(RouterMonitorStartupInfo *info) {
+
     RouterMonitor *self;
 
     if ((self = calloc(1, sizeof(RouterMonitor))) == NULL) {
@@ -88,17 +75,13 @@ routerMonitorNew (
     return self;
 }
 
+bool routerMonitorInit (RouterMonitor *self, RouterMonitorStartupInfo *info) {
 
-bool
-routerMonitorInit (
-    RouterMonitor *self,
-    RouterMonitorStartupInfo *info
-) {
     routerMonitorStartupInfoInit (&self->info, info->frontend, info->routerId, &info->redisInfo, &info->sqlInfo);
     routerMonitorStartupInfoDestroy (&info);
 
     // Allocate the connected clients hashtable
-    if (!(self->connected = zhash_new ())) {
+    if (!(self->connected = zhash_new())) {
         error("Cannot allocate a new connected clients hashtable.");
         return false;
     }
@@ -116,14 +99,12 @@ routerMonitorInit (
     return true;
 }
 
-
-RouterMonitorStartupInfo *
-routerMonitorStartupInfoNew (
+RouterMonitorStartupInfo *routerMonitorStartupInfoNew(
     zsock_t *frontend,
     uint16_t routerId,
     RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo
-) {
+    MySQLStartupInfo *sqlInfo)
+{
     RouterMonitorStartupInfo *self;
 
     if ((self = calloc(1, sizeof(RouterMonitorStartupInfo))) == NULL) {
@@ -139,15 +120,13 @@ routerMonitorStartupInfoNew (
     return self;
 }
 
-
-bool
-routerMonitorStartupInfoInit (
+bool routerMonitorStartupInfoInit (
     RouterMonitorStartupInfo *self,
     zsock_t *frontend,
     uint16_t routerId,
     RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo
-) {
+    MySQLStartupInfo *sqlInfo)
+{
     self->frontend = frontend;
     self->routerId = routerId;
 
@@ -156,7 +135,7 @@ routerMonitorStartupInfoInit (
         return false;
     }
 
-    if (!(mySqlStartupInfoInit (&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
+    if (!(mySqlStartupInfoInit(&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
         error("Cannot initialize MySQL start up info.");
         return false;
     }
@@ -203,9 +182,9 @@ RouterMonitor_monitor (
 
         zframe_t *clientFrame;
         // Check if it already exists in the table
-        if ((clientFrame = zhash_lookup (self->connected, fdClientKey)) != NULL) {
+        if ((clientFrame = zhash_lookup(self->connected, fdClientKey)) != NULL) {
             uint8_t sessionKey [ROUTER_MONITOR_FDKEY_SIZE];
-            socketSessionDestroyGenSessionKey (zframe_data (clientFrame), sessionKey);
+            socketSessionGenSessionKey (zframe_data (clientFrame), sessionKey);
             error("The client FD=%d just connected, but another client has still this FD (previously : %s)",
                    fdClient, sessionKey);
             // TODO : Decide what to do in this case
@@ -226,7 +205,7 @@ RouterMonitor_monitor (
         routerMonitorGenKey (fdClient, fdClientKey);
 
         zframe_t *clientFrame;
-        if ((clientFrame = zhash_lookup (self->connected, fdClientKey)) == NULL) {
+        if ((clientFrame = zhash_lookup(self->connected, fdClientKey)) == NULL) {
             // The client just disconnected, but no client has been registred using this fd
             // It happens when the client connects but send no data to the server
             // TODO : Decide what to do in this case, probably nothing
@@ -236,7 +215,7 @@ RouterMonitor_monitor (
         else {
             // Everything is okay here, disconnect gracefully the client
             uint8_t sessionKeyStr [SOCKET_SESSION_ID_SIZE];
-            socketSessionDestroyGenSessionKey (zframe_data (clientFrame), sessionKeyStr);
+            socketSessionGenSessionKey (zframe_data (clientFrame), sessionKeyStr);
 
             // Flush the session here
             RedisSessionKey sessionKey = {
@@ -304,10 +283,10 @@ RouterMonitor_subscribe (
             routerMonitorGenKey (fdClient, fdClientKey);
 
             zframe_t *clientFrame;
-            if ((clientFrame = zhash_lookup (self->connected, fdClientKey)) == NULL) {
+            if ((clientFrame = zhash_lookup(self->connected, fdClientKey)) == NULL) {
                 // The client just sent its first message, add the identity frame to the hashtable
                 clientFrame = zframe_dup (zmsg_next (msg));
-                zhash_insert (self->connected, fdClientKey, clientFrame);
+                zhash_insert(self->connected, fdClientKey, clientFrame);
             } else {
                 // Check if the fd <=> identity association is always the same
                 if (!zframe_eq (clientFrame, zmsg_next (msg))) {

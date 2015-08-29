@@ -22,6 +22,8 @@
 #include "R1EMU.h"
 #include "common/commander/commander.h"
 #include "common/server/worker.h"
+#include "common/commander/inventory.h"
+#include "common/item/item.h"
 
 typedef enum PacketTypeZoneNormal {
     ZC_NORMAL_UNKNOWN_1 = 0x11,
@@ -292,12 +294,7 @@ void zoneBuilderJump(uint32_t targetPcId, float height, zmsg_t *replyMsg);
 /**
  * Makes a normal chat message
  */
-void zoneBuilderChat(
-    uint32_t targetPcId,
-    uint8_t *familyName,
-    uint8_t *commanderName,
-    uint8_t *chatText,
-    zmsg_t *replyMsg);
+void zoneBuilderChat(CommanderInfo *commander, uint8_t *chatText, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown Contains information about quest position?
@@ -348,3 +345,8 @@ void zoneBuilderPcMoveStop(
     PositionXZ *direction,
     float timestamp,
     zmsg_t *replyMsg);
+
+/**
+ * @brief Add an item in the current commander inventory
+ */
+void zoneBuilderItemAdd(ItemPkt *item, InventoryAddType addType, zmsg_t *replyMsg);

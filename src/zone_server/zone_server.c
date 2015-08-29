@@ -16,6 +16,7 @@
 
 #include "zone_server.h"
 #include "common/server/server.h"
+#include "zone_server/zone_handler/admin_cmd.h"
 
 /**
  * @brief ZoneServer is the representation of the zone server system
@@ -51,6 +52,12 @@ bool zoneServerStart(ZoneServer *self) {
     special("=====================");
     special("=== Zone server %d ===", serverGetRouterId(self->server));
     special("=====================");
+
+    // Initialize admin commands module
+    if (!(adminCmdInit())) {
+        error ("Cannot initialize admin commands module.");
+        return false;
+    }
 
     if (!(serverStart(self->server))) {
         error("Cannot start the Server.");

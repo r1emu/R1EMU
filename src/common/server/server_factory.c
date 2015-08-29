@@ -13,7 +13,7 @@
 
 #include "server_factory.h"
 #include "zone_server/zone_handler/zone_handler.h"
-#include "barrack_server/Barrack_handler/barrack_handler.h"
+#include "barrack_server/barrack_handler/barrack_handler.h"
 #include "social_server/social_handler/social_handler.h"
 
 Server *serverFactoryCreateServer (
@@ -76,7 +76,7 @@ serverFactoryInitServerInfo (
 ) {
     // Initialize MySQL start up information
     MySQLStartupInfo sqlInfo;
-    if (!(mySqlStartupInfoInit (&sqlInfo, sqlHostname, sqlUsername, sqlPassword, sqlDatabase))) {
+    if (!(mySqlStartupInfoInit(&sqlInfo, sqlHostname, sqlUsername, sqlPassword, sqlDatabase))) {
         error("Cannot initialize correctly the MySQL start up information.");
         return false;
     }

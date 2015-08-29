@@ -58,7 +58,7 @@ void mySqlFlushSession(MySQL *self, Session *session) {
                 session->game.commanderSession.currentCommander.base.equipment.bracelet,
                 session->game.commanderSession.currentCommander.base.equipment.ring_left,
                 session->game.commanderSession.currentCommander.base.equipment.ring_right,
-                session->game.commanderSession.currentCommander.base.hairType,
+                session->game.commanderSession.currentCommander.base.hairId,
                 session->game.commanderSession.currentCommander.pos.x,
                 session->game.commanderSession.currentCommander.pos.z,
                 session->game.commanderSession.currentCommander.currentXP,

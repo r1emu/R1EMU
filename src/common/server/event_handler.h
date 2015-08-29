@@ -50,10 +50,8 @@ typedef struct {
 } GameEventPcEnter;
 
 typedef struct {
-    uint32_t pcId;
+    CommanderInfo commander;
     char sessionKey[SOCKET_SESSION_ID_SIZE];
-    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
-    uint8_t commanderName[COMMANDER_NAME_SIZE];
     uint8_t chatText[0]; // variable length array
 } GameEventChat;
 
