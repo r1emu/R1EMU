@@ -48,6 +48,7 @@
 			<Add library="hiredis" />
 			<Add library="mysqlclient" />
 			<Add library="z" />
+			<Add library="jansson" />
 			<Add directory="../../../lib" />
 			<Add directory="../../../lib/x64" />
 			<Add directory="/usr/local/mysql/lib/" />
