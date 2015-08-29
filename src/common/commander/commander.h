@@ -94,10 +94,10 @@ typedef struct CommanderInfo
 
 typedef enum CommanderJobId
 {
-    COMMANDER_JOB_WARRIOR = 0x3E9,
-    COMMANDER_JOB_ARCHER  = 0xBB9,
-    COMMANDER_JOB_MAGE    = 0x7D1,
-    COMMANDER_JOB_CLERIC  = 0xFA1
+    COMMANDER_JOB_WARRIOR = 1001,
+    COMMANDER_JOB_MAGE    = 2001,
+    COMMANDER_JOB_ARCHER  = 3001,
+    COMMANDER_JOB_CLERIC  = 4001
 }   CommanderJobId;
 
 typedef enum CommanderClassId

@@ -40,14 +40,14 @@ void commanderInit(CommanderPkt *commander) {
     memset(commander, 0, sizeof(*commander));
 
     commander->accountId = -1;
-    commander->classId = -1; // Cleric
+    commander->classId = COMMANDER_CLASS_CLERIC;
     commander->unk4 = SWAP_UINT16(0x2220); // ICBT
-    commander->jobId = -1;
-    commander->gender = -1;
+    commander->jobId = COMMANDER_JOB_CLERIC; // Cleric
+    commander->gender = COMMANDER_GENDER_FEMALE; // Female
     commander->unk5 = 0; // ICBT
     commander->level = 1;
     commanderEquipmentInit(&commander->equipment);
-    commander->hairId = -1;
+    commander->hairId = 0x10;
     commander->pose = SWAP_UINT16(0x0000); // Idle (ICBT)
 }
 
