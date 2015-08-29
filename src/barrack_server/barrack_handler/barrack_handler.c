@@ -335,7 +335,7 @@ static PacketHandlerState BarrackHandler_barracknameChange(
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_BARRACKNAME_CHANGE);
 
     CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
-    Commander *commander = &commanderInfo->base;
+    CommanderPkt *commander = &commanderInfo->base;
 
     // Check if the barrack name is not empty and contains only ASCII characters
     size_t barrackNameLen = strlen(clientPacket->barrackName);
@@ -397,14 +397,14 @@ static PacketHandlerState BarrackHandler_commanderCreate(
         float unk4;
         float unk5;
         float unk6;
-        uint8_t hairType;
+        uint8_t hairId;
     }  *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_CREATE);
 
     CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
-    Commander *commander = &commanderInfo->base;
+    CommanderPkt *commander = &commanderInfo->base;
 
     // CharName
     strncpy(commander->commanderName, clientPacket->commanderName, sizeof(commander->commanderName));
@@ -454,7 +454,7 @@ static PacketHandlerState BarrackHandler_commanderCreate(
     }
 
     // Hair type
-    commander->hairType = clientPacket->hairType;
+    commander->hairId = clientPacket->hairId;
 
     // PCID
     session->game.commanderSession.currentCommander.pcId = r1emuGenerateRandom(&self->seed);
@@ -472,7 +472,7 @@ static PacketHandlerState BarrackHandler_commanderCreate(
     commanderInfo->pos = PositionXYZ_decl(19.0, 28.0, 29.0);
 
     // Default MapId : West Siauliai Woods
-    session->game.commanderSession.mapId = 0x3FD;
+    session->game.commanderSession.mapId = 1002;
 
     // Add the character to the account
     session->game.barrackSession.charactersCreatedCount++;

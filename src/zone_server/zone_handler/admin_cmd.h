@@ -46,3 +46,9 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
  *          /test
  */
 void adminCmdTest(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+
+/**
+ * @brief : Initialize admin commands
+ */
+bool adminCmdInit(void);
+

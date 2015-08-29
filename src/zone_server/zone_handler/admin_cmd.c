@@ -21,16 +21,22 @@
 
 zhash_t *adminCommands = NULL;
 
-void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *replyMsg) {
-
-    if (adminCommands == NULL) {
-        // initialize the admin commands hashtable
-        adminCommands = zhash_new();
-        zhash_insert(adminCommands, "spawn",   adminCmdSpawnPc);
-        zhash_insert(adminCommands, "jump",    adminCmdJump);
-        zhash_insert(adminCommands, "itemAdd", adminCmdAddItem);
-        zhash_insert(adminCommands, "test", adminCmdTest);
+bool adminCmdInit(void) {
+    // initialize the admin commands hashtable
+    if (!(adminCommands = zhash_new())) {
+        error ("Cannot initialize admin commands hashtable correctly.");
+        return false;
     }
+
+    zhash_insert(adminCommands, "spawn",   adminCmdSpawnPc);
+    zhash_insert(adminCommands, "jump",    adminCmdJump);
+    zhash_insert(adminCommands, "itemAdd", adminCmdAddItem);
+    zhash_insert(adminCommands, "test",    adminCmdTest);
+
+    return true;
+}
+
+void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *replyMsg) {
 
     void (*handler) (Worker *self, Session *session, char *args, zmsg_t *replyMsg);
     char *commandName = strtok(command, " ");
@@ -41,7 +47,7 @@ void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *repl
 
     handler = zhash_lookup(adminCommands, commandName);
     if (!handler) {
-        warning ("No admin command '%s' found.", commandName);
+        warning ("No admin command '%s' found. (entire command : '%s')", commandName, command);
         return;
     }
 
@@ -99,7 +105,7 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
     ItemPkt item = {
         .uniqueId = r1emuGenerateRandom64(&self->seed),
         .amount = (!amount) ? 1 : amount,
-        .inventoryIndex = 5000 * INVENTORY_CAT_CONSUMABLE + amount,
+        .inventoryIndex = INVENTORY_MAX_SIZE * INVENTORY_CAT_CONSUMABLE + 1,
         .id = itemId
     };
     zoneBuilderItemAdd(&item, INVENTORY_ADD_PICKUP, replyMsg);

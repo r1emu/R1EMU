@@ -43,7 +43,7 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_commander_gender] = REDIS_GAME_SESSION_commander_gender_str,
     [REDIS_GAME_SESSION_commander_unk5] = REDIS_GAME_SESSION_commander_unk5_str,
     [REDIS_GAME_SESSION_commander_level] = REDIS_GAME_SESSION_commander_level_str,
-    [REDIS_GAME_SESSION_commander_hairType] = REDIS_GAME_SESSION_commander_hairType_str,
+    [REDIS_GAME_SESSION_commander_hairId] = REDIS_GAME_SESSION_commander_hairId_str,
     [REDIS_GAME_SESSION_commander_pose] = REDIS_GAME_SESSION_commander_pose_str,
     // Equipment session
     [REDIS_GAME_SESSION_equipment_head_top] = REDIS_GAME_SESSION_equipment_head_top_str,
@@ -112,7 +112,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         " " REDIS_GAME_SESSION_commander_gender_str
         " " REDIS_GAME_SESSION_commander_unk5_str
         " " REDIS_GAME_SESSION_commander_level_str
-        " " REDIS_GAME_SESSION_commander_hairType_str
+        " " REDIS_GAME_SESSION_commander_hairId_str
         " " REDIS_GAME_SESSION_commander_pose_str
         // Equipment
         " " REDIS_GAME_SESSION_equipment_head_top_str
@@ -193,7 +193,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             /// Write the reply to the session
             CommanderSession *commanderSession = &gameSession->commanderSession;
             CommanderInfo *cInfo = &commanderSession->currentCommander;
-            Commander *commander = &cInfo->base;
+            CommanderPkt *commander = &cInfo->base;
             CommanderEquipment *equipment = &commander->equipment;
 
             // Account
@@ -215,7 +215,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             commander->gender    = GET_REDIS_32(commander_gender);
             commander->unk5      = GET_REDIS_32(commander_unk5);
             commander->level     = GET_REDIS_32(commander_level);
-            commander->hairType  = GET_REDIS_32(commander_hairType);
+            commander->hairId  = GET_REDIS_32(commander_hairId);
             commander->pose      = GET_REDIS_32(commander_pose);
 
             // Equipment
@@ -312,7 +312,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
     redisReply *reply = NULL;
 
     CommanderInfo *cInfo = &gameSession->commanderSession.currentCommander;
-    Commander *commander = &cInfo->base;
+    CommanderPkt *commander = &cInfo->base;
     CommanderEquipment *equipment = &commander->equipment;
 
     reply = redisCommandDbg(self,
@@ -334,7 +334,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         " " REDIS_GAME_SESSION_commander_gender_str " %x"
         " " REDIS_GAME_SESSION_commander_unk5_str " %x"
         " " REDIS_GAME_SESSION_commander_level_str " %x"
-        " " REDIS_GAME_SESSION_commander_hairType_str " %x"
+        " " REDIS_GAME_SESSION_commander_hairId_str " %x"
         " " REDIS_GAME_SESSION_commander_pose_str " %x"
         // Equipment
         " " REDIS_GAME_SESSION_equipment_head_top_str " %x"
@@ -393,7 +393,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         commander->gender,
         commander->unk5,
         commander->level,
-        commander->hairType,
+        commander->hairId,
         commander->pose,
 
         // Equipment

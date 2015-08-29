@@ -130,18 +130,8 @@ static PacketHandlerState zoneHandlerChat(
         // normal message : Dispatch a GameEventChat
         size_t gameEventSize = sizeof(GameEventChat) + chatTextSize;
         GameEventChat *event = alloca(gameEventSize);
-        event->pcId = session->game.commanderSession.currentCommander.pcId;
+        memcpy(&event->commander, &session->game.commanderSession.currentCommander, sizeof(event->commander));
         memcpy(event->sessionKey, session->socket.sessionKey, sizeof(event->sessionKey));
-        memcpy(
-            event->familyName,
-            session->game.commanderSession.currentCommander.base.familyName,
-            sizeof(event->familyName)
-        );
-        memcpy(
-            event->commanderName,
-            session->game.commanderSession.currentCommander.base.commanderName,
-            sizeof(event->commanderName)
-        );
         memcpy(event->chatText, clientPacket->msgText, chatTextSize);
         workerDispatchEvent(self, EVENT_SERVER_TYPE_CHAT, event, gameEventSize);
     }
@@ -578,8 +568,7 @@ static PacketHandlerState zoneHandlerConnect(
         return PACKET_HANDLER_ERROR;
     }
 
-    // Position : Official starting point position(tutorial map)
-    session->game.commanderSession.currentCommander.pos = PositionXYZ_decl(-628.0f, 260.0f, -1025.0f);
+    session->game.commanderSession.currentCommander.pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
 
     zoneBuilderConnectOk(
         session->game.commanderSession.currentCommander.pcId,

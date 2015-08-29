@@ -168,9 +168,7 @@ bool eventHandlerChat(EventServer *self, GameEventChat *event) {
     msg = zmsg_new();
 
     zoneBuilderChat(
-        event->pcId,
-        event->familyName,
-        event->commanderName,
+        &event->commander,
         event->chatText,
         msg
     );
