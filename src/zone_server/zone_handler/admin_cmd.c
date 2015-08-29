@@ -63,22 +63,22 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
     commanderInfoInit(&fakePc);
 
     fakePc.pos = session->game.commanderSession.currentCommander.pos;
-    fakePc.base.accountId =
-    fakePc.socialInfoId =
+    fakePc.base.accountId = r1emuGenerateRandom64(&self->seed);
+    fakePc.socialInfoId = r1emuGenerateRandom64(&self->seed);
     fakePc.pcId = r1emuGenerateRandom(&self->seed);
     fakePc.commanderId = r1emuGenerateRandom64(&self->seed);
     snprintf(fakePc.base.familyName, sizeof(fakePc.base.familyName),
-        "PcID=%x", fakePc.pcId);
+        "PcID_%x", fakePc.pcId);
     snprintf(fakePc.base.commanderName, sizeof (fakePc.base.commanderName),
-        "AccountID=%llx", fakePc.base.accountId);
+        "AccountID_%llx", fakePc.base.accountId);
 
     // register the fake socket session
     SocketSession fakeSocketSession;
-    uint64_t sessionKey = r1emuGenerateRandom64(&self->seed);
+    uint32_t sessionKey = r1emuGenerateRandom(&self->seed);
     uint8_t sessionKeyStr[SOCKET_SESSION_ID_SIZE];
 
     socketSessionGenSessionKey((uint8_t *)&sessionKey, sessionKeyStr);
-    sprintf(sessionKeyStr, "%.10I64x", sessionKey);
+    sprintf(sessionKeyStr, "%.08x", sessionKey);
     socketSessionInit(&fakeSocketSession, fakePc.base.accountId, self->info.routerId, session->socket.mapId,
         sessionKeyStr, true);
 

@@ -61,7 +61,7 @@ typedef enum EventServerType {
 
 typedef struct {
     uint16_t mapId;
-    char sessionKey[SOCKET_SESSION_ID_SIZE];
+    uint8_t sessionKey[SOCKET_SESSION_ID_SIZE];
     CommanderInfo commanderInfo;
 } GameEventUpdatePosition;
 

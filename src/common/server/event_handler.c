@@ -19,7 +19,12 @@ bool eventHandlerEnterPc(EventServer *self, GameEventPcEnter *event) {
     zlist_t *clientsAround = NULL;
 
     // update client position
-    if (!(eventServerUpdateClientPosition(self, &event->updatePosEvent, &event->updatePosEvent.commanderInfo.pos, &clientsAround))) {
+    if (!(eventServerUpdateClientPosition(
+        self,
+        &event->updatePosEvent,
+        &event->updatePosEvent.commanderInfo.pos,
+        &clientsAround)))
+    {
         error("Cannot update player %s position.", event->updatePosEvent.sessionKey);
         status = false;
         goto cleanup;
