@@ -42,6 +42,17 @@ void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
 
 /**
+ * @brief : A test command
+ *          /test
+ */
+void adminCmdTest(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+
+/**
  * @brief : Initialize admin commands
  */
 bool adminCmdInit(void);
+
+/**
+ * @brief : Returns the player's position
+ */
+void adminCmdWhere(Worker *self, Session *session, char *args, zmsg_t *replyMsg);

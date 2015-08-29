@@ -31,6 +31,8 @@ bool adminCmdInit(void) {
     zhash_insert(adminCommands, "spawn",   adminCmdSpawnPc);
     zhash_insert(adminCommands, "jump",    adminCmdJump);
     zhash_insert(adminCommands, "itemAdd", adminCmdAddItem);
+    zhash_insert(adminCommands, "test",    adminCmdTest);
+    zhash_insert(adminCommands, "where",   adminCmdWhere);
 
     return true;
 }
@@ -142,4 +144,28 @@ void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) 
         }
         free(arg);
     }
+}
+
+void adminCmdTest(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    info("Test command launched.");
+    size_t memSize;
+    void *memory = dumpToMem(
+        "[03:12:32][main.c:30 in writePacketToFile]  E9 0C 73 2A 86 02 35 00 A2 4E 00 00 02 01 05 00 | ..s*..5..N......"
+        "[03:12:32][main.c:30 in writePacketToFile]  4E 61 6D 65 00 0C 00 44 61 72 6B 48 6F 72 69 7A | Name...DarkHoriz"
+        "[03:12:32][main.c:30 in writePacketToFile]  6F 6E 00 04 00 57 68 6F 00 0A 00 4C 6F 74 68 62 | on...Who...Lothb"
+        "[03:12:32][main.c:30 in writePacketToFile]  72 6F 6F 6B 00                                  | rook."
+      , NULL, &memSize
+    );
+
+    zmsg_add(replyMsg, zframe_new(memory, memSize));
+}
+
+void adminCmdWhere(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    const uint16_t MAX_LEN = 128;
+    char message[MAX_LEN];
+    PositionXYZ position;
+    position = session->game.commanderSession.currentCommander.pos;
+    snprintf(message, MAX_LEN, "[%hu] x = %.0f, y = %.0f, z = %.0f", session->game.commanderSession.mapId, position.x, position.y, position.z);
+
+    zoneBuilderChat(&session->game.commanderSession.currentCommander, message, replyMsg);
 }
