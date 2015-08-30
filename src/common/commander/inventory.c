@@ -33,11 +33,11 @@ struct Inventory
 Inventory *inventoryNew(void) {
     Inventory *self;
 
-    if((self = malloc(sizeof(Inventory))) == NULL) {
+    if ((self = malloc(sizeof(Inventory))) == NULL) {
         return NULL;
     }
 
-    if(!inventoryInit(self)) {
+    if (!inventoryInit(self)) {
         inventoryDestroy(&self);
         error("Inventory failed to initialize.");
         return NULL;
@@ -59,10 +59,9 @@ void inventoryFree(Inventory *self) {
 void inventoryDestroy(Inventory **_self) {
     Inventory *self = *_self;
 
-    if(self) {
+    if (_self && self) {
         inventoryFree(self);
         free(self);
+        *_self = NULL;
     }
-
-    *_self = NULL;
 }

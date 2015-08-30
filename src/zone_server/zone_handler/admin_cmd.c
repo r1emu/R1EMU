@@ -126,7 +126,7 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
     ItemPkt item = {
         .uniqueId = r1emuGenerateRandom64(&self->seed),
         .amount = (!amount) ? 1 : amount,
-        .inventoryIndex = INVENTORY_MAX_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition,
+        .inventoryIndex = INVENTORY_CAT_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition,
         .id = itemId
     };
     zoneBuilderItemAdd(&item, INVENTORY_ADD_PICKUP, replyMsg);

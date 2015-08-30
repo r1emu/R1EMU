@@ -22,7 +22,7 @@
 #include "R1EMU.h"
 
 // ---------- Defines -------------
-#define INVENTORY_MAX_SIZE 5000
+#define INVENTORY_CAT_SIZE 5000
 
 typedef enum {
     INVENTORY_TYPE_COMMANDER = 0,
@@ -34,7 +34,6 @@ typedef enum {
     INVENTORY_ADD_PICKUP = 3,
     INVENTORY_ADD_NOT_NEW = 4,
 }   InventoryAddType;
-
 
 typedef enum {
     INVENTORY_CAT_WEAPON = 1,
