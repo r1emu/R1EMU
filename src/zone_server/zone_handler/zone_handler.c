@@ -40,6 +40,8 @@ static PacketHandlerState zoneHandlerMovementInfo   (Worker *self, Session *sess
 static PacketHandlerState zoneHandlerCampInfo       (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On log out */
 static PacketHandlerState zoneHandlerCzQuickSlotList(Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+/** On change config */
+static PacketHandlerState zoneHandlerChangeConfig   (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On log out */
 static PacketHandlerState zoneHandlerItemUse        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On log out */
@@ -76,6 +78,7 @@ const PacketHandler zoneHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CZ_MOVEMENT_INFO, zoneHandlerMovementInfo),
     REGISTER_PACKET_HANDLER(CZ_CAMPINFO, zoneHandlerCampInfo),
     REGISTER_PACKET_HANDLER(CZ_QUICKSLOT_LIST, zoneHandlerCzQuickSlotList),
+    REGISTER_PACKET_HANDLER(CZ_CHANGE_CONFIG, zoneHandlerChangeConfig),
     REGISTER_PACKET_HANDLER(CZ_LOGOUT, zoneHandlerLogout),
     REGISTER_PACKET_HANDLER(CZ_ITEM_USE, zoneHandlerItemUse),
     REGISTER_PACKET_HANDLER(CZ_I_NEED_PARTY, zoneHandlerINeedParty),
@@ -378,6 +381,18 @@ static PacketHandlerState zoneHandlerCzQuickSlotList(
 {
     warning("CZ_QUICKSLOT_LIST not implemented yet.");
     // Answer PacketType : ZC_QUICKSLOT_REGISTER
+    return PACKET_HANDLER_OK;
+}
+
+static PacketHandlerState zoneHandlerChangeConfig(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *replyMsg)
+{
+    warning("CZ_CHANGE_CONFIG not implemented yet.");
+
     return PACKET_HANDLER_OK;
 }
 
