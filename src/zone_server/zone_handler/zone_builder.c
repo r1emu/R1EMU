@@ -1592,8 +1592,8 @@ void zoneBuilderRotateHead(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg) {
     struct {
         ServerPacketHeader header;
         uint32_t pcId;
-        uint32_t unk1; //x?
-        uint32_t unk2; //z?
+        float unk1; //x?
+        float unk2; //z?
     } replyPacket;
     #pragma pack(pop)
 
