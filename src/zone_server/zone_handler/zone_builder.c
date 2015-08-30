@@ -1609,13 +1609,12 @@ void zoneBuilderRotateHead(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderRotate(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg) {
+void zoneBuilderRotate(uint32_t pcId, PositionXZ *bodyDir, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
         uint32_t pcId;
-        float unk1; //x?
-        float unk2; //z?
+        PositionXZ bodyDir;
         uint8_t unk3;
         uint8_t unk4;
     } replyPacket;
@@ -1628,8 +1627,7 @@ void zoneBuilderRotate(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg) {
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
         replyPacket.pcId = pcId;
-        replyPacket.unk1 = pos->x;
-        replyPacket.unk2 = pos->z;
+        replyPacket.bodyDir = *bodyDir;
         replyPacket.unk3 = false;
         replyPacket.unk4 = false;
     }
