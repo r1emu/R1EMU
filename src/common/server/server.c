@@ -181,6 +181,7 @@ serverCreateProcess (
                 return false;
             }
         }
+        free(argv);
     #endif
 
     zstr_free(&commandLine);

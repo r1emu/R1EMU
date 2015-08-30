@@ -416,11 +416,11 @@ bool globalServerStart(GlobalServer *self) {
 
     if (zsock_bind(self->cliConnection, GLOBAL_SERVER_CLI_ENDPOINT,
             globalInfo->globalConf.ip, globalInfo->globalConf.port) == -1) {
-        error("Failed to bind CLI port.");
+        error("Failed to bind port %d.", globalInfo->globalConf.port);
         return false;
     }
 
-    info("CLI connection binded on port %s.",
+    info("CLI connection binded on %s.",
          zsys_sprintf(GLOBAL_SERVER_CLI_ENDPOINT,
             globalInfo->globalConf.ip, globalInfo->globalConf.port));
 
@@ -434,8 +434,9 @@ bool globalServerStart(GlobalServer *self) {
         return false;
     }
 
-    info("Zones connection binded on port %s.",
-         zsys_sprintf(GLOBAL_SERVER_ZONES_ENDPOINT, globalInfo->globalConf.ip));
+    info("Zones connection binded on %s port %d",
+         zsys_sprintf(GLOBAL_SERVER_ZONES_ENDPOINT, globalInfo->globalConf.ip),
+         globalInfo->zonesConf.globalZonePort);
 
     // ===================================
     //     Initialize N Barrack Server
