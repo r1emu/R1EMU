@@ -76,6 +76,12 @@ typedef struct {
     PositionXZ direction;
 } GameEventHeadRotate;
 
+/** Event data needed for a commander to rotate the body */
+typedef struct {
+    uint32_t pcId;
+    PositionXZ direction;
+} GameEventRotate;
+
 /** Union of all events */
 typedef union {
     GameEventCommanderMove move;
@@ -85,6 +91,7 @@ typedef union {
     GameEventEnterPc enterPc;
     GameEventChat chat;
     GameEventHeadRotate headRotate;
+    GameEventRotate rotate;
 } ZoneEvent;
 
 // ----------- Functions ------------

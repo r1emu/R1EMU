@@ -355,3 +355,8 @@ void zoneBuilderItemAdd(ItemPkt *item, InventoryAddType addType, zmsg_t *replyMs
  * @brief Rotate head
  */
 void zoneBuilderRotateHead(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg);
+
+/**
+ * @brief Rotate body
+ */
+void zoneBuilderRotate(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg);

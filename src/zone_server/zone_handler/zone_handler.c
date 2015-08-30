@@ -36,8 +36,6 @@ static PacketHandlerState zoneHandlerKeyboardMove   (Worker *self, Session *sess
 static PacketHandlerState zoneHandlerMoveStop       (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On movement information */
 static PacketHandlerState zoneHandlerMovementInfo   (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
-/** On commander rotation */
-static PacketHandlerState zoneHandlerRotate         (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** @unknown */
 static PacketHandlerState zoneHandlerCampInfo       (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On log out */
@@ -58,6 +56,8 @@ static PacketHandlerState zoneHandlerChat           (Worker *self, Session *sess
 static PacketHandlerState zoneHandlerChatLog        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On commander head rotation */
 static PacketHandlerState zoneHandlerHeadRotate     (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+/** On commander rotation */
+static PacketHandlerState zoneHandlerRotate         (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 
 /**
  * @brief zoneHandlers is a global table containing all the zone handlers.
@@ -74,7 +74,6 @@ const PacketHandler zoneHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CZ_KEYBOARD_MOVE, zoneHandlerKeyboardMove),
     REGISTER_PACKET_HANDLER(CZ_MOVE_STOP, zoneHandlerMoveStop),
     REGISTER_PACKET_HANDLER(CZ_MOVEMENT_INFO, zoneHandlerMovementInfo),
-    REGISTER_PACKET_HANDLER(CZ_ROTATE, zoneHandlerRotate),
     REGISTER_PACKET_HANDLER(CZ_CAMPINFO, zoneHandlerCampInfo),
     REGISTER_PACKET_HANDLER(CZ_QUICKSLOT_LIST, zoneHandlerCzQuickSlotList),
     REGISTER_PACKET_HANDLER(CZ_LOGOUT, zoneHandlerLogout),
@@ -85,6 +84,7 @@ const PacketHandler zoneHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CZ_CHAT, zoneHandlerChat),
     REGISTER_PACKET_HANDLER(CZ_CHAT_LOG, zoneHandlerChatLog),
     REGISTER_PACKET_HANDLER(CZ_HEAD_ROTATE, zoneHandlerHeadRotate),
+    REGISTER_PACKET_HANDLER(CZ_ROTATE, zoneHandlerRotate),
 
     #undef REGISTER_PACKET_HANDLER
 };
@@ -259,17 +259,6 @@ static PacketHandlerState zoneHandlerLogout(
     zmsg_t *replyMsg)
 {
     warning("CZ_LOGOUT not implemented yet.");
-    return PACKET_HANDLER_OK;
-}
-
-static PacketHandlerState zoneHandlerRotate(
-    Worker *self,
-    Session *session,
-    uint8_t *packet,
-    size_t packetSize,
-    zmsg_t *replyMsg)
-{
-    warning("CZ_ROTATE not implemented yet.");
     return PACKET_HANDLER_OK;
 }
 
@@ -634,6 +623,32 @@ static PacketHandlerState zoneHandlerHeadRotate(
         .direction = clientPacket->direction
     };
     workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_HEAD_ROTATE, &event, sizeof(event));
+
+    return PACKET_HANDLER_OK;
+}
+
+static PacketHandlerState zoneHandlerRotate(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *replyMsg)
+{
+    #pragma pack(push, 1)
+    struct {
+        PositionXZ direction;
+    } *clientPacket = (void *) packet;
+    #pragma pack(pop)
+
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_ROTATE);
+
+    // notify the players around
+    GameEventHeadRotate event = {
+        .pcId = session->game.commanderSession.currentCommander.pcId,
+        .direction = clientPacket->direction
+    };
+
+    workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_ROTATE, &event, sizeof(event));
 
     return PACKET_HANDLER_OK;
 }

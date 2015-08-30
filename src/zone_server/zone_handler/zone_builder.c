@@ -1608,3 +1608,29 @@ void zoneBuilderRotateHead(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg) {
         replyPacket.unk2 = pos->z;
     }
 }
+
+void zoneBuilderRotate(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint32_t pcId;
+        float unk1; //x?
+        float unk2; //z?
+        uint8_t unk3;
+        uint8_t unk4;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_ROTATE;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+        replyPacket.pcId = pcId;
+        replyPacket.unk1 = pos->x;
+        replyPacket.unk2 = pos->z;
+        replyPacket.unk3 = false;
+        replyPacket.unk4 = false;
+    }
+}
