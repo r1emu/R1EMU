@@ -21,3 +21,5 @@
 int strGetLine(char *str, char *dest, int maxlen, int pos);
 
 char **strSplit(const char *s, char c);
+
+char *fileGetContents (const char *filename, int *filesize);

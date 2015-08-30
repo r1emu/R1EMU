@@ -32,6 +32,7 @@
 			<Add option="-Wno-pointer-sign" />
 			<Add option="-D__USE_GNU" />
 			<Add option="-D_GNU_SOURCE" />
+			<Add option="-D__DBG_ACTIVATED__" />
 			<Add directory="/usr/include/" />
 			<Add directory="../../../src" />
 			<Add directory="../../../include" />
@@ -39,6 +40,7 @@
 			<Add directory="../../../include/mysql" />
 			<Add directory="../../../include/hiredis" />
 			<Add directory="../../../include/zlib" />
+			<Add directory="../../../include/jansson" />
 		</Compiler>
 		<Linker>
 			<Add library="zmq" />
@@ -46,6 +48,7 @@
 			<Add library="hiredis" />
 			<Add library="mysqlclient" />
 			<Add library="z" />
+			<Add library="jansson" />
 			<Add directory="../../../lib" />
 			<Add directory="../../../lib/x64" />
 			<Add directory="/usr/local/mysql/lib/" />

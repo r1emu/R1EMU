@@ -33,7 +33,7 @@ bool mySqlInit(MySQL *self, MySQLStartupInfo *info) {
     self->result = NULL;
     self->handle = mysql_init(NULL);
 
-    mySqlStartupInfoInit(&self->info, info->hostname, info->login, info->password, info->database);
+    mySqlStartupInfoInit(&self->info, info->hostname, info->user, info->password, info->database);
 
     return true;
 }
@@ -41,12 +41,12 @@ bool mySqlInit(MySQL *self, MySQLStartupInfo *info) {
 bool mySqlStartupInfoInit(
     MySQLStartupInfo *self,
     char *hostname,
-    char *login,
+    char *user,
     char *password,
     char *database)
 {
     self->hostname = strdup(hostname);
-    self->login    = strdup(login);
+    self->user     = strdup(user);
     self->password = strdup(password);
     self->database = strdup(database);
 
@@ -56,11 +56,11 @@ bool mySqlStartupInfoInit(
 bool mySqlConnect(MySQL *self) {
     MySQLStartupInfo *info = &self->info;
 
-    info("Connecting to the MySQL Server(%s@%s -> %s)...", info->login, info->hostname, info->database);
+    info("Connecting to the MySQL Server(%s@%s -> %s)...", info->user, info->hostname, info->database);
 
-    if(!mysql_real_connect(self->handle, info->hostname, info->login, info->password, info->database, 0, NULL, 0)) {
+    if(!mysql_real_connect(self->handle, info->hostname, info->user, info->password, info->database, 0, NULL, 0)) {
         error("Could not connect to the '%s' database(%s@%s.(mysql_errno = %d)",
-            info->database, info->login, info->hostname, mysql_errno(self->handle));
+            info->database, info->user, info->hostname, mysql_errno(self->handle));
         return false;
     }
 
@@ -103,7 +103,7 @@ void mySqlFreeResult(MySQL *self) {
 void mySqlStartupInfoFree(MySQLStartupInfo *self) {
     free(self->hostname);
     free(self->database);
-    free(self->login);
+    free(self->user);
     free(self->password);
 }
 

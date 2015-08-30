@@ -20,8 +20,7 @@ Server *serverFactoryCreateServer (
     ServerType serverType,
     uint16_t routerId,
     char *routerIp,
-    int portsCount,
-    int *ports,
+    int port,
     int workersCount,
     char *globalServerIp,
     int globalServerPort,
@@ -37,7 +36,7 @@ Server *serverFactoryCreateServer (
     if (!(serverFactoryInitServerInfo (&serverInfo,
         serverType,
         routerId, routerIp,
-        portsCount, ports,
+        port,
         workersCount,
         globalServerIp, globalServerPort,
         sqlHostname, sqlUsername, sqlPassword, sqlDatabase,
@@ -62,8 +61,7 @@ serverFactoryInitServerInfo (
     ServerType serverType,
     uint16_t routerId,
     char *routerIp,
-    int portsCount,
-    int *ports,
+    int port,
     int workersCount,
     char *globalServerIp,
     int globalServerPort,
@@ -90,7 +88,7 @@ serverFactoryInitServerInfo (
 
     // Initialize Router start up information
     RouterStartupInfo routerInfo;
-    if (!(routerStartupInfoInit (&routerInfo, routerId, routerIp, ports, portsCount, workersCount, &redisInfo, &sqlInfo))) {
+    if (!(routerStartupInfoInit (&routerInfo, routerId, routerIp, port, workersCount, &redisInfo, &sqlInfo))) {
         error("Cannot initialize correctly the Router start up information.");
         return false;
     }

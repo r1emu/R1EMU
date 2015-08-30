@@ -21,11 +21,6 @@
 
 #define BARRACK_SERVER_EXECUTABLE_NAME             "BarrackServer"
 
-// configuration default values
-#define BARRACK_SERVER_PORTS_DEFAULT               (char []) {"2000"}
-#define BARRACK_SERVER_WORKERS_COUNT_DEFAULT       1
-#define BARRACK_SERVER_FRONTEND_IP_DEFAULT         (char []) {"127.0.0.1"}
-
 // BarrackServer is opaque
 typedef struct BarrackServer BarrackServer;
 

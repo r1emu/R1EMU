@@ -132,3 +132,44 @@ char
 	splitted[i] = NULL;
 	return (splitted);
 }
+
+char *fileGetContents (const char *filename, int *filesize)
+{
+	FILE *f = NULL;
+	char *ret = NULL;
+	size_t _fileSize;
+	int size = 0;
+	if (filesize) {
+	    *filesize = 0;
+	}
+
+	f = fopen(filename, "rb");
+
+	if (!f) {
+		printf("%s cannot be opened\n", filename);
+		return NULL;
+	}
+
+	fseek(f, 0, SEEK_END);
+	size = ftell(f);
+	_fileSize = size;
+
+	rewind(f);
+
+	ret = malloc(size + 1);
+	size = 0;
+
+	for (size = 0; size < _fileSize; size++) {
+		ret[size] = fgetc (f);
+	}
+
+	ret[size] = '\0';
+
+	fclose(f);
+
+	if (filesize) {
+        *filesize = _fileSize;
+	}
+
+	return ret;
+}

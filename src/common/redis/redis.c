@@ -247,12 +247,14 @@ void redisDestroy(Redis **_self) {
 
     Redis *self = *_self;
 
-    redisStartupInfoFree (&self->info);
+    if (_self && self) {
+        redisStartupInfoFree (&self->info);
 
-    if (self->context) {
-        redisFree (self->context);
+        if (self->context) {
+            redisFree (self->context);
+        }
+
+        free(self);
+        *_self = NULL;
     }
-
-    free(self);
-    *_self = NULL;
 }

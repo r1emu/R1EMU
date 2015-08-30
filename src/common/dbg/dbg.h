@@ -36,7 +36,7 @@ typedef enum {
 
 #define pause()                              \
     do {                                     \
-        info("Press a key to continue..."); \
+        info("Press a key to continue...");  \
         getc (stdin);                        \
     } while (0);
 
@@ -44,13 +44,13 @@ typedef enum {
 #define dbg_ex(level, output, format, ...)                            \
     do {                                                              \
         char *__time_now__ = zclock_timestr();                        \
-        _dbg(level, "[%s][%s:%d in %s] " format,                     \
+        _dbg(level, "[%s][%s:%d in %s] " format,                      \
             __time_now__,                                             \
             __FILENAME__,                                             \
             __LINE__,                                                 \
             __FUNCTION__,                                             \
             ##__VA_ARGS__);                                           \
-            zstr_free(&__time_now__);                                \
+            zstr_free(&__time_now__);                                 \
     } while (0)
 
 #define dbg_exnl(level, output, format, ...)                          \
@@ -60,16 +60,16 @@ typedef enum {
 #define buffer_print_ex(buffer, size, prefix)                         \
     do {                                                              \
         char *__time_now__ = zclock_timestr();                        \
-        char *__prefix__ = zsys_sprintf(                             \
+        char *__prefix__ = zsys_sprintf(                              \
             "[%s][%s:%d in %s] %s",                                   \
             __time_now__,                                             \
             __FILENAME__,                                             \
             __LINE__,                                                 \
             __FUNCTION__,                                             \
             (prefix) ? prefix : "");                                  \
-            _bufferPrint(buffer, size, __prefix__);                 \
-            zstr_free(&__prefix__);                                  \
-            zstr_free(&__time_now__);                                \
+            _bufferPrint(buffer, size, __prefix__);                   \
+            zstr_free(&__prefix__);                                   \
+            zstr_free(&__time_now__);                                 \
     } while (0)
 
 

@@ -49,15 +49,7 @@ int main (int argc, char **argv)
     // === Read the command line arguments ===
     uint16_t routerId = atoi(*++argv);
     char *routerIp = *++argv;
-    int portsCount = atoi(*++argv);
-    int *ports;
-    if (!(ports = malloc (sizeof(int) * portsCount))) {
-        error("Cannot allocate the port array.");
-        return -1;
-    }
-    for (int i = 0; i < portsCount; i++) {
-        ports[i] = atoi(*++argv);
-    }
+    int port = atoi(*++argv);
     uint16_t workersCount = atoi(*++argv);
     char *globalServerIp = *++argv;
     int globalServerPort = atoi(*++argv);
@@ -68,7 +60,6 @@ int main (int argc, char **argv)
     char *redisHostname = *++argv;
     int redisPort = atoi(*++argv);
     ServerType serverType = atoi(*++argv);
-
 
     // Set a custom output for linux for each servers
     #ifndef WIN32
@@ -115,7 +106,7 @@ int main (int argc, char **argv)
     if (!(server = serverFactoryCreateServer(
         serverType,
         routerId, routerIp,
-        portsCount, ports,
+        port,
         workersCount,
         globalServerIp, globalServerPort,
         sqlHostname, sqlUsername, sqlPassword, sqlDatabase,
@@ -189,6 +180,8 @@ int main (int argc, char **argv)
 
     // Close the custom debug file if necessary
     dbgClose();
+
+    pause();
 
     return 0;
 }
