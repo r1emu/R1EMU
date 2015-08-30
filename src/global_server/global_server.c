@@ -205,7 +205,7 @@ bool globalServerStartupInfoInit(GlobalServerStartupInfo *self, char *confFilePa
 
     // allocate configuration
     self->barracksConf.count = json_array_size(barrackServers);
-    if (!(self->barracksConf.confs = malloc (sizeof (BarrackServerConf) * self->barracksConf.count))) {
+    if (!(self->barracksConf.confs = malloc (sizeof(BarrackServerConf) * self->barracksConf.count))) {
         error("Cannot allocate barracks configuration.");
         result = false;
         goto cleanup;
@@ -235,7 +235,7 @@ bool globalServerStartupInfoInit(GlobalServerStartupInfo *self, char *confFilePa
 
     // allocate configuration
     self->socialsConf.count = json_array_size(socialServers);
-    if (!(self->socialsConf.confs = malloc (sizeof (SocialServerConf) * self->socialsConf.count))) {
+    if (!(self->socialsConf.confs = malloc (sizeof(SocialServerConf) * self->socialsConf.count))) {
         error("Cannot allocate socials configuration.");
         result = false;
         goto cleanup;
@@ -265,7 +265,7 @@ bool globalServerStartupInfoInit(GlobalServerStartupInfo *self, char *confFilePa
 
     // allocate configuration
     self->zonesConf.count = json_array_size(zoneServers);
-    if (!(self->zonesConf.confs = malloc (sizeof (ZoneServerConf) * self->zonesConf.count))) {
+    if (!(self->zonesConf.confs = malloc (sizeof(ZoneServerConf) * self->zonesConf.count))) {
         error("Cannot allocate zones configuration.");
         result = false;
         goto cleanup;

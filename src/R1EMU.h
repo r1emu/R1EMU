@@ -42,3 +42,12 @@
 
 // utils
 #include "common/utils/utils.h"
+
+// Servers
+/** @brief Global types of the servers of the architecture */
+typedef enum {
+    SERVER_TYPE_GLOBAL,
+    SERVER_TYPE_BARRACK,
+    SERVER_TYPE_SOCIAL,
+    SERVER_TYPE_ZONE
+} ServerType;

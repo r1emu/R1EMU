@@ -87,7 +87,9 @@ static PacketHandlerState BarrackHandler_login(
     // update the session
     // gives a fake admin account
     session->socket.accountId = r1emuGenerateRandom64(&self->seed);
-    accountSessionInit(&session->game.accountSession, clientPacket->login, session->socket.sessionKey, ACCOUNT_SESSION_PRIVILEGES_ADMIN);
+    accountSessionInit(&session->game.accountSession,
+        clientPacket->login, session->socket.sessionKey,
+        ACCOUNT_SESSION_PRIVILEGES_ADMIN);
 
     info("AccountID %llx generated !", session->socket.accountId);
 

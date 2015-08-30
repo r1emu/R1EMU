@@ -55,7 +55,7 @@ void zoneBuilderItemAdd(ItemPkt *item, InventoryAddType addType, zmsg_t *replyMs
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof (replyPacket));
+        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
         replyPacket.item = *item;
         replyPacket.unk1 = SWAP_UINT16(0x0600);
         replyPacket.addType = addType;

@@ -69,19 +69,30 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/commander/commander.h" />
+		<Unit filename="../../../src/common/commander/inventory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/commander/inventory.h" />
 		<Unit filename="../../../src/common/crypto/bf/bf_ecb.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/crypto/bf/bf_enc.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../src/common/crypto/bf/bf_locl.h" />
+		<Unit filename="../../../src/common/crypto/bf/bf_pi.h" />
 		<Unit filename="../../../src/common/crypto/bf/bf_skey.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../src/common/crypto/bf/blowfish.h" />
+		<Unit filename="../../../src/common/crypto/bf/e_os2.h" />
+		<Unit filename="../../../src/common/crypto/bf/opensslconf.h" />
+		<Unit filename="../../../src/common/crypto/bf/opensslv.h" />
 		<Unit filename="../../../src/common/crypto/crypto.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/crypto/crypto.h" />
+		<Unit filename="../../../src/common/crypto/schedule.h" />
 		<Unit filename="../../../src/common/dbg/dbg.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -90,6 +101,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/graph/graph.h" />
+		<Unit filename="../../../src/common/item/item.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/item/item.h" />
 		<Unit filename="../../../src/common/mysql/fields/mysql_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -134,6 +149,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/server/event_server.h" />
+		<Unit filename="../../../src/common/server/game_event.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/server/game_event.h" />
 		<Unit filename="../../../src/common/server/router.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -221,6 +240,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/social_server/social_server.h" />
+		<Unit filename="../../../src/zone_server/zone_event_server.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/zone_server/zone_event_server.h" />
 		<Unit filename="../../../src/zone_server/zone_handler/admin_cmd.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -229,6 +252,11 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/zone_server/zone_handler/zone_builder.h" />
+		<Unit filename="../../../src/zone_server/zone_handler/zone_event.h" />
+		<Unit filename="../../../src/zone_server/zone_handler/zone_event_handler.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/zone_server/zone_handler/zone_event_handler.h" />
 		<Unit filename="../../../src/zone_server/zone_handler/zone_handler.c">
 			<Option compilerVar="CC" />
 		</Unit>

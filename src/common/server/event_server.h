@@ -21,6 +21,8 @@
 #include "common/session/session.h"
 #include "common/server/router.h"
 
+#include "zone_server/zone_handler/zone_event.h"
+
 #define EVENT_SERVER_EXECUTABLE_NAME             "EventServer"
 #define EVENT_SERVER_SUBSCRIBER_ENDPOINT         "inproc://eventServerWorkersSubscriber-%d-%d"
 
@@ -50,21 +52,30 @@ typedef enum EventServerSendHeader {
 
 #undef DECL_EVENT_SERVER_HEADER
 
-typedef enum EventServerType {
-    EVENT_SERVER_TYPE_COMMANDER_MOVE,
-    EVENT_SERVER_TYPE_REST_SIT,
-    EVENT_SERVER_TYPE_JUMP,
-    EVENT_SERVER_TYPE_MOVE_STOP,
-    EVENT_SERVER_TYPE_ENTER_PC,
-    EVENT_SERVER_TYPE_CHAT,
-    EVENT_SERVER_TYPE_HEAD_ROTATE
-} EventServerType;
+/**
+ * @brief List of all events code
+ */
+typedef enum EventType {
+    // Zone Events
+    EVENT_TYPE_ZONE_START,
+    EVENT_TYPE_COMMANDER_MOVE,
+    EVENT_TYPE_REST_SIT,
+    EVENT_TYPE_JUMP,
+    EVENT_TYPE_MOVE_STOP,
+    EVENT_TYPE_ENTER_PC,
+    EVENT_TYPE_CHAT,
+    EVENT_TYPE_HEAD_ROTATE,
+    EVENT_TYPE_ZONE_END,
 
-typedef struct {
-    uint16_t mapId;
-    uint8_t sessionKey[SOCKET_SESSION_ID_SIZE];
-    CommanderInfo commanderInfo;
-} GameEventUpdatePosition;
+    // Barrack Events
+    EVENT_TYPE_BARRACK_START,
+    EVENT_TYPE_BARRACK_END,
+
+    // Social Events
+    EVENT_TYPE_SOCIAL_START,
+    EVENT_TYPE_SOCIAL_END,
+
+} EventType;
 
 typedef struct {
     uint16_t routerId;
@@ -81,17 +92,19 @@ typedef struct EventServer EventServer;
 /**
  * @brief Allocate a new EventServer structure.
  * @param info An allocated EventServerStartupInfo containing the information for starting up the event server.
+ * @param serverType The type of the server linked to the EventServer
  * @return A pointer to an allocated EventServer.
  */
-EventServer *eventServerNew(EventServerStartupInfo *info);
+EventServer *eventServerNew(EventServerStartupInfo *info, ServerType serverType);
 
 /**
  * @brief Initialize an allocated EventServer structure.
  * @param self An allocated EventServer to initialize.
  * @param info An allocated EventServerStartupInfo containing the information for starting up the event server.
+ * @param serverType The type of the server linked to the EventServer
  * @return true on success, false otherwise.
  */
-bool eventServerInit(EventServer *self, EventServerStartupInfo *info);
+bool eventServerInit(EventServer *self, EventServerStartupInfo *info, ServerType serverType);
 
 /**
  * @brief Allocate a new GraphNodeClient structure.
@@ -129,20 +142,6 @@ void eventServerFree(EventServer *self);
  * @param self A pointer to an allocated EventServer.
  */
 void eventServerDestroy(EventServer **self);
-
-/**
- * @brief Update the position of a client within the event server structures
- * @param self A pointer to an allocated EventServer.
- * @param updatePosEvent Contains needed information for updating a commander position
- * @param newPosition The new position of the client
- * @param[out] redisClientsAround The list of other clients around the client at its new position
- * @return true on success, false otherwise
- */
-bool eventServerUpdateClientPosition(
-    EventServer *self,
-    GameEventUpdatePosition *updatePosEvent,
-    PositionXYZ *newPosition,
-    zlist_t **_redisClientsAround);
 
 /**
  * @brief Link 2 clients together.
@@ -239,3 +238,22 @@ bool eventServerStart(EventServer *self);
  * Get a client node based on its key
  */
 GraphNode *eventServerGetClientNode(EventServer *self, uint8_t *socketId);
+
+
+/**
+ * @brief Return a list of clients into an area according to the Redis database
+ * @param self An allocated EventServer
+ * @param mapId : The mapId of the target zone
+ * @param ignoredSessionKey A socketID to ignore. NULL don't ignore anybody.
+ * @param center The position of the center of the circle
+ * @param range Radius of the circle
+ * @return a zlist_t of identity keys
+ */
+zlist_t *
+EventServer_redisGetClientsWithinRange (
+    EventServer *self,
+    uint16_t mapId,
+    uint8_t *ignoredSessionKey,
+    PositionXZ *position,
+    float range
+);

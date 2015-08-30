@@ -300,7 +300,7 @@ Router_subscribe (
     }
 
     // Convert the header frame to a RouterHeader
-    RouterHeader packetHeader = *((RouterHeader *) zframe_data (header));
+    RouterHeader packetHeader = *((RouterHeader *) zframe_data(header));
     zframe_destroy (&header);
 
     switch (packetHeader)
@@ -365,7 +365,7 @@ Router_backend (
     }
 
     // Convert the header frame to a RouterHeader
-    RouterHeader packetHeader = *((RouterHeader *) zframe_data (header));
+    RouterHeader packetHeader = *((RouterHeader *) zframe_data(header));
 
     switch (packetHeader)
     {
@@ -379,8 +379,8 @@ Router_backend (
 
         case ROUTER_WORKER_READY: {
             // The worker sent a 'ready' signal. Register it.
-            zframe_t *workerIdFrame = zmsg_next (msg);
-            uint16_t workerId = *((uint16_t *) zframe_data (workerIdFrame));
+            zframe_t *workerIdFrame = zmsg_next(msg);
+            uint16_t workerId = *((uint16_t *) zframe_data(workerIdFrame));
             self->workers [workerId].identity.frame = zframe_dup (workerStateFrame);
             self->workers [workerId].identity.id = workerId;
             self->workersReadyCount++;
@@ -501,11 +501,11 @@ Router_frontend (
     }
 
     zframe_t *identityClient = zmsg_first (msg);
-    zframe_t *data = zmsg_next (msg);
+    zframe_t *data = zmsg_next(msg);
 
     // Retrieve the FD of the client
     zframe_t *identityClientDup = zframe_dup (identityClient);
-    uint8_t *identity = zframe_data (identityClientDup);
+    uint8_t *identity = zframe_data(identityClientDup);
     zmq_getsockopt (zsock_resolve (frontend), ZMQ_IDENTITY_FD, identity, (size_t[]) {5});
     uint64_t fdClient = *((uint64_t *) identity);
     zframe_destroy (&identityClientDup);
@@ -603,7 +603,7 @@ Router_initMonitor (
     // Wait for the READY signal from the monitor actor
     zmsg_t *msg;
     if ((!(msg = zmsg_recv(monitorActor)))
-    || (memcmp (zframe_data (zmsg_first (msg)), PACKET_HEADER (ROUTER_MONITOR_READY), sizeof(ROUTER_MONITOR_READY)) != 0)
+    || (memcmp (zframe_data(zmsg_first (msg)), PACKET_HEADER (ROUTER_MONITOR_READY), sizeof(ROUTER_MONITOR_READY)) != 0)
     ) {
         error("Cannot received correctly an answer from the monitor actor.");
         return false;

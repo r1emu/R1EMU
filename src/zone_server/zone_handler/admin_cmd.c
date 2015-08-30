@@ -15,10 +15,11 @@
 #include "common/commander/commander.h"
 #include "common/redis/fields/redis_game_session.h"
 #include "common/redis/fields/redis_socket_session.h"
-#include "zone_server/zone_handler/zone_builder.h"
 #include "common/session/session.h"
 #include "common/server/worker.h"
 #include "common/server/event_handler.h"
+#include "zone_server/zone_handler/zone_builder.h"
+#include "zone_server/zone_handler/zone_event_handler.h"
 
 zhash_t *adminCommands = NULL;
 
@@ -69,7 +70,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
     fakePc.commanderId = r1emuGenerateRandom64(&self->seed);
     snprintf(fakePc.base.familyName, sizeof(fakePc.base.familyName),
         "PcID_%x", fakePc.pcId);
-    snprintf(fakePc.base.commanderName, sizeof (fakePc.base.commanderName),
+    snprintf(fakePc.base.commanderName, sizeof(fakePc.base.commanderName),
         "AccountID_%llx", fakePc.base.accountId);
 
     // register the fake socket session
@@ -104,15 +105,14 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
     info("Fake PC spawned.(SocketID=%s, SocialID=%I64x, AccID=%I64x, PcID=%x, CommID=%I64x)",
          sessionKeyStr, fakePc.socialInfoId, fakePc.base.accountId, fakePc.pcId, fakePc.commanderId);
 
-    GameEventPcEnter event = {
+    GameEventEnterPc event = {
         .updatePosEvent = {
             .mapId = fakeSocketSession.mapId,
-            .sessionKey = SOCKET_ID_ARRAY(sessionKeyStr),
             .commanderInfo = fakePc
         }
     };
 
-    workerDispatchEvent(self, EVENT_SERVER_TYPE_ENTER_PC, &event, sizeof (event));
+    workerDispatchEvent(self, sessionKeyStr, EVENT_TYPE_ENTER_PC, &event, sizeof(event));
 }
 
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {

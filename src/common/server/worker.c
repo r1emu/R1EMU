@@ -25,6 +25,7 @@
 #include "common/redis/fields/redis_game_session.h"
 #include "common/crypto/crypto.h"
 #include "common/packet/packet.h"
+#include "common/server/game_event.h"
 
 
 // ------ Structure declaration -------
@@ -302,7 +303,7 @@ Worker_processClientPacket (
 
     // Read the message
     zframe_t *sessionKeyFrame = zmsg_first (msg);
-    zframe_t *packetFrame = zmsg_next (msg);
+    zframe_t *packetFrame = zmsg_next(msg);
     // We don't need the client packet in the reply
     zmsg_remove (msg, packetFrame);
 
@@ -310,7 +311,7 @@ Worker_processClientPacket (
     uint8_t sessionKeyStr [SOCKET_SESSION_ID_SIZE];
 
     // Generate the socketId key
-    socketSessionGenSessionKey (zframe_data (sessionKeyFrame), sessionKeyStr);
+    socketSessionGenSessionKey (zframe_data(sessionKeyFrame), sessionKeyStr);
 
     // Request the Session
     RedisSessionKey sessionKey = {
@@ -330,7 +331,7 @@ Worker_processClientPacket (
     zmsg_push (msg, headerAnswer);
 
     // === Build the message reply ===
-    uint8_t *packet = zframe_data (packetFrame);
+    uint8_t *packet = zframe_data(packetFrame);
     size_t packetSize = zframe_size (packetFrame);
 
     if (!(Worker_buildReply (self, &session, packet, packetSize, msg, headerAnswer))) {
@@ -689,7 +690,7 @@ Worker_processGlobalPacket (
     zframe_t *headerFrame = zmsg_pop (msg);
     zframe_t *requestAnswer = NULL;
 
-    RouterRecvHeader header = *((RouterRecvHeader *) zframe_data (headerFrame));
+    RouterRecvHeader header = *((RouterRecvHeader *) zframe_data(headerFrame));
 
     // Handle the request
     switch (header) {
@@ -755,20 +756,23 @@ cleanup:
     return result;
 }
 
-bool
-workerDispatchEvent (
-    Worker *self,
-    EventServerType eventType,
-    void *event,
-    size_t eventSize
-) {
+bool workerDispatchEvent (Worker *self, uint8_t *emitterSk, EventType eventType, void *event, size_t eventSize)
+{
     bool result = true;
     zmsg_t *msg = NULL;
+
+    GameEvent gameEvent = {
+        .emitterSk = SOCKET_ID_ARRAY(emitterSk),
+        .type = eventType
+    };
+
+    memcpy (&gameEvent.data, event, eventSize);
+    size_t gameEventSize = sizeof(GameEvent) - sizeof (EventDataCategories) + eventSize;
 
     if ((!(msg = zmsg_new ()))
     ||  zmsg_addmem (msg, PACKET_HEADER (EVENT_SERVER_EVENT), sizeof(EVENT_SERVER_EVENT)) != 0
     ||  zmsg_addmem (msg, PACKET_HEADER (eventType), sizeof(eventType)) != 0
-    ||  zmsg_addmem (msg, event, eventSize) != 0
+    ||  zmsg_addmem (msg, &gameEvent, gameEventSize) != 0
     ) {
         error("Cannot build the event message.");
         result = false;

@@ -50,9 +50,9 @@
                                                                                                     \
                 return PACKET_HANDLER_ERROR;                                                        \
         }                                                                                           \
-        if (packetSize > (sizeof (packet) + BF_BLOCK) || packetSize < sizeof (packet) ) {           \
+        if (packetSize > (sizeof(packet) + BF_BLOCK) || packetSize < sizeof(packet) ) {           \
             error("The packet size received isn't correct. (packet size = %d, correct size = %d)",  \
-                packetSize, sizeof (packet));                                                       \
+                packetSize, sizeof(packet));                                                       \
             return PACKET_HANDLER_ERROR;                                                            \
         }                                                                                           \
     } while (0)

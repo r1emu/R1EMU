@@ -174,8 +174,8 @@ RouterMonitor_monitor (
         // A client just connected to the Router.
 
         // Get the socket file descriptor
-        zframe_t *fdFrame = zmsg_next (msg);
-        uint64_t fdClient = strtoull(zframe_data (fdFrame), NULL, 10);
+        zframe_t *fdFrame = zmsg_next(msg);
+        uint64_t fdClient = strtoull(zframe_data(fdFrame), NULL, 10);
 
         // Check if this file descriptor is still used
         uint8_t fdClientKey [ROUTER_MONITOR_FDKEY_SIZE];
@@ -185,7 +185,7 @@ RouterMonitor_monitor (
         // Check if it already exists in the table
         if ((clientFrame = zhash_lookup(self->connected, fdClientKey)) != NULL) {
             uint8_t sessionKey [ROUTER_MONITOR_FDKEY_SIZE];
-            socketSessionGenSessionKey (zframe_data (clientFrame), sessionKey);
+            socketSessionGenSessionKey (zframe_data(clientFrame), sessionKey);
             error("The client FD=%d just connected, but another client has still this FD (previously : %s)",
                    fdClient, sessionKey);
             // TODO : Decide what to do in this case
@@ -198,8 +198,8 @@ RouterMonitor_monitor (
         // A client just disconnected from the Router.
 
         // Get the socket file descriptor
-        zframe_t *fdFrame = zmsg_next (msg);
-        uint64_t fdClient = strtoull(zframe_data (fdFrame), NULL, 10);
+        zframe_t *fdFrame = zmsg_next(msg);
+        uint64_t fdClient = strtoull(zframe_data(fdFrame), NULL, 10);
 
         // Check if this file descriptor is already used
         uint8_t fdClientKey [ROUTER_MONITOR_FDKEY_SIZE];
@@ -216,7 +216,7 @@ RouterMonitor_monitor (
         else {
             // Everything is okay here, disconnect gracefully the client
             uint8_t sessionKeyStr [SOCKET_SESSION_ID_SIZE];
-            socketSessionGenSessionKey (zframe_data (clientFrame), sessionKeyStr);
+            socketSessionGenSessionKey (zframe_data(clientFrame), sessionKeyStr);
 
             // Flush the session here
             RedisSessionKey sessionKey = {
@@ -269,15 +269,15 @@ RouterMonitor_subscribe (
     }
 
     // Convert the frame to a RouterMonitorHeader
-    RouterMonitorHeader packetHeader = *((RouterMonitorHeader *) zframe_data (header));
+    RouterMonitorHeader packetHeader = *((RouterMonitorHeader *) zframe_data(header));
 
     switch (packetHeader) {
 
         case ROUTER_MONITOR_ADD_FD: {
-            zframe_t *fdFrame = zmsg_next (msg);
+            zframe_t *fdFrame = zmsg_next(msg);
 
             // Get the socket file descriptor
-            uint64_t fdClient = *((uint64_t *) (zframe_data (fdFrame)));
+            uint64_t fdClient = *((uint64_t *) (zframe_data(fdFrame)));
 
             // Check if this file descriptor is still used
             uint8_t fdClientKey [ROUTER_MONITOR_FDKEY_SIZE];
@@ -286,11 +286,11 @@ RouterMonitor_subscribe (
             zframe_t *clientFrame;
             if ((clientFrame = zhash_lookup(self->connected, fdClientKey)) == NULL) {
                 // The client just sent its first message, add the identity frame to the hashtable
-                clientFrame = zframe_dup (zmsg_next (msg));
+                clientFrame = zframe_dup (zmsg_next(msg));
                 zhash_insert(self->connected, fdClientKey, clientFrame);
             } else {
                 // Check if the fd <=> identity association is always the same
-                if (!zframe_eq (clientFrame, zmsg_next (msg))) {
+                if (!zframe_eq (clientFrame, zmsg_next(msg))) {
                     // Huho.
                     // TODO : Decide what to do
                     error("==================================================================");

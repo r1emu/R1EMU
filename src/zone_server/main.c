@@ -92,7 +92,7 @@ int main (int argc, char **argv)
         error("Cannot initialize the event server.");
         return -1;
     }
-    if (!(eventServer = eventServerNew(&eventServerInfo))) {
+    if (!(eventServer = eventServerNew(&eventServerInfo, serverType))) {
         error("Cannot create the event server.");
         return -1;
     }

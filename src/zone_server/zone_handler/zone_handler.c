@@ -13,6 +13,7 @@
 
 #include "zone_handler.h"
 #include "zone_builder.h"
+#include "zone_event_handler.h"
 #include "admin_cmd.h"
 #include "common/packet/packet.h"
 #include "common/redis/fields/redis_game_session.h"
@@ -131,9 +132,8 @@ static PacketHandlerState zoneHandlerChat(
         size_t gameEventSize = sizeof(GameEventChat) + chatTextSize;
         GameEventChat *event = alloca(gameEventSize);
         memcpy(&event->commander, &session->game.commanderSession.currentCommander, sizeof(event->commander));
-        memcpy(event->sessionKey, session->socket.sessionKey, sizeof(event->sessionKey));
         memcpy(event->chatText, clientPacket->msgText, chatTextSize);
-        workerDispatchEvent(self, EVENT_SERVER_TYPE_CHAT, event, gameEventSize);
+        workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_CHAT, event, gameEventSize);
     }
 
     return PACKET_HANDLER_OK;
@@ -157,10 +157,8 @@ static PacketHandlerState zoneHandlerRestSit(
     // notify the players around
     GameEventRestSit event = {
         .pcId = session->game.commanderSession.currentCommander.pcId,
-        .sessionKey = SOCKET_ID_ARRAY(session->socket.sessionKey)
     };
-
-    workerDispatchEvent(self, EVENT_SERVER_TYPE_REST_SIT, &event, sizeof(event));
+    workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_REST_SIT, &event, sizeof(event));
 
     return PACKET_HANDLER_OK;
 }
@@ -322,14 +320,13 @@ static PacketHandlerState zoneHandlerMoveStop(
         .updatePosEvent = {
             .mapId = session->socket.mapId,
             .commanderInfo = session->game.commanderSession.currentCommander,
-            .sessionKey = SOCKET_ID_ARRAY(session->socket.sessionKey)
         },
         .position = clientPacket->position,
         .direction = clientPacket->direction,
         .timestamp = clientPacket->timestamp,
     };
 
-    workerDispatchEvent(self, EVENT_SERVER_TYPE_MOVE_STOP, &event, sizeof(event));
+    workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_MOVE_STOP, &event, sizeof(event));
 
     return PACKET_HANDLER_OK;
 }
@@ -371,15 +368,14 @@ static PacketHandlerState zoneHandlerKeyboardMove(
     GameEventCommanderMove event = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .commanderInfo = session->game.commanderSession.currentCommander,
-            .sessionKey = SOCKET_ID_ARRAY(session->socket.sessionKey)
+            .commanderInfo = session->game.commanderSession.currentCommander
         },
         .position = clientPacket->position,
         .direction = clientPacket->direction,
         .timestamp = clientPacket->timestamp,
     };
 
-    workerDispatchEvent(self, EVENT_SERVER_TYPE_COMMANDER_MOVE, &event, sizeof(event));
+    workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_COMMANDER_MOVE, &event, sizeof(event));
 
     return PACKET_HANDLER_UPDATE_SESSION;
 }
@@ -445,16 +441,14 @@ static PacketHandlerState zoneHandlerGameReady(
     // ZoneBuilder_skillAdd(replyMsg);
 
     // Notify players around that a new PC has entered
-    GameEventPcEnter pcEnterEvent = {
+    GameEventEnterPc pcEnterEvent = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .commanderInfo = *commanderInfo,
-            .sessionKey = SOCKET_ID_ARRAY(session->socket.sessionKey)
+            .commanderInfo = *commanderInfo
         }
     };
-
-    workerDispatchEvent(self, EVENT_SERVER_TYPE_ENTER_PC, &pcEnterEvent, sizeof(pcEnterEvent));
-    zoneBuilderEnterPc(&pcEnterEvent.updatePosEvent.commanderInfo, replyMsg);
+    workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_ENTER_PC, &pcEnterEvent, sizeof(pcEnterEvent));
+    // zoneBuilderEnterPc(&pcEnterEvent.updatePosEvent.commanderInfo, replyMsg);
 
     // ZoneBuilder_buffList(commanderInfo->base.pcId, replyMsg);
 
@@ -589,12 +583,11 @@ static PacketHandlerState zoneHandlerJump(
     GameEventJump event = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .commanderInfo = session->game.commanderSession.currentCommander,
-            .sessionKey = SOCKET_ID_ARRAY(session->socket.sessionKey)
+            .commanderInfo = session->game.commanderSession.currentCommander
         },
         .height = COMMANDER_HEIGHT_JUMP
     };
-    workerDispatchEvent(self, EVENT_SERVER_TYPE_JUMP, &event, sizeof(event));
+    workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_JUMP, &event, sizeof(event));
 
     return PACKET_HANDLER_OK;
 }
@@ -638,11 +631,9 @@ static PacketHandlerState zoneHandlerHeadRotate(
     // notify the players around
     GameEventHeadRotate event = {
         .pcId = session->game.commanderSession.currentCommander.pcId,
-        .sessionKey = SOCKET_ID_ARRAY(session->socket.sessionKey),
         .direction = clientPacket->direction
     };
-
-    workerDispatchEvent(self, EVENT_SERVER_TYPE_HEAD_ROTATE, &event, sizeof(event));
+    workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_HEAD_ROTATE, &event, sizeof(event));
 
     return PACKET_HANDLER_OK;
 }
