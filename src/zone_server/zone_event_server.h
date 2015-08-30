@@ -25,7 +25,7 @@
 #include "zone_handler/zone_event_handler.h"
 
 // ---------- Defines -------------
-
+#define COMMANDER_VIEW_RANGE 250.0
 
 // ------ Structure declaration -------
 

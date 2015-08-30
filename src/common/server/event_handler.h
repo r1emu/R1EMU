@@ -22,7 +22,6 @@
 #include "game_event.h"
 
 // ---------- Defines -------------
-#define COMMANDER_RANGE_AROUND 250.0
 
 // ------ Structure declaration -------
 

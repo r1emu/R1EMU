@@ -24,7 +24,6 @@
 #include "common/server/event_handler.h"
 
 // ---------- Defines -------------
-#define COMMANDER_RANGE_AROUND 250.0
 
 // ------ Structure declaration -------
 extern const EventHandler zoneEventHandlers[EVENT_TYPE_ZONE_END];

@@ -61,7 +61,7 @@ zoneEventServerUpdateClientPosition (
     // Get the clients around
     if (!(redisClientsAround = EventServer_redisGetClientsWithinRange (
         self, mapId, emitterSk, &PositionXYZToXZ (&updatePosEvent->newPosition),
-        COMMANDER_RANGE_AROUND
+        COMMANDER_VIEW_RANGE
     ))) {
         error("Cannot get clients within range");
         status = false;
