@@ -65,8 +65,7 @@ typedef struct Router Router;
 typedef struct {
     uint16_t routerId;
     char *ip;
-    int *ports;
-    int portsCount;
+    int port;
     int workersCount;
     RedisStartupInfo redisInfo;
     MySQLStartupInfo sqlInfo;
@@ -91,8 +90,7 @@ bool routerInit(Router *self, RouterStartupInfo *info);
  * @param self An allocated RouterStartupInfo to initialize.
  * @param routerId The Server ID
  * @param ip The IP of the router
- * @param ports The ports binded by the Router
- * @param portsCount Ports count
+ * @param port The port binded by the Router
  * @param workersCount Number of workers linked to the Router
  * @return true on success, false otherwise
  */
@@ -100,8 +98,7 @@ bool routerStartupInfoInit(
     RouterStartupInfo *self,
     uint16_t routerId,
     char *ip,
-    int *ports,
-    int portsCount,
+    int port,
     int workersCount,
     RedisStartupInfo *redisInfo,
     MySQLStartupInfo *sqlInfo);

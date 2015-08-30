@@ -19,11 +19,7 @@
 #include "R1EMU.h"
 #include "common/server/server.h"
 
-#define ZONE_SERVER_EXECUTABLE_NAME         "zone_server"
-
-// configuration default values
-#define ZONE_SERVER_PORTS_DEFAULT           (char []) {"2004"}
-#define ZONE_SERVER_WORKERS_COUNT_DEFAULT   1
+#define ZONE_SERVER_EXECUTABLE_NAME "zone_server"
 
 // ZoneServer is opaque
 typedef struct ZoneServer ZoneServer;

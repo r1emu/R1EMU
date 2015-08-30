@@ -271,7 +271,9 @@ workerStartupInfoInit (
         return false;
     }
 
-    if (!(mySqlStartupInfoInit(&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
+    if (!(mySqlStartupInfoInit(&self->sqlInfo,
+        sqlInfo->hostname, sqlInfo->user, sqlInfo->password, sqlInfo->database)))
+    {
         error("Cannot initialize MySQL start up info.");
         return false;
     }
@@ -562,28 +564,24 @@ workerMainLoop (
         error("[routerId=%d][WorkerId=%d] cannot connect to the backend socket.", self->info.routerId, self->info.workerId);
         goto cleanup;
     }
-    info("[routerId=%d][WorkerId=%d] connected to the backend %s.",
-          self->info.routerId, self->info.workerId, zsys_sprintf(ROUTER_BACKEND_ENDPOINT, self->info.routerId));
 
     // Create and connect a socket to the global server
     if (!(global = zsock_new (ZMQ_REQ))
     ||  zsock_connect (global, ROUTER_GLOBAL_ENDPOINT, self->info.globalServerIp, self->info.globalServerPort) == -1
     ) {
-        error("[routerId=%d][WorkerId=%d] cannot bind to the global server %s:%d.", self->info.routerId, self->info.workerId, self->info.globalServerIp, self->info.globalServerPort);
+        error("[routerId=%d][WorkerId=%d] cannot bind to the global server %s:%d.",
+              self->info.routerId, self->info.workerId, self->info.globalServerIp, self->info.globalServerPort);
         goto cleanup;
     }
-    info("[routerId=%d][WorkerId=%d] connected to the global server %s.",
-          self->info.routerId, self->info.workerId, zsys_sprintf(ROUTER_GLOBAL_ENDPOINT, self->info.globalServerIp, self->info.globalServerPort));
 
     // Create and bind a publisher to send messages to the Event Server
     if (!(self->eventServer = zsock_new (ZMQ_PUB))
     ||  zsock_bind(self->eventServer, EVENT_SERVER_SUBSCRIBER_ENDPOINT, self->info.routerId, self->info.workerId) == -1
     ) {
-        error("[routerId=%d][WorkerId=%d] cannot bind to the subscriber endpoint.", self->info.routerId, self->info.workerId);
+        error("[routerId=%d][WorkerId=%d] cannot bind to the subscriber endpoint.",
+              self->info.routerId, self->info.workerId);
         goto cleanup;
     }
-    info("[routerId=%d][WorkerId=%d] bind to the subscriber endpoint %s",
-          self->info.routerId, self->info.workerId, zsys_sprintf(EVENT_SERVER_SUBSCRIBER_ENDPOINT, self->info.routerId, self->info.workerId));
 
     // Tell to the broker we're ready for work
     zmsg_t *readyMsg = zmsg_new ();
@@ -601,7 +599,6 @@ workerMainLoop (
         error("[routerId=%d][WorkerId=%d] cannot create a poller.", self->info.routerId, self->info.workerId);
         goto cleanup;
     }
-    info("[routerId=%d][WorkerId=%d] is running and waiting for messages.", self->info.routerId, self->info.workerId);
 
     // TODO : Refactor zpoller into zreactor ?
     while (isRunning) {
@@ -617,17 +614,20 @@ workerMainLoop (
             handler = Worker_handlePrivateRequest;
         }
         else {
-            warning("[routerId=%d][WorkerId=%d] received a message from an unknown actor. Maybe it is a SIGINT signal?", self->info.routerId, self->info.workerId);
+            warning("[routerId=%d][WorkerId=%d] received a message from an unknown actor. Maybe it is a SIGINT signal?",
+                    self->info.routerId, self->info.workerId);
             break;
         }
 
         switch (handler (self, actor)) {
             case -1: // ERROR
-                error("[routerId=%d][WorkerId=%d] encountered an error when handling a request.", self->info.routerId, self->info.workerId);
+                error("[routerId=%d][WorkerId=%d] encountered an error when handling a request.",
+                      self->info.routerId, self->info.workerId);
             break;
 
             case -2: // Connection stopped
-                error("[routerId=%d][WorkerId=%d] The worker has been requested to stop.", self->info.routerId, self->info.workerId);
+                error("[routerId=%d][WorkerId=%d] The worker has been requested to stop.",
+                      self->info.routerId, self->info.workerId);
                 isRunning = false;
             break;
 

@@ -135,7 +135,8 @@ bool routerMonitorStartupInfoInit (
         return false;
     }
 
-    if (!(mySqlStartupInfoInit(&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
+    if (!(mySqlStartupInfoInit(&self->sqlInfo,
+        sqlInfo->hostname, sqlInfo->user, sqlInfo->password, sqlInfo->database))) {
         error("Cannot initialize MySQL start up info.");
         return false;
     }

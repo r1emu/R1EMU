@@ -20,9 +20,10 @@
 #include "router.h"
 #include "worker.h"
 
-// router unique IDs
-#define BARRACK_SERVER_ROUTER_ID ((uint16_t) -1)
-#define SOCIAL_SERVER_ROUTER_ID ((uint16_t) -2)
+// Routers IDs
+#define ZONES_SERVER_ROUTER_ID       0
+#define BARRACKS_SERVER_ROUTER_ID    1000
+#define SOCIALS_SERVER_ROUTER_ID     2000
 
 typedef struct Server Server;
 

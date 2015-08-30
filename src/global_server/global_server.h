@@ -26,11 +26,6 @@
 
 #define GLOBAL_SERVER_CLI_ENDPOINT          "tcp://%s:%d"
 #define GLOBAL_SERVER_ZONES_ENDPOINT        "tcp://%s:*"
-#define GLOBAL_SERVER_CLI_IP_DEFAULT        "127.0.0.1"
-
-// configuration default values
-#define GLOBAL_SERVER_CLI_PORT_DEFAULT      2003
-#define GLOBAL_SERVER_ZONES_PORT_DEFAULT    2007
 
 /**
  * Enumeration of all the packets headers that the global server handles
@@ -66,56 +61,58 @@ typedef enum GlobalServerSendHeader {
 typedef struct GlobalServer GlobalServer;
 
 typedef struct {
-    // server IP for the global server
     char *ip;
+    int port;
+    int workersCount;
+}   BasicServerConf;
 
-    // frontend port of the global server. It shouldn't be opened on internet
-    int cliPort;
+typedef struct {
+    char *ip;
+    int port;
+}   GlobalServerConf;
 
-    // zone servers ports. They should be opened to the internet, as clients will connect to them
-    int *socialServersPorts;
+typedef struct {
+    BasicServerConf basicConf;
+}   BarrackServerConf;
 
-    // zone servers IP
-    char **socialServersIp;
+typedef struct {
+    BasicServerConf basicConf;
+}   SocialServerConf;
 
-    // count of zone servers
-    int socialServersCount;
+typedef struct {
+    BasicServerConf basicConf;
+}   ZoneServerConf;
 
-    // count of worker for each zone servers
-    int socialWorkersCount;
+typedef struct {
+    ZoneServerConf *confs;
+    size_t count;
+    int globalZonePort;
+}   ZoneServersConf;
 
-    // port for communicating with the zones
-    int socialPort;
+typedef struct {
 
-    // zone servers ports. They should be opened to the internet, as clients will connect to them
-    int *zoneServersPorts;
+    SocialServerConf *confs;
+    size_t count;
 
-    // zone servers IP
-    char **zoneServersIp;
+}   SocialsServerConf;
 
-    // count of zone servers
-    int zoneServersCount;
+typedef struct {
 
-    // count of worker for each zone servers
-    int zoneWorkersCount;
+    BarrackServerConf *confs;
+    size_t count;
 
-    // port for communicating with the zones
-    int zonesPort;
+}   BarracksServerConf;
 
-    // barrack servers ports. They should be opened to the internet, as clients will connect to them
-    int *barrackServerPort;
-
-    // number of ports
-    int barrackServerPortCount;
-
-    // barrack servers IP
-    char *barrackServerIp;
-
-    // count of workers
-    int barrackWorkersCount;
+typedef struct {
 
     // configuration file path
     char *confFilePath;
+
+    // configuration data
+    GlobalServerConf globalConf;
+    BarracksServerConf barracksConf;
+    SocialsServerConf socialsConf;
+    ZoneServersConf zonesConf;
 
     // database
     MySQLStartupInfo sqlInfo;

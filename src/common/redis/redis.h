@@ -24,9 +24,6 @@
 #define REDIS_EMPTY_STRING (uint8_t *) "__EMPTY_STRING__"
 #define CHECK_REDIS_EMPTY_STRING(_x) ((_x)[0] != '\0') ? (_x) : REDIS_EMPTY_STRING
 
-#define REDIS_HOSTNAME_DEFAULT   (char []) {"localhost"}
-#define REDIS_PORT_DEFAULT       6379
-
 // accessors helpers
 #define COPY_REDIS_STR(_str, _x) strncpy (_str, reply->element[REDIS_GAME_SESSION_##_x]->str, sizeof(_str));
 #define GET_REDIS_32(_x) strtoul(reply->element[REDIS_GAME_SESSION_##_x]->str, NULL, 16)

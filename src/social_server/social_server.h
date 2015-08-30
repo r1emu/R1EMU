@@ -19,10 +19,6 @@
 #include "R1EMU.h"
 #include "common/server/server.h"
 
-// configuration default values
-#define SOCIAL_SERVER_PORTS_DEFAULT             (char []) {"1337 1338"}
-#define SOCIAL_SERVER_WORKERS_COUNT_DEFAULT     1
-
 typedef struct SocialServer SocialServer;
 
 /**

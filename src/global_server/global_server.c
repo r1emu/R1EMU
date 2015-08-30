@@ -16,6 +16,7 @@
 #include "social_server/social_server.h"
 #include "barrack_server/barrack_server.h"
 #include "common/server/server_factory.h"
+#include <jansson.h>
 
 /**
  * @brief GlobalServer detains the authority on all the zone servers
@@ -83,266 +84,290 @@ bool globalServerFlushRedis(GlobalServer *self) {
     return redisFlushDatabase(self->redis);
 }
 
+bool globalServerReadBasicServerConf(BasicServerConf *basicConf, json_t *servers, int serverId)
+{
+    bool result = true;
+    json_t *server = NULL;
+    json_t *field = NULL;
+
+    if (!(server = json_array_get(servers, serverId))) {
+        error("Cannot get element ID = %d.", serverId);
+        result = false;
+        goto cleanup;
+    }
+
+    // read IP
+    if (!(field = json_object_get(server, "ip"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'ip' field.");
+        result = false;
+        goto cleanup;
+    }
+    basicConf->ip = strdup(json_string_value(field));
+
+    // read port
+    if (!(field = json_object_get(server, "port"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'port' field.");
+        result = false;
+        goto cleanup;
+    }
+    basicConf->port = atoi(json_string_value(field));
+
+    // read workers count
+    if (!(field = json_object_get(server, "workersCount"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'workersCount' field.");
+        result = false;
+        goto cleanup;
+    }
+    basicConf->workersCount = atoi(json_string_value(field));
+
+
+cleanup:
+    return result;
+}
+
 bool globalServerStartupInfoInit(GlobalServerStartupInfo *self, char *confFilePath) {
     memset(self, 0, sizeof(GlobalServerStartupInfo));
 
     bool result = true;
-    zconfig_t *conf = NULL;
-    char *portsArray = NULL;
+    char *confStr = NULL;
+    json_t *root = NULL;
+    json_error_t error;
+    json_t *field;
+
+    // open the configuration file
+    if (!(confStr = fileGetContents(confFilePath, NULL))) {
+        error("Cannot read the configuration file (%s).", confFilePath);
+        result = false;
+        goto cleanup;
+    }
+
+    if (!(root = json_loads(confStr, 0, &error))) {
+        error("Cannot load JSON correctly : Line %d : %s", error.line, error.text);
+        result = false;
+        goto cleanup;
+    }
+
+    if (!(json_is_object(root))) {
+        error("Cannot read JSON correctly.");
+        result = false;
+        goto cleanup;
+    }
 
     // ===================================
     //       Read Global configuration
     // ===================================
-    // open the configuration file
-    if (!(conf = zconfig_load(confFilePath))) {
-        error("Cannot read the global configuration file (%s).", confFilePath);
+    json_t *globalServer;
+    if (!(globalServer = json_object_get(root, "globalServer"))
+    ||  !(json_is_object(globalServer)))
+    {
+        error("Cannot read 'globalServer' section correctly.");
         result = false;
         goto cleanup;
     }
 
-    // read the CLI serverIP
-    if (!(self->ip = strdup(zconfig_resolve(conf, "globalServer/serverIP", NULL)))) {
-        warning("Cannot read correctly the CLI serverIP in the configuration file (%s). ", confFilePath);
-        warning("The default serverIP = %s has been used.", GLOBAL_SERVER_CLI_IP_DEFAULT);
-        self->ip = GLOBAL_SERVER_CLI_IP_DEFAULT;
+    // read IP
+    if (!(field = json_object_get(globalServer, "ip"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'ip' field in 'globalServer' section correctly.");
+        result = false;
+        goto cleanup;
+    }
+    self->globalConf.ip = strdup(json_string_value(field));
+
+    // read port
+    if (!(field = json_object_get(globalServer, "port"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'port' field in 'globalServer' section correctly.");
+        result = false;
+        goto cleanup;
+    }
+    self->globalConf.port = atoi(json_string_value(field));
+
+    // ===================================
+    //     Read Barracks configuration
+    // ===================================
+    json_t *barrackServers;
+    if (!(barrackServers = json_object_get(root, "barrackServers"))
+    ||  !(json_is_array(barrackServers)))
+    {
+        error("Cannot read 'barrackServers' section correctly.");
+        result = false;
+        goto cleanup;
     }
 
-    // read the CLI port
-    if (!(self->cliPort = atoi(zconfig_resolve(conf, "globalServer/port", NULL)))) {
-        warning("Cannot read correctly the CLI port in the configuration file (%s). ", confFilePath);
-        warning("The default port = %d has been used.", GLOBAL_SERVER_CLI_PORT_DEFAULT);
-        self->cliPort = GLOBAL_SERVER_CLI_PORT_DEFAULT;
+    // allocate configuration
+    self->barracksConf.count = json_array_size(barrackServers);
+    if (!(self->barracksConf.confs = malloc (sizeof (BarrackServerConf) * self->barracksConf.count))) {
+        error("Cannot allocate barracks configuration.");
+        result = false;
+        goto cleanup;
+    }
+
+    // read configuration
+    for (int id = 0; id < json_array_size(barrackServers); id++) {
+        BarrackServerConf *curConf = &self->barracksConf.confs[id];
+        if (!(globalServerReadBasicServerConf(&curConf->basicConf, barrackServers, id))) {
+            error("Cannot read barrack server entry %d in 'barrackServers'", id);
+            result = false;
+            goto cleanup;
+        }
     }
 
     // ===================================
-    //       Read Zone configuration
+    //     Read Socials configuration
     // ===================================
-    // read the zone ports array
-    if (!(portsArray = zconfig_resolve(conf, "zoneServer/portsArray", NULL))) {
-        warning("Public Zone ports cannot be read for Global Server. Defaults ports have been used : %s",
-            ZONE_SERVER_PORTS_DEFAULT);
-        portsArray = ZONE_SERVER_PORTS_DEFAULT;
-    }
-
-    // tokenize the ports array
-    char *port = strtok(portsArray, " ");
-    while (port != NULL) {
-        self->zoneServersCount++;
-        port = strtok(NULL, " ");
-    }
-
-    if (self->zoneServersCount == 0) {
-        error("Cannot read correctly the zone ports array.");
+    json_t *socialServers;
+    if (!(socialServers = json_object_get(root, "socialServers"))
+    ||  !(json_is_array(socialServers)))
+    {
+        error("Cannot read 'socialServers' section correctly.");
         result = false;
         goto cleanup;
     }
 
-    // fill the server ports array
-    self->zoneServersPorts = calloc(self->zoneServersCount, sizeof(int));
-
-    for (int portIndex = 0; portIndex < self->zoneServersCount; portIndex++) {
-        self->zoneServersPorts[portIndex] = strtoul(portsArray, &portsArray, 10);
-        portsArray++;
-    }
-
-    // read the number of zone workers
-    if (!(self->zoneWorkersCount = atoi(zconfig_resolve(conf, "zoneServer/workersCount", NULL)))) {
-        warning("Cannot read correctly the zone workers count in the configuration file (%s). ", confFilePath);
-        warning("The default worker count = %d has been used.", ZONE_SERVER_WORKERS_COUNT_DEFAULT);
-        self->zoneWorkersCount = ZONE_SERVER_WORKERS_COUNT_DEFAULT;
-    }
-
-    char *zoneServersIp;
-    // read the zone server interfaces IP
-    if (!(zoneServersIp = zconfig_resolve(conf, "zoneServer/serversIP", NULL))) {
-        error("Cannot read correctly the zone servers interface IP in the configuration file (%s). ", confFilePath);
+    // allocate configuration
+    self->socialsConf.count = json_array_size(socialServers);
+    if (!(self->socialsConf.confs = malloc (sizeof (SocialServerConf) * self->socialsConf.count))) {
+        error("Cannot allocate socials configuration.");
         result = false;
         goto cleanup;
     }
 
-    int nbZoneServersIp = 0;
-    char *routerIp = strtok(zoneServersIp, " ");
-
-    while (routerIp != NULL) {
-        routerIp = strtok(NULL, " ");
-        nbZoneServersIp++;
-    }
-
-    if (nbZoneServersIp != self->zoneServersCount) {
-        error("Number of zone ports different from the number of zone interfaces IP. (%d / %d)",
-            nbZoneServersIp, self->zoneServersCount
-        );
-
-        result = false;
-        goto cleanup;
-    }
-
-    // fill the zone server IPs array
-    self->zoneServersIp = calloc(self->zoneServersCount, sizeof(char *));
-
-    for (int ipIndex = 0; ipIndex < self->zoneServersCount; ipIndex++) {
-        self->zoneServersIp[ipIndex] = strdup(zoneServersIp);
-        zoneServersIp += strlen(zoneServersIp) + 1;
+    // read configuration
+    for (int id = 0; id < json_array_size(socialServers); id++) {
+        SocialServerConf *curConf = &self->socialsConf.confs[id];
+        if (!(globalServerReadBasicServerConf(&curConf->basicConf, socialServers, id))) {
+            error("Cannot read social server entry %d in 'socialServers'", id);
+            result = false;
+            goto cleanup;
+        }
     }
 
     // ===================================
-    //       Read Social configuration
+    //     Read Zones configuration
     // ===================================
-    // read the social ports array
-    if (!(portsArray = zconfig_resolve(conf, "socialServer/portsArray", NULL))) {
-        warning("Public Social ports cannot be read for Global Server. Defaults ports have been used : %s",
-            SOCIAL_SERVER_PORTS_DEFAULT);
-        portsArray = SOCIAL_SERVER_PORTS_DEFAULT;
-    }
-
-    // Tokenize the ports array
-    port = strtok(portsArray, " ");
-
-    while (port != NULL) {
-        self->socialServersCount++;
-        port = strtok(NULL, " ");
-    }
-
-    if (self->socialServersCount == 0) {
-        error("Cannot read correctly the social ports array.");
+    json_t *zoneServers;
+    if (!(zoneServers = json_object_get(root, "zoneServers"))
+    ||  !(json_is_array(zoneServers)))
+    {
+        error("Cannot read 'zoneServers' section correctly.");
         result = false;
         goto cleanup;
     }
 
-    // Fill the server ports array
-    self->socialServersPorts = calloc(self->socialServersCount, sizeof(int));
-
-    for (int portIndex = 0; portIndex < self->socialServersCount; portIndex++) {
-        self->socialServersPorts[portIndex] = strtoul(portsArray, &portsArray, 10);
-        portsArray++;
-    }
-
-    // Read the number of social workers
-    if (!(self->socialWorkersCount = atoi(zconfig_resolve(conf, "socialServer/workersCount", NULL)))) {
-        warning("Cannot read correctly the social workers count in the configuration file (%s). ", confFilePath);
-        warning("The default worker count = %d has been used.", SOCIAL_SERVER_WORKERS_COUNT_DEFAULT);
-        self->socialWorkersCount = SOCIAL_SERVER_WORKERS_COUNT_DEFAULT;
-    }
-
-    char *socialServersIp;
-
-    // Read the social server interfaces IP
-    if (!(socialServersIp = zconfig_resolve(conf, "socialServer/serversIP", NULL))) {
-        error("Cannot read correctly the social servers interface IP in the configuration file (%s). ", confFilePath);
+    // allocate configuration
+    self->zonesConf.count = json_array_size(zoneServers);
+    if (!(self->zonesConf.confs = malloc (sizeof (ZoneServerConf) * self->zonesConf.count))) {
+        error("Cannot allocate zones configuration.");
         result = false;
         goto cleanup;
     }
 
-    int nbSocialServersIp = 0;
-    routerIp = strtok(socialServersIp, " ");
-
-    while (routerIp != NULL) {
-        routerIp = strtok(NULL, " ");
-        nbSocialServersIp++;
-    }
-
-    if (nbSocialServersIp != self->socialServersCount) {
-        error("Number of social ports different from the number of social interfaces IP. (%d / %d)",
-            nbSocialServersIp, self->socialServersCount
-        );
-
-        result = false;
-        goto cleanup;
-    }
-
-    // fill the social server IPs array
-    self->socialServersIp = calloc(self->socialServersCount, sizeof(char *));
-
-    for (int ipIndex = 0; ipIndex < self->socialServersCount; ipIndex++) {
-        self->socialServersIp[ipIndex] = strdup(socialServersIp);
-        socialServersIp += strlen(socialServersIp) + 1;
-    }
-
-    // ===================================
-    //       Read Barrack configuration
-    // ===================================
-    // Read the ports array
-    if (!(portsArray = zconfig_resolve(conf, "barrackServer/portsArray", NULL))) {
-        warning("Ports cannot be read for Barrack Server. Defaults ports have been used : %s",
-            BARRACK_SERVER_PORTS_DEFAULT);
-        portsArray = BARRACK_SERVER_PORTS_DEFAULT;
-    }
-
-    // tokenize the ports array
-    port = strtok(portsArray, " ");
-
-    while (port != NULL) {
-        self->barrackServerPortCount++;
-        port = strtok(NULL, " ");
-    }
-
-    // fill the server ports array
-    self->barrackServerPort = calloc(self->barrackServerPortCount, sizeof(int));
-
-    for (int portIndex = 0; portIndex < self->barrackServerPortCount; portIndex++) {
-        self->barrackServerPort[portIndex] = strtoul(portsArray, &portsArray, 10);
-        portsArray++;
-    }
-
-    // Read the number of barrack server workers
-    if (!(self->barrackWorkersCount = atoi(zconfig_resolve(conf, "barrackServer/workersCount", NULL)))) {
-        warning("Cannot read correctly the barrack workers count in the configuration file (%s). ", confFilePath);
-        warning("The default worker count = %d has been used.", BARRACK_SERVER_WORKERS_COUNT_DEFAULT);
-        self->barrackWorkersCount = BARRACK_SERVER_WORKERS_COUNT_DEFAULT;
-    }
-
-    // Read the server interface IP
-    if (!(self->barrackServerIp = strdup(zconfig_resolve(conf, "barrackServer/serverIP", NULL)))) {
-        warning("Cannot read correctly the barrack interface IP in the configuration file (%s). ", confFilePath);
-        warning("The default IP = %s has been used.", BARRACK_SERVER_FRONTEND_IP_DEFAULT);
-        self->barrackServerIp = BARRACK_SERVER_FRONTEND_IP_DEFAULT;
+    // read configuration
+    for (int id = 0; id < json_array_size(zoneServers); id++) {
+        ZoneServerConf *curConf = &self->zonesConf.confs[id];
+        if (!(globalServerReadBasicServerConf(&curConf->basicConf, zoneServers, id))) {
+            error("Cannot read zone server entry %d in 'zoneServers'", id);
+            result = false;
+            goto cleanup;
+        }
     }
 
     // ===================================
     //       Read MySQL configuration
     // ===================================
-    if (!(self->sqlInfo.hostname = strdup(zconfig_resolve(conf, "database/mysql_host", NULL)))) {
-        warning("Cannot read correctly the MySQL host in the configuration file (%s). ", confFilePath);
-        warning("The default hostname = %s has been used.", MYSQL_HOSTNAME_DEFAULT);
-        self->sqlInfo.hostname = MYSQL_HOSTNAME_DEFAULT;
+    json_t *mysqlServer;
+    if (!(mysqlServer = json_object_get(root, "mysqlServer"))
+    ||  !(json_is_object(mysqlServer)))
+    {
+        error("Cannot read 'mysqlServer' section correctly.");
+        result = false;
+        goto cleanup;
     }
 
-    if (!(self->sqlInfo.login = strdup(zconfig_resolve(conf, "database/mysql_user", NULL)))) {
-        warning("Cannot read correctly the MySQL user in the configuration file (%s). ", confFilePath);
-        warning("The default hostname = %s has been used.", MYSQL_LOGIN_DEFAULT);
-        self->sqlInfo.login = MYSQL_LOGIN_DEFAULT;
+    // read host
+    if (!(field = json_object_get(mysqlServer, "host"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'host' field in 'mysqlServer' section correctly.");
+        result = false;
+        goto cleanup;
     }
+    self->sqlInfo.hostname = strdup(json_string_value(field));
 
-    if (!(self->sqlInfo.password = strdup(zconfig_resolve(conf, "database/mysql_password", NULL)))) {
-        warning("Cannot read correctly the MySQL password in the configuration file (%s). ", confFilePath);
-        warning("The default hostname = %s has been used.", MYSQL_PASSWORD_DEFAULT);
-        self->sqlInfo.password = MYSQL_PASSWORD_DEFAULT;
+    // read user
+    if (!(field = json_object_get(mysqlServer, "user"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'user' field in 'mysqlServer' section correctly.");
+        result = false;
+        goto cleanup;
     }
+    self->sqlInfo.user = strdup(json_string_value(field));
 
-    if (!(self->sqlInfo.database = strdup(zconfig_resolve(conf, "database/mysql_database", NULL)))) {
-        warning("Cannot read correctly the MySQL database in the configuration file (%s). ", confFilePath);
-        warning("The default hostname = %s has been used.", MYSQL_DATABASE_DEFAULT);
-        self->sqlInfo.database = MYSQL_DATABASE_DEFAULT;
+    // read password
+    if (!(field = json_object_get(mysqlServer, "password"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'password' field in 'mysqlServer' section correctly.");
+        result = false;
+        goto cleanup;
     }
+    self->sqlInfo.password = strdup(json_string_value(field));
+
+    // read database
+    if (!(field = json_object_get(mysqlServer, "database"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'database' field in 'mysqlServer' section correctly.");
+        result = false;
+        goto cleanup;
+    }
+    self->sqlInfo.database = strdup(json_string_value(field));
 
     // ===================================
     //       Read Redis configuration
     // ===================================
-    if (!(self->redisInfo.hostname = strdup(zconfig_resolve(conf, "redisServer/redis_host", NULL)))) {
-        warning("Cannot read correctly the Redis host in the configuration file (%s). ", confFilePath);
-        warning("The default hostname = %s has been used.", REDIS_HOSTNAME_DEFAULT);
-        self->redisInfo.hostname = REDIS_HOSTNAME_DEFAULT;
+    json_t *redisServer;
+    if (!(redisServer = json_object_get(root, "redisServer"))
+    ||  !(json_is_object(redisServer)))
+    {
+        error("Cannot read 'redisServer' section correctly.");
+        result = false;
+        goto cleanup;
     }
 
-    if (!(self->redisInfo.port = atoi(zconfig_resolve(conf, "redisServer/redis_port", NULL)))) {
-        warning("Cannot read correctly the Redis port in the configuration file (%s). ", confFilePath);
-        warning("The default hostname = %d has been used.", REDIS_PORT_DEFAULT);
-        self->redisInfo.port = REDIS_PORT_DEFAULT;
+    // read host
+    if (!(field = json_object_get(redisServer, "host"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'host' field in 'redisServer' section correctly.");
+        result = false;
+        goto cleanup;
     }
+    self->redisInfo.hostname = strdup(json_string_value(field));
+
+    // read port
+    if (!(field = json_object_get(redisServer, "port"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'port' field in 'redisServer' section correctly.");
+        result = false;
+        goto cleanup;
+    }
+    self->redisInfo.port = atoi(json_string_value(field));
 
 cleanup:
     // close the configuration file
-    zconfig_destroy(&conf);
+    free(confStr);
     return result;
 }
 
@@ -377,7 +402,7 @@ bool globalServerStart(GlobalServer *self) {
     special("=== Global server ====");
     special("======================");
 
-    GlobalServerStartupInfo *info = &self->info;
+    GlobalServerStartupInfo *globalInfo = &self->info;
 
     zpoller_t *poller;
     bool isRunning = true;
@@ -389,62 +414,79 @@ bool globalServerStart(GlobalServer *self) {
     // CLI should communicates through BSD sockets
     zsock_set_router_raw(self->cliConnection, true);
 
-    if (zsock_bind(self->cliConnection, GLOBAL_SERVER_CLI_ENDPOINT, info->ip, info->cliPort) == -1) {
+    if (zsock_bind(self->cliConnection, GLOBAL_SERVER_CLI_ENDPOINT,
+            globalInfo->globalConf.ip, globalInfo->globalConf.port) == -1) {
         error("Failed to bind CLI port.");
         return false;
     }
 
-    info("CLI connection binded on port %s.", zsys_sprintf(GLOBAL_SERVER_CLI_ENDPOINT, info->ip, info->cliPort));
+    info("CLI connection binded on port %s.",
+         zsys_sprintf(GLOBAL_SERVER_CLI_ENDPOINT,
+            globalInfo->globalConf.ip, globalInfo->globalConf.port));
 
     // ===================================
     //     Initialize Zones connection
     // ===================================
-    if ((info->zonesPort = zsock_bind(self->zonesConnection, GLOBAL_SERVER_ZONES_ENDPOINT, info->ip)) == -1) {
+    if ((globalInfo->zonesConf.globalZonePort = zsock_bind(self->zonesConnection,
+            GLOBAL_SERVER_ZONES_ENDPOINT, globalInfo->globalConf.ip)) == -1)
+    {
         error("Failed to bind zones port.");
         return false;
     }
 
-    info("Zones connection binded on port %s.", zsys_sprintf(GLOBAL_SERVER_ZONES_ENDPOINT, info->ip, info->zonesPort));
+    info("Zones connection binded on port %s.",
+         zsys_sprintf(GLOBAL_SERVER_ZONES_ENDPOINT, globalInfo->globalConf.ip));
 
     // ===================================
-    //     Initialize 1 Barrack Server
+    //     Initialize N Barrack Server
     // ===================================
-    if (!(serverFactoryInitServerInfo(&serverInfo,
-        SERVER_TYPE_BARRACK,
-        BARRACK_SERVER_ROUTER_ID,
-        info->barrackServerIp,
-        info->barrackServerPortCount, info->barrackServerPort,
-        info->zoneWorkersCount,
-        info->ip, info->cliPort,
-        info->sqlInfo.hostname, info->sqlInfo.login, info->sqlInfo.password, info->sqlInfo.database,
-        info->redisInfo.hostname, info->redisInfo.port)))
-    {
-        error("[Barrack] Cannot create a new ServerInfo.");
-        return false;
-    }
+    for (uint16_t id = 0; id < globalInfo->barracksConf.count; id++) {
+        BarrackServerConf *curConf = &globalInfo->barracksConf.confs[id];
+        BasicServerConf *basicConf = &curConf->basicConf;
+        if (!(serverFactoryInitServerInfo(&serverInfo,
+            SERVER_TYPE_BARRACK,
+            BARRACKS_SERVER_ROUTER_ID + id,
+            basicConf->ip,
+            basicConf->port,
+            basicConf->workersCount,
+            globalInfo->globalConf.ip, globalInfo->globalConf.port,
+            globalInfo->sqlInfo.hostname, globalInfo->sqlInfo.user,
+            globalInfo->sqlInfo.password, globalInfo->sqlInfo.database,
+            globalInfo->redisInfo.hostname, globalInfo->redisInfo.port)))
+        {
+            error("[Barrack] Cannot create a new ServerInfo.");
+            return false;
+        }
 
-    if (!(serverCreateProcess(&serverInfo, ZONE_SERVER_EXECUTABLE_NAME))) {
-        error("[Barrack] Can't launch a new Server process.");
-        return false;
+        if (!(serverCreateProcess(&serverInfo, ZONE_SERVER_EXECUTABLE_NAME))) {
+            error("[Barrack] Can't launch a new Server process.");
+            return false;
+        }
     }
 
     // ===================================
     //     Initialize N Social Server
     // ===================================
-    for (uint16_t routerId = 0; routerId < info->socialServersCount; routerId++) {
-        serverFactoryInitServerInfo(&serverInfo,
+    for (uint16_t id = 0; id < globalInfo->socialsConf.count; id++) {
+        SocialServerConf *curConf = &globalInfo->socialsConf.confs[id];
+        BasicServerConf *basicConf = &curConf->basicConf;
+        if (!(serverFactoryInitServerInfo(&serverInfo,
             SERVER_TYPE_SOCIAL,
-            SOCIAL_SERVER_ROUTER_ID - routerId,
-            info->socialServersIp[routerId],
-            1, &info->socialServersPorts[routerId], // only 1 port for each social server
-            info->socialWorkersCount,
-            info->ip, info->cliPort,
-            info->sqlInfo.hostname, info->sqlInfo.login, info->sqlInfo.password, info->sqlInfo.database,
-            info->redisInfo.hostname, info->redisInfo.port
-        );
+            SOCIALS_SERVER_ROUTER_ID + id,
+            basicConf->ip,
+            basicConf->port,
+            basicConf->workersCount,
+            globalInfo->globalConf.ip, globalInfo->globalConf.port,
+            globalInfo->sqlInfo.hostname, globalInfo->sqlInfo.user,
+            globalInfo->sqlInfo.password, globalInfo->sqlInfo.database,
+            globalInfo->redisInfo.hostname, globalInfo->redisInfo.port)))
+        {
+            error("[Social] Cannot create a new ServerInfo.");
+            return false;
+        }
 
-        if (!(serverCreateProcess (&serverInfo, ZONE_SERVER_EXECUTABLE_NAME))) {
-            error("[routerId=%d] Can't launch a new Server process.", routerId);
+        if (!(serverCreateProcess(&serverInfo, ZONE_SERVER_EXECUTABLE_NAME))) {
+            error("[Social] Can't launch a new Server process.");
             return false;
         }
     }
@@ -452,20 +494,26 @@ bool globalServerStart(GlobalServer *self) {
     // ===================================
     //     Initialize N Zone Server
     // ===================================
-    for (uint16_t routerId = 0; routerId < info->zoneServersCount; routerId++) {
-        serverFactoryInitServerInfo(&serverInfo,
+    for (uint16_t id = 0; id < globalInfo->zonesConf.count; id++) {
+        ZoneServerConf *curConf = &globalInfo->zonesConf.confs[id];
+        BasicServerConf *basicConf = &curConf->basicConf;
+        if (!(serverFactoryInitServerInfo(&serverInfo,
             SERVER_TYPE_ZONE,
-            routerId,
-            info->zoneServersIp[routerId],
-            1, &info->zoneServersPorts[routerId], // only 1 port for each Zone server
-            info->zoneWorkersCount,
-            info->ip, info->cliPort,
-            info->sqlInfo.hostname, info->sqlInfo.login, info->sqlInfo.password, info->sqlInfo.database,
-            info->redisInfo.hostname, info->redisInfo.port
-        );
+            ZONES_SERVER_ROUTER_ID + id,
+            basicConf->ip,
+            basicConf->port,
+            basicConf->workersCount,
+            globalInfo->globalConf.ip, globalInfo->globalConf.port,
+            globalInfo->sqlInfo.hostname, globalInfo->sqlInfo.user,
+            globalInfo->sqlInfo.password, globalInfo->sqlInfo.database,
+            globalInfo->redisInfo.hostname, globalInfo->redisInfo.port)))
+        {
+            error("[Zone] Cannot create a new ServerInfo.");
+            return false;
+        }
 
         if (!(serverCreateProcess(&serverInfo, ZONE_SERVER_EXECUTABLE_NAME))) {
-            error("[routerId=%d] Can't launch a new Server process.", routerId);
+            error("[Zone] Can't launch a new Server process.");
             return false;
         }
     }

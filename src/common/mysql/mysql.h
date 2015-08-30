@@ -25,17 +25,12 @@ typedef enum MySQLStatus {
 
 #define MAX_QUERY_SIZE 1024
 
-#define MYSQL_HOSTNAME_DEFAULT     (char []) {"localhost"}
-#define MYSQL_LOGIN_DEFAULT        (char []) {"r1emu"}
-#define MYSQL_PASSWORD_DEFAULT     (char []) {"r1emu"}
-#define MYSQL_DATABASE_DEFAULT     (char []) {"r1emu"}
-
 typedef struct MySQLStartupInfo {
     // the MySQL hostname
     char *hostname;
 
     // the username of the MySQL user with read/write privilege
-    char *login;
+    char *user;
 
     // the password of the MySQL user
     char *password;

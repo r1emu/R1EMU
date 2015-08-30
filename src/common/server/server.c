@@ -142,22 +142,16 @@ serverCreateProcess (
         executableName,
         self->routerInfo.routerId,
         self->routerInfo.ip,
-        self->routerInfo.portsCount
+        self->routerInfo.port
     );
 
     char *lastCommandLine;
-    for (int i = 0; i < self->routerInfo.portsCount; i++) {
-        lastCommandLine = zsys_sprintf("%s %d", commandLine, self->routerInfo.ports[i]);
-        zstr_free(&commandLine);
-        commandLine = lastCommandLine;
-    }
-
     lastCommandLine = zsys_sprintf("%s %d %s %d %s %s %s %s %s %d %d",
         commandLine,
         self->routerInfo.workersCount,
         globalServerIp,
         globalServerPort,
-        sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database,
+        sqlInfo->hostname, sqlInfo->user, sqlInfo->password, sqlInfo->database,
         redisInfo->hostname, redisInfo->port,
         self->serverType
     );

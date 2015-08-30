@@ -187,7 +187,7 @@ routerInit (
     // Get a private copy of the Router Information
     if (!(routerStartupInfoInit (
             &self->info, info->routerId, info->ip,
-            info->ports, info->portsCount, info->workersCount,
+            info->port, info->workersCount,
             &info->redisInfo, &info->sqlInfo))
     ) {
         error("Cannot initialize router start up info.");
@@ -249,8 +249,7 @@ routerStartupInfoInit (
     RouterStartupInfo *self,
     uint16_t routerId,
     char *ip,
-    int *ports,
-    int portsCount,
+    int port,
     int workersCount,
     RedisStartupInfo *redisInfo,
     MySQLStartupInfo *sqlInfo
@@ -261,13 +260,7 @@ routerStartupInfoInit (
         return false;
     }
 
-    if (!(self->ports = calloc(portsCount, sizeof(int)))) {
-        error("Cannot allocate ports array.");
-        return false;
-    }
-
-    memcpy(self->ports, ports, sizeof(int) * portsCount);
-    self->portsCount = portsCount;
+    self->port = port;
     self->workersCount = workersCount;
 
     if (!(redisStartupInfoInit(&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
@@ -275,7 +268,8 @@ routerStartupInfoInit (
         return false;
     }
 
-    if (!(mySqlStartupInfoInit(&self->sqlInfo, sqlInfo->hostname, sqlInfo->login, sqlInfo->password, sqlInfo->database))) {
+    if (!(mySqlStartupInfoInit(&self->sqlInfo,
+            sqlInfo->hostname, sqlInfo->user, sqlInfo->password, sqlInfo->database))) {
         error("Cannot initialize MySQL start up info.");
         return false;
     }
@@ -630,13 +624,11 @@ Router_initFrontend (
     zsock_set_router_raw(self->frontend, 1);
 
     // Bind the endpoints for the ROUTER frontend
-    for (int i = 0; i < self->info.portsCount; i++) {
-        if (zsock_bind(self->frontend, ROUTER_FRONTEND_ENDPOINT, self->info.ip, self->info.ports[i]) == -1) {
-            error("Failed to bind Server frontend to the endpoint : %s:%d.", self->info.ip, self->info.ports[i]);
-            return false;
-        }
-        info("Frontend listening on port %d.", self->info.ports[i]);
+    if (zsock_bind(self->frontend, ROUTER_FRONTEND_ENDPOINT, self->info.ip, self->info.port) == -1) {
+        error("Failed to bind Server frontend to the endpoint : %s:%d.", self->info.ip, self->info.port);
+        return false;
     }
+    info("Frontend listening on port %d.", self->info.port);
 
     return true;
 }
@@ -739,7 +731,6 @@ routerStartupInfoFree (
     RouterStartupInfo *self
 ) {
     free(self->ip);
-    free(self->ports);
 }
 
 void
