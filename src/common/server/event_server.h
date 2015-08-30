@@ -21,8 +21,6 @@
 #include "common/session/session.h"
 #include "common/server/router.h"
 
-#include "zone_server/zone_handler/zone_event.h"
-
 #define EVENT_SERVER_EXECUTABLE_NAME             "EventServer"
 #define EVENT_SERVER_SUBSCRIBER_ENDPOINT         "inproc://eventServerWorkersSubscriber-%d-%d"
 

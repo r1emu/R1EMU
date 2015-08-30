@@ -23,13 +23,16 @@
 #include "common/session/socket_session.h"
 #include "common/server/event_server.h"
 
+#include "zone_server/zone_handler/zone_event.h"
+#include "barrack_server/barrack_handler/barrack_event.h"
+
 // ---------- Defines -------------
 
 
 // ------ Structure declaration -------
 typedef union {
     ZoneEvent zone;
-    // BarrackEvent barrack;
+    BarrackEvent barrack;
     // SocialEvent social;
 } EventDataCategories;
 
