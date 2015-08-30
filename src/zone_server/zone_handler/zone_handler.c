@@ -622,6 +622,7 @@ static PacketHandlerState zoneHandlerHeadRotate(
         .pcId = session->game.commanderSession.currentCommander.pcId,
         .direction = clientPacket->direction
     };
+
     workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_HEAD_ROTATE, &event, sizeof(event));
 
     return PACKET_HANDLER_OK;
@@ -643,7 +644,7 @@ static PacketHandlerState zoneHandlerRotate(
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_ROTATE);
 
     // notify the players around
-    GameEventHeadRotate event = {
+    GameEventRotate event = {
         .pcId = session->game.commanderSession.currentCommander.pcId,
         .direction = clientPacket->direction
     };
