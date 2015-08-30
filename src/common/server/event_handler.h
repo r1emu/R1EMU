@@ -55,6 +55,12 @@ typedef struct {
     uint8_t chatText[0]; // variable length array
 } GameEventChat;
 
+typedef struct {
+    uint32_t pcId;
+    char sessionKey[SOCKET_SESSION_ID_SIZE];
+    PositionXZ direction;
+} GameEventHeadRotate;
+
 bool eventHandlerCommanderMove(EventServer *self, GameEventCommanderMove *eventData);
 
 bool eventHandlerMoveStop(EventServer *self, GameEventMoveStop *eventData);
@@ -66,3 +72,5 @@ bool eventHandlerRestSit(EventServer *self, GameEventRestSit *eventData);
 bool eventHandlerEnterPc(EventServer *self, GameEventPcEnter *event);
 
 bool eventHandlerJump(EventServer *self, GameEventJump *event);
+
+bool eventHandlerHeadRotate(EventServer *self, GameEventHeadRotate *event);

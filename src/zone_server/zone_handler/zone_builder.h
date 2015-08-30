@@ -350,3 +350,8 @@ void zoneBuilderPcMoveStop(
  * @brief Add an item in the current commander inventory
  */
 void zoneBuilderItemAdd(ItemPkt *item, InventoryAddType addType, zmsg_t *replyMsg);
+
+/**
+ * @brief Rotate head
+ */
+void zoneBuilderRotateHead(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg);

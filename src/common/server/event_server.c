@@ -190,6 +190,10 @@ EventServer_handleEvent (
             result = eventHandlerJump (self, eventData);
         } break;
 
+        case EVENT_SERVER_TYPE_HEAD_ROTATE : {
+            result = eventHandlerHeadRotate (self, eventData);
+        } break;
+
         default :
             error("Unknown event type received : %d", eventType);
             result = false;

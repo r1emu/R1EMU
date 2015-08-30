@@ -220,3 +220,40 @@ cleanup:
     zmsg_destroy(&msg);
     return status;
 }
+
+bool eventHandlerHeadRotate(EventServer *self, GameEventHeadRotate *event) {
+    bool status = true;
+    zmsg_t *msg = NULL;
+    zlist_t *clientsAround = NULL;
+
+    // Get the clients around
+    if (!eventServerGetClientsAround(self, event->sessionKey, &clientsAround)) {
+        error("Cannot get clients within range");
+        status = false;
+        goto cleanup;
+    }
+
+    // add itself in the clients list
+    zlist_append(clientsAround, event->sessionKey);
+
+    // build the packet for the clients around
+    msg = zmsg_new();
+
+    zoneBuilderRotateHead(
+        event->pcId,
+        &event->direction,
+        msg
+    );
+
+    // send the packet
+    if (!(eventServerSendToClients(self, clientsAround, msg))) {
+        error("Failed to send the packet to the clients.");
+        status = false;
+        goto cleanup;
+    }
+
+cleanup:
+    zlist_destroy(&clientsAround);
+    zmsg_destroy(&msg);
+    return status;
+}
