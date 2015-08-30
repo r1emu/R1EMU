@@ -54,10 +54,19 @@
 			<Add directory="/usr/local/mysql/lib/" />
 		</Linker>
 		<Unit filename="../../../src/R1EMU.h" />
+		<Unit filename="../../../src/barrack_server/barrack_event_server.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/barrack_server/barrack_event_server.h" />
 		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_builder.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_builder.h" />
+		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_event.h" />
+		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_event_handler.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_event_handler.h" />
 		<Unit filename="../../../src/barrack_server/barrack_handler/barrack_handler.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -66,7 +75,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/barrack_server/barrack_server.h" />
-		<Unit filename="../../../src/barrack_server/barrack_worker/barrack_worker.h" />
 		<Unit filename="../../../src/common/commander/commander.c">
 			<Option compilerVar="CC" />
 		</Unit>

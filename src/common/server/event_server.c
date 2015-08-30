@@ -17,9 +17,8 @@
 #include "common/redis/redis.h"
 #include "common/packet/packet.h"
 #include "common/redis/fields/redis_game_session.h"
+#include "barrack_server/barrack_event_server.h"
 #include "zone_server/zone_event_server.h"
-#include "zone_server/zone_handler/zone_builder.h"
-#include "zone_server/zone_handler/zone_event_handler.h"
 
 /**
  * @brief EventServer communicates with the Router and broadcast packets to the clients
@@ -93,8 +92,10 @@ bool eventServerInit(EventServer *self, EventServerStartupInfo *info, ServerType
     switch (serverType)
     {
         case SERVER_TYPE_BARRACK:
+            self->eventServerProcess = barrackEventServerProcess;
             break;
         case SERVER_TYPE_SOCIAL:
+            // self->eventServerProcess = socialEventServerProcess;
             break;
         case SERVER_TYPE_ZONE:
             self->eventServerProcess = zoneEventServerProcess;
