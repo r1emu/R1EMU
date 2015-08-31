@@ -15,8 +15,8 @@
 #include "zone_event_handler.h"
 #include "zone_builder.h"
 #include "zone_event.h"
-#include "common/server/game_event.h"
 #include "zone_server/zone_event_server.h"
+#include "common/server/game_event.h"
 
 static bool zoneEventHandlerCommanderMove(EventServer *self, GameEvent *event);
 static bool zoneEventHandlerMoveStop(EventServer *self, GameEvent *event);

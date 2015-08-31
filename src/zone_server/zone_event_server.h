@@ -49,3 +49,13 @@ bool zoneEventServerUpdateClientPosition(
     GameEvent *event,
     GameEventUpdatePosition *updatePosEvent,
     zlist_t **_redisClientsAround);
+
+/**
+ * @brief Event handler when a client disconnects
+ */
+bool zoneEventServerOnDisconnect (
+    zsock_t *eventServer,
+    Redis *redis,
+    uint16_t routerId,
+    uint8_t *sessionKeyStr
+);

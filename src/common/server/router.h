@@ -21,6 +21,7 @@
 #include "R1EMU.h"
 #include "common/redis/redis.h"
 #include "common/mysql/mysql.h"
+#include "router_monitor.h"
 
 #define ROUTER_FRONTEND_ENDPOINT           "tcp://%s:%d"
 #define ROUTER_BACKEND_ENDPOINT            "inproc://routerWorkersBackend-%d"
@@ -69,6 +70,7 @@ typedef struct {
     int workersCount;
     RedisStartupInfo redisInfo;
     MySQLStartupInfo sqlInfo;
+    DisconnectEventHandler disconnectHandler;
 } RouterStartupInfo;
 
 /**
@@ -92,6 +94,7 @@ bool routerInit(Router *self, RouterStartupInfo *info);
  * @param ip The IP of the router
  * @param port The port binded by the Router
  * @param workersCount Number of workers linked to the Router
+ * @param disconnectHandler A server specific disconnection handler
  * @return true on success, false otherwise
  */
 bool routerStartupInfoInit(
@@ -101,7 +104,8 @@ bool routerStartupInfoInit(
     int port,
     int workersCount,
     RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo);
+    MySQLStartupInfo *sqlInfo,
+    DisconnectEventHandler disconnectHandler);
 
 /**
  * @brief Start a new Router

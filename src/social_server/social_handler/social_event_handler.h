@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file barrack_event_server.h
+ * @file social_event_handler.h
  * @brief
  *
  *
@@ -20,26 +20,12 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
-#include "barrack_handler/barrack_event_handler.h"
 #include "common/server/event_server.h"
-#include "common/server/game_event.h"
+#include "common/server/event_handler.h"
 
 // ---------- Defines -------------
 
 // ------ Structure declaration -------
+extern const EventHandler socialEventHandlers[EVENT_TYPE_SOCIAL_END];
 
 // ----------- Functions ------------
-/**
- * @brief Process the barrack events received from the workers
- */
-bool barrackEventServerProcess(EventServer *self, EventType type, void *eventData);
-
-/**
- * @brief Event handler when a client disconnects
- */
-bool barrackEventServerOnDisconnect (
-    zsock_t *eventServer,
-    Redis *redis,
-    uint16_t routerId,
-    uint8_t *sessionKeyStr
-);

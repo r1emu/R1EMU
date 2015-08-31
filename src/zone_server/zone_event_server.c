@@ -15,6 +15,8 @@
 #include "zone_handler/zone_builder.h"
 #include "zone_handler/zone_event_handler.h"
 #include "common/server/event_handler.h"
+#include "common/redis/fields/redis_session.h"
+#include "common/redis/fields/redis_game_session.h"
 
 bool zoneEventServerProcess(EventServer *self, EventType type, void *eventData) {
 
@@ -35,6 +37,40 @@ bool zoneEventServerProcess(EventServer *self, EventType type, void *eventData) 
     }
 
     return handler(self, eventData);
+}
+
+bool zoneEventServerOnDisconnect (
+    zsock_t *eventServer,
+    Redis *redis,
+    uint16_t routerId,
+    uint8_t *sessionKeyStr
+) {
+    // Get the current game session
+    GameSession gameSession;
+    if (!(redisGetGameSessionBySocketId(redis, routerId, sessionKeyStr, &gameSession))) {
+        error("Cannot get game session of '%s'", sessionKeyStr);
+        return false;
+    }
+
+    // Send a EVENT_TYPE_LEAVE packet to the event server
+    GameEventLeave event = {
+        .pcId = gameSession.commanderSession.currentCommander.pcId
+    };
+    eventServerDispatchEvent(eventServer, sessionKeyStr, EVENT_TYPE_LEAVE, &event, sizeof(event));
+
+    // Flush the Redis session of the client
+    RedisSessionKey sessionKey = {
+        .socketKey = {
+            .routerId = routerId,
+            .sessionKey = sessionKeyStr
+        }
+    };
+    if (!(redisFlushSession (redis, &sessionKey))) {
+        error ("Cannot flush the redis session '%s'", sessionKey);
+        return false;
+    }
+
+    return true;
 }
 
 bool zoneEventServerUpdateClientPosition (

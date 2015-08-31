@@ -7,39 +7,23 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file barrack_event_server.h
- * @brief
- *
- *
- *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
  *          See LICENSE file for further information
  */
 
-#pragma once
-
 // ---------- Includes ------------
-#include "R1EMU.h"
-#include "barrack_handler/barrack_event_handler.h"
-#include "common/server/event_server.h"
+#include "social_event_handler.h"
+#include "social_builder.h"
+#include "social_event.h"
+#include "social_server/social_event_server.h"
 #include "common/server/game_event.h"
 
-// ---------- Defines -------------
-
-// ------ Structure declaration -------
-
-// ----------- Functions ------------
 /**
- * @brief Process the barrack events received from the workers
+ * @brief socialEventHandlers is a global table containing all the social event handlers.
  */
-bool barrackEventServerProcess(EventServer *self, EventType type, void *eventData);
+const EventHandler socialEventHandlers[EVENT_TYPE_SOCIAL_END] = {
+    #define REGISTER_PACKET_HANDLER(packetName, _handler) \
+       [packetName] = {.handler = (void *) _handler, .eventName = STRINGIFY(packetName
 
-/**
- * @brief Event handler when a client disconnects
- */
-bool barrackEventServerOnDisconnect (
-    zsock_t *eventServer,
-    Redis *redis,
-    uint16_t routerId,
-    uint8_t *sessionKeyStr
-);
+    #undef REGISTER_PACKET_HANDLER
+};

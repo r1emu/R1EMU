@@ -11,26 +11,27 @@
  *          See LICENSE file for further information
  */
 
-#include "barrack_event_server.h"
-#include "barrack_handler/barrack_builder.h"
-#include "barrack_handler/barrack_event_handler.h"
+#include "social_event_server.h"
+#include "social_handler/social_builder.h"
+#include "social_handler/social_event_handler.h"
 #include "common/server/event_handler.h"
 #include "common/redis/fields/redis_session.h"
+#include "common/redis/fields/redis_game_session.h"
 
-bool barrackEventServerProcess(EventServer *self, EventType type, void *eventData)
-{
+bool socialEventServerProcess(EventServer *self, EventType type, void *eventData) {
+
     EventHandlerFunction handler;
 
-    if (type <= EVENT_TYPE_BARRACK_START || type >= EVENT_TYPE_BARRACK_END) {
-        error("Wrong event received from barrackEventServer : %d", type);
+    if (type <= EVENT_TYPE_SOCIAL_START || type >= EVENT_TYPE_SOCIAL_END) {
+        error("Wrong event received from ZoneEventServer : %d", type);
         return false;
     }
 
     // Test if a handler is associated with the packet type requested.
-    if (!(handler = barrackEventHandlers [type].handler)) {
+    if (!(handler = socialEventHandlers [type].handler)) {
         error("Cannot find handler for the requested packet type : %s",
-            (type <= EVENT_TYPE_BARRACK_START || type >= EVENT_TYPE_BARRACK_END) ?
-               "UNKNOWN" : barrackEventHandlers[type].eventName
+            (type <= EVENT_TYPE_SOCIAL_START || type >= EVENT_TYPE_SOCIAL_END) ?
+               "UNKNOWN" : socialEventHandlers[type].eventName
         );
         return false;
     }
@@ -38,7 +39,7 @@ bool barrackEventServerProcess(EventServer *self, EventType type, void *eventDat
     return handler(self, eventData);
 }
 
-bool barrackEventServerOnDisconnect (
+bool socialEventServerOnDisconnect (
     zsock_t *eventServer,
     Redis *redis,
     uint16_t routerId,

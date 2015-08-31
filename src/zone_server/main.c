@@ -18,8 +18,11 @@
 
 // ---------- Includes ------------
 #include "zone_server/zone_server.h"
+#include "zone_server/zone_event_server.h"
 #include "barrack_server/barrack_server.h"
+#include "barrack_server/barrack_event_server.h"
 #include "social_server/social_server.h"
+#include "social_server/social_event_server.h"
 #include "common/server/event_server.h"
 #include "common/server/server_factory.h"
 
@@ -101,7 +104,28 @@ int main (int argc, char **argv)
         return -1;
     }
 
-    // === Build the Zone Server ===
+    // Specific server stuff
+    DisconnectEventHandler disconnectHandler;
+    switch (serverType) {
+        case SERVER_TYPE_BARRACK:
+            disconnectHandler = barrackEventServerOnDisconnect;
+        break;
+
+        case SERVER_TYPE_ZONE:
+            disconnectHandler = zoneEventServerOnDisconnect;
+        break;
+
+        case SERVER_TYPE_SOCIAL:
+            disconnectHandler = socialEventServerOnDisconnect;
+        break;
+
+        default :
+            error("Unknown server type.");
+            return 0;
+        break;
+    }
+
+    // === Build the Server ===
     Server *server;
     if (!(server = serverFactoryCreateServer(
         serverType,
@@ -110,7 +134,7 @@ int main (int argc, char **argv)
         workersCount,
         globalServerIp, globalServerPort,
         sqlHostname, sqlUsername, sqlPassword, sqlDatabase,
-        redisHostname, redisPort
+        redisHostname, redisPort, disconnectHandler
     ))) {
         error("Cannot create a Server.");
         return -1;

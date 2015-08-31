@@ -35,7 +35,8 @@ Server *serverFactoryCreateServer(
     char *sqlPassword,
     char *sqlDatabase,
     char *redisHostname,
-    int redisPort);
+    int redisPort,
+    DisconnectEventHandler disconnectHandler);
 
 /**
  * @brief : Factory for initializing a generic Server
@@ -54,4 +55,5 @@ bool serverFactoryInitServerInfo(
     char *sqlPassword,
     char *sqlDatabase,
     char *redisHostname,
-    int redisPort);
+    int redisPort,
+    DisconnectEventHandler disconnectHandler);

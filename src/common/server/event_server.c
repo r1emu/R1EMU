@@ -17,6 +17,7 @@
 #include "common/redis/redis.h"
 #include "common/packet/packet.h"
 #include "common/redis/fields/redis_game_session.h"
+#include "common/redis/fields/redis_session.h"
 #include "barrack_server/barrack_event_server.h"
 #include "zone_server/zone_event_server.h"
 
@@ -26,7 +27,7 @@
 struct EventServer
 {
     // socket connected to the workers
-    zsock_t *workers;
+    zsock_t *eventsInput;
 
     // frontend connected to the router
     zsock_t *router;
@@ -66,7 +67,7 @@ bool eventServerInit(EventServer *self, EventServerStartupInfo *info, ServerType
     memcpy(&self->info, info, sizeof(self->info));
 
     // create a unique publisher for the EventServer
-    if (!(self->workers = zsock_new(ZMQ_SUB))) {
+    if (!(self->eventsInput = zsock_new(ZMQ_SUB))) {
         error("Cannot allocate a new Server SUBSCRIBER");
         return false;
     }
@@ -122,6 +123,23 @@ GraphNodeClient *graphNodeClientNew (void) {
     }
 
     return self;
+}
+
+bool eventServerFlushSession(EventServer *self, uint8_t *sessionKey) {
+
+    // Flush the redis session here
+    RedisSessionKey redisSessionKey = {
+        .socketKey = {
+            .routerId = self->info.routerId,
+            .sessionKey = sessionKey
+        }
+    };
+    if (!(redisFlushSession (self->redis, &redisSessionKey))) {
+        error ("Cannot flush the redis session '%s'", sessionKey);
+        return false;
+    }
+
+    return true;
 }
 
 bool graphNodeClientInit (GraphNodeClient *self) {
@@ -199,7 +217,7 @@ eventServerSubscribe (
     zframe_t *header;
 
     // Receive the message from the publisher socket
-    if (!(msg = zmsg_recv(self->workers))) {
+    if (!(msg = zmsg_recv(self->eventsInput))) {
         // Interrupt
         return -1;
     }
@@ -270,6 +288,45 @@ eventServerSendToClients (
 
     if (zmsg_send (&msg, self->router) != 0) {
         error("Cannot send the multicast packet to the Router.");
+        result = false;
+        goto cleanup;
+    }
+
+cleanup:
+    zmsg_destroy(&msg);
+    return result;
+}
+
+bool eventServerDispatchEvent(
+    zsock_t *eventServer,
+    uint8_t *emitterSk,
+    EventType eventType,
+    void *event,
+    size_t eventSize)
+{
+    bool result = true;
+    zmsg_t *msg = NULL;
+
+    GameEvent gameEvent = {
+        .emitterSk = SOCKET_ID_ARRAY(emitterSk),
+        .type = eventType
+    };
+
+    memcpy (&gameEvent.data, event, eventSize);
+    size_t gameEventSize = sizeof(GameEvent) - sizeof (EventDataCategories) + eventSize;
+
+    if ((!(msg = zmsg_new ()))
+    ||  zmsg_addmem (msg, PACKET_HEADER (EVENT_SERVER_EVENT), sizeof(EVENT_SERVER_EVENT)) != 0
+    ||  zmsg_addmem (msg, PACKET_HEADER (eventType), sizeof(eventType)) != 0
+    ||  zmsg_addmem (msg, &gameEvent, gameEventSize) != 0
+    ) {
+        error("Cannot build the event message.");
+        result = false;
+        goto cleanup;
+    }
+
+    if (zmsg_send (&msg, eventServer) != 0) {
+        error("Cannot send the event packet.");
         result = false;
         goto cleanup;
     }
@@ -403,16 +460,25 @@ eventServerStart (
         return false;
     }
 
-    // Initialize subscribers
+    // Initialize worker event subscribers
     for (int workerId = 0; workerId < self->info.workersCount; workerId++) {
-        if (zsock_connect (self->workers, EVENT_SERVER_SUBSCRIBER_ENDPOINT, self->info.routerId, workerId) != 0) {
-            error("Failed to connect to the subscriber endpoint %d:%d.", self->info.routerId, workerId);
+        if (zsock_connect (self->eventsInput, EVENT_SERVER_SUBSCRIBER_ENDPOINT, self->info.routerId, workerId) != 0) {
+            error("Failed to connect to the worker subscriber endpoint %d:%d.", self->info.routerId, workerId);
             return false;
         }
-        info("EventServer subscribed to %s", zsys_sprintf(EVENT_SERVER_SUBSCRIBER_ENDPOINT, self->info.routerId, workerId));
-        // Subscribe to all messages, without any filter
-        zsock_set_subscribe(self->workers, "");
+        info("EventServer subscribed to %s",
+             zsys_sprintf(EVENT_SERVER_SUBSCRIBER_ENDPOINT, self->info.routerId, workerId));
     }
+
+    // Initialize router monitor event subscriber
+    if (zsock_connect (self->eventsInput, EVENT_SERVER_MONITOR_ENDPOINT, self->info.routerId) != 0) {
+        error("Failed to connect to the router monitor subscriber endpoint %d.", self->info.routerId);
+        return false;
+    }
+    info("EventServer subscribed to %s", zsys_sprintf(EVENT_SERVER_MONITOR_ENDPOINT, self->info.routerId));
+
+    // Subscribe to all messages, without any filter
+    zsock_set_subscribe(self->eventsInput, "");
 
     // Listen to the subscriber socket
     while (eventServerSubscribe (self) != -1) {

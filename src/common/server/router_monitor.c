@@ -22,6 +22,7 @@
 #include "common/session/session.h"
 #include "common/redis/fields/redis_session.h"
 #include "common/packet/packet.h"
+#include "common/server/event_server.h"
 
 // ------ Structure declaration -------
 /**
@@ -32,6 +33,9 @@ struct RouterMonitor {
 
     /** FD => Socket Id hashtable */
     zhash_t *connected;
+
+    /** The EventServer socket */
+    zsock_t *eventServer;
 
     /** Database connection */
     Redis *redis;
@@ -46,7 +50,7 @@ struct RouterMonitor {
  * @param self The RouterMonitor
  * @return 0 on success, -1 on error
  */
-static int RouterMonitor_monitor(zloop_t *loop, zsock_t *monitor, void *_self);
+static int routerMonitorProcess(zloop_t *loop, zsock_t *monitor, void *_self);
 
 /**
  * @brief Router Subscriber handler
@@ -55,7 +59,13 @@ static int RouterMonitor_monitor(zloop_t *loop, zsock_t *monitor, void *_self);
  * @param self The RouterMonitor
  * @return 0 on success, -1 on error
  */
-static int RouterMonitor_subscribe(zloop_t *loop, zsock_t *monitor, void *_self);
+static int routerMonitorSubscribe(zloop_t *loop, zsock_t *monitor, void *_self);
+
+/**
+ * @brief Disconnect a client successfully
+ **/
+static bool routerMonitorDisconnectClient(RouterMonitor *self, uint8_t *fdClientKey, uint8_t *sessionKeyStr);
+
 
 // ------ Extern functions implementation -------
 RouterMonitor *routerMonitorNew(RouterMonitorStartupInfo *info) {
@@ -77,7 +87,13 @@ RouterMonitor *routerMonitorNew(RouterMonitorStartupInfo *info) {
 
 bool routerMonitorInit (RouterMonitor *self, RouterMonitorStartupInfo *info) {
 
-    routerMonitorStartupInfoInit (&self->info, info->frontend, info->routerId, &info->redisInfo, &info->sqlInfo);
+    routerMonitorStartupInfoInit (&self->info,
+        info->frontend,
+        info->routerId,
+        &info->redisInfo,
+        &info->sqlInfo,
+        info->disconnectHandler
+    );
     routerMonitorStartupInfoDestroy (&info);
 
     // Allocate the connected clients hashtable
@@ -96,6 +112,15 @@ bool routerMonitorInit (RouterMonitor *self, RouterMonitorStartupInfo *info) {
         return false;
     }
 
+    // Create and bind a publisher to send messages to the Event Server
+    if (!(self->eventServer = zsock_new (ZMQ_PUB))
+    ||  zsock_bind(self->eventServer, EVENT_SERVER_MONITOR_ENDPOINT, self->info.routerId) == -1
+    ) {
+        error("[routerId=%d] cannot bind to the monitor subscriber endpoint.", self->info.routerId);
+        return false;
+    }
+    info ("RouterMonitor binded %s.", zsys_sprintf(EVENT_SERVER_MONITOR_ENDPOINT, self->info.routerId));
+
     return true;
 }
 
@@ -103,7 +128,8 @@ RouterMonitorStartupInfo *routerMonitorStartupInfoNew(
     zsock_t *frontend,
     uint16_t routerId,
     RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo)
+    MySQLStartupInfo *sqlInfo,
+    DisconnectEventHandler disconnectHandler)
 {
     RouterMonitorStartupInfo *self;
 
@@ -111,7 +137,7 @@ RouterMonitorStartupInfo *routerMonitorStartupInfoNew(
         return NULL;
     }
 
-    if (!routerMonitorStartupInfoInit (self, frontend, routerId, redisInfo, sqlInfo)) {
+    if (!routerMonitorStartupInfoInit (self, frontend, routerId, redisInfo, sqlInfo, disconnectHandler)) {
         routerMonitorStartupInfoDestroy (&self);
         error("RouterMonitorStartupInfo failed to initialize.");
         return NULL;
@@ -125,10 +151,12 @@ bool routerMonitorStartupInfoInit (
     zsock_t *frontend,
     uint16_t routerId,
     RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo)
+    MySQLStartupInfo *sqlInfo,
+    DisconnectEventHandler disconnectHandler)
 {
     self->frontend = frontend;
     self->routerId = routerId;
+    self->disconnectHandler = disconnectHandler;
 
     if (!(redisStartupInfoInit(&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
         error("Cannot initialize Redis Start up info.");
@@ -146,7 +174,7 @@ bool routerMonitorStartupInfoInit (
 
 
 static int
-RouterMonitor_monitor (
+routerMonitorProcess (
     zloop_t *loop,
     zsock_t *monitor,
     void *_self
@@ -214,23 +242,23 @@ RouterMonitor_monitor (
             dbg("DISCONNECTED : Key = %s", fdClientKey);
         }
         else {
-            // Everything is okay here, disconnect gracefully the client
+            // everything is okay here, disconnect gracefully the client
+
+            // generate a session key string
             uint8_t sessionKeyStr [SOCKET_SESSION_ID_SIZE];
             socketSessionGenSessionKey (zframe_data(clientFrame), sessionKeyStr);
 
-            // Flush the session here
-            RedisSessionKey sessionKey = {
-                .socketKey = {
-                    .routerId = self->info.routerId,
-                    .sessionKey = sessionKeyStr
+            // call the custom disconnect handler
+            if (!self->info.disconnectHandler) {
+                warning("No custom disconnection server handler has been registred.");
+            } else {
+                if (!(self->info.disconnectHandler(self->eventServer, self->redis, self->info.routerId, sessionKeyStr))) {
+                    warning("Custom disconnect handler failed.");
                 }
-            };
-            redisFlushSession (self->redis, &sessionKey);
-
-            // Remove the key from the "connected" hashtable
-            zhash_delete (self->connected, fdClientKey);
+            }
+            // call router monitor disconnect handler
+            routerMonitorDisconnectClient(self, fdClientKey, sessionKeyStr);
             zframe_destroy (&clientFrame);
-
             info("%s session successfully flushed !", sessionKeyStr);
         }
     }
@@ -242,9 +270,16 @@ cleanup:
     return result;
 }
 
+static bool routerMonitorDisconnectClient(RouterMonitor *self, uint8_t *fdClientKey, uint8_t *sessionKeyStr) {
+
+    // Remove the key from the "connected" hashtable
+    zhash_delete (self->connected, fdClientKey);
+
+    return true;
+}
 
 static int
-RouterMonitor_subscribe (
+routerMonitorSubscribe (
     zloop_t *loop,
     zsock_t *monitor,
     void *_self
@@ -371,8 +406,8 @@ routerMonitorStart (
     }
 
     // Attach a callback to frontend and backend sockets
-    if (zloop_reader(reactor, (zsock_t *) servermon, RouterMonitor_monitor, &self) == -1
-    ||  zloop_reader(reactor, requests, RouterMonitor_subscribe, &self) == -1
+    if (zloop_reader(reactor, (zsock_t *) servermon, routerMonitorProcess, &self) == -1
+    ||  zloop_reader(reactor, requests, routerMonitorSubscribe, &self) == -1
     ) {
         error("Cannot register the sockets with the reactor.");
         goto cleanup;

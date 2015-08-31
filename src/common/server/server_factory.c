@@ -29,7 +29,9 @@ Server *serverFactoryCreateServer (
     char *sqlPassword,
     char *sqlDatabase,
     char *redisHostname,
-    int redisPort) {
+    int redisPort,
+    DisconnectEventHandler disconnectHandler)
+{
     Server *server;
 
     ServerStartupInfo serverInfo;
@@ -40,7 +42,7 @@ Server *serverFactoryCreateServer (
         workersCount,
         globalServerIp, globalServerPort,
         sqlHostname, sqlUsername, sqlPassword, sqlDatabase,
-        redisHostname, redisPort
+        redisHostname, redisPort, disconnectHandler
     ))) {
         error("Cannot build a ServerStartupInfo.");
         return NULL;
@@ -70,7 +72,8 @@ serverFactoryInitServerInfo (
     char *sqlPassword,
     char *sqlDatabase,
     char *redisHostname,
-    int redisPort
+    int redisPort,
+    DisconnectEventHandler disconnectHandler
 ) {
     // Initialize MySQL start up information
     MySQLStartupInfo sqlInfo;
@@ -88,7 +91,8 @@ serverFactoryInitServerInfo (
 
     // Initialize Router start up information
     RouterStartupInfo routerInfo;
-    if (!(routerStartupInfoInit (&routerInfo, routerId, routerIp, port, workersCount, &redisInfo, &sqlInfo))) {
+    if (!(routerStartupInfoInit (&routerInfo, routerId, routerIp, port, workersCount,
+                                 &redisInfo, &sqlInfo, disconnectHandler))) {
         error("Cannot initialize correctly the Router start up information.");
         return false;
     }

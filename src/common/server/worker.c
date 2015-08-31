@@ -746,7 +746,8 @@ Worker_handlePublicRequest (
 
     // Reply back to the sender
     if (zmsg_send (&msg, worker) != 0) {
-        warning("[routerId=%d][WorkerId=%d] failed to send a message to the backend.", self->info.routerId, self->info.workerId);
+        warning("[routerId=%d][WorkerId=%d] failed to send a message to the backend.",
+                self->info.routerId, self->info.workerId);
         result = -1;
         goto cleanup;
     }
@@ -758,36 +759,7 @@ cleanup:
 
 bool workerDispatchEvent (Worker *self, uint8_t *emitterSk, EventType eventType, void *event, size_t eventSize)
 {
-    bool result = true;
-    zmsg_t *msg = NULL;
-
-    GameEvent gameEvent = {
-        .emitterSk = SOCKET_ID_ARRAY(emitterSk),
-        .type = eventType
-    };
-
-    memcpy (&gameEvent.data, event, eventSize);
-    size_t gameEventSize = sizeof(GameEvent) - sizeof (EventDataCategories) + eventSize;
-
-    if ((!(msg = zmsg_new ()))
-    ||  zmsg_addmem (msg, PACKET_HEADER (EVENT_SERVER_EVENT), sizeof(EVENT_SERVER_EVENT)) != 0
-    ||  zmsg_addmem (msg, PACKET_HEADER (eventType), sizeof(eventType)) != 0
-    ||  zmsg_addmem (msg, &gameEvent, gameEventSize) != 0
-    ) {
-        error("Cannot build the event message.");
-        result = false;
-        goto cleanup;
-    }
-
-    if (zmsg_send (&msg, self->eventServer) != 0) {
-        error("Cannot send the event packet.");
-        result = false;
-        goto cleanup;
-    }
-
-cleanup:
-    zmsg_destroy(&msg);
-    return result;
+    return eventServerDispatchEvent (self->eventServer, emitterSk, eventType, event, eventSize);
 }
 
 void

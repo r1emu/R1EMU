@@ -218,8 +218,7 @@ static PacketHandlerState BarrackHandler_startGame(
         reply
     );
 
-    // We don't need the barrack session anymore
-    return PACKET_HANDLER_DELETE_SESSION;
+    return PACKET_HANDLER_OK;
 }
 
 static PacketHandlerState

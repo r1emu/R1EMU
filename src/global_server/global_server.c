@@ -13,8 +13,10 @@
 
 #include "global_server.h"
 #include "zone_server/zone_server.h"
-#include "social_server/social_server.h"
+#include "zone_server/zone_event_server.h"
 #include "barrack_server/barrack_server.h"
+#include "barrack_server/barrack_event_server.h"
+#include "social_server/social_server.h"
 #include "common/server/server_factory.h"
 #include <jansson.h>
 
@@ -453,7 +455,8 @@ bool globalServerStart(GlobalServer *self) {
             globalInfo->globalConf.ip, globalInfo->globalConf.port,
             globalInfo->sqlInfo.hostname, globalInfo->sqlInfo.user,
             globalInfo->sqlInfo.password, globalInfo->sqlInfo.database,
-            globalInfo->redisInfo.hostname, globalInfo->redisInfo.port)))
+            globalInfo->redisInfo.hostname, globalInfo->redisInfo.port,
+            NULL)))
         {
             error("[Barrack] Cannot create a new ServerInfo.");
             return false;
@@ -480,7 +483,8 @@ bool globalServerStart(GlobalServer *self) {
             globalInfo->globalConf.ip, globalInfo->globalConf.port,
             globalInfo->sqlInfo.hostname, globalInfo->sqlInfo.user,
             globalInfo->sqlInfo.password, globalInfo->sqlInfo.database,
-            globalInfo->redisInfo.hostname, globalInfo->redisInfo.port)))
+            globalInfo->redisInfo.hostname, globalInfo->redisInfo.port,
+            NULL)))
         {
             error("[Social] Cannot create a new ServerInfo.");
             return false;
@@ -507,7 +511,8 @@ bool globalServerStart(GlobalServer *self) {
             globalInfo->globalConf.ip, globalInfo->globalConf.port,
             globalInfo->sqlInfo.hostname, globalInfo->sqlInfo.user,
             globalInfo->sqlInfo.password, globalInfo->sqlInfo.database,
-            globalInfo->redisInfo.hostname, globalInfo->redisInfo.port)))
+            globalInfo->redisInfo.hostname, globalInfo->redisInfo.port,
+            zoneEventServerOnDisconnect)))
         {
             error("[Zone] Cannot create a new ServerInfo.");
             return false;

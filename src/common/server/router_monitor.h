@@ -23,6 +23,9 @@
 #define ROUTER_MONITOR_FDKEY_SIZE ((sizeof(uint64_t) * 2) + 1)
 #define ROUTER_MONITOR_SUBSCRIBER_ENDPOINT "inproc://routerMonitorSubscriber-%d"
 
+/** Server specific handler when a client disconnects */
+typedef bool (*DisconnectEventHandler) (zsock_t *eventServer, Redis *redis, uint16_t routerId, uint8_t *sessionKeyStr);
+
 /** All the Router Monitor Packet headers */
 typedef enum {
     ROUTER_MONITOR_ADD_FD,
@@ -41,6 +44,10 @@ typedef struct {
     // database info
     RedisStartupInfo redisInfo;
     MySQLStartupInfo sqlInfo;
+
+    /** Server specific handler when a client disconnects */
+    DisconnectEventHandler disconnectHandler;
+
 } RouterMonitorStartupInfo;
 
 /**
@@ -67,7 +74,8 @@ RouterMonitorStartupInfo *routerMonitorStartupInfoNew(
     zsock_t *frontend,
     uint16_t routerId,
     RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo);
+    MySQLStartupInfo *sqlInfo,
+    DisconnectEventHandler disconnectHandler);
 
 /**
  * @brief Initialize an allocated RouterMonitorStartupInfo structure.
@@ -80,7 +88,8 @@ bool routerMonitorStartupInfoInit(
     zsock_t *frontend,
     uint16_t routerId,
     RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo);
+    MySQLStartupInfo *sqlInfo,
+    DisconnectEventHandler disconnectHandler);
 
 /**
  * @brief Start the Router Monitor

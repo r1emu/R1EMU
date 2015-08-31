@@ -241,6 +241,19 @@
 		<Unit filename="../../../src/global_server/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../src/social_server/social_event_server.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/social_server/social_event_server.h" />
+		<Unit filename="../../../src/social_server/social_handler/social_builder.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/social_server/social_handler/social_builder.h" />
+		<Unit filename="../../../src/social_server/social_handler/social_event.h" />
+		<Unit filename="../../../src/social_server/social_handler/social_event_handler.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/social_server/social_handler/social_event_handler.h" />
 		<Unit filename="../../../src/social_server/social_handler/social_handler.c">
 			<Option compilerVar="CC" />
 		</Unit>

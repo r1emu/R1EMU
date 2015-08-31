@@ -14,7 +14,6 @@
 // ---------- Includes ------------
 #include "router.h"
 #include "worker.h"
-#include "router_monitor.h"
 #include "common/packet/packet.h"
 
 // ------ Structure declaration -------
@@ -188,7 +187,8 @@ routerInit (
     if (!(routerStartupInfoInit (
             &self->info, info->routerId, info->ip,
             info->port, info->workersCount,
-            &info->redisInfo, &info->sqlInfo))
+            &info->redisInfo, &info->sqlInfo,
+            info->disconnectHandler))
     ) {
         error("Cannot initialize router start up info.");
         return false;
@@ -252,7 +252,8 @@ routerStartupInfoInit (
     int port,
     int workersCount,
     RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo
+    MySQLStartupInfo *sqlInfo,
+    DisconnectEventHandler disconnectHandler
 ) {
     self->routerId = routerId;
     if (!(self->ip = strdup(ip))) {
@@ -262,6 +263,7 @@ routerStartupInfoInit (
 
     self->port = port;
     self->workersCount = workersCount;
+    self->disconnectHandler = disconnectHandler;
 
     if (!(redisStartupInfoInit(&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
         error("Cannot initialize Redis Start up info.");
@@ -589,7 +591,13 @@ Router_initMonitor (
     info("Binded to the Router Monitor endpoint %s", zsys_sprintf(ROUTER_MONITOR_SUBSCRIBER_ENDPOINT, self->info.routerId));
 
     RouterMonitorStartupInfo *routerMonitorInfo;
-    if (!(routerMonitorInfo = routerMonitorStartupInfoNew (self->frontend, self->info.routerId, &self->info.redisInfo, &self->info.sqlInfo))) {
+    if (!(routerMonitorInfo = routerMonitorStartupInfoNew(
+        self->frontend,
+        self->info.routerId,
+        &self->info.redisInfo,
+        &self->info.sqlInfo,
+        self->info.disconnectHandler)))
+    {
         error("Cannot allocate a new Router Monitor Info.");
         return false;
     }

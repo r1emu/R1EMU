@@ -23,6 +23,7 @@
 
 #define EVENT_SERVER_EXECUTABLE_NAME             "EventServer"
 #define EVENT_SERVER_SUBSCRIBER_ENDPOINT         "inproc://eventServerWorkersSubscriber-%d-%d"
+#define EVENT_SERVER_MONITOR_ENDPOINT            "inproc://eventServerMonitorSubscriber-%d"
 
 /** Enumeration of all the packets headers that the EventServer handles */
 // we want to differentiate the headers being received from the the ones being send, but we also want to keep a list
@@ -265,3 +266,18 @@ eventServerRedisGetClientsWithinRange (
     PositionXZ *position,
     float range
 );
+
+/**
+ * @brief Send an event to the event server socket
+ */
+bool eventServerDispatchEvent(
+    zsock_t *eventServer,
+    uint8_t *emitterSk,
+    EventType eventType,
+    void *event,
+    size_t eventSize);
+
+/**
+ * @brief Flush a session of a given client
+ */
+bool eventServerFlushSession(EventServer *self, uint8_t *sessionKey);
