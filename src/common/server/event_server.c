@@ -326,7 +326,7 @@ eventServerGetRouterId (
 }
 
 zlist_t *
-EventServer_redisGetClientsWithinRange (
+eventServerRedisGetClientsWithinRange (
     EventServer *self,
     uint16_t mapId,
     uint8_t *ignoredSessionKey,
@@ -334,6 +334,24 @@ EventServer_redisGetClientsWithinRange (
     float range
 ) {
     return redisGetClientsWithinDistance (self->redis, self->info.routerId, mapId, position, range, ignoredSessionKey);
+}
+
+bool eventServerRemoveClient(EventServer *self, uint8_t *sessionKey)
+{
+    GraphNode *node;
+
+    // Get the node associated with the sessionKey
+    if (!(node = eventServerGetClientNode (self, sessionKey))) {
+        error("Cannot get the node %s.", sessionKey);
+        return false;
+    }
+
+    if (!(graphRemoveNode(self->clientsGraph, node))) {
+        error ("Cannot remove a client '%s' from the graph.", sessionKey);
+        return false;
+    }
+
+    return true;
 }
 
 bool

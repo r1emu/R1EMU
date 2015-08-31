@@ -59,7 +59,7 @@ zoneEventServerUpdateClientPosition (
     CommanderInfo *commanderInfo = &updatePosEvent->commanderInfo;
 
     // Get the clients around
-    if (!(redisClientsAround = EventServer_redisGetClientsWithinRange (
+    if (!(redisClientsAround = eventServerRedisGetClientsWithinRange (
         self, mapId, emitterSk, &PositionXYZToXZ (&updatePosEvent->newPosition),
         COMMANDER_VIEW_RANGE
     ))) {
@@ -126,12 +126,10 @@ zoneEventServerUpdateClientPosition (
              enterPcSocketId != NULL;
              enterPcSocketId = zlist_next (pcEnterList)
         ) {
-            /*
             if (strcmp (enterPcSocketId, emitterSk) == 0) {
                 // Doesn't send again the packet - the client sees himself
                 continue;
             }
-            */
 
             GameSession gameSession;
             curPcEnterMsg = zmsg_new ();

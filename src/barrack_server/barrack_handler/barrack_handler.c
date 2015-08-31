@@ -316,7 +316,7 @@ static PacketHandlerState BarrackHandler_currentBarrack(
     //    size pktType  checksum     accountId               float    float    float    float
 
     barrackBuilderPetInformation(reply);
-    barrackBuilderZoneTraffics(reply);
+    barrackBuilderZoneTraffics(1002, reply);
 
     return PACKET_HANDLER_OK;
 }

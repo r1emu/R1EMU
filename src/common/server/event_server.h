@@ -120,6 +120,14 @@ GraphNodeClient *graphNodeClientNew(void);
 bool graphNodeClientInit(GraphNodeClient *self);
 
 /**
+ * @brief Remove a client from the client graph
+ * @param self An allocated EventServer to initialize.
+ * @param sessionKey The player sessionKey
+ * @return true on success, false otherwise.
+ */
+bool eventServerRemoveClient(EventServer *self, uint8_t *sessionKey);
+
+/**
  * @brief Free an allocated GraphNodeClient structure.
  * @param self A pointer to an allocated GraphNodeClient.
  */
@@ -250,7 +258,7 @@ GraphNode *eventServerGetClientNode(EventServer *self, uint8_t *socketId);
  * @return a zlist_t of identity keys
  */
 zlist_t *
-EventServer_redisGetClientsWithinRange (
+eventServerRedisGetClientsWithinRange (
     EventServer *self,
     uint16_t mapId,
     uint8_t *ignoredSessionKey,

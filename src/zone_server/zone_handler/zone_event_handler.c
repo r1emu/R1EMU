@@ -349,6 +349,9 @@ bool zoneEventHandlerLeave(EventServer *self, GameEvent *event) {
     // add itself in the clients list
     zlist_append(clientsAround, event->emitterSk);
 
+    // Remove the node from the proximity graph
+    eventServerRemoveClient(self, event->emitterSk);
+
     // build the packet for the clients around
     msg = zmsg_new();
 

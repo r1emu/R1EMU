@@ -244,7 +244,7 @@ void barrackBuilderPetInformation(zmsg_t *replyMsg) {
     }
 }
 
-void barrackBuilderZoneTraffics(zmsg_t *replyMsg) {
+void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     typedef struct {
         uint16_t zoneListId;
@@ -283,7 +283,7 @@ void barrackBuilderZoneTraffics(zmsg_t *replyMsg) {
     // fill the arrays here
     for (int mapIndex = 0; mapIndex < mapAvailableCount; mapIndex++) {
         zoneServerCounts [mapIndex] = 5;
-        mapsId [mapIndex] = 1002;
+        mapsId [mapIndex] = mapId;
     }
     // number of players per zone
     int currentPlayersCount = 10;

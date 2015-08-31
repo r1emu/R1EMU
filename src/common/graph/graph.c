@@ -165,6 +165,22 @@ GraphArc *graphNodeGetArc(GraphNode *from, GraphNode *to) {
     return NULL;
 }
 
+bool graphRemoveNode(Graph *self, GraphNode *node)
+{
+    GraphArc *arc;
+
+    // Disconnect the node from all other nodes
+    while ((arc = zlist_first(node->arcs)) != NULL) {
+        GraphNode *to = arc->to;
+        if (!(graphUnlink(self, node, to))) {
+            error ("Cannot unlink %s and %s.", node->key, to->key);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 GraphArc *graphAddArc(Graph *self, GraphNode *from, GraphNode *to) {
     GraphArc *arc = NULL;
 

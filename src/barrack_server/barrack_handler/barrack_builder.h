@@ -110,7 +110,7 @@ void barrackBuilderCommanderList(uint64_t accountId, zmsg_t *replyMsg);
 /**
  * @brief Build the list of zone servers
  */
-void barrackBuilderZoneTraffics(zmsg_t *replyMsg);
+void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg);
 
 /**
  * @brief Change the name of the barrack

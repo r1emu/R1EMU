@@ -164,6 +164,14 @@ bool graphInsertNode(Graph *self, GraphNode *node);
 GraphArc *graphNodeGetArc(GraphNode *from, GraphNode *to);
 
 /**
+ * @brief Remove a node from the graph
+ * @param self A pointer to an allocated Graph.
+ * @param node The node to remove
+ * @param true on success, false otherwise
+ */
+bool graphRemoveNode(Graph *self, GraphNode *node);
+
+/**
  * @brief Remove the arc between 2 nodes
  * @param from The source node
  * @param to The destination node
