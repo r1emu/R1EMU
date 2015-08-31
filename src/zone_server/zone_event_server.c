@@ -16,8 +16,8 @@
 #include "zone_handler/zone_event_handler.h"
 #include "common/server/event_handler.h"
 
-bool zoneEventServerProcess(EventServer *self, EventType type, void *eventData)
-{
+bool zoneEventServerProcess(EventServer *self, EventType type, void *eventData) {
+
     EventHandlerFunction handler;
 
     if (type <= EVENT_TYPE_ZONE_START || type >= EVENT_TYPE_ZONE_END) {
@@ -37,13 +37,12 @@ bool zoneEventServerProcess(EventServer *self, EventType type, void *eventData)
     return handler(self, eventData);
 }
 
-bool
-zoneEventServerUpdateClientPosition (
+bool zoneEventServerUpdateClientPosition (
     EventServer *self,
     GameEvent *event,
     GameEventUpdatePosition *updatePosEvent,
-    zlist_t **_redisClientsAround
-) {
+    zlist_t **_redisClientsAround)
+{
     bool status = true;
 
     zmsg_t *pcEnterMsg = NULL;
