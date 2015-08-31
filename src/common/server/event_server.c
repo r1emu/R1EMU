@@ -44,7 +44,7 @@ struct EventServer
     bool (*eventServerProcess)(EventServer *self, EventType type, void *eventData);
 };
 
-static int EventServer_subscribe(EventServer *self);
+static int eventServerSubscribe(EventServer *self);
 
 EventServer *eventServerNew(EventServerStartupInfo *info, ServerType serverType) {
     EventServer *self;
@@ -192,7 +192,7 @@ eventServerGetGameSessionBySocketId (
 }
 
 static int
-EventServer_subscribe (
+eventServerSubscribe (
     EventServer *self
 ) {
     zmsg_t *msg;
@@ -415,7 +415,7 @@ eventServerStart (
     }
 
     // Listen to the subscriber socket
-    while (EventServer_subscribe (self) != -1) {
+    while (eventServerSubscribe (self) != -1) {
         // Things to do between two messages ?
     }
 
