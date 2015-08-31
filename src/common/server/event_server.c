@@ -44,7 +44,7 @@ struct EventServer
     bool (*eventServerProcess)(EventServer *self, EventType type, void *eventData);
 };
 
-static bool EventServer_subscribe(EventServer *self);
+static int EventServer_subscribe(EventServer *self);
 
 EventServer *eventServerNew(EventServerStartupInfo *info, ServerType serverType) {
     EventServer *self;
@@ -191,7 +191,7 @@ eventServerGetGameSessionBySocketId (
     return redisGetGameSessionBySocketId (self->redis, routerId, socketId, gameSession);
 }
 
-static bool
+static int
 EventServer_subscribe (
     EventServer *self
 ) {
@@ -201,13 +201,13 @@ EventServer_subscribe (
     // Receive the message from the publisher socket
     if (!(msg = zmsg_recv(self->workers))) {
         // Interrupt
-        return false;
+        return -1;
     }
 
     // Get the header frame of the message
     if (!(header = zmsg_pop (msg))) {
         error("Frame header cannot be retrieved.");
-        return false;
+        return -1;
     }
 
     // Convert the header frame to a EventServerHeader
@@ -219,7 +219,7 @@ EventServer_subscribe (
         case EVENT_SERVER_EVENT :
             if (!(EventServer_handleEvent (self, msg))) {
                 error("Cannot handle the event properly.");
-                return false;
+                return 0;
             }
         break;
 
@@ -231,7 +231,7 @@ EventServer_subscribe (
     // Cleanup
     zmsg_destroy(&msg);
 
-    return true;
+    return 1;
 }
 
 bool
@@ -415,7 +415,7 @@ eventServerStart (
     }
 
     // Listen to the subscriber socket
-    while (EventServer_subscribe (self)) {
+    while (EventServer_subscribe (self) != -1) {
         // Things to do between two messages ?
     }
 
