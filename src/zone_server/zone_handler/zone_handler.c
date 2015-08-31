@@ -261,7 +261,21 @@ static PacketHandlerState zoneHandlerLogout(
     size_t packetSize,
     zmsg_t *replyMsg)
 {
-    warning("CZ_LOGOUT not implemented yet.");
+    #pragma pack(push, 1)
+    struct {
+        uint8_t unk1;
+    } *clientPacket = (void *) packet;
+    #pragma pack(pop)
+
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_LOGOUT);
+    zoneBuilderLogout(replyMsg);
+
+    // notify leave to clients
+    GameEventLeave event = {
+        .pcId = session->game.commanderSession.currentCommander.pcId,
+    };
+    workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_LEAVE, &event, sizeof(event));
+
     return PACKET_HANDLER_OK;
 }
 

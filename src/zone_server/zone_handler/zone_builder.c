@@ -1632,3 +1632,19 @@ void zoneBuilderRotate(uint32_t pcId, PositionXZ *bodyDir, zmsg_t *replyMsg) {
         replyPacket.unk4 = false;
     }
 }
+
+void zoneBuilderLogout(zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_LOGOUT_OK;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+    }
+}

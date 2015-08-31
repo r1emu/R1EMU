@@ -360,3 +360,8 @@ void zoneBuilderRotateHead(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg);
  * @brief Rotate body
  */
 void zoneBuilderRotate(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg);
+
+/**
+ * @brief Logout
+ */
+void zoneBuilderLogout(zmsg_t *replyMsg);

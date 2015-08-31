@@ -26,6 +26,7 @@ static bool zoneEventHandlerEnterPc(EventServer *self, GameEvent *event);
 static bool zoneEventHandlerJump(EventServer *self, GameEvent *event);
 static bool zoneEventHandlerHeadRotate(EventServer *self, GameEvent *event);
 static bool zoneEventHandlerRotate(EventServer *self, GameEvent *event);
+static bool zoneEventHandlerLeave(EventServer *self, GameEvent *event);
 
 /**
  * @brief zoneEventHandlers is a global table containing all the zone event handlers.
@@ -42,6 +43,7 @@ const EventHandler zoneEventHandlers[EVENT_TYPE_ZONE_END] = {
     REGISTER_PACKET_HANDLER(EVENT_TYPE_JUMP, zoneEventHandlerJump),
     REGISTER_PACKET_HANDLER(EVENT_TYPE_HEAD_ROTATE, zoneEventHandlerHeadRotate),
     REGISTER_PACKET_HANDLER(EVENT_TYPE_ROTATE, zoneEventHandlerRotate),
+    REGISTER_PACKET_HANDLER(EVENT_TYPE_LEAVE, zoneEventHandlerLeave),
 
     #undef REGISTER_PACKET_HANDLER
 };
@@ -315,6 +317,43 @@ bool zoneEventHandlerRotate(EventServer *self, GameEvent *event) {
     zoneBuilderRotate(
         rotateEvent->pcId,
         &rotateEvent->direction,
+        msg
+    );
+
+    // send the packet
+    if (!(eventServerSendToClients(self, clientsAround, msg))) {
+        error("Failed to send the packet to the clients.");
+        status = false;
+        goto cleanup;
+    }
+
+cleanup:
+    zlist_destroy(&clientsAround);
+    zmsg_destroy(&msg);
+    return status;
+}
+
+bool zoneEventHandlerLeave(EventServer *self, GameEvent *event) {
+    bool status = true;
+    zmsg_t *msg = NULL;
+    zlist_t *clientsAround = NULL;
+    GameEventLeave *leaveEvent = &event->data.zone.leave;
+
+    // Get the clients around
+    if (!eventServerGetClientsAround(self, event->emitterSk, &clientsAround)) {
+        error("Cannot get clients within range");
+        status = false;
+        goto cleanup;
+    }
+
+    // add itself in the clients list
+    zlist_append(clientsAround, event->emitterSk);
+
+    // build the packet for the clients around
+    msg = zmsg_new();
+
+    zoneBuilderLeave(
+        leaveEvent->pcId,
         msg
     );
 

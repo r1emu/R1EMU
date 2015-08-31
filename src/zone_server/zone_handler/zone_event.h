@@ -82,6 +82,11 @@ typedef struct {
     PositionXZ direction;
 } GameEventRotate;
 
+/** Event data needed to display in-game player's disconnection  */
+typedef struct {
+    uint32_t pcId;
+} GameEventLeave;
+
 /** Union of all events */
 typedef union {
     GameEventCommanderMove move;
@@ -92,6 +97,7 @@ typedef union {
     GameEventChat chat;
     GameEventHeadRotate headRotate;
     GameEventRotate rotate;
+    GameEventLeave leave;
 } ZoneEvent;
 
 // ----------- Functions ------------
