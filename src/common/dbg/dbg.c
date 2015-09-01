@@ -30,6 +30,23 @@ FILE *_output = NULL;
 
 // ------ Extern function implementation ------
 
+void dbgSetCustomOutput(char *filename) {
+
+    // Special case : stdout
+    if (strcmp(filename, "stdout") == 0) {
+        dbgSetOutput(stdout);
+        return;
+    }
+
+    FILE *out = fopen(filename, "a+");
+    if (!out) {
+        error("Cannot open filename '%s'", filename);
+        return;
+    }
+
+    dbgSetOutput(out);
+}
+
 void dbgSetOutput(FILE *output) {
     _output = output;
 }

@@ -22,6 +22,7 @@ Server *serverFactoryCreateServer (
     char *routerIp,
     int port,
     int workersCount,
+    char *output,
     char *globalServerIp,
     int globalServerPort,
     char *sqlHostname,
@@ -40,6 +41,7 @@ Server *serverFactoryCreateServer (
         routerId, routerIp,
         port,
         workersCount,
+        output,
         globalServerIp, globalServerPort,
         sqlHostname, sqlUsername, sqlPassword, sqlDatabase,
         redisHostname, redisPort, disconnectHandler
@@ -65,6 +67,7 @@ serverFactoryInitServerInfo (
     char *routerIp,
     int port,
     int workersCount,
+    char *output,
     char *globalServerIp,
     int globalServerPort,
     char *sqlHostname,
@@ -145,7 +148,7 @@ serverFactoryInitServerInfo (
     }
 
     // Initialize Server start up information
-    if (!(serverStartupInfoInit (serverInfo, serverType, &routerInfo, workersInfo, workersCount))) {
+    if (!(serverStartupInfoInit (serverInfo, serverType, &routerInfo, workersInfo, workersCount, output))) {
         error("Cannot initialize correctly the Server start up information.");
         return false;
     }

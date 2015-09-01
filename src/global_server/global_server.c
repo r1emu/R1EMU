@@ -128,6 +128,15 @@ bool globalServerReadBasicServerConf(BasicServerConf *basicConf, json_t *servers
     }
     basicConf->workersCount = atoi(json_string_value(field));
 
+    // read output file
+    if (!(field = json_object_get(server, "output"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'output' field.");
+        result = false;
+        goto cleanup;
+    }
+    basicConf->output = strdup(json_string_value(field));
 
 cleanup:
     return result;
@@ -192,6 +201,28 @@ bool globalServerStartupInfoInit(GlobalServerStartupInfo *self, char *confFilePa
         goto cleanup;
     }
     self->globalConf.port = atoi(json_string_value(field));
+
+    // read output file
+    if (!(field = json_object_get(globalServer, "output"))
+    ||  !(json_is_string(field)))
+    {
+        error("Cannot read 'output' field.");
+        result = false;
+        goto cleanup;
+    }
+
+    const char *filename = json_string_value(field);
+    FILE *output;
+    if (strcmp(filename, "stdout") == 0) {
+        output = stdout;
+    } else {
+        output = fopen(filename, "a+");
+        if (!output) {
+            error ("Cannot open '%s' !", filename);
+        } else {
+            dbgSetOutput(output);
+        }
+    }
 
     // ===================================
     //     Read Barracks configuration
@@ -452,6 +483,7 @@ bool globalServerStart(GlobalServer *self) {
             basicConf->ip,
             basicConf->port,
             basicConf->workersCount,
+            basicConf->output,
             globalInfo->globalConf.ip, globalInfo->globalConf.port,
             globalInfo->sqlInfo.hostname, globalInfo->sqlInfo.user,
             globalInfo->sqlInfo.password, globalInfo->sqlInfo.database,
@@ -480,6 +512,7 @@ bool globalServerStart(GlobalServer *self) {
             basicConf->ip,
             basicConf->port,
             basicConf->workersCount,
+            basicConf->output,
             globalInfo->globalConf.ip, globalInfo->globalConf.port,
             globalInfo->sqlInfo.hostname, globalInfo->sqlInfo.user,
             globalInfo->sqlInfo.password, globalInfo->sqlInfo.database,
@@ -508,6 +541,7 @@ bool globalServerStart(GlobalServer *self) {
             basicConf->ip,
             basicConf->port,
             basicConf->workersCount,
+            basicConf->output,
             globalInfo->globalConf.ip, globalInfo->globalConf.port,
             globalInfo->sqlInfo.hostname, globalInfo->sqlInfo.user,
             globalInfo->sqlInfo.password, globalInfo->sqlInfo.database,

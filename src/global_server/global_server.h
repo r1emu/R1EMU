@@ -64,6 +64,7 @@ typedef struct {
     char *ip;
     int port;
     int workersCount;
+    char *output;
 }   BasicServerConf;
 
 typedef struct {

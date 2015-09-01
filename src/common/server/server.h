@@ -31,6 +31,7 @@ typedef struct {
     RouterStartupInfo routerInfo;
     WorkerStartupInfo *workersInfo;
     int workersInfoCount;
+    char *output;
     ServerType serverType;
 } ServerStartupInfo;
 
@@ -63,7 +64,8 @@ bool serverStartupInfoInit(
     ServerType serverType,
     RouterStartupInfo *routerInfo,
     WorkerStartupInfo *workersInfo,
-    int workersInfoCount);
+    int workersInfoCount,
+    char *output);
 
 /**
  * @brief Start a new Server

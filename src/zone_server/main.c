@@ -63,12 +63,13 @@ int main (int argc, char **argv)
     char *redisHostname = *++argv;
     int redisPort = atoi(*++argv);
     ServerType serverType = atoi(*++argv);
+    char *output = *++argv;
 
-    // Set a custom output for linux for each servers
-    #ifndef WIN32
-    dbgSetOutput(fopen(zsys_sprintf("ZoneServer%d_output.txt", routerId), "w+"));
-    #else
+    // Set a custom output
+    dbgSetCustomOutput(output);
+
     // For Windows, change the console title
+    #ifdef WIN32
     switch (serverType) {
         case SERVER_TYPE_BARRACK:
             SetConsoleTitle(zsys_sprintf("Barrack (%d)", routerId));
@@ -132,6 +133,7 @@ int main (int argc, char **argv)
         routerId, routerIp,
         port,
         workersCount,
+        output,
         globalServerIp, globalServerPort,
         sqlHostname, sqlUsername, sqlPassword, sqlDatabase,
         redisHostname, redisPort, disconnectHandler

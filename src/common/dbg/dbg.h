@@ -158,6 +158,7 @@ void _bufferPrint(void *buffer, int bufferSize, char *prefix);
  * @param output The destination stream of the debug messages
  */
 void dbgSetOutput(FILE *output);
+void dbgSetCustomOutput(char *filename);
 
 /**
  * @brief Close the custom debug file

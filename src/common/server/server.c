@@ -65,7 +65,14 @@ serverInit (
     ServerStartupInfo *info
 ) {
     // Make a private copy
-    if (!(serverStartupInfoInit (&self->info, info->serverType, &info->routerInfo, info->workersInfo, info->workersInfoCount))) {
+    if (!(serverStartupInfoInit (
+        &self->info,
+        info->serverType,
+        &info->routerInfo,
+        info->workersInfo,
+        info->workersInfoCount,
+        info->output)))
+    {
         error("Cannot init the ServerStartupInfo");
         return false;
     }
@@ -106,7 +113,8 @@ serverStartupInfoInit (
     ServerType serverType,
     RouterStartupInfo *routerInfo,
     WorkerStartupInfo *workersInfo,
-    int workersInfoCount
+    int workersInfoCount,
+    char *output
 ) {
     // Copy router Info
     memcpy(&self->routerInfo, routerInfo, sizeof(self->routerInfo));
@@ -119,6 +127,7 @@ serverStartupInfoInit (
 
     self->serverType = serverType;
     self->workersInfoCount = workersInfoCount;
+    self->output = output;
 
     return true;
 }
@@ -146,14 +155,15 @@ serverCreateProcess (
     );
 
     char *lastCommandLine;
-    lastCommandLine = zsys_sprintf("%s %d %s %d %s %s %s %s %s %d %d",
+    lastCommandLine = zsys_sprintf("%s %d %s %d %s %s %s %s %s %d %d %s",
         commandLine,
         self->routerInfo.workersCount,
         globalServerIp,
         globalServerPort,
         sqlInfo->hostname, sqlInfo->user, sqlInfo->password, sqlInfo->database,
         redisInfo->hostname, redisInfo->port,
-        self->serverType
+        self->serverType,
+        self->output
     );
 
     zstr_free(&commandLine);
