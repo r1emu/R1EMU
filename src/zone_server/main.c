@@ -130,8 +130,8 @@ int main (int argc, char **argv)
     Server *server;
     if (!(server = serverFactoryCreateServer(
         serverType,
-        routerId, routerIp,
-        port,
+        routerId,
+        routerIp, port,
         workersCount,
         output,
         globalServerIp, globalServerPort,

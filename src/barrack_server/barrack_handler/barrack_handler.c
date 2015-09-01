@@ -22,23 +22,23 @@
 #include "common/redis/fields/redis_socket_session.h"
 
 /** Read the passport and accepts or refuse the authentification */
-static PacketHandlerState BarrackHandler_loginByPassport  (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerLoginByPassport  (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Read the login / password and accepts or refuse the authentification */
-static PacketHandlerState BarrackHandler_login            (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerLogin            (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Start the barrack : call other handlers that initializes the barrack */
-static PacketHandlerState BarrackHandler_startBarrack     (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerStartBarrack     (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Once the commander list has been received, request to start the barrack */
-static PacketHandlerState BarrackHandler_currentBarrack   (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerCurrentBarrack   (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Change a barrack name */
-static PacketHandlerState BarrackHandler_barracknameChange(Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerBarracknameChange(Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Create a commander */
-static PacketHandlerState BarrackHandler_commanderCreate  (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerCommanderCreate  (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Send a list of zone servers */
-static PacketHandlerState BarrackHandler_commanderDestroy (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerCommanderDestroy (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Change the commander position in the barrack */
-static PacketHandlerState BarrackHandler_commanderMove    (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerCommanderMove    (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Request for the player to enter in game */
-static PacketHandlerState BarrackHandler_startGame        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerStartGame        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 
 /**
  * @brief barrackHandlers is a global table containing all the barrack handlers.
@@ -47,21 +47,21 @@ const PacketHandler barrackHandlers[PACKET_TYPE_COUNT] = {
     #define REGISTER_PACKET_HANDLER(packetName, handler) \
        [packetName] = {handler, STRINGIFY(packetName)}
 
-    REGISTER_PACKET_HANDLER(CB_LOGIN,              BarrackHandler_login),
-    REGISTER_PACKET_HANDLER(CB_LOGIN_BY_PASSPORT,  BarrackHandler_loginByPassport),
-    REGISTER_PACKET_HANDLER(CB_START_BARRACK,      BarrackHandler_startBarrack),
-    REGISTER_PACKET_HANDLER(CB_CURRENT_BARRACK,    BarrackHandler_currentBarrack),
-    REGISTER_PACKET_HANDLER(CB_BARRACKNAME_CHANGE, BarrackHandler_barracknameChange),
-    REGISTER_PACKET_HANDLER(CB_COMMANDER_CREATE,   BarrackHandler_commanderCreate),
-    REGISTER_PACKET_HANDLER(CB_COMMANDER_DESTROY,  BarrackHandler_commanderDestroy),
-    REGISTER_PACKET_HANDLER(CB_COMMANDER_MOVE,     BarrackHandler_commanderMove),
-    // REGISTER_PACKET_HANDLER(CB_JUMP,               BarrackHandler_jump),
-    REGISTER_PACKET_HANDLER(CB_START_GAME,         BarrackHandler_startGame),
+    REGISTER_PACKET_HANDLER(CB_LOGIN,              barrackHandlerLogin),
+    REGISTER_PACKET_HANDLER(CB_LOGIN_BY_PASSPORT,  barrackHandlerLoginByPassport),
+    REGISTER_PACKET_HANDLER(CB_START_BARRACK,      barrackHandlerStartBarrack),
+    REGISTER_PACKET_HANDLER(CB_CURRENT_BARRACK,    barrackHandlerCurrentBarrack),
+    REGISTER_PACKET_HANDLER(CB_BARRACKNAME_CHANGE, barrackHandlerBarracknameChange),
+    REGISTER_PACKET_HANDLER(CB_COMMANDER_CREATE,   barrackHandlerCommanderCreate),
+    REGISTER_PACKET_HANDLER(CB_COMMANDER_DESTROY,  barrackHandlerCommanderDestroy),
+    REGISTER_PACKET_HANDLER(CB_COMMANDER_MOVE,     barrackHandlerCommanderMove),
+    // REGISTER_PACKET_HANDLER(CB_JUMP,               barrackHandlerJump),
+    REGISTER_PACKET_HANDLER(CB_START_GAME,         barrackHandlerStartGame),
 
     #undef REGISTER_PACKET_HANDLER
 };
 
-static PacketHandlerState BarrackHandler_login(
+static PacketHandlerState barrackHandlerLogin(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -104,7 +104,7 @@ static PacketHandlerState BarrackHandler_login(
     return PACKET_HANDLER_UPDATE_SESSION;
 }
 
-static PacketHandlerState BarrackHandler_loginByPassport(
+static PacketHandlerState barrackHandlerLoginByPassport(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -151,7 +151,7 @@ static PacketHandlerState BarrackHandler_loginByPassport(
     return PACKET_HANDLER_UPDATE_SESSION;
 }
 
-static PacketHandlerState BarrackHandler_startGame(
+static PacketHandlerState barrackHandlerStartGame(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -222,7 +222,7 @@ static PacketHandlerState BarrackHandler_startGame(
 }
 
 static PacketHandlerState
-BarrackHandler_commanderMove(
+barrackHandlerCommanderMove(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -258,7 +258,7 @@ BarrackHandler_commanderMove(
 }
 
 static PacketHandlerState
-BarrackHandler_startBarrack(
+barrackHandlerStartBarrack(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -300,7 +300,7 @@ BarrackHandler_startBarrack(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState BarrackHandler_currentBarrack(
+static PacketHandlerState barrackHandlerCurrentBarrack(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -320,7 +320,7 @@ static PacketHandlerState BarrackHandler_currentBarrack(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState BarrackHandler_barracknameChange(
+static PacketHandlerState barrackHandlerBarracknameChange(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -362,7 +362,7 @@ static PacketHandlerState BarrackHandler_barracknameChange(
     return PACKET_HANDLER_UPDATE_SESSION;
 }
 
-static PacketHandlerState BarrackHandler_commanderDestroy(
+static PacketHandlerState barrackHandlerCommanderDestroy(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -382,7 +382,7 @@ static PacketHandlerState BarrackHandler_commanderDestroy(
     return PACKET_HANDLER_UPDATE_SESSION;
 }
 
-static PacketHandlerState BarrackHandler_commanderCreate(
+static PacketHandlerState barrackHandlerCommanderCreate(
     Worker *self,
     Session *session,
     uint8_t *packet,
