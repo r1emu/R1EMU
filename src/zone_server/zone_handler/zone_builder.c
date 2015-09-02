@@ -1656,11 +1656,8 @@ void zoneBuilderPose(uint32_t pcId, uint32_t poseId, PositionXYZ *pos, PositionX
         ServerPacketHeader header;
         uint32_t pcId;
         uint32_t poseId;
-        uint32_t posX;
-        uint32_t posY;
-        uint32_t posZ;
-        uint32_t dirX;
-        uint32_t dirZ;
+        PositionXYZ pos;
+        PositionXZ dir;
     } replyPacket;
     #pragma pack(pop)
 
@@ -1672,11 +1669,8 @@ void zoneBuilderPose(uint32_t pcId, uint32_t poseId, PositionXYZ *pos, PositionX
         serverPacketHeaderInit(&replyPacket.header, packetType);
         replyPacket.pcId = pcId;
         replyPacket.poseId = poseId;
-        replyPacket.posX = pos->x;
-        replyPacket.posY = pos->y;
-        replyPacket.posZ = pos->z;
-        replyPacket.dirX = dir->x;
-        replyPacket.dirZ = dir->z;
+        memcpy(&replyPacket.pos, pos, sizeof(replyPacket.pos));
+        memcpy(&replyPacket.dir, dir, sizeof(replyPacket.dir));
     }
 }
 
@@ -1701,7 +1695,7 @@ void zoneBuilderChangeCamera(uint8_t mode, PositionXYZ *pos, float fspd, float i
         serverPacketHeaderInit(&replyPacket.header, packetType);
         replyPacket.mode = mode;
         replyPacket.unk = 0;
-        memcpy(&replyPacket.pos, pos, sizeof(PositionXYZ));
+        memcpy(&replyPacket.pos, pos, sizeof(replyPacket.pos));
         replyPacket.fspd = fspd;
         replyPacket.ispd = ispd;
     }
