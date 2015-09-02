@@ -30,11 +30,12 @@ bool adminCmdInit(void) {
         return false;
     }
 
-    zhash_insert(adminCommands, "spawn",   adminCmdSpawnPc);
-    zhash_insert(adminCommands, "jump",    adminCmdJump);
-    zhash_insert(adminCommands, "itemAdd", adminCmdAddItem);
-    zhash_insert(adminCommands, "test",    adminCmdTest);
-    zhash_insert(adminCommands, "where",   adminCmdWhere);
+    zhash_insert(adminCommands, "spawn",          adminCmdSpawnPc);
+    zhash_insert(adminCommands, "jump",           adminCmdJump);
+    zhash_insert(adminCommands, "itemAdd",        adminCmdAddItem);
+    zhash_insert(adminCommands, "test",           adminCmdTest);
+    zhash_insert(adminCommands, "where",          adminCmdWhere);
+    zhash_insert(adminCommands, "changeCamera",   adminCmdChangeCamera);
 
     return true;
 }
@@ -187,4 +188,48 @@ void adminCmdWhere(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
         position.x, position.y, position.z);
 
     zoneBuilderChat(&session->game.commanderSession.currentCommander, message, replyMsg);
+}
+
+void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    const uint16_t MAX_LEN = 128;
+    char message[MAX_LEN];
+    PositionXYZ pos;
+    float fspd;
+    float ispd;
+
+    info("Change Camera command used, args = %s", args);
+    if (strlen (args) == 0) {
+        pos.x = 0;
+        pos.y = 0;
+        pos.z = 0;
+        zoneBuilderChangeCamera((uint8_t)0, &pos, (float)0, (float)0, replyMsg);
+    }
+    else {
+        char **arg;
+        int argc;
+
+        arg = strSplit(args, ' ');
+        argc = 0;
+        while (arg[++argc] != NULL);
+        if (argc >= 3) {
+            pos.x = (strlen(arg[0]) == 1 && arg[0][0] == 'c') ?
+                session->game.commanderSession.currentCommander.pos.x : atof(arg[0]);
+            pos.y = (strlen(arg[1]) == 1 && arg[1][0] == 'c') ?
+                session->game.commanderSession.currentCommander.pos.y : atof(arg[1]);
+            pos.z = (strlen(arg[2]) == 1 && arg[2][0] == 'c') ?
+                session->game.commanderSession.currentCommander.pos.z : atof(arg[2]);
+        }
+        if (argc == 3)
+            zoneBuilderChangeCamera((uint8_t)1, &pos, (float)10, (float)0.7, replyMsg);
+        else if (argc == 5) {
+            fspd = atof(arg[3]);
+            ispd = atof(arg[4]);
+            zoneBuilderChangeCamera((uint8_t)1, &pos, fspd, ispd, replyMsg);
+        }
+        else {
+            snprintf(message, sizeof(message), "Bad usage /changeCamera <x> <y> <z> {<fspd> <ispd>}");
+            zoneBuilderChat(&session->game.commanderSession.currentCommander, message, replyMsg);
+        }
+        free(arg);
+    }
 }

@@ -56,3 +56,8 @@ bool adminCmdInit(void);
  * @brief : Returns the player's position
  */
 void adminCmdWhere(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+
+/**
+ * @brief : Change the camera position
+ */
+void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *replyMsg);

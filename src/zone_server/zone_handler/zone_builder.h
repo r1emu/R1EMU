@@ -365,3 +365,8 @@ void zoneBuilderRotate(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg);
  * @brief Logout
  */
 void zoneBuilderLogout(zmsg_t *replyMsg);
+
+/**
+ * @brief Change the camera
+ */
+void zoneBuilderChangeCamera(uint8_t mode, PositionXYZ *pos, float fspd, float ispd, zmsg_t *replyMsg);

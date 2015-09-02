@@ -1648,3 +1648,30 @@ void zoneBuilderLogout(zmsg_t *replyMsg) {
         serverPacketHeaderInit(&replyPacket.header, packetType);
     }
 }
+
+void zoneBuilderChangeCamera(uint8_t mode, PositionXYZ *pos, float fspd, float ispd, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint8_t mode; // option 0, 1 or 2 | 0 = reset, 1, 2 = set then update ?
+        uint32_t unk;
+        PositionXYZ pos;
+        float fspd;
+        float ispd;
+    } replyPacket;
+    #pragma pack(pop)
+
+    info("Launched changeCamera packet size: %d", sizeof(replyPacket));
+    PacketType packetType = ZC_CHANGE_CAMERA;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+        replyPacket.mode = mode;
+        replyPacket.unk = 0;
+        memcpy(&replyPacket.pos, pos, sizeof(PositionXYZ));
+        replyPacket.fspd = fspd;
+        replyPacket.ispd = ispd;
+    }
+}
