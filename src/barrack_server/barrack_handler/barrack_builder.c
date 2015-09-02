@@ -106,9 +106,11 @@ void barrackBuilderCommanderMoveOk(
     } replyPacket;
     #pragma pack(pop)
 
+    PacketType packetType = BC_NORMAL_COMMANDER_MOVE_OK;
+
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        packetNormalHeaderInit(&replyPacket.normalHeader, BC_NORMAL_COMMANDER_MOVE_OK, sizeof(replyPacket));
+        packetNormalHeaderInit(&replyPacket.normalHeader, packetType, sizeof(replyPacket));
         replyPacket.accountId = accountId;
         replyPacket.unk1 = 3; // 3, 2, 1, 3, 2, 1, ...
         memcpy(&replyPacket.position, position, sizeof(replyPacket.position));
