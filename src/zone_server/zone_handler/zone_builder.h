@@ -365,3 +365,8 @@ void zoneBuilderRotate(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg);
  * @brief Logout
  */
 void zoneBuilderLogout(zmsg_t *replyMsg);
+
+/**
+ * Makes an animation
+ */
+void zoneBuilderPose(uint32_t pcId, uint32_t poseId, PositionXYZ *pos, PositionXZ *dir, zmsg_t *replyMsg);

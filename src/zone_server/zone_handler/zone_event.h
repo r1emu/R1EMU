@@ -87,6 +87,14 @@ typedef struct {
     uint32_t pcId;
 } GameEventLeave;
 
+/** Event data needed for a commander to stop moving */
+typedef struct {
+    uint32_t pcId;
+    uint32_t poseId;
+    PositionXYZ position;
+    PositionXZ direction;
+} GameEventPose;
+
 /** Union of all events */
 typedef union {
     GameEventCommanderMove move;
@@ -98,6 +106,7 @@ typedef union {
     GameEventHeadRotate headRotate;
     GameEventRotate rotate;
     GameEventLeave leave;
+    GameEventPose pose;
 } ZoneEvent;
 
 // ----------- Functions ------------

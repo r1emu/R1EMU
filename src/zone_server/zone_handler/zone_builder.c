@@ -1648,3 +1648,34 @@ void zoneBuilderLogout(zmsg_t *replyMsg) {
         serverPacketHeaderInit(&replyPacket.header, packetType);
     }
 }
+
+void zoneBuilderPose(uint32_t pcId, uint32_t poseId, PositionXYZ *pos, PositionXZ *dir, zmsg_t *replyMsg) {
+
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint32_t pcId;
+        uint32_t poseId;
+        uint32_t posX;
+        uint32_t posY;
+        uint32_t posZ;
+        uint32_t dirX;
+        uint32_t dirZ;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_POSE;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+        replyPacket.pcId = pcId;
+        replyPacket.poseId = poseId;
+        replyPacket.posX = pos->x;
+        replyPacket.posY = pos->y;
+        replyPacket.posZ = pos->z;
+        replyPacket.dirX = dir->x;
+        replyPacket.dirZ = dir->z;
+    }
+}
