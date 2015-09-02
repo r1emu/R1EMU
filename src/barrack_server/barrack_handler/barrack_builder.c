@@ -284,7 +284,7 @@ void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg) {
 
     // fill the arrays here
     for (int mapIndex = 0; mapIndex < mapAvailableCount; mapIndex++) {
-        zoneServerCounts [mapIndex] = 5;
+        zoneServerCounts [mapIndex] = 1;
         mapsId [mapIndex] = mapId;
     }
     // number of players per zone
