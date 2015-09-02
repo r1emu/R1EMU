@@ -60,8 +60,10 @@ static PacketHandlerState zoneHandlerChatLog        (Worker *self, Session *sess
 static PacketHandlerState zoneHandlerHeadRotate     (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On commander rotation */
 static PacketHandlerState zoneHandlerRotate         (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
-/** On commander rotation */
+/** On commander pose */
 static PacketHandlerState zoneHandlerPose           (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+/** On commander dash run */
+static PacketHandlerState zoneHandlerDashRun        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 
 /**
  * @brief zoneHandlers is a global table containing all the zone handlers.
@@ -91,6 +93,7 @@ const PacketHandler zoneHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CZ_HEAD_ROTATE, zoneHandlerHeadRotate),
     REGISTER_PACKET_HANDLER(CZ_ROTATE, zoneHandlerRotate),
     REGISTER_PACKET_HANDLER(CZ_POSE, zoneHandlerPose),
+    REGISTER_PACKET_HANDLER(CZ_DASHRUN, zoneHandlerDashRun),
 
     #undef REGISTER_PACKET_HANDLER
 };
@@ -712,6 +715,27 @@ static PacketHandlerState zoneHandlerPose(
     };
 
     workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_POSE, &event, sizeof(event));
+
+    return PACKET_HANDLER_OK;
+}
+
+static PacketHandlerState zoneHandlerDashRun(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *replyMsg)
+{
+    /*#pragma pack(push, 1)
+    struct {
+        uint8_t unk1;
+    } *clientPacket = (void *) packet;
+    #pragma pack(pop)
+
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_DASHRUN);
+    zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander.pcId, 38.0f, replyMsg);*/
+
+    warning("CZ_DASHRUN not implemented yet.");
 
     return PACKET_HANDLER_OK;
 }
