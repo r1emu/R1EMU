@@ -65,7 +65,7 @@ serverFactoryInitServerInfo (
     ServerType serverType,
     uint16_t routerId,
     char *routerIp,
-    int port,
+    int routerPort,
     int workersCount,
     char *output,
     char *globalServerIp,
@@ -94,7 +94,7 @@ serverFactoryInitServerInfo (
 
     // Initialize Router start up information
     RouterStartupInfo routerInfo;
-    if (!(routerStartupInfoInit (&routerInfo, routerId, routerIp, port, workersCount,
+    if (!(routerStartupInfoInit (&routerInfo, routerId, routerIp, routerPort, workersCount,
                                  &redisInfo, &sqlInfo, disconnectHandler))) {
         error("Cannot initialize correctly the Router start up information.");
         return false;
@@ -140,8 +140,8 @@ serverFactoryInitServerInfo (
             serverType,
             globalServerIp, globalServerPort,
             &sqlInfo, &redisInfo,
-            packetHandlers, packetHandlersCount)
-        )) {
+            packetHandlers, packetHandlersCount,
+            routerIp, routerPort))) {
             error("Cannot initialize a Worker.");
             return false;
         }

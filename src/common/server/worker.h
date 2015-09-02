@@ -84,6 +84,10 @@ struct _WorkerStartupInfo {
 
     // packet handlers entries count
     int packetHandlersCount;
+
+    // Router information
+    char *routerIp;
+    int routerPort;
 };
 
 /**
@@ -155,6 +159,7 @@ bool workerInit(Worker *self, WorkerStartupInfo *info);
  * @param redisInfo The information about the Redis Database
  * @param packetHandlers Array of packet handlers
  * @param packetHandlersCount Packet handlers entries count
+ * @param routerIp, routerPort IP and port of the router responsable of the worker
  * @return true on success, false otherwise.
  */
 bool workerStartupInfoInit(
@@ -167,7 +172,8 @@ bool workerStartupInfoInit(
     MySQLStartupInfo *sqlInfo,
     RedisStartupInfo *redisInfo,
     const PacketHandler *packetHandlers,
-    int packetHandlersCount);
+    int packetHandlersCount,
+    char *routerIp, int routerPort);
 
 /**
  * @brief Start a new Worker

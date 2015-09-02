@@ -205,7 +205,8 @@ workerInit (
         &self->info, info->workerId, info->routerId, info->serverType,
         info->globalServerIp, info->globalServerPort,
         &info->sqlInfo, &info->redisInfo,
-        info->packetHandlers, info->packetHandlersCount))
+        info->packetHandlers, info->packetHandlersCount,
+        info->routerIp, info->routerPort))
     ) {
         error("Cannot initialize worker start up info.");
         return false;
@@ -254,11 +255,14 @@ workerStartupInfoInit (
     MySQLStartupInfo *sqlInfo,
     RedisStartupInfo *redisInfo,
     const PacketHandler *packetHandlers,
-    int packetHandlersCount
+    int packetHandlersCount,
+    char *routerIp, int routerPort
 ) {
     self->workerId = workerId;
     self->routerId = routerId;
     self->serverType = serverType;
+    self->routerIp = strdup(routerIp);
+    self->routerPort = routerPort;
 
     if (!(self->globalServerIp = strdup(globalServerIp))) {
         error("Cannot allocated globalServerIp.");
