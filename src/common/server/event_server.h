@@ -66,6 +66,7 @@ typedef enum EventType {
     EVENT_TYPE_HEAD_ROTATE,
     EVENT_TYPE_ROTATE,
     EVENT_TYPE_LEAVE,
+    EVENT_TYPE_POSE,
     EVENT_TYPE_ZONE_END,
 
     // Barrack Events

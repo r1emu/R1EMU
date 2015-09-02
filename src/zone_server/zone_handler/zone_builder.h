@@ -370,3 +370,8 @@ void zoneBuilderLogout(zmsg_t *replyMsg);
  * @brief Change the camera
  */
 void zoneBuilderChangeCamera(uint8_t mode, PositionXYZ *pos, float fspd, float ispd, zmsg_t *replyMsg);
+
+/**
+ * Makes an animation
+ */
+void zoneBuilderPose(uint32_t pcId, uint32_t poseId, PositionXYZ *pos, PositionXZ *dir, zmsg_t *replyMsg);
