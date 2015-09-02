@@ -369,15 +369,23 @@ static PacketHandlerState barrackHandlerCommanderDestroy(
     size_t packetSize,
     zmsg_t *reply)
 {
-    // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_DESTROY);
+    #pragma pack(push, 1)
+    struct {
+        uint8_t charPosition;
+    }  *clientPacket = (void *) packet;
+    #pragma pack(pop)
 
-    uint8_t commanderDestroyMask = 0xFF; // Destroy all characters!
+    // For future reference, clientPacket->charPosition 0xFF removes all characters.
+
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_DESTROY);
 
     // Update session
-    session->game.barrackSession.charactersCreatedCount = 0;
+    if (session->game.barrackSession.charactersCreatedCount > 0) {
+        session->game.barrackSession.charactersCreatedCount -= 1;
+    }
 
     // Build the reply packet
-    barrackBuilderCommanderDestroy(commanderDestroyMask, reply);
+    barrackBuilderCommanderDestroy(clientPacket->charPosition, reply);
 
     return PACKET_HANDLER_UPDATE_SESSION;
 }
