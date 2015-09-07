@@ -32,7 +32,7 @@ bool adminCmdInit(void) {
 
     zhash_insert(adminCommands, "spawn",          adminCmdSpawnPc);
     zhash_insert(adminCommands, "jump",           adminCmdJump);
-    zhash_insert(adminCommands, "itemAdd",        adminCmdAddItem);
+    zhash_insert(adminCommands, "additem",        adminCmdAddItem);
     zhash_insert(adminCommands, "test",           adminCmdTest);
     zhash_insert(adminCommands, "where",          adminCmdWhere);
     zhash_insert(adminCommands, "changeCamera",   adminCmdChangeCamera);
