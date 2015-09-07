@@ -61,10 +61,10 @@ void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *repl
 void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
 
     // add a fake commander with a fake account
-    Commander fakePc;
-    commanderInit(&fakePc);
+    CommanderInfo fakePc;
+    commanderInfoInit(&fakePc);
 
-    fakePc.pos = session->game.commanderSession.currentCommander.pos;
+    fakePc.pos = session->game.commanderSession.currentCommander.info.pos;
     fakePc.appareance.accountId = r1emuGenerateRandom64(&self->seed);
     fakePc.socialInfoId = r1emuGenerateRandom64(&self->seed);
     fakePc.pcId = r1emuGenerateRandom(&self->seed);
@@ -109,7 +109,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
     GameEventEnterPc event = {
         .updatePosEvent = {
             .mapId = fakeSocketSession.mapId,
-            .commander = fakePc
+            .info = fakePc
         }
     };
 
@@ -157,8 +157,8 @@ void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) 
             info("y = %.6f", position.y);
             position.z = atof(arg[2]);
             info("z = %.6f", position.z);
-            session->game.commanderSession.currentCommander.pos = position;
-            zoneBuilderSetPos(session->game.commanderSession.currentCommander.pcId, &position, replyMsg);
+            session->game.commanderSession.currentCommander.info.pos = position;
+            zoneBuilderSetPos(session->game.commanderSession.currentCommander.info.pcId, &position, replyMsg);
         }
         free(arg);
     }
@@ -182,12 +182,12 @@ void adminCmdWhere(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
     const uint16_t MAX_LEN = 128;
     char message[MAX_LEN];
     PositionXYZ position;
-    position = session->game.commanderSession.currentCommander.pos;
+    position = session->game.commanderSession.currentCommander.info.pos;
     snprintf(message, sizeof(message), "[%hu] x = %.0f, y = %.0f, z = %.0f",
         session->game.commanderSession.mapId,
         position.x, position.y, position.z);
 
-    zoneBuilderChat(&session->game.commanderSession.currentCommander, message, replyMsg);
+    zoneBuilderChat(&session->game.commanderSession.currentCommander.info, message, replyMsg);
 }
 
 void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
@@ -213,11 +213,11 @@ void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *re
         while (arg[++argc] != NULL);
         if (argc >= 3) {
             pos.x = (strlen(arg[0]) == 1 && arg[0][0] == 'c') ?
-                session->game.commanderSession.currentCommander.pos.x : atof(arg[0]);
+                session->game.commanderSession.currentCommander.info.pos.x : atof(arg[0]);
             pos.y = (strlen(arg[1]) == 1 && arg[1][0] == 'c') ?
-                session->game.commanderSession.currentCommander.pos.y : atof(arg[1]);
+                session->game.commanderSession.currentCommander.info.pos.y : atof(arg[1]);
             pos.z = (strlen(arg[2]) == 1 && arg[2][0] == 'c') ?
-                session->game.commanderSession.currentCommander.pos.z : atof(arg[2]);
+                session->game.commanderSession.currentCommander.info.pos.z : atof(arg[2]);
         }
         if (argc == 3)
             zoneBuilderChangeCamera((uint8_t)1, &pos, (float)10, (float)0.7, replyMsg);
@@ -228,7 +228,7 @@ void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *re
         }
         else {
             snprintf(message, sizeof(message), "Bad usage /changeCamera <x> <y> <z> {<fspd> <ispd>}");
-            zoneBuilderChat(&session->game.commanderSession.currentCommander, message, replyMsg);
+            zoneBuilderChat(&session->game.commanderSession.currentCommander.info, message, replyMsg);
         }
         free(arg);
     }

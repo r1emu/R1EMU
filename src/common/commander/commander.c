@@ -36,7 +36,7 @@ void commanderEquipmentInit(CommanderEquipment *equipment) {
     equipment->necklace = 0xa;
 }
 
-void appareanceInit(CommanderAppearence *commander) {
+void commanderApparenceInit(CommanderAppearence *commander) {
     memset(commander, 0, sizeof(*commander));
 
     commander->accountId = -1;
@@ -51,10 +51,10 @@ void appareanceInit(CommanderAppearence *commander) {
     commander->pose = SWAP_UINT16(0x0000); // Idle (ICBT)
 }
 
-void commanderInit(Commander *commander) {
+void commanderInfoInit(CommanderInfo *commander) {
     memset(commander, 0, sizeof(*commander));
 
-    appareanceInit(&commander->appareance);
+    commanderApparenceInit(&commander->appareance);
 
     commander->pos = PositionXYZ_decl(27.0, 30.0, 29.0);
     commander->currentXP = 0;
@@ -95,7 +95,7 @@ void commanderEquipmentPrint(CommanderEquipment *equipment) {
     dbg("necklace = %d (%x)", equipment->necklace, equipment->necklace);
 }
 
-void appareancePrint(CommanderAppearence *appareance) {
+void commanderAppareancePrint(CommanderAppearence *appareance) {
     dbg("commanderName = %s", appareance->commanderName);
     dbg("familyName = %s", appareance->familyName);
     dbg("accountId = %llu (%llx)", appareance->accountId, appareance->accountId);
@@ -110,8 +110,8 @@ void appareancePrint(CommanderAppearence *appareance) {
     dbg("pose = %d (%x)", appareance->pose, appareance->pose);
 }
 
-void commanderPrint(Commander *commander) {
-    appareancePrint(&commander->appareance);
+void commanderInfoPrint(CommanderInfo *commander) {
+    commanderAppareancePrint(&commander->appareance);
     dbg("posX = %f %f %f (%x %x %x)",
          commander->pos.x, commander->pos.y, commander->pos.z,
          commander->pos.x, commander->pos.y, commander->pos.z);

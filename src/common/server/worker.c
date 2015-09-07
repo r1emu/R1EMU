@@ -198,15 +198,15 @@ workerNew (
 bool
 workerInit (
     Worker *self,
-    WorkerStartupInfo *info
+    WorkerStartupInfo *workerInfo
 ) {
     // Make a private copy of the WorkerStartupInfo
     if (!(workerStartupInfoInit (
-        &self->info, info->workerId, info->routerId, info->serverType,
-        info->globalServerIp, info->globalServerPort,
-        &info->sqlInfo, &info->redisInfo,
-        info->packetHandlers, info->packetHandlersCount,
-        info->routerIp, info->routerPort))
+        &self->info, workerInfo->workerId, workerInfo->routerId, workerInfo->serverType,
+        workerInfo->globalServerIp, workerInfo->globalServerPort,
+        &workerInfo->sqlInfo, &workerInfo->redisInfo,
+        workerInfo->packetHandlers, workerInfo->packetHandlersCount,
+        workerInfo->routerIp, workerInfo->routerPort))
     ) {
         error("Cannot initialize worker start up info.");
         return false;
@@ -215,7 +215,7 @@ workerInit (
     // ===================================
     //          Initialize MySQL
     // ===================================
-    if (!(self->sqlConn = mySqlNew (&info->sqlInfo))) {
+    if (!(self->sqlConn = mySqlNew (&workerInfo->sqlInfo))) {
         error("Cannot initialize a new MySQL connection.");
         return false;
     }
@@ -228,7 +228,7 @@ workerInit (
     // ===================================
     //     Initialize Redis connection
     // ===================================
-    if (!(self->redis = redisNew (&info->redisInfo))) {
+    if (!(self->redis = redisNew (&workerInfo->redisInfo))) {
         error("Cannot initialize a new Redis connection.");
         return false;
     }

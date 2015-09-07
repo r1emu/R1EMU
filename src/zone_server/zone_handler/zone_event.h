@@ -28,7 +28,7 @@
 /** Event data needed for a commander to update position */
 typedef struct {
     uint16_t mapId;
-    Commander commander;
+    CommanderInfo info;
     PositionXYZ newPosition;
 } GameEventUpdatePosition;
 
@@ -66,7 +66,7 @@ typedef struct {
 
 /** Event data needed for a commander to chat */
 typedef struct {
-    Commander commander;
+    CommanderInfo info;
     uint8_t chatText[0]; // variable length array
 } GameEventChat;
 

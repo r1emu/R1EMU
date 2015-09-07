@@ -54,13 +54,20 @@ bool mySqlStartupInfoInit(
 }
 
 bool mySqlConnect(MySQL *self) {
-    MySQLStartupInfo *info = &self->info;
+    MySQLStartupInfo *sqlInfo = &self->info;
 
-    info("Connecting to the MySQL Server(%s@%s -> %s)...", info->user, info->hostname, info->database);
+    info("Connecting to the MySQL Server(%s@%s -> %s)...", sqlInfo->user, sqlInfo->hostname, sqlInfo->database);
 
-    if(!mysql_real_connect(self->handle, info->hostname, info->user, info->password, info->database, 0, NULL, 0)) {
+    if (!mysql_real_connect(
+        self->handle,
+        sqlInfo->hostname,
+        sqlInfo->user,
+        sqlInfo->password,
+        sqlInfo->database,
+        0, NULL, 0))
+    {
         error("Could not connect to the '%s' database(%s@%s.(mysql_errno = %d)",
-            info->database, info->user, info->hostname, mysql_errno(self->handle));
+            sqlInfo->database, sqlInfo->user, sqlInfo->hostname, mysql_errno(self->handle));
         return false;
     }
 

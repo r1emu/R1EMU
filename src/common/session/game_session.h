@@ -40,7 +40,7 @@ struct GameSession {
     // Barrack session variables
     BarrackSession barrackSession;
 
-    // Commander session variables
+    // CommanderInfo session variables
     CommanderSession commanderSession;
 };
 
@@ -51,7 +51,7 @@ typedef struct GameSession GameSession;
  * @param commander An initialized commander information
  * @return A pointer to an allocated GameSession.
  */
-GameSession *gameSessionNew(Commander *commander);
+GameSession *gameSessionNew(CommanderInfo *commander);
 
 /**
  * @brief Initialize an allocated GameSession structure.
@@ -59,7 +59,7 @@ GameSession *gameSessionNew(Commander *commander);
  * @param commander An initialized commander information
  * @return true on success, false otherwise.
  */
-bool gameSessionInit(GameSession *self, Commander *commander);
+bool gameSessionInit(GameSession *self, CommanderInfo *commander);
 
 /**
  * @brief Prints a GameSession structure.

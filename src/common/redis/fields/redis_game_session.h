@@ -28,7 +28,7 @@
 // Barrack session
 #define REDIS_GAME_SESSION_barrack_charactersCreatedCount_str "barrack_charactersCreatedCount"
 
-// Commander session
+// CommanderInfo session
 #define REDIS_GAME_SESSION_commander_mapId_str           "commander_mapId"
 #define REDIS_GAME_SESSION_commander_commanderName_str   "commander_commanderName"
 #define REDIS_GAME_SESSION_commander_familyName_str      "commander_familyName"
@@ -91,7 +91,7 @@ enum RedisGameSessionFields {
     // Barrack Session
     REDIS_GAME_SESSION_barrack_charactersCreatedCount,
 
-    // Commander Session
+    // CommanderInfo Session
     REDIS_GAME_SESSION_commander_mapId,
     REDIS_GAME_SESSION_commander_commanderName,
     REDIS_GAME_SESSION_commander_familyName,
@@ -127,7 +127,7 @@ enum RedisGameSessionFields {
     REDIS_GAME_SESSION_equipment_ring_right,
     REDIS_GAME_SESSION_equipment_necklace,
 
-    // Commander Info Session
+    // CommanderInfo Info Session
     REDIS_GAME_SESSION_info_posX,
     REDIS_GAME_SESSION_info_posY,
     REDIS_GAME_SESSION_info_posZ,

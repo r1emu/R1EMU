@@ -21,7 +21,7 @@
 
 GameSession *
 gameSessionNew (
-    Commander *commander
+    CommanderInfo *commander
 ) {
     GameSession *self;
 
@@ -41,7 +41,7 @@ gameSessionNew (
 bool
 gameSessionInit (
     GameSession *self,
-    Commander *commander
+    CommanderInfo *commander
 ) {
     memset(self, 0, sizeof(GameSession));
 

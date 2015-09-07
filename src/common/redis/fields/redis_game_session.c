@@ -32,7 +32,7 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_account_privilege] = REDIS_GAME_SESSION_account_privilege_str,
     // Barrack session
     [REDIS_GAME_SESSION_barrack_charactersCreatedCount] = REDIS_GAME_SESSION_barrack_charactersCreatedCount_str,
-    // Commander session
+    // CommanderInfo session
     [REDIS_GAME_SESSION_commander_mapId] = REDIS_GAME_SESSION_commander_mapId_str,
     [REDIS_GAME_SESSION_commander_commanderName] = REDIS_GAME_SESSION_commander_commanderName_str,
     [REDIS_GAME_SESSION_commander_familyName] = REDIS_GAME_SESSION_commander_familyName_str,
@@ -66,7 +66,7 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_equipment_ring_left] = REDIS_GAME_SESSION_equipment_ring_left_str,
     [REDIS_GAME_SESSION_equipment_ring_right] = REDIS_GAME_SESSION_equipment_ring_right_str,
     [REDIS_GAME_SESSION_equipment_necklace] = REDIS_GAME_SESSION_equipment_necklace_str,
-    // Commander Info session
+    // CommanderInfo Info session
     [REDIS_GAME_SESSION_info_posX] = REDIS_GAME_SESSION_info_posX_str,
     [REDIS_GAME_SESSION_info_posY] = REDIS_GAME_SESSION_info_posY_str,
     [REDIS_GAME_SESSION_info_posZ] = REDIS_GAME_SESSION_info_posZ_str,
@@ -135,7 +135,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         " " REDIS_GAME_SESSION_equipment_ring_left_str
         " " REDIS_GAME_SESSION_equipment_ring_right_str
         " " REDIS_GAME_SESSION_equipment_necklace_str
-        // Commander Info
+        // CommanderInfo Info
         " " REDIS_GAME_SESSION_info_posX_str
         " " REDIS_GAME_SESSION_info_posY_str
         " " REDIS_GAME_SESSION_info_posZ_str
@@ -192,7 +192,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
 
             /// Write the reply to the session
             CommanderSession *commanderSession = &gameSession->commanderSession;
-            Commander *cInfo = &commanderSession->currentCommander;
+            CommanderInfo *cInfo = &commanderSession->currentCommander.info;
             CommanderAppearence *appareance = &cInfo->appareance;
             CommanderEquipment *equipment = &appareance->equipment;
 
@@ -240,7 +240,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             equipment->ring_right  = GET_REDIS_32(equipment_ring_right);
             equipment->necklace    = GET_REDIS_32(equipment_necklace);
 
-            // Commander info
+            // CommanderInfo info
             cInfo->pos.x = GET_REDIS_FLOAT (info_posX);
             cInfo->pos.y = GET_REDIS_FLOAT (info_posY);
             cInfo->pos.z = GET_REDIS_FLOAT (info_posZ);
@@ -311,7 +311,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
     bool result = true;
     redisReply *reply = NULL;
 
-    Commander *cInfo = &gameSession->commanderSession.currentCommander;
+    CommanderInfo *cInfo = &gameSession->commanderSession.currentCommander.info;
     CommanderAppearence *appareance = &cInfo->appareance;
     CommanderEquipment *equipment = &appareance->equipment;
 
@@ -357,7 +357,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         " " REDIS_GAME_SESSION_equipment_ring_left_str " %x"
         " " REDIS_GAME_SESSION_equipment_ring_right_str " %x"
         " " REDIS_GAME_SESSION_equipment_necklace_str " %x"
-        // Commander Info
+        // CommanderInfo Info
         " " REDIS_GAME_SESSION_info_posX_str " %f"
         " " REDIS_GAME_SESSION_info_posY_str " %f"
         " " REDIS_GAME_SESSION_info_posZ_str " %f"
@@ -418,7 +418,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         equipment->ring_right,
         equipment->necklace,
 
-        // Commander info
+        // CommanderInfo info
         cInfo->pos.x,
         cInfo->pos.y,
         cInfo->pos.z,

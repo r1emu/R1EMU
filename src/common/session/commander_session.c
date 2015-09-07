@@ -21,7 +21,7 @@
 
 CommanderSession *
 commanderSessionNew (
-    Commander *commander
+    CommanderInfo *commander
 ) {
     CommanderSession *self;
 
@@ -41,11 +41,11 @@ commanderSessionNew (
 bool
 commanderSessionInit (
     CommanderSession *self,
-    Commander *commander
+    CommanderInfo *commander
 ) {
     memset(self, 0, sizeof(CommanderSession));
 
-    memcpy(&self->currentCommander, commander, sizeof(Commander));
+    memcpy(&self->currentCommander, commander, sizeof(self->currentCommander));
 
     return true;
 }
@@ -55,7 +55,7 @@ commanderSessionPrint (
     CommanderSession *self
 ) {
     dbg("==== CommanderSession %p ====", self);
-    commanderPrint (&self->currentCommander);
+    commanderInfoPrint (&self->currentCommander.info);
 }
 
 void

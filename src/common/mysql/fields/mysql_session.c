@@ -18,7 +18,7 @@ void mySqlSessionFlush(MySQL *self, Session *session) {
 
     // flush the commander
     if (mySqlQuery(self, "SELECT count(*) FROM commander WHERE commander_id = %u",
-                   session->game.commanderSession.currentCommander.commanderId)) {
+                   session->game.commanderSession.currentCommander.info.commanderId)) {
         error("SQL Error : %s" , mysql_error(self->handle));
     }
     else {
@@ -38,32 +38,32 @@ void mySqlSessionFlush(MySQL *self, Session *session) {
                 "%d, %d, %d, %d, %d, %d, %d, "
                 "%d, %d, %d, %d, %d, "
                 "%d, %d)",
-                session->game.commanderSession.currentCommander.commanderId,
-                session->game.commanderSession.currentCommander.appareance.accountId,
-                session->game.commanderSession.currentCommander.appareance.commanderName,
-                session->game.commanderSession.currentCommander.appareance.familyName,
-                session->game.commanderSession.currentCommander.appareance.classId,
-                session->game.commanderSession.currentCommander.appareance.gender,
-                session->game.commanderSession.currentCommander.appareance.level,
-                session->game.commanderSession.currentCommander.appareance.equipment.head_top,
-                session->game.commanderSession.currentCommander.appareance.equipment.head_middle,
-                session->game.commanderSession.currentCommander.appareance.equipment.necklace,
-                session->game.commanderSession.currentCommander.appareance.equipment.body_armor,
-                session->game.commanderSession.currentCommander.appareance.equipment.leg_armor,
-                session->game.commanderSession.currentCommander.appareance.equipment.gloves,
-                session->game.commanderSession.currentCommander.appareance.equipment.boots,
-                session->game.commanderSession.currentCommander.appareance.equipment.weapon,
-                session->game.commanderSession.currentCommander.appareance.equipment.shield,
-                session->game.commanderSession.currentCommander.appareance.equipment.costume,
-                session->game.commanderSession.currentCommander.appareance.equipment.bracelet,
-                session->game.commanderSession.currentCommander.appareance.equipment.ring_left,
-                session->game.commanderSession.currentCommander.appareance.equipment.ring_right,
-                session->game.commanderSession.currentCommander.appareance.hairId,
-                session->game.commanderSession.currentCommander.pos.x,
-                session->game.commanderSession.currentCommander.pos.z,
-                session->game.commanderSession.currentCommander.currentXP,
-                session->game.commanderSession.currentCommander.currentHP,
-                session->game.commanderSession.currentCommander.currentSP))
+                session->game.commanderSession.currentCommander.info.commanderId,
+                session->game.commanderSession.currentCommander.info.appareance.accountId,
+                session->game.commanderSession.currentCommander.info.appareance.commanderName,
+                session->game.commanderSession.currentCommander.info.appareance.familyName,
+                session->game.commanderSession.currentCommander.info.appareance.classId,
+                session->game.commanderSession.currentCommander.info.appareance.gender,
+                session->game.commanderSession.currentCommander.info.appareance.level,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.head_top,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.head_middle,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.necklace,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.body_armor,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.leg_armor,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.gloves,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.boots,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.weapon,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.shield,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.costume,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.bracelet,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.ring_left,
+                session->game.commanderSession.currentCommander.info.appareance.equipment.ring_right,
+                session->game.commanderSession.currentCommander.info.appareance.hairId,
+                session->game.commanderSession.currentCommander.info.pos.x,
+                session->game.commanderSession.currentCommander.info.pos.z,
+                session->game.commanderSession.currentCommander.info.currentXP,
+                session->game.commanderSession.currentCommander.info.currentHP,
+                session->game.commanderSession.currentCommander.info.currentSP))
             {
                 error("SQL Error : %s" , mysql_error(self->handle));
             }

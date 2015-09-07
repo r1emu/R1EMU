@@ -62,16 +62,16 @@ serverNew (
 bool
 serverInit (
     Server *self,
-    ServerStartupInfo *info
+    ServerStartupInfo *serverInfo
 ) {
     // Make a private copy
     if (!(serverStartupInfoInit (
         &self->info,
-        info->serverType,
-        &info->routerInfo,
-        info->workersInfo,
-        info->workersInfoCount,
-        info->output)))
+        serverInfo->serverType,
+        &serverInfo->routerInfo,
+        serverInfo->workersInfo,
+        serverInfo->workersInfoCount,
+        serverInfo->output)))
     {
         error("Cannot init the ServerStartupInfo");
         return false;
@@ -84,21 +84,21 @@ serverInit (
     }
 
     // Initialize router
-    if (!(self->router = routerNew (&info->routerInfo))) {
+    if (!(self->router = routerNew (&serverInfo->routerInfo))) {
         error("Cannot allocate a new Router.");
         return false;
     }
 
     // Initialize workers - Start N worker threads.
-    if (!(self->workers = malloc (sizeof(Worker *) * info->routerInfo.workersCount))) {
+    if (!(self->workers = malloc (sizeof(Worker *) * serverInfo->routerInfo.workersCount))) {
         error("Cannot allocate enough Workers.");
         return false;
     }
 
-    for (uint16_t workerId = 0; workerId < info->routerInfo.workersCount; workerId++)
+    for (uint16_t workerId = 0; workerId < serverInfo->routerInfo.workersCount; workerId++)
     {
         // Allocate a new worker
-        if (!(self->workers[workerId] = workerNew (&info->workersInfo[workerId]))) {
+        if (!(self->workers[workerId] = workerNew (&serverInfo->workersInfo[workerId]))) {
             error("Cannot allocate a new worker");
             return false;
         }

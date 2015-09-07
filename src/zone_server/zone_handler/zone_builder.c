@@ -627,7 +627,7 @@ void zoneBuilderLeave(uint32_t targetPcId, zmsg_t *replyMsg) {
 
 void zoneBuilderCampInfo(uint64_t accountId, zmsg_t *replyMsg) {}
 
-void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg) {
+void zoneBuilderEnterPc(CommanderInfo *commander, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
@@ -1344,7 +1344,7 @@ void zoneBuilderMoveSpeed(uint32_t targetPcId, float movementSpeed, zmsg_t *repl
     }
 }
 
-void zoneBuilderChat(Commander *commander, uint8_t *chatText, zmsg_t *replyMsg) {
+void zoneBuilderChat(CommanderInfo *commander, uint8_t *chatText, zmsg_t *replyMsg) {
 
     size_t chatTextLen = strlen(chatText) + 1;
 
@@ -1415,7 +1415,7 @@ void zoneBuilderConnectOk(
     uint32_t pcId,
     uint8_t gameMode,
     uint8_t accountPrivileges,
-    Commander *commander,
+    CommanderInfo *commander,
     zmsg_t *replyMsg)
 {
     #pragma pack(push, 1)
@@ -1430,7 +1430,7 @@ void zoneBuilderConnectOk(
         uint8_t passport[41];
         uint32_t pcId;
         uint32_t unk5;
-        Commander commander;
+        CommanderInfo commander;
     } replyPacket;
     #pragma pack(pop)
 

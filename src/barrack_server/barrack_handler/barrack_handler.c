@@ -213,7 +213,7 @@ static PacketHandlerState barrackHandlerStartGame(
         zoneServerPort,
         session->game.commanderSession.mapId,
         clientPacket->commanderListId,
-        session->game.commanderSession.currentCommander.socialInfoId,
+        session->game.commanderSession.currentCommander.info.socialInfoId,
         false,
         reply
     );
@@ -239,7 +239,7 @@ barrackHandlerCommanderMove(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_MOVE);
 
-    Commander *commander = &session->game.commanderSession.currentCommander;
+    CommanderInfo *commander = &session->game.commanderSession.currentCommander.info;
 
     // TODO : Check position of the client
 
@@ -335,7 +335,7 @@ static PacketHandlerState barrackHandlerBarracknameChange(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_BARRACKNAME_CHANGE);
 
-    Commander *commander = &session->game.commanderSession.currentCommander;
+    CommanderInfo *commander = &session->game.commanderSession.currentCommander.info;
     CommanderAppearence *appareance = &commander->appareance;
 
     // Check if the barrack name is not empty and contains only ASCII characters
@@ -412,7 +412,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_CREATE);
 
-    Commander *commander = &session->game.commanderSession.currentCommander;
+    CommanderInfo *commander = &session->game.commanderSession.currentCommander.info;
     CommanderAppearence *appareance = &commander->appareance;
 
     // CharName
@@ -466,8 +466,8 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     appareance->hairId = clientPacket->hairId;
 
     // PCID
-    session->game.commanderSession.currentCommander.pcId = r1emuGenerateRandom(&self->seed);
-    info("PCID generated : %x", session->game.commanderSession.currentCommander.pcId);
+    session->game.commanderSession.currentCommander.info.pcId = r1emuGenerateRandom(&self->seed);
+    info("PCID generated : %x", session->game.commanderSession.currentCommander.info.pcId);
 
     // CommanderID
     commander->commanderId = r1emuGenerateRandom64(&self->seed);

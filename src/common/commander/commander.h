@@ -8,7 +8,7 @@
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
  * @file commander.h
- * @brief Commander contains all character related functions
+ * @brief CommanderInfo contains all character related functions
  *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
  *          See LICENSE file for further information
@@ -25,7 +25,7 @@
 
 #pragma pack(push, 1)
 /**
- * @brief Commander is the struct of a commander.
+ * @brief CommanderInfo is the struct of a commander.
  */
 typedef struct CommanderEquipment {
     uint32_t head_top;
@@ -96,10 +96,10 @@ typedef struct CommanderCreateInfo {
 #pragma pack(pop)
 
 /**
- * Contains all information about a commander
+ * Contains information about a commander exchanged between the client and server
  */
 #pragma pack(push, 1)
-typedef struct Commander
+typedef struct
 {
     CommanderAppearence appareance;
     PositionXYZ pos;
@@ -116,7 +116,17 @@ typedef struct Commander
     uint32_t maxStamina;
     uint16_t unk6;
     uint16_t unk7;
-    Inventory inventory;
+} CommanderInfo;
+#pragma pack(pop)
+
+/**
+ * Contains all information about a commander
+ */
+#pragma pack(push, 1)
+typedef struct
+{
+    CommanderInfo info;
+
 } Commander;
 #pragma pack(pop)
 
@@ -153,11 +163,11 @@ typedef enum CommanderHair
 /**
  * @brief Initialize a commander with basic information
  */
-void commanderInit(Commander *commander);
-void appareanceInit(CommanderAppearence *commander);
+void commanderInfoInit(CommanderInfo *commander);
+void commanderApparenceInit(CommanderAppearence *appareance);
 
 /**
- * @brief Dump a Commander in the console
+ * @brief Dump a CommanderInfo in the console
  */
-void commanderPrint(Commander *commander);
-void appareancePrint(CommanderAppearence *appareance);
+void commanderInfoPrint(CommanderInfo *commander);
+void commanderAppareancePrint(CommanderAppearence *appareance);

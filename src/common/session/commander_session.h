@@ -36,7 +36,7 @@ typedef struct CommanderSession CommanderSession;
  * @brief Allocate a new CommanderSession structure.
  * @return A pointer to an allocated CommanderSession.
  */
-CommanderSession *commanderSessionNew(Commander *commander);
+CommanderSession *commanderSessionNew(CommanderInfo *commander);
 
 /**
  * @brief Initialize an allocated CommanderSession structure.
@@ -44,7 +44,7 @@ CommanderSession *commanderSessionNew(Commander *commander);
  * @param commander An allocated Commander
  * @return true on success, false otherwise.
  */
-bool commanderSessionInit(CommanderSession *self, Commander *commander);
+bool commanderSessionInit(CommanderSession *self, CommanderInfo *commander);
 
 /**
  * @brief Prints a CommanderSession structure.
