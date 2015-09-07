@@ -193,8 +193,8 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             /// Write the reply to the session
             CommanderSession *commanderSession = &gameSession->commanderSession;
             Commander *cInfo = &commanderSession->currentCommander;
-            CommanderAppearence *commanderAppareance = &cInfo->appareance;
-            CommanderEquipment *equipment = &commanderAppareance->equipment;
+            CommanderAppearence *appareance = &cInfo->appareance;
+            CommanderEquipment *equipment = &appareance->equipment;
 
             // Account
             COPY_REDIS_STR(gameSession->accountSession.login, account_login);
@@ -206,17 +206,17 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
 
             // Commander
             commanderSession->mapId = GET_REDIS_32(commander_mapId);
-            COPY_REDIS_STR(commanderAppareance->commanderName, commander_commanderName);
-            COPY_REDIS_STR(commanderAppareance->familyName, commander_familyName);
-            commanderAppareance->accountId = GET_REDIS_64 (commander_accountId);
-            commanderAppareance->classId   = GET_REDIS_32(commander_classId);
-            commanderAppareance->unk4      = GET_REDIS_32(commander_unk4);
-            commanderAppareance->jobId     = GET_REDIS_32(commander_jobId);
-            commanderAppareance->gender    = GET_REDIS_32(commander_gender);
-            commanderAppareance->unk5      = GET_REDIS_32(commander_unk5);
-            commanderAppareance->level     = GET_REDIS_32(commander_level);
-            commanderAppareance->hairId    = GET_REDIS_32(commander_hairId);
-            commanderAppareance->pose      = GET_REDIS_32(commander_pose);
+            COPY_REDIS_STR(appareance->commanderName, commander_commanderName);
+            COPY_REDIS_STR(appareance->familyName, commander_familyName);
+            appareance->accountId = GET_REDIS_64 (commander_accountId);
+            appareance->classId   = GET_REDIS_32(commander_classId);
+            appareance->unk4      = GET_REDIS_32(commander_unk4);
+            appareance->jobId     = GET_REDIS_32(commander_jobId);
+            appareance->gender    = GET_REDIS_32(commander_gender);
+            appareance->unk5      = GET_REDIS_32(commander_unk5);
+            appareance->level     = GET_REDIS_32(commander_level);
+            appareance->hairId    = GET_REDIS_32(commander_hairId);
+            appareance->pose      = GET_REDIS_32(commander_pose);
 
             // Equipment
             equipment->head_top    = GET_REDIS_32(equipment_head_top);
@@ -312,8 +312,8 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
     redisReply *reply = NULL;
 
     Commander *cInfo = &gameSession->commanderSession.currentCommander;
-    CommanderAppearence *commanderAppareance = &cInfo->appareance;
-    CommanderEquipment *equipment = &commanderAppareance->equipment;
+    CommanderAppearence *appareance = &cInfo->appareance;
+    CommanderEquipment *equipment = &appareance->equipment;
 
     reply = redisCommandDbg(self,
         "HMSET zone%x:map%x:acc%llx"
@@ -384,17 +384,17 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         gameSession->barrackSession.charactersCreatedCount,
         // Commander
         gameSession->commanderSession.mapId,
-        CHECK_REDIS_EMPTY_STRING(commanderAppareance->commanderName),
-        CHECK_REDIS_EMPTY_STRING(commanderAppareance->familyName),
+        CHECK_REDIS_EMPTY_STRING(appareance->commanderName),
+        CHECK_REDIS_EMPTY_STRING(appareance->familyName),
         key->accountId,
-        commanderAppareance->classId,
-        commanderAppareance->unk4,
-        commanderAppareance->jobId,
-        commanderAppareance->gender,
-        commanderAppareance->unk5,
-        commanderAppareance->level,
-        commanderAppareance->hairId,
-        commanderAppareance->pose,
+        appareance->classId,
+        appareance->unk4,
+        appareance->jobId,
+        appareance->gender,
+        appareance->unk5,
+        appareance->level,
+        appareance->hairId,
+        appareance->pose,
 
         // Equipment
         equipment->head_top,

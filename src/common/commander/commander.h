@@ -154,10 +154,10 @@ typedef enum CommanderHair
  * @brief Initialize a commander with basic information
  */
 void commanderInit(Commander *commander);
-void commanderAppareanceInit(CommanderAppearence *commander);
+void appareanceInit(CommanderAppearence *commander);
 
 /**
  * @brief Dump a Commander in the console
  */
 void commanderPrint(Commander *commander);
-void commanderAppareancePrint(CommanderAppearence *commanderAppareance);
+void appareancePrint(CommanderAppearence *appareance);

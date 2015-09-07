@@ -36,7 +36,7 @@ void commanderEquipmentInit(CommanderEquipment *equipment) {
     equipment->necklace = 0xa;
 }
 
-void commanderAppareanceInit(CommanderAppearence *commander) {
+void appareanceInit(CommanderAppearence *commander) {
     memset(commander, 0, sizeof(*commander));
 
     commander->accountId = -1;
@@ -54,7 +54,7 @@ void commanderAppareanceInit(CommanderAppearence *commander) {
 void commanderInit(Commander *commander) {
     memset(commander, 0, sizeof(*commander));
 
-    commanderAppareanceInit(&commander->appareance);
+    appareanceInit(&commander->appareance);
 
     commander->pos = PositionXYZ_decl(27.0, 30.0, 29.0);
     commander->currentXP = 0;
@@ -95,23 +95,23 @@ void commanderEquipmentPrint(CommanderEquipment *equipment) {
     dbg("necklace = %d (%x)", equipment->necklace, equipment->necklace);
 }
 
-void commanderAppareancePrint(CommanderAppearence *commanderAppareance) {
-    dbg("commanderName = %s", commanderAppareance->commanderName);
-    dbg("familyName = %s", commanderAppareance->familyName);
-    dbg("accountId = %llu (%llx)", commanderAppareance->accountId, commanderAppareance->accountId);
-    dbg("classId = %d (%x)", commanderAppareance->classId, commanderAppareance->classId);
-    dbg("unk4 = %d (%x)", commanderAppareance->unk4, commanderAppareance->unk4);
-    dbg("jobId = %d (%x)", commanderAppareance->jobId, commanderAppareance->jobId);
-    dbg("gender = %d (%x)", commanderAppareance->gender, commanderAppareance->gender);
-    dbg("unk5 = %d (%x)", commanderAppareance->unk5, commanderAppareance->unk5);
-    dbg("level = %d (%x)", commanderAppareance->level, commanderAppareance->level);
-    commanderEquipmentPrint(&commanderAppareance->equipment);
-    dbg("hairId = %d (%x)", commanderAppareance->hairId, commanderAppareance->hairId);
-    dbg("pose = %d (%x)", commanderAppareance->pose, commanderAppareance->pose);
+void appareancePrint(CommanderAppearence *appareance) {
+    dbg("commanderName = %s", appareance->commanderName);
+    dbg("familyName = %s", appareance->familyName);
+    dbg("accountId = %llu (%llx)", appareance->accountId, appareance->accountId);
+    dbg("classId = %d (%x)", appareance->classId, appareance->classId);
+    dbg("unk4 = %d (%x)", appareance->unk4, appareance->unk4);
+    dbg("jobId = %d (%x)", appareance->jobId, appareance->jobId);
+    dbg("gender = %d (%x)", appareance->gender, appareance->gender);
+    dbg("unk5 = %d (%x)", appareance->unk5, appareance->unk5);
+    dbg("level = %d (%x)", appareance->level, appareance->level);
+    commanderEquipmentPrint(&appareance->equipment);
+    dbg("hairId = %d (%x)", appareance->hairId, appareance->hairId);
+    dbg("pose = %d (%x)", appareance->pose, appareance->pose);
 }
 
 void commanderPrint(Commander *commander) {
-    commanderAppareancePrint(&commander->appareance);
+    appareancePrint(&commander->appareance);
     dbg("posX = %f %f %f (%x %x %x)",
          commander->pos.x, commander->pos.y, commander->pos.z,
          commander->pos.x, commander->pos.y, commander->pos.z);
