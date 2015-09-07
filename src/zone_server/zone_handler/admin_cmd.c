@@ -65,14 +65,14 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
     commanderInit(&fakePc);
 
     fakePc.pos = session->game.commanderSession.currentCommander.pos;
-    fakePc.base.accountId = r1emuGenerateRandom64(&self->seed);
+    fakePc.appareance.accountId = r1emuGenerateRandom64(&self->seed);
     fakePc.socialInfoId = r1emuGenerateRandom64(&self->seed);
     fakePc.pcId = r1emuGenerateRandom(&self->seed);
     fakePc.commanderId = r1emuGenerateRandom64(&self->seed);
-    snprintf(fakePc.base.familyName, sizeof(fakePc.base.familyName),
+    snprintf(fakePc.appareance.familyName, sizeof(fakePc.appareance.familyName),
         "PcID_%x", fakePc.pcId);
-    snprintf(fakePc.base.commanderName, sizeof(fakePc.base.commanderName),
-        "AccountID_%llx", fakePc.base.accountId);
+    snprintf(fakePc.appareance.commanderName, sizeof(fakePc.appareance.commanderName),
+        "AccountID_%llx", fakePc.appareance.accountId);
 
     // register the fake socket session
     SocketSession fakeSocketSession;
@@ -81,7 +81,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
     socketSessionGenSessionKey((uint8_t *)&sessionKey, sessionKeyStr);
     sprintf(sessionKeyStr, "%.08x", sessionKey);
-    socketSessionInit(&fakeSocketSession, fakePc.base.accountId, self->info.routerId, session->socket.mapId,
+    socketSessionInit(&fakeSocketSession, fakePc.appareance.accountId, self->info.routerId, session->socket.mapId,
         sessionKeyStr, true);
 
     RedisSocketSessionKey socketKey = {
@@ -104,7 +104,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
     redisUpdateGameSession(self->redis, &gameKey, sessionKeyStr, &fakeGameSession);
     info("Fake PC spawned.(SocketID=%s, SocialID=%I64x, AccID=%I64x, PcID=%x, CommID=%I64x)",
-         sessionKeyStr, fakePc.socialInfoId, fakePc.base.accountId, fakePc.pcId, fakePc.commanderId);
+         sessionKeyStr, fakePc.socialInfoId, fakePc.appareance.accountId, fakePc.pcId, fakePc.commanderId);
 
     GameEventEnterPc event = {
         .updatePosEvent = {

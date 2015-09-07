@@ -380,8 +380,8 @@ void barrackBuilderCommanderCreate(CommanderCreateInfo *commanderCreate, zmsg_t 
     #pragma pack(pop)
 
     // ICBT : those values are zeroes for some reason
-    memset(commanderCreate->commander.familyName, 0, sizeof(commanderCreate->commander.familyName));
-    commanderCreate->commander.accountId = 0;
+    memset(commanderCreate->appareance.familyName, 0, sizeof(commanderCreate->appareance.familyName));
+    commanderCreate->appareance.accountId = 0;
 
     PacketType packetType = BC_COMMANDER_CREATE;
     CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);

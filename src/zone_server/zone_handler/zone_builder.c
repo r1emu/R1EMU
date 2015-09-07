@@ -651,7 +651,7 @@ void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg) {
         uint32_t titleAchievmentId; // 24B42B1B
         uint32_t unk9; // FFFFFFFF
         uint8_t unk10; // 00
-        CommanderPkt commander;
+        CommanderAppearence commander;
         uint8_t partyName[48+1]; // "None"
     } replyPacket;
     #pragma pack(pop)
@@ -681,7 +681,7 @@ void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg) {
         replyPacket.titleAchievmentId = SWAP_UINT32(0xA1860100); // ICBT, "Hunter"
         replyPacket.unk9 = -1;
         replyPacket.unk10 = 0;
-        memcpy(&replyPacket.commander, &commander->base, sizeof(replyPacket.commander));
+        memcpy(&replyPacket.commander, &commander->appareance, sizeof(replyPacket.commander));
         strncpy(replyPacket.partyName, "None", sizeof(replyPacket.partyName));
     }
 }
@@ -1373,15 +1373,15 @@ void zoneBuilderChat(Commander *commander, uint8_t *chatText, zmsg_t *replyMsg) 
     {
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
         replyPacket.pcId = commander->pcId;
-        memcpy(replyPacket.familyName, commander->base.familyName, sizeof(replyPacket.familyName));
-        memcpy(replyPacket.commanderName, commander->base.commanderName, sizeof(replyPacket.commanderName));
+        memcpy(replyPacket.familyName, commander->appareance.familyName, sizeof(replyPacket.familyName));
+        memcpy(replyPacket.commanderName, commander->appareance.commanderName, sizeof(replyPacket.commanderName));
         replyPacket.unk1 = 0x4F;
-        replyPacket.jobId = commander->base.jobId;
+        replyPacket.jobId = commander->appareance.jobId;
         replyPacket.unk2 = 1;
-        replyPacket.gender = commander->base.gender;
-        replyPacket.hairId = commander->base.hairId;
+        replyPacket.gender = commander->appareance.gender;
+        replyPacket.hairId = commander->appareance.hairId;
         replyPacket.unk3 = 0;
-        replyPacket.headTop = commander->base.equipment.head_top;
+        replyPacket.headTop = commander->appareance.equipment.head_top;
         replyPacket.displayTime = 0;
         memcpy(replyPacket.chatText, chatText, sizeof(replyPacket.chatText));
     }

@@ -36,25 +36,6 @@ typedef enum PacketTypeBarrackNormal {
 
 } PacketTypeBarrackNormal;
 
-/**
- * Structure of variables needed for BC_COMMANDER_CREATE
- */
-typedef struct CommanderCreateInfo {
-    CommanderPkt commander;
-    uint64_t socialInfoId;
-    uint16_t commanderPosition;
-    uint16_t mapId;
-    uint32_t unk4;
-    uint32_t unk5;
-    uint32_t maxXP;
-    uint32_t unk6;
-    PositionXYZ pos;
-    PositionXZ dir;
-    PositionXYZ pos2;
-    PositionXZ dir2;
-    uint32_t unk8;
-} CommanderCreateInfo;
-
 
 /**
  * @brief Send back the information of the account after a successful log in
