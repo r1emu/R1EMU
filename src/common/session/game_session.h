@@ -48,18 +48,18 @@ typedef struct GameSession GameSession;
 
 /**
  * @brief Allocate a new GameSession structure.
- * @param commanderInfo An initialized commander information
+ * @param commander An initialized commander information
  * @return A pointer to an allocated GameSession.
  */
-GameSession *gameSessionNew(CommanderInfo *commanderInfo);
+GameSession *gameSessionNew(Commander *commander);
 
 /**
  * @brief Initialize an allocated GameSession structure.
  * @param self An allocated GameSession to initialize.
- * @param commanderInfo An initialized commander information
+ * @param commander An initialized commander information
  * @return true on success, false otherwise.
  */
-bool gameSessionInit(GameSession *self, CommanderInfo *commanderInfo);
+bool gameSessionInit(GameSession *self, Commander *commander);
 
 /**
  * @brief Prints a GameSession structure.

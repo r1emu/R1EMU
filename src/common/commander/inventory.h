@@ -47,13 +47,20 @@ typedef enum {
     INVENTORY_CAT_CARD = 9,
     INVENTORY_CAT_COLLECTION = 10,
     INVENTORY_CAT_BOOK = 11,
-    INVENTORY_CAT_QUEST = 12,
+    INVENTORY_CAT_QUEST =  12,
     INVENTORY_CAT_PETWEAPON = 13,
     INVENTORY_CAT_PETARMOR = 14,
 }   InventoryCategory;
 
 // ------ Structure declaration -------
 typedef struct Inventory Inventory;
+
+/**
+ * @brief Inventory contains the basic structure of an inventory
+ */
+struct Inventory
+{
+};
 
 // ----------- Functions ------------
 /**

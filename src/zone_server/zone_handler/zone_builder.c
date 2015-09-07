@@ -627,7 +627,7 @@ void zoneBuilderLeave(uint32_t targetPcId, zmsg_t *replyMsg) {
 
 void zoneBuilderCampInfo(uint64_t accountId, zmsg_t *replyMsg) {}
 
-void zoneBuilderEnterPc(CommanderInfo *commanderInfo, zmsg_t *replyMsg) {
+void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
@@ -662,26 +662,26 @@ void zoneBuilderEnterPc(CommanderInfo *commanderInfo, zmsg_t *replyMsg) {
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
-        replyPacket.pcId = commanderInfo->pcId;
-        replyPacket.position = commanderInfo->pos;
+        replyPacket.pcId = commander->pcId;
+        replyPacket.position = commander->pos;
         replyPacket.unk1 = 1.0f;
         replyPacket.unk2 = 0;
         replyPacket.unk3 = 0;
-        replyPacket.socialInfoId = commanderInfo->socialInfoId;
+        replyPacket.socialInfoId = commander->socialInfoId;
         replyPacket.pose = 0;
         replyPacket.moveSpeed = 31.0f; // TODO : store this in CommanderSession
-        replyPacket.currentHP = commanderInfo->currentHP;
-        replyPacket.maxHP = commanderInfo->maxHP;
-        replyPacket.currentSP = commanderInfo->currentSP;
-        replyPacket.maxSP = commanderInfo->maxSP;
-        replyPacket.currentStamina = commanderInfo->currentStamina;
-        replyPacket.maxStamina = commanderInfo->maxStamina;
+        replyPacket.currentHP = commander->currentHP;
+        replyPacket.maxHP = commander->maxHP;
+        replyPacket.currentSP = commander->currentSP;
+        replyPacket.maxSP = commander->maxSP;
+        replyPacket.currentStamina = commander->currentStamina;
+        replyPacket.maxStamina = commander->maxStamina;
         replyPacket.unk6 = 0;
         replyPacket.unk7 = 0;
         replyPacket.titleAchievmentId = SWAP_UINT32(0xA1860100); // ICBT, "Hunter"
         replyPacket.unk9 = -1;
         replyPacket.unk10 = 0;
-        memcpy(&replyPacket.commander, &commanderInfo->base, sizeof(replyPacket.commander));
+        memcpy(&replyPacket.commander, &commander->base, sizeof(replyPacket.commander));
         strncpy(replyPacket.partyName, "None", sizeof(replyPacket.partyName));
     }
 }
@@ -1344,7 +1344,7 @@ void zoneBuilderMoveSpeed(uint32_t targetPcId, float movementSpeed, zmsg_t *repl
     }
 }
 
-void zoneBuilderChat(CommanderInfo *commander, uint8_t *chatText, zmsg_t *replyMsg) {
+void zoneBuilderChat(Commander *commander, uint8_t *chatText, zmsg_t *replyMsg) {
 
     size_t chatTextLen = strlen(chatText) + 1;
 
@@ -1415,7 +1415,7 @@ void zoneBuilderConnectOk(
     uint32_t pcId,
     uint8_t gameMode,
     uint8_t accountPrivileges,
-    CommanderInfo *commander,
+    Commander *commander,
     zmsg_t *replyMsg)
 {
     #pragma pack(push, 1)
@@ -1430,7 +1430,7 @@ void zoneBuilderConnectOk(
         uint8_t passport[41];
         uint32_t pcId;
         uint32_t unk5;
-        CommanderInfo commander;
+        Commander commander;
     } replyPacket;
     #pragma pack(pop)
 

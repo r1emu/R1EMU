@@ -36,7 +36,7 @@ void commanderEquipmentInit(CommanderEquipment *equipment) {
     equipment->necklace = 0xa;
 }
 
-void commanderInit(CommanderPkt *commander) {
+void commanderPktInit(CommanderPkt *commander) {
     memset(commander, 0, sizeof(*commander));
 
     commander->accountId = -1;
@@ -51,25 +51,25 @@ void commanderInit(CommanderPkt *commander) {
     commander->pose = SWAP_UINT16(0x0000); // Idle (ICBT)
 }
 
-void commanderInfoInit(CommanderInfo *commanderInfo) {
-    memset(commanderInfo, 0, sizeof(*commanderInfo));
+void commanderInit(Commander *commander) {
+    memset(commander, 0, sizeof(*commander));
 
-    commanderInit(&commanderInfo->base);
+    commanderPktInit(&commander->base);
 
-    commanderInfo->pos = PositionXYZ_decl(27.0, 30.0, 29.0);
-    commanderInfo->currentXP = 0;
-    commanderInfo->maxXP = 0xC; // ICBT
-    commanderInfo->pcId = -1;
-    commanderInfo->socialInfoId = -1;
-    commanderInfo->commanderId = -1;
-    commanderInfo->currentHP = 238;
-    commanderInfo->maxHP = 238;
-    commanderInfo->currentSP = 105;
-    commanderInfo->maxSP = 105;
-    commanderInfo->currentStamina = 25000;
-    commanderInfo->maxStamina = 25000;
-    commanderInfo->unk6 = SWAP_UINT16(0x0020);
-    commanderInfo->unk7 = SWAP_UINT16(0x5910); // ICBT
+    commander->pos = PositionXYZ_decl(27.0, 30.0, 29.0);
+    commander->currentXP = 0;
+    commander->maxXP = 0xC; // ICBT
+    commander->pcId = -1;
+    commander->socialInfoId = -1;
+    commander->commanderId = -1;
+    commander->currentHP = 238;
+    commander->maxHP = 238;
+    commander->currentSP = 105;
+    commander->maxSP = 105;
+    commander->currentStamina = 25000;
+    commander->maxStamina = 25000;
+    commander->unk6 = SWAP_UINT16(0x0020);
+    commander->unk7 = SWAP_UINT16(0x5910); // ICBT
 }
 
 void commanderEquipmentPrint(CommanderEquipment *equipment) {
@@ -95,36 +95,36 @@ void commanderEquipmentPrint(CommanderEquipment *equipment) {
     dbg("necklace = %d (%x)", equipment->necklace, equipment->necklace);
 }
 
-void commanderPrint(CommanderPkt *commander) {
-    dbg("commanderName = %s", commander->commanderName);
-    dbg("familyName = %s", commander->familyName);
-    dbg("accountId = %llu (%llx)", commander->accountId, commander->accountId);
-    dbg("classId = %d (%x)", commander->classId, commander->classId);
-    dbg("unk4 = %d (%x)", commander->unk4, commander->unk4);
-    dbg("jobId = %d (%x)", commander->jobId, commander->jobId);
-    dbg("gender = %d (%x)", commander->gender, commander->gender);
-    dbg("unk5 = %d (%x)", commander->unk5, commander->unk5);
-    dbg("level = %d (%x)", commander->level, commander->level);
-    commanderEquipmentPrint(&commander->equipment);
-    dbg("hairId = %d (%x)", commander->hairId, commander->hairId);
-    dbg("pose = %d (%x)", commander->pose, commander->pose);
+void commanderPktPrint(CommanderPkt *commanderPkt) {
+    dbg("commanderName = %s", commanderPkt->commanderName);
+    dbg("familyName = %s", commanderPkt->familyName);
+    dbg("accountId = %llu (%llx)", commanderPkt->accountId, commanderPkt->accountId);
+    dbg("classId = %d (%x)", commanderPkt->classId, commanderPkt->classId);
+    dbg("unk4 = %d (%x)", commanderPkt->unk4, commanderPkt->unk4);
+    dbg("jobId = %d (%x)", commanderPkt->jobId, commanderPkt->jobId);
+    dbg("gender = %d (%x)", commanderPkt->gender, commanderPkt->gender);
+    dbg("unk5 = %d (%x)", commanderPkt->unk5, commanderPkt->unk5);
+    dbg("level = %d (%x)", commanderPkt->level, commanderPkt->level);
+    commanderEquipmentPrint(&commanderPkt->equipment);
+    dbg("hairId = %d (%x)", commanderPkt->hairId, commanderPkt->hairId);
+    dbg("pose = %d (%x)", commanderPkt->pose, commanderPkt->pose);
 }
 
-void commanderInfoPrint(CommanderInfo *commanderInfo) {
-    commanderPrint(&commanderInfo->base);
+void commanderPrint(Commander *commander) {
+    commanderPktPrint(&commander->base);
     dbg("posX = %f %f %f (%x %x %x)",
-         commanderInfo->pos.x, commanderInfo->pos.y, commanderInfo->pos.z,
-         commanderInfo->pos.x, commanderInfo->pos.y, commanderInfo->pos.z);
-    dbg("currentXP = %d (%x)", commanderInfo->currentXP, commanderInfo->currentXP);
-    dbg("maxXP = %d (%x)", commanderInfo->maxXP, commanderInfo->maxXP);
-    dbg("socialInfoId = %llu (%llx)", commanderInfo->socialInfoId, commanderInfo->socialInfoId);
-    dbg("commanderId = %llu (%llx)", commanderInfo->commanderId, commanderInfo->commanderId);
-    dbg("currentHP = %d (%x)", commanderInfo->currentHP, commanderInfo->currentHP);
-    dbg("maxHP = %d (%x)", commanderInfo->maxHP, commanderInfo->maxHP);
-    dbg("currentSP = %d (%x)", commanderInfo->currentSP, commanderInfo->currentSP);
-    dbg("maxSP = %d (%x)", commanderInfo->maxSP, commanderInfo->maxSP);
-    dbg("currentStamina = %d (%x)", commanderInfo->currentStamina, commanderInfo->currentStamina);
-    dbg("maxStamina = %d (%x)", commanderInfo->maxStamina, commanderInfo->maxStamina);
-    dbg("unk6 = %d (%x)", commanderInfo->unk6, commanderInfo->unk6);
-    dbg("unk7 = %d (%x)", commanderInfo->unk7, commanderInfo->unk7);
+         commander->pos.x, commander->pos.y, commander->pos.z,
+         commander->pos.x, commander->pos.y, commander->pos.z);
+    dbg("currentXP = %d (%x)", commander->currentXP, commander->currentXP);
+    dbg("maxXP = %d (%x)", commander->maxXP, commander->maxXP);
+    dbg("socialInfoId = %llu (%llx)", commander->socialInfoId, commander->socialInfoId);
+    dbg("commanderId = %llu (%llx)", commander->commanderId, commander->commanderId);
+    dbg("currentHP = %d (%x)", commander->currentHP, commander->currentHP);
+    dbg("maxHP = %d (%x)", commander->maxHP, commander->maxHP);
+    dbg("currentSP = %d (%x)", commander->currentSP, commander->currentSP);
+    dbg("maxSP = %d (%x)", commander->maxSP, commander->maxSP);
+    dbg("currentStamina = %d (%x)", commander->currentStamina, commander->currentStamina);
+    dbg("maxStamina = %d (%x)", commander->maxStamina, commander->maxStamina);
+    dbg("unk6 = %d (%x)", commander->unk6, commander->unk6);
+    dbg("unk7 = %d (%x)", commander->unk7, commander->unk7);
 }

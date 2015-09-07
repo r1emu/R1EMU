@@ -27,7 +27,7 @@ struct CommanderSession {
     uint16_t mapId;
 
     // current commander
-    CommanderInfo currentCommander;
+    Commander currentCommander;
 };
 
 typedef struct CommanderSession CommanderSession;
@@ -36,15 +36,15 @@ typedef struct CommanderSession CommanderSession;
  * @brief Allocate a new CommanderSession structure.
  * @return A pointer to an allocated CommanderSession.
  */
-CommanderSession *commanderSessionNew(CommanderInfo *commanderInfo);
+CommanderSession *commanderSessionNew(Commander *commander);
 
 /**
  * @brief Initialize an allocated CommanderSession structure.
  * @param self An allocated CommanderSession to initialize.
- * @param commanderInfo An allocated CommanderInfo
+ * @param commander An allocated Commander
  * @return true on success, false otherwise.
  */
-bool commanderSessionInit(CommanderSession *self, CommanderInfo *commanderInfo);
+bool commanderSessionInit(CommanderSession *self, Commander *commander);
 
 /**
  * @brief Prints a CommanderSession structure.

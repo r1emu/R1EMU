@@ -91,7 +91,7 @@ bool zoneEventServerUpdateClientPosition (
 
     uint8_t *emitterSk = event->emitterSk;
     uint16_t mapId = updatePosEvent->mapId;
-    CommanderInfo *commanderInfo = &updatePosEvent->commanderInfo;
+    Commander *commander = &updatePosEvent->commander;
 
     // Get the clients around
     if (!(redisClientsAround = eventServerRedisGetClientsWithinRange (
@@ -148,7 +148,7 @@ bool zoneEventServerUpdateClientPosition (
         // Send the ZC_PC_ENTER to clients who now sees the current client
         if (zlist_size (pcEnterList) > 0) {
             pcEnterMsg = zmsg_new ();
-            zoneBuilderEnterPc (commanderInfo, pcEnterMsg);
+            zoneBuilderEnterPc (commander, pcEnterMsg);
             if (!(eventServerSendToClients (self, redisClientsAround, pcEnterMsg))) {
                 error("Failed to send the packet to the clients.");
                 status = false;
@@ -207,7 +207,7 @@ bool zoneEventServerUpdateClientPosition (
     if (zlist_size (pcLeaveList) > 0)
     {
         pcLeaveMsg = zmsg_new ();
-        zoneBuilderLeave (commanderInfo->pcId, pcLeaveMsg);
+        zoneBuilderLeave (commander->pcId, pcLeaveMsg);
 
         // Also, send to the current player the list of left players
         if (!(eventServerSendToClients (self, pcLeaveList, pcLeaveMsg))) {

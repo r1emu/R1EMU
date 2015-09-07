@@ -13,7 +13,7 @@
 
 #include "mysql_session.h"
 
-void mySqlFlushSession(MySQL *self, Session *session) {
+void mySqlSessionFlush(MySQL *self, Session *session) {
     MYSQL_ROW count;
 
     // flush the commander

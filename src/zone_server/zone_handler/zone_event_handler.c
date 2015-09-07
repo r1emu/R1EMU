@@ -87,7 +87,7 @@ bool zoneEventHandlerCommanderMove(EventServer *self, GameEvent *event) {
         msg = zmsg_new();
 
         zoneBuilderMoveDir(
-            moveEvent->updatePosEvent.commanderInfo.pcId,
+            moveEvent->updatePosEvent.commander.pcId,
             &moveEvent->position,
             &moveEvent->direction,
             moveEvent->timestamp,
@@ -127,7 +127,7 @@ bool zoneEventHandlerMoveStop(EventServer *self, GameEvent *event) {
         msg = zmsg_new ();
 
         zoneBuilderPcMoveStop(
-            moveStopEvent->updatePosEvent.commanderInfo.pcId,
+            moveStopEvent->updatePosEvent.commander.pcId,
             &moveStopEvent->position,
             &moveStopEvent->direction,
             moveStopEvent->timestamp,
@@ -169,7 +169,7 @@ bool zoneEventHandlerJump(EventServer *self, GameEvent *event) {
     // build the packet for the clients around
     msg = zmsg_new();
 
-    zoneBuilderJump(jumpEvent->updatePosEvent.commanderInfo.pcId, jumpEvent->height, msg);
+    zoneBuilderJump(jumpEvent->updatePosEvent.commander.pcId, jumpEvent->height, msg);
 
     // send the packet
     if (!(eventServerSendToClients(self, clientsAround, msg))) {

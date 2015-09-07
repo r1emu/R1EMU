@@ -64,7 +64,7 @@
 #define REDIS_GAME_SESSION_equipment_ring_right_str      "equipment_ring_right"
 #define REDIS_GAME_SESSION_equipment_necklace_str        "equipment_necklace"
 
-// CommanderInfo
+// Commander
 #define REDIS_GAME_SESSION_info_posX_str            "info_posX"
 #define REDIS_GAME_SESSION_info_posY_str            "info_posY"
 #define REDIS_GAME_SESSION_info_posZ_str            "info_posZ"

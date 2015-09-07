@@ -17,6 +17,7 @@
 #pragma once
 
 #include "R1EMU.h"
+#include "inventory.h"
 
 #define COMMANDER_NAME_SIZE 64
 #define COMMANDER_FAMILY_NAME_SIZE 64
@@ -24,7 +25,7 @@
 
 #pragma pack(push, 1)
 /**
- * @brief CommanderInfo is the struct of a commander.
+ * @brief Commander is the struct of a commander.
  */
 typedef struct CommanderEquipment {
     uint32_t head_top;
@@ -72,7 +73,7 @@ typedef struct CommanderPkt
     uint16_t pose;
 } CommanderPkt;
 
-typedef struct CommanderInfo
+typedef struct Commander
 {
     CommanderPkt base;
     PositionXYZ pos;
@@ -89,7 +90,8 @@ typedef struct CommanderInfo
     uint32_t maxStamina;
     uint16_t unk6;
     uint16_t unk7;
-} CommanderInfo;
+    Inventory inventory;
+} Commander;
 #pragma pack(pop)
 
 typedef enum CommanderJobId
@@ -125,9 +127,11 @@ typedef enum CommanderHair
 /**
  * @brief Initialize a commander with basic information
  */
-void commanderInfoInit(CommanderInfo *commander);
+void commanderInit(Commander *commander);
+void commanderPktInit(CommanderPkt *commander);
 
 /**
- * @brief Dump a CommanderInfo in the console
+ * @brief Dump a Commander in the console
  */
-void commanderInfoPrint(CommanderInfo *commander);
+void commanderPrint(Commander *commander);
+void commanderPktPrint(CommanderPkt *commanderPkt);

@@ -17,13 +17,6 @@
 
 
 // ------ Structure declaration -------
-/**
- * @brief Inventory contains
- */
-struct Inventory
-{
-
-};
 
 // ------ Static declaration -------
 
@@ -48,6 +41,8 @@ Inventory *inventoryNew(void) {
 
 bool inventoryInit(Inventory *self) {
     memset(self, 0, sizeof(Inventory));
+
+
 
     return true;
 }

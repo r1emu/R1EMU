@@ -239,18 +239,18 @@ barrackHandlerCommanderMove(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_MOVE);
 
-    CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
+    Commander *commander = &session->game.commanderSession.currentCommander;
 
     // TODO : Check position of the client
 
     // Update session
-    memcpy(&commanderInfo->pos, &clientPacket->position, sizeof(PositionXZ));
+    memcpy(&commander->pos, &clientPacket->position, sizeof(PositionXZ));
 
     // Build packet
     barrackBuilderCommanderMoveOk(
         session->socket.accountId,
         clientPacket->commanderListId,
-        &commanderInfo->pos,
+        &commander->pos,
         reply
     );
 
@@ -335,8 +335,8 @@ static PacketHandlerState barrackHandlerBarracknameChange(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_BARRACKNAME_CHANGE);
 
-    CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
-    CommanderPkt *commander = &commanderInfo->base;
+    Commander *commander = &session->game.commanderSession.currentCommander;
+    CommanderPkt *commanderPkt = &commander->base;
 
     // Check if the barrack name is not empty and contains only ASCII characters
     size_t barrackNameLen = strlen(clientPacket->barrackName);
@@ -354,10 +354,10 @@ static PacketHandlerState barrackHandlerBarracknameChange(
     }
 
     // Update the session
-    strncpy(commander->familyName, clientPacket->barrackName, sizeof(commander->familyName));
+    strncpy(commanderPkt->familyName, clientPacket->barrackName, sizeof(commanderPkt->familyName));
 
     // Build the reply packet
-    barrackBuilderBarrackNameChange(commander->familyName, reply);
+    barrackBuilderBarrackNameChange(commanderPkt->familyName, reply);
 
     return PACKET_HANDLER_UPDATE_SESSION;
 }
@@ -412,14 +412,14 @@ static PacketHandlerState barrackHandlerCommanderCreate(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_CREATE);
 
-    CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
-    CommanderPkt *commander = &commanderInfo->base;
+    Commander *commander = &session->game.commanderSession.currentCommander;
+    CommanderPkt *commanderPkt = &commander->base;
 
     // CharName
-    strncpy(commander->commanderName, clientPacket->commanderName, sizeof(commander->commanderName));
+    strncpy(commanderPkt->commanderName, clientPacket->commanderName, sizeof(commanderPkt->commanderName));
 
     // AccountID
-    commander->accountId = session->socket.accountId;
+    commanderPkt->accountId = session->socket.accountId;
 
     // JobID
     switch(clientPacket->jobId) {
@@ -428,26 +428,26 @@ static PacketHandlerState barrackHandlerCommanderCreate(
             return PACKET_HANDLER_ERROR;
             break;
         case COMMANDER_JOB_WARRIOR:
-            commander->classId = COMMANDER_CLASS_WARRIOR;
+            commanderPkt->classId = COMMANDER_CLASS_WARRIOR;
             break;
         case COMMANDER_JOB_ARCHER:
-            commander->classId = COMMANDER_CLASS_ARCHER;
+            commanderPkt->classId = COMMANDER_CLASS_ARCHER;
             break;
         case COMMANDER_JOB_MAGE:
-            commander->classId = COMMANDER_CLASS_MAGE;
+            commanderPkt->classId = COMMANDER_CLASS_MAGE;
             break;
         case COMMANDER_JOB_CLERIC:
-            commander->classId = COMMANDER_CLASS_CLERIC;
+            commanderPkt->classId = COMMANDER_CLASS_CLERIC;
             break;
     }
 
-    commander->jobId = clientPacket->jobId;
+    commanderPkt->jobId = clientPacket->jobId;
 
     // Gender
     switch(clientPacket->gender) {
         case COMMANDER_GENDER_MALE:
         case COMMANDER_GENDER_FEMALE:
-            commander->gender = clientPacket->gender;
+            commanderPkt->gender = clientPacket->gender;
             break;
 
         case COMMANDER_GENDER_BOTH:
@@ -463,22 +463,22 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     }
 
     // Hair type
-    commander->hairId = clientPacket->hairId;
+    commanderPkt->hairId = clientPacket->hairId;
 
     // PCID
     session->game.commanderSession.currentCommander.pcId = r1emuGenerateRandom(&self->seed);
     info("PCID generated : %x", session->game.commanderSession.currentCommander.pcId);
 
     // CommanderID
-    commanderInfo->commanderId = r1emuGenerateRandom64(&self->seed);
-    info("CommanderID generated : %llx", commanderInfo->commanderId);
+    commander->commanderId = r1emuGenerateRandom64(&self->seed);
+    info("CommanderID generated : %llx", commander->commanderId);
 
     // SocialInfoID
-    commanderInfo->socialInfoId = r1emuGenerateRandom64(&self->seed);
-    info("SocialInfoID generated : %llx", commanderInfo->socialInfoId);
+    commander->socialInfoId = r1emuGenerateRandom64(&self->seed);
+    info("SocialInfoID generated : %llx", commander->socialInfoId);
 
     // Position : Center of the barrack
-    commanderInfo->pos = PositionXYZ_decl(19.0, 28.0, 29.0);
+    commander->pos = PositionXYZ_decl(19.0, 28.0, 29.0);
 
     // Default MapId : West Siauliai Woods
     session->game.commanderSession.mapId = 1002;
@@ -489,17 +489,17 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     // Build the reply packet
     PositionXZ commanderDir = PositionXZ_decl(-0.707107f, 0.707107f);
     CommanderCreateInfo commanderCreate = {
-        .commander = commanderInfo->base,
+        .commander = commander->base,
         .mapId = session->game.commanderSession.mapId,
-        .socialInfoId = commanderInfo->socialInfoId,
+        .socialInfoId = commander->socialInfoId,
         .commanderPosition = session->game.barrackSession.charactersCreatedCount,
         .unk4 = SWAP_UINT32(0x02000000), // ICBT
         .unk5 = 0,
         .maxXP = 0xC, // ICBT ; TODO : Implement EXP table
         .unk6 = SWAP_UINT32(0xC01C761C), // ICBT
-        .pos = commanderInfo->pos,
+        .pos = commander->pos,
         .dir = commanderDir,
-        .pos2 = commanderInfo->pos,
+        .pos2 = commander->pos,
         .dir2 = commanderDir,
     };
     barrackBuilderCommanderCreate(&commanderCreate, reply);

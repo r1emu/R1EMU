@@ -21,7 +21,7 @@
 
 CommanderSession *
 commanderSessionNew (
-    CommanderInfo *commanderInfo
+    Commander *commander
 ) {
     CommanderSession *self;
 
@@ -29,7 +29,7 @@ commanderSessionNew (
         return NULL;
     }
 
-    if (!commanderSessionInit (self, commanderInfo)) {
+    if (!commanderSessionInit (self, commander)) {
         commanderSessionDestroy (&self);
         error("CommanderSession failed to initialize.");
         return NULL;
@@ -41,11 +41,11 @@ commanderSessionNew (
 bool
 commanderSessionInit (
     CommanderSession *self,
-    CommanderInfo *commanderInfo
+    Commander *commander
 ) {
     memset(self, 0, sizeof(CommanderSession));
 
-    memcpy(&self->currentCommander, commanderInfo, sizeof(CommanderInfo));
+    memcpy(&self->currentCommander, commander, sizeof(Commander));
 
     return true;
 }
@@ -55,7 +55,7 @@ commanderSessionPrint (
     CommanderSession *self
 ) {
     dbg("==== CommanderSession %p ====", self);
-    commanderInfoPrint (&self->currentCommander);
+    commanderPrint (&self->currentCommander);
 }
 
 void

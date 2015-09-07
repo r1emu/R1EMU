@@ -192,9 +192,9 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
 
             /// Write the reply to the session
             CommanderSession *commanderSession = &gameSession->commanderSession;
-            CommanderInfo *cInfo = &commanderSession->currentCommander;
-            CommanderPkt *commander = &cInfo->base;
-            CommanderEquipment *equipment = &commander->equipment;
+            Commander *cInfo = &commanderSession->currentCommander;
+            CommanderPkt *commanderPkt = &cInfo->base;
+            CommanderEquipment *equipment = &commanderPkt->equipment;
 
             // Account
             COPY_REDIS_STR(gameSession->accountSession.login, account_login);
@@ -206,17 +206,17 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
 
             // Commander
             commanderSession->mapId = GET_REDIS_32(commander_mapId);
-            COPY_REDIS_STR(commander->commanderName, commander_commanderName);
-            COPY_REDIS_STR(commander->familyName, commander_familyName);
-            commander->accountId = GET_REDIS_64 (commander_accountId);
-            commander->classId   = GET_REDIS_32(commander_classId);
-            commander->unk4      = GET_REDIS_32(commander_unk4);
-            commander->jobId     = GET_REDIS_32(commander_jobId);
-            commander->gender    = GET_REDIS_32(commander_gender);
-            commander->unk5      = GET_REDIS_32(commander_unk5);
-            commander->level     = GET_REDIS_32(commander_level);
-            commander->hairId  = GET_REDIS_32(commander_hairId);
-            commander->pose      = GET_REDIS_32(commander_pose);
+            COPY_REDIS_STR(commanderPkt->commanderName, commander_commanderName);
+            COPY_REDIS_STR(commanderPkt->familyName, commander_familyName);
+            commanderPkt->accountId = GET_REDIS_64 (commander_accountId);
+            commanderPkt->classId   = GET_REDIS_32(commander_classId);
+            commanderPkt->unk4      = GET_REDIS_32(commander_unk4);
+            commanderPkt->jobId     = GET_REDIS_32(commander_jobId);
+            commanderPkt->gender    = GET_REDIS_32(commander_gender);
+            commanderPkt->unk5      = GET_REDIS_32(commander_unk5);
+            commanderPkt->level     = GET_REDIS_32(commander_level);
+            commanderPkt->hairId    = GET_REDIS_32(commander_hairId);
+            commanderPkt->pose      = GET_REDIS_32(commander_pose);
 
             // Equipment
             equipment->head_top    = GET_REDIS_32(equipment_head_top);
@@ -311,9 +311,9 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
     bool result = true;
     redisReply *reply = NULL;
 
-    CommanderInfo *cInfo = &gameSession->commanderSession.currentCommander;
-    CommanderPkt *commander = &cInfo->base;
-    CommanderEquipment *equipment = &commander->equipment;
+    Commander *cInfo = &gameSession->commanderSession.currentCommander;
+    CommanderPkt *commanderPkt = &cInfo->base;
+    CommanderEquipment *equipment = &commanderPkt->equipment;
 
     reply = redisCommandDbg(self,
         "HMSET zone%x:map%x:acc%llx"
@@ -384,17 +384,17 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         gameSession->barrackSession.charactersCreatedCount,
         // Commander
         gameSession->commanderSession.mapId,
-        CHECK_REDIS_EMPTY_STRING(commander->commanderName),
-        CHECK_REDIS_EMPTY_STRING(commander->familyName),
+        CHECK_REDIS_EMPTY_STRING(commanderPkt->commanderName),
+        CHECK_REDIS_EMPTY_STRING(commanderPkt->familyName),
         key->accountId,
-        commander->classId,
-        commander->unk4,
-        commander->jobId,
-        commander->gender,
-        commander->unk5,
-        commander->level,
-        commander->hairId,
-        commander->pose,
+        commanderPkt->classId,
+        commanderPkt->unk4,
+        commanderPkt->jobId,
+        commanderPkt->gender,
+        commanderPkt->unk5,
+        commanderPkt->level,
+        commanderPkt->hairId,
+        commanderPkt->pose,
 
         // Equipment
         equipment->head_top,

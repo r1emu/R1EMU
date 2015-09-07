@@ -61,8 +61,8 @@ void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *repl
 void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
 
     // add a fake commander with a fake account
-    CommanderInfo fakePc;
-    commanderInfoInit(&fakePc);
+    Commander fakePc;
+    commanderInit(&fakePc);
 
     fakePc.pos = session->game.commanderSession.currentCommander.pos;
     fakePc.base.accountId = r1emuGenerateRandom64(&self->seed);
@@ -109,7 +109,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
     GameEventEnterPc event = {
         .updatePosEvent = {
             .mapId = fakeSocketSession.mapId,
-            .commanderInfo = fakePc
+            .commander = fakePc
         }
     };
 

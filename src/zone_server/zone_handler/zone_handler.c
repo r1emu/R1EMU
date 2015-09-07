@@ -331,7 +331,7 @@ static PacketHandlerState zoneHandlerMoveStop(
     GameEventMoveStop event = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .commanderInfo = session->game.commanderSession.currentCommander,
+            .commander = session->game.commanderSession.currentCommander,
         },
         .position = clientPacket->position,
         .direction = clientPacket->direction,
@@ -380,7 +380,7 @@ static PacketHandlerState zoneHandlerKeyboardMove(
     GameEventCommanderMove event = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .commanderInfo = session->game.commanderSession.currentCommander
+            .commander = session->game.commanderSession.currentCommander
         },
         .position = clientPacket->position,
         .direction = clientPacket->direction,
@@ -425,7 +425,7 @@ static PacketHandlerState zoneHandlerGameReady(
 {
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_GAME_READY);
 
-    CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander;
+    Commander *commander = &session->game.commanderSession.currentCommander;
 
     zoneBuilderItemInventoryList(replyMsg);
     zoneBuilderSessionObjects(replyMsg);
@@ -442,16 +442,16 @@ static PacketHandlerState zoneHandlerGameReady(
     zoneBuilderStartInfo(replyMsg);
 
     zoneBuilderItemEquipList(replyMsg);
-    // ZoneBuilder_skillList(commanderInfo->pcId, replyMsg);
-    zoneBuilderAbilityList(commanderInfo->pcId, replyMsg);
-    zoneBuilderCooldownList(commanderInfo->socialInfoId, replyMsg);
+    // ZoneBuilder_skillList(commander->pcId, replyMsg);
+    zoneBuilderAbilityList(commander->pcId, replyMsg);
+    zoneBuilderCooldownList(commander->socialInfoId, replyMsg);
 
     zoneBuilderQuickSlotList(replyMsg);
 
     zoneBuilderNormalUnk1(replyMsg);
     zoneBuilderNormalUnk2(replyMsg);
     zoneBuilderNormalUnk3(replyMsg);
-    zoneBuilderNormalUnk4(commanderInfo->socialInfoId, replyMsg);
+    zoneBuilderNormalUnk4(commander->socialInfoId, replyMsg);
     zoneBuilderNormalUnk5(replyMsg);
 
     zoneBuilderStartGame(1.0, 0.0, 0.0, 0.0, replyMsg);
@@ -461,20 +461,20 @@ static PacketHandlerState zoneHandlerGameReady(
     */
     zoneBuilderLoginTime(replyMsg);
 
-    zoneBuilderMyPCEnter(&commanderInfo->pos, replyMsg);
+    zoneBuilderMyPCEnter(&commander->pos, replyMsg);
     // ZoneBuilder_skillAdd(replyMsg);
 
     // Notify players around that a new PC has entered
     GameEventEnterPc pcEnterEvent = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .commanderInfo = *commanderInfo
+            .commander = *commander
         }
     };
     workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_ENTER_PC, &pcEnterEvent, sizeof(pcEnterEvent));
-    // zoneBuilderEnterPc(&pcEnterEvent.updatePosEvent.commanderInfo, replyMsg);
+    // zoneBuilderEnterPc(&pcEnterEvent.updatePosEvent.commander, replyMsg);
 
-    // ZoneBuilder_buffList(commanderInfo->base.pcId, replyMsg);
+    // ZoneBuilder_buffList(commander->base.pcId, replyMsg);
 
     // add NPC at the start screen
     // ZoneBuilder_enterMonster(replyMsg);
@@ -482,7 +482,7 @@ static PacketHandlerState zoneHandlerGameReady(
 
     /*
     ZoneBuilder_normalUnk6(
-        commanderInfo->base.commanderName,
+        commander->base.commanderName,
         replyMsg
     );
 
@@ -607,7 +607,7 @@ static PacketHandlerState zoneHandlerJump(
     GameEventJump event = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .commanderInfo = session->game.commanderSession.currentCommander
+            .commander = session->game.commanderSession.currentCommander
         },
         .height = COMMANDER_HEIGHT_JUMP
     };
