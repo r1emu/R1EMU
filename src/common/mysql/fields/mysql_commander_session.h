@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file barrack_event_server.h
+ * @file mysql_commander.h
  * @brief
  *
  *
@@ -20,27 +20,14 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
-#include "barrack_handler/barrack_event_handler.h"
-#include "common/server/event_server.h"
-#include "common/server/game_event.h"
+#include "common/mysql/mysql.h"
+#include "common/commander/commander.h"
+#include "common/session/commander_session.h"
 
 // ---------- Defines -------------
+
 
 // ------ Structure declaration -------
 
 // ----------- Functions ------------
-/**
- * @brief Process the barrack events received from the workers
- */
-bool barrackEventServerProcess(EventServer *self, EventType type, void *eventData);
-
-/**
- * @brief Event handler when a client disconnects
- */
-bool barrackEventServerOnDisconnect (
-    zsock_t *eventServer,
-    Redis *redis,
-    MySQL *mysql,
-    uint16_t routerId,
-    uint8_t *sessionKeyStr
-);
+bool mySqlCommanderSessionFlush(MySQL *self, CommanderSession *commanderSession);
