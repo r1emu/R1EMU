@@ -252,7 +252,13 @@ routerMonitorProcess (
             if (!self->info.disconnectHandler) {
                 warning("No custom disconnection server handler has been registred.");
             } else {
-                if (!(self->info.disconnectHandler(self->eventServer, self->redis, self->info.routerId, sessionKeyStr))) {
+                if (!(self->info.disconnectHandler(
+                        self->eventServer,
+                        self->redis,
+                        self->sql,
+                        self->info.routerId,
+                        sessionKeyStr)))
+                {
                     warning("Custom disconnect handler failed.");
                 }
             }

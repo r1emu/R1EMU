@@ -17,6 +17,7 @@
 #include "common/server/event_handler.h"
 #include "common/redis/fields/redis_session.h"
 #include "common/redis/fields/redis_game_session.h"
+#include "common/mysql/fields/mysql_commander_session.h"
 
 bool zoneEventServerProcess(EventServer *self, EventType type, void *eventData) {
 
@@ -42,6 +43,7 @@ bool zoneEventServerProcess(EventServer *self, EventType type, void *eventData) 
 bool zoneEventServerOnDisconnect (
     zsock_t *eventServer,
     Redis *redis,
+    MySQL *mysql,
     uint16_t routerId,
     uint8_t *sessionKeyStr
 ) {
@@ -58,6 +60,12 @@ bool zoneEventServerOnDisconnect (
     };
     eventServerDispatchEvent(eventServer, sessionKeyStr, EVENT_TYPE_LEAVE, &event, sizeof(event));
 
+    // Transfer the Redis session to SQL
+    if (!(mySqlCommanderSessionFlush(mysql, &gameSession.commanderSession))) {
+        error ("Cannot flush the redis session '%s' to the SQL.", sessionKeyStr);
+        return false;
+    }
+
     // Flush the Redis session of the client
     RedisSessionKey sessionKey = {
         .socketKey = {
@@ -65,8 +73,9 @@ bool zoneEventServerOnDisconnect (
             .sessionKey = sessionKeyStr
         }
     };
+
     if (!(redisFlushSession (redis, &sessionKey))) {
-        error ("Cannot flush the redis session '%s'", sessionKey);
+        error ("Cannot flush the redis session '%s'", sessionKeyStr);
         return false;
     }
 

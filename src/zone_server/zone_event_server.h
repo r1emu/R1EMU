@@ -56,6 +56,7 @@ bool zoneEventServerUpdateClientPosition(
 bool zoneEventServerOnDisconnect (
     zsock_t *eventServer,
     Redis *redis,
+    MySQL *mysql,
     uint16_t routerId,
     uint8_t *sessionKeyStr
 );

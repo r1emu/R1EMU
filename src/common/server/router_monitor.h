@@ -24,7 +24,13 @@
 #define ROUTER_MONITOR_SUBSCRIBER_ENDPOINT "inproc://routerMonitorSubscriber-%d"
 
 /** Server specific handler when a client disconnects */
-typedef bool (*DisconnectEventHandler) (zsock_t *eventServer, Redis *redis, uint16_t routerId, uint8_t *sessionKeyStr);
+typedef bool (*DisconnectEventHandler) (
+    zsock_t *eventServer,
+    Redis *redis,
+    MySQL *mysql,
+    uint16_t routerId,
+    uint8_t *sessionKeyStr
+);
 
 /** All the Router Monitor Packet headers */
 typedef enum {

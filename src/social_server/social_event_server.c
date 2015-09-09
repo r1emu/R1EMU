@@ -42,6 +42,7 @@ bool socialEventServerProcess(EventServer *self, EventType type, void *eventData
 bool socialEventServerOnDisconnect (
     zsock_t *eventServer,
     Redis *redis,
+    MySQL *mysql,
     uint16_t routerId,
     uint8_t *sessionKeyStr
 ) {

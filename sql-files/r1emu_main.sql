@@ -1,3 +1,5 @@
+use r1emu;
+
 --
 -- Database: `r1emu`
 --
@@ -47,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `commander` (
   `last_map` int(11) NOT NULL DEFAULT '1032',
   `last_x` int(11) NOT NULL DEFAULT '0',
   `last_y` int(11) NOT NULL DEFAULT '0',
+  `last_z` int(11) NOT NULL DEFAULT '0',
   `current_xp` int(11) NOT NULL DEFAULT '0',
   `pose` int(11) NOT NULL,
   `current_hp` int(11) NOT NULL DEFAULT '0',

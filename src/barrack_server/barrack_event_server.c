@@ -41,6 +41,7 @@ bool barrackEventServerProcess(EventServer *self, EventType type, void *eventDat
 bool barrackEventServerOnDisconnect (
     zsock_t *eventServer,
     Redis *redis,
+    MySQL *mysql,
     uint16_t routerId,
     uint8_t *sessionKeyStr
 ) {
