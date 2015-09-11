@@ -36,6 +36,7 @@ bool adminCmdInit(void) {
     zhash_insert(adminCommands, "test",           adminCmdTest);
     zhash_insert(adminCommands, "where",          adminCmdWhere);
     zhash_insert(adminCommands, "changeCamera",   adminCmdChangeCamera);
+    zhash_insert(adminCommands, "setStamina",     adminCmdSetStamina);
 
     return true;
 }
@@ -229,6 +230,31 @@ void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *re
         else {
             snprintf(message, sizeof(message), "Bad usage /changeCamera <x> <y> <z> {<fspd> <ispd>}");
             zoneBuilderChat(&session->game.commanderSession.currentCommander.info, message, replyMsg);
+        }
+        free(arg);
+    }
+}
+
+void adminCmdSetStamina(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    if (strlen (args) == 0) {
+        info("Set stamina needs a argument!");
+    }
+    else {
+        char **arg;
+        int argc;
+
+        info("Set stamina with argument: %s", args);
+        arg = strSplit(args, ' ');
+        argc = 0;
+        while (arg[++argc] != NULL);
+        if (argc != 1) {
+            info("Wrong number of argument, must be 1.");
+        }
+        else {
+            int stamina = atoi(arg[0]) * 1000;
+            info("Setting stamina to %d.", stamina);
+            session->game.commanderSession.currentCommander.info.currentStamina = stamina;
+            zoneBuilderStamina(stamina, replyMsg);
         }
         free(arg);
     }
