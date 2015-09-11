@@ -251,7 +251,7 @@ void adminCmdSetStamina(Worker *self, Session *session, char *args, zmsg_t *repl
             info("Wrong number of argument, must be 1.");
         }
         else {
-            int stamina = atoi(arg[0]) * 1000;
+            uint32_t stamina = atoi(arg[0]) * 1000;
             info("Setting stamina to %d.", stamina);
             session->game.commanderSession.currentCommander.info.currentStamina = stamina;
             zoneBuilderStamina(stamina, replyMsg);

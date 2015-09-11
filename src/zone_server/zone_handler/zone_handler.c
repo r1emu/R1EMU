@@ -145,7 +145,7 @@ static PacketHandlerState zoneHandlerChat(
         workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_CHAT, event, gameEventSize);
     }
 
-    return PACKET_HANDLER_OK;
+    return PACKET_HANDLER_UPDATE_SESSION;
 }
 
 static PacketHandlerState zoneHandlerRestSit(
