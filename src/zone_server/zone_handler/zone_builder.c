@@ -576,6 +576,28 @@ void zoneBuilderStamina(uint32_t stamina, zmsg_t *replyMsg) {
     }
 }
 
+void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint32_t pcId;
+        uint32_t sp;
+        uint8_t  unk1;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_UPDATE_SP;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        replyPacket.header.type = ZC_UPDATE_SP;
+        replyPacket.pcId = targetPcID;
+        replyPacket.sp = sp;
+        replyPacket.unk1 = 0;
+    }
+}
+
 void zoneBuilderBuffList(uint32_t targetPcId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
