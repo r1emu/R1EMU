@@ -61,3 +61,13 @@ void adminCmdWhere(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
  * @brief : Change the camera position
  */
 void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+
+/**
+ * @brief : Set player stamina
+ */
+ void adminCmdSetStamina(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+
+/**
+ * @brief : Set player SP
+ */
+ void adminCmdSetSP(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
