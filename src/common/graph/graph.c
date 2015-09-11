@@ -191,7 +191,7 @@ GraphArc *graphAddArc(Graph *self, GraphNode *from, GraphNode *to) {
     }
 
     if (!zhash_lookup(self->nodes, from->key)) {
-        if (!(zhash_insert(self->nodes, from->key, from))) {
+        if (zhash_insert(self->nodes, from->key, from) != 0) {
             error ("Cannot insert 'from' node.");
             status = false;
             goto cleanup;
@@ -199,7 +199,7 @@ GraphArc *graphAddArc(Graph *self, GraphNode *from, GraphNode *to) {
     }
 
     if (!zhash_lookup(self->nodes, to->key)) {
-        if (!(zhash_insert(self->nodes, to->key, to))) {
+        if (zhash_insert(self->nodes, to->key, to) != 0) {
             error ("Cannot insert 'to' node.");
             status = false;
             goto cleanup;
