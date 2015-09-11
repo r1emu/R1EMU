@@ -336,7 +336,7 @@ static PacketHandlerState barrackHandlerBarracknameChange(
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_BARRACKNAME_CHANGE);
 
     CommanderInfo *commander = &session->game.commanderSession.currentCommander.info;
-    CommanderAppearence *appareance = &commander->appareance;
+    CommanderAppearance *appearance = &commander->appearance;
 
     // Check if the barrack name is not empty and contains only ASCII characters
     size_t barrackNameLen = strlen(clientPacket->barrackName);
@@ -354,10 +354,10 @@ static PacketHandlerState barrackHandlerBarracknameChange(
     }
 
     // Update the session
-    strncpy(appareance->familyName, clientPacket->barrackName, sizeof(appareance->familyName));
+    strncpy(appearance->familyName, clientPacket->barrackName, sizeof(appearance->familyName));
 
     // Build the reply packet
-    barrackBuilderBarrackNameChange(appareance->familyName, reply);
+    barrackBuilderBarrackNameChange(appearance->familyName, reply);
 
     return PACKET_HANDLER_UPDATE_SESSION;
 }
@@ -413,13 +413,13 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_CREATE);
 
     CommanderInfo *commander = &session->game.commanderSession.currentCommander.info;
-    CommanderAppearence *appareance = &commander->appareance;
+    CommanderAppearance *appearance = &commander->appearance;
 
     // CharName
-    strncpy(appareance->commanderName, clientPacket->commanderName, sizeof(appareance->commanderName));
+    strncpy(appearance->commanderName, clientPacket->commanderName, sizeof(appearance->commanderName));
 
     // AccountID
-    appareance->accountId = session->socket.accountId;
+    appearance->accountId = session->socket.accountId;
 
     // JobID
     switch(clientPacket->jobId) {
@@ -428,26 +428,26 @@ static PacketHandlerState barrackHandlerCommanderCreate(
             return PACKET_HANDLER_ERROR;
             break;
         case COMMANDER_JOB_WARRIOR:
-            appareance->classId = COMMANDER_CLASS_WARRIOR;
+            appearance->classId = COMMANDER_CLASS_WARRIOR;
             break;
         case COMMANDER_JOB_ARCHER:
-            appareance->classId = COMMANDER_CLASS_ARCHER;
+            appearance->classId = COMMANDER_CLASS_ARCHER;
             break;
         case COMMANDER_JOB_MAGE:
-            appareance->classId = COMMANDER_CLASS_MAGE;
+            appearance->classId = COMMANDER_CLASS_MAGE;
             break;
         case COMMANDER_JOB_CLERIC:
-            appareance->classId = COMMANDER_CLASS_CLERIC;
+            appearance->classId = COMMANDER_CLASS_CLERIC;
             break;
     }
 
-    appareance->jobId = clientPacket->jobId;
+    appearance->jobId = clientPacket->jobId;
 
     // Gender
     switch(clientPacket->gender) {
         case COMMANDER_GENDER_MALE:
         case COMMANDER_GENDER_FEMALE:
-            appareance->gender = clientPacket->gender;
+            appearance->gender = clientPacket->gender;
             break;
 
         case COMMANDER_GENDER_BOTH:
@@ -463,7 +463,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     }
 
     // Hair type
-    appareance->hairId = clientPacket->hairId;
+    appearance->hairId = clientPacket->hairId;
 
     // PCID
     session->game.commanderSession.currentCommander.info.pcId = r1emuGenerateRandom(&self->seed);
@@ -489,7 +489,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     // Build the reply packet
     PositionXZ commanderDir = PositionXZ_decl(-0.707107f, 0.707107f);
     CommanderCreateInfo commanderCreate = {
-        .appareance = commander->appareance,
+        .appearance = commander->appearance,
         .mapId = session->game.commanderSession.mapId,
         .socialInfoId = commander->socialInfoId,
         .commanderPosition = session->game.barrackSession.charactersCreatedCount,
