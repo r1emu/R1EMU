@@ -53,9 +53,9 @@ typedef struct CommanderEquipment {
 
 #pragma pack(push, 1)
 /**
- * @brief CommanderAppearence is the struct of a commander sent to the client
+ * @brief CommanderAppearance is the struct of a commander sent to the client
  */
-typedef struct CommanderAppearence
+typedef struct CommanderAppearance
 {
     uint8_t commanderName [COMMANDER_NAME_SIZE+1];
     uint8_t familyName [COMMANDER_FAMILY_NAME_SIZE];
@@ -71,7 +71,7 @@ typedef struct CommanderAppearence
     uint8_t hairId;
     uint8_t unk6;
     uint16_t pose;
-} CommanderAppearence;
+} CommanderAppearance;
 #pragma pack(pop)
 
 #pragma pack(push, 1)
@@ -79,7 +79,7 @@ typedef struct CommanderAppearence
  * Structure of variables needed for BC_COMMANDER_CREATE
  */
 typedef struct CommanderCreateInfo {
-    CommanderAppearence appareance;
+    CommanderAppearance appearance;
     uint64_t socialInfoId;
     uint16_t commanderPosition;
     uint16_t mapId;
@@ -101,7 +101,7 @@ typedef struct CommanderCreateInfo {
 #pragma pack(push, 1)
 typedef struct
 {
-    CommanderAppearence appareance;
+    CommanderAppearance appearance;
     PositionXYZ pos;
     uint32_t currentXP;
     uint32_t maxXP;
@@ -164,10 +164,10 @@ typedef enum CommanderHair
  * @brief Initialize a commander with basic information
  */
 void commanderInfoInit(CommanderInfo *commander);
-void commanderApparenceInit(CommanderAppearence *appareance);
+void commanderApparenceInit(CommanderAppearance *appearance);
 
 /**
  * @brief Dump a CommanderInfo in the console
  */
 void commanderInfoPrint(CommanderInfo *commander);
-void commanderAppareancePrint(CommanderAppearence *appareance);
+void commanderAppearancePrint(CommanderAppearance *appearance);

@@ -473,7 +473,7 @@ static PacketHandlerState zoneHandlerGameReady(
     workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_ENTER_PC, &pcEnterEvent, sizeof(pcEnterEvent));
     // zoneBuilderEnterPc(&pcEnterEvent.updatePosEvent.info, replyMsg);
 
-    // ZoneBuilder_buffList(cInfo->appareance.pcId, replyMsg);
+    // ZoneBuilder_buffList(cInfo->appearance.pcId, replyMsg);
 
     // add NPC at the start screen
     // ZoneBuilder_enterMonster(replyMsg);
@@ -481,20 +481,20 @@ static PacketHandlerState zoneHandlerGameReady(
 
     /*
     ZoneBuilder_normalUnk6(
-        commander->appareance.commanderName,
+        commander->appearance.commanderName,
         replyMsg
     );
 
     ZoneBuilder_normalUnk7(
         session->socket.accountId,
-        session->game.commanderSession.currentCommander.info.appareance.pcId,
-        session->game.commanderSession.currentCommander.info.appareance.familyName,
-        session->game.commanderSession.currentCommander.info.appareance.commanderName,
+        session->game.commanderSession.currentCommander.info.appearance.pcId,
+        session->game.commanderSession.currentCommander.info.appearance.familyName,
+        session->game.commanderSession.currentCommander.info.appearance.commanderName,
         replyMsg
     );
 
     ZoneBuilder_jobPts(replyMsg);
-    ZoneBuilder_normalUnk9(session->game.commanderSession.currentCommander.info.appareance.pcId, replyMsg);
+    ZoneBuilder_normalUnk9(session->game.commanderSession.currentCommander.info.appearance.pcId, replyMsg);
     ZoneBuilder_addonMsg(replyMsg);
     */
 

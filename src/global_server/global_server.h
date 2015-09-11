@@ -142,7 +142,7 @@ bool globalServerInit(GlobalServer *self, GlobalServerStartupInfo *info);
  * @param confFilePath The configuration file of the Global Server.
  * @return true on success, false otherwise.
  */
-bool globalServerStartupInfoInit(GlobalServerStartupInfo *self,char *confFilePath);
+bool globalServerStartupInfoInit(GlobalServerStartupInfo *self, char *confFilePath);
 
 /**
  * @brief Request to the GlobalServer to flush the Redis Server
