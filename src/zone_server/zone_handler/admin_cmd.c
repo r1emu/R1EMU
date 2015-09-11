@@ -254,6 +254,14 @@ void adminCmdSetStamina(Worker *self, Session *session, char *args, zmsg_t *repl
             int stamina = atoi(arg[0]) * 1000;
             info("Setting stamina to %d.", stamina);
             session->game.commanderSession.currentCommander.info.currentStamina = stamina;
+
+            RedisGameSessionKey gameKey = {
+                .routerId  = session->socket.routerId,
+                .mapId     = session->socket.mapId,
+                .accountId = session->socket.accountId
+            };
+
+            redisUpdateGameSession(self->redis, &gameKey, session->socket.sessionKey, &(session->game));
             zoneBuilderStamina(stamina, replyMsg);
         }
         free(arg);
