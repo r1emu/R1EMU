@@ -152,9 +152,10 @@ void zoneBuilderSkillAdd(zmsg_t *replyMsg);
 void zoneBuilderLoginTime(zmsg_t *replyMsg);
 
 /**
- * @brief @unknown
+ * @brief Sets the stamina to value of stamina. Note: Stamina in game is
+ *        divided. 25 stamina ingame means stamina=25000.
  */
-void zoneBuilderStamina(zmsg_t *replyMsg);
+void zoneBuilderStamina(uint32_t stamina, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown

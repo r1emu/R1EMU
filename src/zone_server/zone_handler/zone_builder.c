@@ -558,25 +558,21 @@ void zoneBuilderLoginTime(zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderStamina(zmsg_t *replyMsg) {
+void zoneBuilderStamina(uint32_t stamina, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
-        // not yet implemented
+        ServerPacketHeader header;
+        uint32_t stamina;
     } replyPacket;
-   (void) replyPacket;
     #pragma pack(pop)
 
-    // PacketType packetType = ZC_STAMINA;
-    // CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
-    // BUILD_REPLY_PACKET(replyPacket, replyMsg)
-    {
-        size_t memSize;
-        void *memory = dumpToMem(
-            "[11:10:22][           ToSClient:                     dbgBuffer]  A4 0C FF FF FF FF A8 61 00 00                   | .......a..\n"
-            , NULL, &memSize
-        );
+    PacketType packetType = ZC_STAMINA;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
 
-        zmsg_add(replyMsg, zframe_new(memory, memSize));
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        replyPacket.header.type = ZC_STAMINA;
+        replyPacket.stamina = stamina;
     }
 }
 
