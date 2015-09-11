@@ -63,7 +63,8 @@ bool zoneEventServerOnDisconnect (
     // Transfer the Redis session to SQL
     if (!(mySqlCommanderSessionFlush(mysql, &gameSession.commanderSession))) {
         error ("Cannot flush the redis session '%s' to the SQL.", sessionKeyStr);
-        return false;
+        // return false;
+        // TODO : Should we flush the Redis data in that case ?
     }
 
     // Flush the Redis session of the client
