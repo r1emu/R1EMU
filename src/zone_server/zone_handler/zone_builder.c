@@ -598,6 +598,26 @@ void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg) {
     }
 }
 
+void zoneBuilderPCLevelUp(uint32_t targetPcID, uint32_t level, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint32_t pcId;
+        uint32_t level;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_PC_LEVELUP;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        replyPacket.header.type = ZC_PC_LEVELUP;
+        replyPacket.pcId = targetPcID;
+        replyPacket.level = level;
+    }
+}
+
 void zoneBuilderBuffList(uint32_t targetPcId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {

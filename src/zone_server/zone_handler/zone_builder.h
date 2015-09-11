@@ -163,6 +163,11 @@ void zoneBuilderStamina(uint32_t stamina, zmsg_t *replyMsg);
 void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg);
 
 /**
+ * @brief Updates sp of character to value of sp.
+ */
+void zoneBuilderPCLevelUp(uint32_t targetPcID, uint32_t level, zmsg_t *replyMsg);
+
+/**
  * @brief @unknown
  */
 void zoneBuilderObjectProperty(zmsg_t *replyMsg);
