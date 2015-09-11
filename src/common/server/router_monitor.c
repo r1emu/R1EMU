@@ -328,7 +328,11 @@ routerMonitorSubscribe (
             if ((clientFrame = zhash_lookup(self->connected, fdClientKey)) == NULL) {
                 // The client just sent its first message, add the identity frame to the hashtable
                 clientFrame = zframe_dup (zmsg_next(msg));
-                zhash_insert(self->connected, fdClientKey, clientFrame);
+                if (!(zhash_insert(self->connected, fdClientKey, clientFrame))) {
+                    error ("Cannot insert client frame in client connected hashtable.");
+                    result = -1;
+                    goto cleanup;
+                }
             } else {
                 // Check if the fd <=> identity association is always the same
                 if (!zframe_eq (clientFrame, zmsg_next(msg))) {
