@@ -37,6 +37,7 @@ bool adminCmdInit(void) {
     zhash_insert(adminCommands, "where",          adminCmdWhere);
     zhash_insert(adminCommands, "changeCamera",   adminCmdChangeCamera);
     zhash_insert(adminCommands, "setStamina",     adminCmdSetStamina);
+    zhash_insert(adminCommands, "setSP",          adminCmdSetSP);
 
     return true;
 }
@@ -248,13 +249,38 @@ void adminCmdSetStamina(Worker *self, Session *session, char *args, zmsg_t *repl
         argc = 0;
         while (arg[++argc] != NULL);
         if (argc != 1) {
-            info("Wrong number of argument, must be 1.");
+            info("Wrong number of arguments, must be 1.");
         }
         else {
             uint32_t stamina = atoi(arg[0]) * 1000;
             info("Setting stamina to %d.", stamina);
             session->game.commanderSession.currentCommander.info.currentStamina = stamina;
             zoneBuilderStamina(stamina, replyMsg);
+        }
+        free(arg);
+    }
+}
+
+void adminCmdSetSP(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    if (strlen (args) == 0) {
+        info("Set SP needs a argument!");
+    }
+    else {
+        char **arg;
+        int argc;
+
+        info("Set SP with argument: %s", args);
+        arg = strSplit(args, ' ');
+        argc = 0;
+        while (arg[++argc] != NULL);
+        if (argc != 1) {
+            info("Wrong number of arguments, must be 1.");
+        }
+        else {
+            uint32_t sp = atoi(arg[0]);
+            info("Setting SP to %d.", sp);
+            session->game.commanderSession.currentCommander.info.currentSP = sp;
+            zoneBuilderUpdateSP(session->game.commanderSession.currentCommander.info.pcId, sp, replyMsg);
         }
         free(arg);
     }
