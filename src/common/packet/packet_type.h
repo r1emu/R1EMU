@@ -69,7 +69,7 @@ typedef enum PacketType {
 	CB_REQ_GET_POSTBOX_ITEM = 91, // size = 30
 	BC_WAIT_QUEUE_ORDER = 92, // size = 10
 	CB_CANCEL_SERVER_WAIT_QUEUE = 93, // size = 10
-	CS_LOGIN = 2901, // size = 64
+	CS_LOGIN = 2901, // size = 68
 	SC_NORMAL = 2902, // size = 0
 	SC_FROM_INTEGRATE = 2903, // size = 0
 	CS_REGISTER_SNS_ID = 2904, // size = 16

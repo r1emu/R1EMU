@@ -102,7 +102,7 @@ bool eventServerInit(EventServer *self, EventServerStartupInfo *info, ServerType
             self->eventServerProcess = zoneEventServerProcess;
             break;
         default:
-            // No EventServer registred for this server
+            // No EventServer registered for this server
         break;
     }
 

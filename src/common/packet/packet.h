@@ -32,7 +32,7 @@
     do {                                                                                    \
         if (packetTypeInfo.packets[packetType].size != 0                                    \
          && sizeof(packet) != packetTypeInfo.packets[packetType].size) {                    \
-            error("The packet size sent isn't the equal to the one in PacketType.h");       \
+            error("The packet size sent isn't the equal to the one in packet_type.h");      \
             error("The packet size is %d bytes. The waited size is %d bytes.",              \
                 sizeof(packet), packetTypeInfo.packets[packetType].size);                   \
         }                                                                                   \
@@ -44,15 +44,15 @@
                                   - sizeof(ClientPacketHeader);                                     \
         if (packetTypeInfo.packets[packetType].size != 0                                            \
          && sizeof(packet) != __clientPacketSize) {                                                 \
-            error("The packet size sent isn't the equal to the one in PacketType.h");               \
+            error("The packet size sent isn't the equal to the one in packet_type.h");              \
             error("The packet size is %d bytes. The waited size is %d bytes.",                      \
                 sizeof(packet), __clientPacketSize);                                                \
                                                                                                     \
                 return PACKET_HANDLER_ERROR;                                                        \
         }                                                                                           \
-        if (packetSize > (sizeof(packet) + BF_BLOCK) || packetSize < sizeof(packet) ) {           \
+        if (packetSize > (sizeof(packet) + BF_BLOCK) || packetSize < sizeof(packet) ) {             \
             error("The packet size received isn't correct. (packet size = %d, correct size = %d)",  \
-                packetSize, sizeof(packet));                                                       \
+                packetSize, sizeof(packet));                                                        \
             return PACKET_HANDLER_ERROR;                                                            \
         }                                                                                           \
     } while (0)
