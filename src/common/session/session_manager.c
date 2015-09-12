@@ -72,7 +72,6 @@ void *sessionManagerMainLoop (void *arg) {
 
     while (true) {
         msg = zmsg_recv(self->endpoint);
-        zmsg_print(msg);
 
         if (!msg) {
             error("Cannot receive a message.");
