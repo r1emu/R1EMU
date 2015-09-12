@@ -616,6 +616,36 @@ void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg) {
     }
 }
 
+void zoneBuilderUpdateAllStatus(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, uint16_t sp,
+                                uint16_t maxSp, zmsg_t *replyMsg)
+{
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint32_t pcId;
+        uint32_t hp;
+        uint32_t maxHp;
+        uint16_t sp;
+        uint16_t maxSp;
+        uint32_t unk1; // 01 is most common, but other values (0x09, 0x0A, 0x0B) seem to work
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_UPDATE_ALL_STATUS;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        replyPacket.header.type = ZC_UPDATE_ALL_STATUS;
+        replyPacket.pcId = targetPcID;
+        replyPacket.hp = hp;
+        replyPacket.maxHp = maxHp;
+        replyPacket.sp = sp;
+        replyPacket.maxSp = maxSp;
+        replyPacket.unk1 = 0x01;
+    }
+}
+
 void zoneBuilderPCLevelUp(uint32_t targetPcID, uint32_t level, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
