@@ -656,7 +656,7 @@ void zoneBuilderAddHp(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, zmsg_t *
         replyPacket.pcId = targetPcID;
         replyPacket.hp = hp;
         replyPacket.maxHp = maxHp;
-        replyPacket.unk1 = 11;
+        replyPacket.unk1 = 1;
     }
 }
 
