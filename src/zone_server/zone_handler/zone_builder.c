@@ -636,6 +636,30 @@ void zoneBuilderPCLevelUp(uint32_t targetPcID, uint32_t level, zmsg_t *replyMsg)
     }
 }
 
+void zoneBuilderAddHp(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint32_t pcId;
+        uint32_t hp;
+        uint32_t maxHp; //? not sure
+        uint32_t unk1; // This might be some encoding for the source of the hp?
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_ADD_HP;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        replyPacket.header.type = ZC_ADD_HP;
+        replyPacket.pcId = targetPcID;
+        replyPacket.hp = hp;
+        replyPacket.maxHp = maxHp;
+        replyPacket.unk1 = 11;
+    }
+}
+
 void zoneBuilderBuffList(uint32_t targetPcId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {

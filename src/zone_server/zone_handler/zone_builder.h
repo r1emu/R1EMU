@@ -175,6 +175,8 @@ void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg);
  */
 void zoneBuilderPCLevelUp(uint32_t targetPcID, uint32_t level, zmsg_t *replyMsg);
 
+void zoneBuilderAddHp(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, zmsg_t *replyMsg);
+
 /**
  * @brief @unknown
  */
