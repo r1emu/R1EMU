@@ -208,6 +208,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/session/session.h" />
+		<Unit filename="../../../src/common/session/session_manager.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/session/session_manager.h" />
 		<Unit filename="../../../src/common/session/socket_session.c">
 			<Option compilerVar="CC" />
 		</Unit>

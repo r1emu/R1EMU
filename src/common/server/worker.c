@@ -26,6 +26,7 @@
 #include "common/crypto/crypto.h"
 #include "common/packet/packet.h"
 #include "common/server/game_event.h"
+#include "common/session/session_manager.h"
 
 
 // ------ Structure declaration -------
@@ -91,19 +92,12 @@ Worker_processGlobalPacket (
 
 /**
  * @brief Build a reply for a given packet
- * @param self A pointer to the current worker
- * @param[in] packetHandlers The packet handlers
- * @param[in] handlersCount The number of handlers in the handlers array
- * @param[in] session The game session associated with the packet
- * @param[in] packet The packet sent by the client
- * @param[in] packetSize The size of the packet
- * @param[out] reply The message for the reply. Each frame contains a reply to send in different packets.
  * @return PacketHandlerState
  */
 static bool
 Worker_buildReply (
     Worker *self,
-    Session *session,
+    uint8_t *sessionKey,
     uint8_t *packet,
     size_t packetSize,
     zmsg_t *msg,
@@ -138,7 +132,7 @@ Worker_handlePacket (
 /**
  * @brief Build a reply based on a single request
  * @param self A pointer to the current worker
- * @param[in] session The game session associated with the packet
+ * @param[in] session The session of the client
  * @param[in] packet The packet sent by the client
  * @param[in] packetSize The size of the packet
  * @param[out] reply The message for the reply. Each frame contains a reply to send in different packets.
@@ -238,6 +232,19 @@ workerInit (
         return false;
     }
 
+    // ===================================
+    //     Initialize ZMQ connection
+    // ===================================
+    if (!(self->eventServer = zsock_new (ZMQ_PUB))) {
+        error("Cannot allocate event server zsock.");
+        return false;
+    }
+
+    if (!(self->sessionManager = zsock_new (ZMQ_REQ))) {
+        error("Cannot allocate session manager zsock.");
+        return false;
+    }
+
     // Initialize random seed
     self->seed = r1emuSeedRandom (self->info.routerId);
 
@@ -296,13 +303,136 @@ Worker_handlePingPacket (
     return zframe_new (PACKET_HEADER (ROUTER_PONG), sizeof(ROUTER_PONG));
 }
 
+bool workerRequestSession(Worker *self, uint8_t *sessionKey) {
+    bool status = false;
+    zmsg_t *msg = NULL;
+
+    if (!(msg = zmsg_new ())) {
+        error ("Cannot allocate a new zmsg.");
+        goto cleanup;
+    }
+
+    if ((zmsg_addmem(msg, PACKET_HEADER(SESSION_MANAGER_LOAD_SESSION), sizeof(SESSION_MANAGER_LOAD_SESSION))) != 0) {
+        error("Cannot add header to the message.");
+        goto cleanup;
+    }
+
+    if ((zmsg_addmem(msg, sessionKey, SOCKET_SESSION_ID_SIZE)) != 0) {
+        error("Cannot add sessionKey to the message.");
+        goto cleanup;
+    }
+
+    if (zmsg_send(&msg, self->sessionManager) != 0) {
+        error("Cannot send session request to the session manager.");
+        goto cleanup;
+    }
+
+    status = true;
+
+cleanup:
+    zmsg_destroy(&msg);
+    return status;
+}
+
+bool workerStoreSession(Worker *self, Session *session) {
+    bool status = false;
+    zmsg_t *msg = NULL;
+    zframe_t *sessionManagerStatusFrame = NULL;
+
+    if (!(msg = zmsg_new ())) {
+        error ("Cannot allocate a new zmsg.");
+        goto cleanup;
+    }
+
+    if ((zmsg_addmem(msg, PACKET_HEADER(SESSION_MANAGER_STORE_SESSION), sizeof(SESSION_MANAGER_STORE_SESSION))) != 0) {
+        error("Cannot add header to the message.");
+        goto cleanup;
+    }
+
+    if ((zmsg_addmem(msg, session->socket.sessionKey, SOCKET_SESSION_ID_SIZE)) != 0) {
+        error("Cannot add sessionKey to the message.");
+        goto cleanup;
+    }
+
+    if ((zmsg_addmem(msg, session, sizeof(*session))) != 0) {
+        error("Cannot add the session to the message.");
+        goto cleanup;
+    }
+
+    if (zmsg_send(&msg, self->sessionManager) != 0) {
+        error("Cannot send session request to the session manager.");
+        goto cleanup;
+    }
+
+    if (!(msg = zmsg_recv(self->sessionManager))) {
+        error("Cannot receive answer of the session request from the session manager.");
+        goto cleanup;
+    }
+
+    if (!(sessionManagerStatusFrame = zmsg_first(msg))) {
+        error("Cannot get status frame.");
+        goto cleanup;
+    }
+    SessionManagerStatus sessionManagerStatus = *(SessionManagerStatus *) zframe_data(sessionManagerStatusFrame);
+
+    if (sessionManagerStatus != SESSION_MANAGER_STATUS_SUCCESS) {
+        error("Session manager returned an error : %d", sessionManagerStatus);
+        goto cleanup;
+    }
+
+    status = true;
+
+cleanup:
+    zmsg_destroy(&msg);
+    return status;
+}
+
+bool workerGetSession(Worker *self, uint8_t *sessionKey, Session *session) {
+    bool status = false;
+    zmsg_t *msg = NULL;
+    zframe_t *frame = NULL;
+
+    // Wait for the session manager to answer
+    if (!(msg = zmsg_recv(self->sessionManager))) {
+        error("Cannot retrieve the session");
+        goto cleanup;
+    }
+
+    // Get header frame
+    if (!(frame = zmsg_first(msg))) {
+        error("Cannot read frame header.");
+        goto cleanup;
+    }
+
+    // Check header
+    SessionManagerStatus sessionManagerStatus;
+    if ((sessionManagerStatus = *(SessionManagerStatus *) zframe_data(frame)) != SESSION_MANAGER_STATUS_SUCCESS) {
+        error("SessionManager sent an error : %d", sessionManagerStatus);
+        goto cleanup;
+    }
+
+    // Get session frame
+    if (!(frame = zmsg_next(msg))) {
+        error("Cannot read session frame.");
+        goto cleanup;
+    }
+
+    // Copy it
+    Session *sessionFromManager = (Session *) zframe_data(frame);
+    memcpy(session, sessionFromManager, sizeof(*session));
+    status = true;
+
+cleanup:
+    zmsg_destroy(&msg);
+    return status;
+}
+
 static bool
 Worker_processClientPacket (
     Worker *self,
     zmsg_t *msg
 ) {
-    bool result = true;
-    Session session = {{0}};
+    bool result = false;
     zframe_t *headerAnswer = NULL;
 
     // Read the message
@@ -318,15 +448,8 @@ Worker_processClientPacket (
     socketSessionGenSessionKey (zframe_data(sessionKeyFrame), sessionKeyStr);
 
     // Request the Session
-    RedisSessionKey sessionKey = {
-        .socketKey = {
-            .routerId = self->info.routerId,
-            .sessionKey = sessionKeyStr
-        }
-    };
-    if (!(redisGetSession (self->redis, &sessionKey, &session))) {
-        error("Cannot retrieve a Game Session.");
-        result = false;
+    if (!(workerRequestSession(self, sessionKeyStr))) {
+        error ("Cannot request a Session.");
         goto cleanup;
     }
 
@@ -338,12 +461,13 @@ Worker_processClientPacket (
     uint8_t *packet = zframe_data(packetFrame);
     size_t packetSize = zframe_size (packetFrame);
 
-    if (!(Worker_buildReply (self, &session, packet, packetSize, msg, headerAnswer))) {
+    if (!(Worker_buildReply (self, sessionKeyStr, packet, packetSize, msg, headerAnswer))) {
         error("Cannot build a reply for the following packet :");
         buffer_print(packet, packetSize, NULL);
-        result = false;
         goto cleanup;
     }
+
+    result = true;
 
 cleanup:
     // Cleanup
@@ -354,7 +478,7 @@ cleanup:
 static bool
 Worker_buildReply (
     Worker *self,
-    Session *session,
+    uint8_t *sessionKeyStr,
     uint8_t *packet,
     size_t packetSize,
     zmsg_t *msg,
@@ -362,16 +486,24 @@ Worker_buildReply (
 ) {
     CryptPacketHeader cryptHeader;
 
+    bool status = false;
     size_t packetPos = 0;
     size_t packetSizeRemaining = packetSize;
     int isCrypted;
+
+    // Get the session
+    Session session;
+    if (!(workerGetSession(self, sessionKeyStr, &session))) {
+        error("Cannot get the session.");
+        goto cleanup;
+    }
 
     while (packetSizeRemaining > 0)
     {
         // Get crypto packet info
         if ((isCrypted = Worker_getCryptedPacketInfo (self, packetSizeRemaining, &packet[packetPos], &cryptHeader)) == -1) {
             error("Cannot get crypted packet info.");
-            return false;
+            goto cleanup;
         }
 
         // Compute the subPacket size
@@ -381,9 +513,9 @@ Worker_buildReply (
         }
 
         // Process the request
-        if ((!(Worker_processOneRequest (self, session, &packet[packetPos], subPacketSize, msg, headerAnswer, isCrypted)))) {
+        if ((!(Worker_processOneRequest (self, &session, &packet[packetPos], subPacketSize, msg, headerAnswer, isCrypted)))) {
             error("Cannot process properly a reply.");
-            return false;
+            goto cleanup;
         }
 
         // == Iterate to the next reply ==
@@ -391,9 +523,11 @@ Worker_buildReply (
         packetSizeRemaining -= subPacketSize;
     }
 
-    return true;
-}
+    status = true;
 
+cleanup:
+    return status;
+}
 
 static bool
 Worker_processOneRequest (
@@ -405,11 +539,13 @@ Worker_processOneRequest (
     zframe_t *headerAnswer,
     bool isCrypted
 ) {
+    bool status = false;
+
     // Decrypt the packet
     if (isCrypted) {
         if (!(cryptoDecryptPacket (&packet, &packetSize))) {
             error("Cannot decrypt the client packet.");
-            return false;
+            goto cleanup;
         }
     }
 
@@ -418,16 +554,22 @@ Worker_processOneRequest (
     {
         case PACKET_HANDLER_ERROR:
             zframe_reset (headerAnswer, PACKET_HEADER (ROUTER_WORKER_ERROR), sizeof(ROUTER_WORKER_ERROR));
-            return false;
+            goto cleanup;
         break;
 
         case PACKET_HANDLER_OK:
         break;
 
         case PACKET_HANDLER_UPDATE_SESSION:
+
+            if (!(workerStoreSession(self, session))) {
+                error("Cannot update the memory session.");
+                goto cleanup;
+            }
+
             if (!(redisUpdateSession (self->redis, session))) {
-                error("Cannot update the Session.");
-                return false;
+                error("Cannot update the Redis session.");
+                goto cleanup;
             }
         break;
 
@@ -440,13 +582,17 @@ Worker_processOneRequest (
             };
             if (!(redisFlushSession (self->redis, &sessionKey))) {
                 error("Cannot delete the Session.");
-                return false;
+                goto cleanup;
             }
         }
         break;
     }
 
-    return true;
+    status = true;
+
+cleanup:
+
+    return status;
 }
 
 
@@ -539,6 +685,25 @@ bool
 workerStart (
     Worker *self
 ) {
+
+    // ============================
+    //    Initialize connections
+    // ============================
+
+    // Create and bind a publisher to send messages to the Event Server
+    if (zsock_bind(self->eventServer,
+                   EVENT_SERVER_SUBSCRIBER_ENDPOINT, self->info.routerId, self->info.workerId) != 0) {
+        error("[routerId=%d][WorkerId=%d] cannot bind to the subscriber endpoint.",
+              self->info.routerId, self->info.workerId);
+        return false;
+    }
+
+    if (zsock_connect(self->sessionManager, SESSION_MANAGER_ENDPOINT, self->info.routerId) != 0) {
+        error("[routerId=%d][WorkerId=%d] Cannot connect to session manager.",
+              self->info.routerId, self->info.workerId);
+        return false;
+    }
+
     if (zthread_new (workerMainLoop, self) != 0) {
         error("Cannot create Server worker ID = %d.", self->info.workerId);
         return false;
@@ -558,10 +723,6 @@ workerMainLoop (
 
     Worker *self = (Worker *) arg;
 
-    // ============================
-    //    Initialize connections
-    // ============================
-
     // Create and connect a socket to the backend
     if (!(worker = zsock_new (ZMQ_REQ))
     ||  zsock_connect (worker, ROUTER_BACKEND_ENDPOINT, self->info.routerId) == -1
@@ -579,12 +740,9 @@ workerMainLoop (
         goto cleanup;
     }
 
-    // Create and bind a publisher to send messages to the Event Server
-    if (!(self->eventServer = zsock_new (ZMQ_PUB))
-    ||  zsock_bind(self->eventServer, EVENT_SERVER_SUBSCRIBER_ENDPOINT, self->info.routerId, self->info.workerId) == -1
-    ) {
-        error("[routerId=%d][WorkerId=%d] cannot bind to the subscriber endpoint.",
-              self->info.routerId, self->info.workerId);
+    // Define a poller with the global and the worker socket
+    if (!(poller = zpoller_new (global, worker, NULL))) {
+        error("[routerId=%d][WorkerId=%d] cannot create a poller.", self->info.routerId, self->info.workerId);
         goto cleanup;
     }
 
@@ -596,12 +754,6 @@ workerMainLoop (
     ) {
         error("[routerId=%d][WorkerId=%d] cannot send a correct ROUTER_WORKER_READY state.",
                self->info.routerId, self->info.workerId);
-        goto cleanup;
-    }
-
-    // Define a poller with the global and the worker socket
-    if (!(poller = zpoller_new (global, worker, NULL))) {
-        error("[routerId=%d][WorkerId=%d] cannot create a poller.", self->info.routerId, self->info.workerId);
         goto cleanup;
     }
 
