@@ -576,6 +576,24 @@ void zoneBuilderStamina(uint32_t stamina, zmsg_t *replyMsg) {
     }
 }
 
+void zoneBuilderAddStamina(uint32_t stamina, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint32_t stamina;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_ADD_STAMINA;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        replyPacket.header.type = ZC_ADD_STAMINA;
+        replyPacket.stamina = stamina;
+    }
+}
+
 void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
@@ -595,6 +613,50 @@ void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg) {
         replyPacket.pcId = targetPcID;
         replyPacket.sp = sp;
         replyPacket.unk1 = 0;
+    }
+}
+
+void zoneBuilderPCLevelUp(uint32_t targetPcID, uint32_t level, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint32_t pcId;
+        uint32_t level;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_PC_LEVELUP;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        replyPacket.header.type = ZC_PC_LEVELUP;
+        replyPacket.pcId = targetPcID;
+        replyPacket.level = level;
+    }
+}
+
+void zoneBuilderAddHp(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint32_t pcId;
+        uint32_t hp;
+        uint32_t maxHp; //? not sure
+        uint32_t unk1; // This might be some encoding for the source of the hp?
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_ADD_HP;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        replyPacket.header.type = ZC_ADD_HP;
+        replyPacket.pcId = targetPcID;
+        replyPacket.hp = hp;
+        replyPacket.maxHp = maxHp;
+        replyPacket.unk1 = 1;
     }
 }
 

@@ -38,6 +38,7 @@ bool adminCmdInit(void) {
     zhash_insert(adminCommands, "changeCamera",   adminCmdChangeCamera);
     zhash_insert(adminCommands, "setStamina",     adminCmdSetStamina);
     zhash_insert(adminCommands, "setSP",          adminCmdSetSP);
+    zhash_insert(adminCommands, "setLevel",       adminCmdSetLevel);
 
     return true;
 }
@@ -281,6 +282,31 @@ void adminCmdSetSP(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
             info("Setting SP to %d.", sp);
             session->game.commanderSession.currentCommander.info.currentSP = sp;
             zoneBuilderUpdateSP(session->game.commanderSession.currentCommander.info.pcId, sp, replyMsg);
+        }
+        free(arg);
+    }
+}
+
+void adminCmdSetLevel(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    if (strlen (args) == 0) {
+        info("Set level needs a argument!");
+    }
+    else {
+        char **arg;
+        int argc;
+
+        info("Set level with argument: %s", args);
+        arg = strSplit(args, ' ');
+        argc = 0;
+        while (arg[++argc] != NULL);
+        if (argc != 1) {
+            info("Wrong number of arguments, must be 1.");
+        }
+        else {
+            uint32_t level = atoi(arg[0]);
+            info("Setting level to %d.", level);
+            session->game.commanderSession.currentCommander.info.appearance.level = level;
+            zoneBuilderPCLevelUp(session->game.commanderSession.currentCommander.info.pcId, level, replyMsg);
         }
         free(arg);
     }
