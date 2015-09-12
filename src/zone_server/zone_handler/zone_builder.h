@@ -158,6 +158,14 @@ void zoneBuilderLoginTime(zmsg_t *replyMsg);
 void zoneBuilderStamina(uint32_t stamina, zmsg_t *replyMsg);
 
 /**
+ * @brief Sets the stamina to value of stamina. Note: Stamina in game is
+ *        divided. I'm not sure of this packets exact functionality, but
+ *        this one will not change the stamina in the client. In captures
+ *        it is sent exactly at the same time with same data as ZC_STAMINA.
+ */
+void zoneBuilderAddStamina(uint32_t stamina, zmsg_t *replyMsg);
+
+/**
  * @brief Updates sp of character to value of sp.
  */
 void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg);

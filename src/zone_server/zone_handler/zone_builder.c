@@ -576,6 +576,24 @@ void zoneBuilderStamina(uint32_t stamina, zmsg_t *replyMsg) {
     }
 }
 
+void zoneBuilderAddStamina(uint32_t stamina, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint32_t stamina;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_ADD_STAMINA;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        replyPacket.header.type = ZC_ADD_STAMINA;
+        replyPacket.stamina = stamina;
+    }
+}
+
 void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
