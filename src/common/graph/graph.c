@@ -182,6 +182,7 @@ bool graphRemoveNode(Graph *self, GraphNode *node)
 }
 
 GraphArc *graphAddArc(Graph *self, GraphNode *from, GraphNode *to) {
+    bool status = true;
     GraphArc *arc = NULL;
 
     if (!(arc = graphArcNew(from, to))) {
@@ -190,11 +191,25 @@ GraphArc *graphAddArc(Graph *self, GraphNode *from, GraphNode *to) {
     }
 
     if (!zhash_lookup(self->nodes, from->key)) {
-        zhash_insert(self->nodes, from->key, from);
+        if (zhash_insert(self->nodes, from->key, from) != 0) {
+            error ("Cannot insert 'from' node.");
+            status = false;
+            goto cleanup;
+        }
     }
 
     if (!zhash_lookup(self->nodes, to->key)) {
-        zhash_insert(self->nodes, to->key, to);
+        if (zhash_insert(self->nodes, to->key, to) != 0) {
+            error ("Cannot insert 'to' node.");
+            status = false;
+            goto cleanup;
+        }
+    }
+
+cleanup:
+    if (!status) {
+        free(arc);
+        arc = NULL;
     }
 
     return arc;

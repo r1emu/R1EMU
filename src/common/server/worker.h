@@ -101,6 +101,9 @@ struct _Worker {
     // the publisher socket to send asynchronous messages to the Event Server
     zsock_t *eventServer;
 
+    // the connection to the session manager
+    zsock_t *sessionManager;
+
     // seed for the random generator
     uint32_t seed;
 
