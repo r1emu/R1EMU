@@ -27,7 +27,7 @@
 struct GlobalServer
 {
     // global information
-    GlobalServerStartupInfo info;
+    GlobalServerInfo info;
 
     // socket listening to the CLI
     zsock_t *cliConnection;
@@ -39,7 +39,7 @@ struct GlobalServer
     Redis *redis;
 };
 
-GlobalServer *globalServerNew(GlobalServerStartupInfo *info) {
+GlobalServer *globalServerNew(GlobalServerInfo *info) {
     GlobalServer *self;
 
     if ((self = calloc(1, sizeof(GlobalServer))) == NULL) {
@@ -55,7 +55,7 @@ GlobalServer *globalServerNew(GlobalServerStartupInfo *info) {
     return self;
 }
 
-bool globalServerInit(GlobalServer *self, GlobalServerStartupInfo *info) {
+bool globalServerInit(GlobalServer *self, GlobalServerInfo *info) {
     memcpy(&self->info, info, sizeof(self->info));
 
     // allocate ZMQ objects
@@ -142,8 +142,8 @@ cleanup:
     return result;
 }
 
-bool globalServerStartupInfoInit(GlobalServerStartupInfo *self, char *confFilePath) {
-    memset(self, 0, sizeof(GlobalServerStartupInfo));
+bool globalServerInfoInit(GlobalServerInfo *self, char *confFilePath) {
+    memset(self, 0, sizeof(GlobalServerInfo));
 
     bool result = true;
     char *confStr = NULL;
@@ -435,11 +435,11 @@ bool globalServerStart(GlobalServer *self) {
     special("=== Global server ====");
     special("======================");
 
-    GlobalServerStartupInfo *globalInfo = &self->info;
+    GlobalServerInfo *globalInfo = &self->info;
 
     zpoller_t *poller;
     bool isRunning = true;
-    ServerStartupInfo serverInfo;
+    ServerInfo serverInfo;
 
     // ===================================
     //     Initialize CLI connection

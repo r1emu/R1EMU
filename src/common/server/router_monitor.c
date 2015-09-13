@@ -29,7 +29,7 @@
  * @brief RouterMonitor contains needed information about client connection
  */
 struct RouterMonitor {
-    RouterMonitorStartupInfo info;
+    RouterMonitorInfo info;
 
     /** FD => Socket Id hashtable */
     zhash_t *connected;
@@ -68,7 +68,7 @@ static bool routerMonitorDisconnectClient(RouterMonitor *self, uint8_t *fdClient
 
 
 // ------ Extern functions implementation -------
-RouterMonitor *routerMonitorNew(RouterMonitorStartupInfo *info) {
+RouterMonitor *routerMonitorNew(RouterMonitorInfo *info) {
 
     RouterMonitor *self;
 
@@ -85,16 +85,16 @@ RouterMonitor *routerMonitorNew(RouterMonitorStartupInfo *info) {
     return self;
 }
 
-bool routerMonitorInit (RouterMonitor *self, RouterMonitorStartupInfo *info) {
+bool routerMonitorInit (RouterMonitor *self, RouterMonitorInfo *info) {
 
-    routerMonitorStartupInfoInit (&self->info,
+    routerMonitorInfoInit (&self->info,
         info->frontend,
         info->routerId,
         &info->redisInfo,
         &info->sqlInfo,
         info->disconnectHandler
     );
-    routerMonitorStartupInfoDestroy (&info);
+    routerMonitorInfoDestroy (&info);
 
     // Allocate the connected clients hashtable
     if (!(self->connected = zhash_new())) {
@@ -124,46 +124,46 @@ bool routerMonitorInit (RouterMonitor *self, RouterMonitorStartupInfo *info) {
     return true;
 }
 
-RouterMonitorStartupInfo *routerMonitorStartupInfoNew(
+RouterMonitorInfo *routerMonitorInfoNew(
     zsock_t *frontend,
     uint16_t routerId,
-    RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo,
+    RedisInfo *redisInfo,
+    MySQLInfo *sqlInfo,
     DisconnectEventHandler disconnectHandler)
 {
-    RouterMonitorStartupInfo *self;
+    RouterMonitorInfo *self;
 
-    if ((self = calloc(1, sizeof(RouterMonitorStartupInfo))) == NULL) {
+    if ((self = calloc(1, sizeof(RouterMonitorInfo))) == NULL) {
         return NULL;
     }
 
-    if (!routerMonitorStartupInfoInit (self, frontend, routerId, redisInfo, sqlInfo, disconnectHandler)) {
-        routerMonitorStartupInfoDestroy (&self);
-        error("RouterMonitorStartupInfo failed to initialize.");
+    if (!routerMonitorInfoInit (self, frontend, routerId, redisInfo, sqlInfo, disconnectHandler)) {
+        routerMonitorInfoDestroy (&self);
+        error("RouterMonitorInfo failed to initialize.");
         return NULL;
     }
 
     return self;
 }
 
-bool routerMonitorStartupInfoInit (
-    RouterMonitorStartupInfo *self,
+bool routerMonitorInfoInit (
+    RouterMonitorInfo *self,
     zsock_t *frontend,
     uint16_t routerId,
-    RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo,
+    RedisInfo *redisInfo,
+    MySQLInfo *sqlInfo,
     DisconnectEventHandler disconnectHandler)
 {
     self->frontend = frontend;
     self->routerId = routerId;
     self->disconnectHandler = disconnectHandler;
 
-    if (!(redisStartupInfoInit(&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
+    if (!(redisInfoInit(&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
         error("Cannot initialize Redis Start up info.");
         return false;
     }
 
-    if (!(mySqlStartupInfoInit(&self->sqlInfo,
+    if (!(mySqlInfoInit(&self->sqlInfo,
         sqlInfo->hostname, sqlInfo->user, sqlInfo->password, sqlInfo->database))) {
         error("Cannot initialize MySQL start up info.");
         return false;
@@ -473,21 +473,21 @@ routerMonitorDestroy (
 }
 
 void
-RouterMonitorStartupInfo_free(
-    RouterMonitorStartupInfo *self
+RouterMonitorInfo_free(
+    RouterMonitorInfo *self
 ) {
-    redisStartupInfoFree (&self->redisInfo);
-    mySqlStartupInfoFree (&self->sqlInfo);
+    redisInfoFree (&self->redisInfo);
+    mySqlInfoFree (&self->sqlInfo);
 }
 
 void
-routerMonitorStartupInfoDestroy (
-    RouterMonitorStartupInfo **_self
+routerMonitorInfoDestroy (
+    RouterMonitorInfo **_self
 ) {
-    RouterMonitorStartupInfo *self = *_self;
+    RouterMonitorInfo *self = *_self;
 
     if (self) {
-        RouterMonitorStartupInfo_free(self);
+        RouterMonitorInfo_free(self);
         free(self);
     }
 

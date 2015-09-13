@@ -32,17 +32,17 @@
 
 typedef struct Redis Redis;
 
-typedef struct RedisStartupInfo {
+typedef struct RedisInfo {
     char *hostname;
     int port;
-} RedisStartupInfo;
+} RedisInfo;
 
 /**
  * @brief Allocate a new Redis structure.
  * @param redisInfo The information about the Redis database connection to etablish
  * @return A pointer to an allocated Redis.
  */
-Redis *redisNew(RedisStartupInfo *info);
+Redis *redisNew(RedisInfo *info);
 
 /**
  * @brief Initialize an allocated Redis structure.
@@ -50,16 +50,16 @@ Redis *redisNew(RedisStartupInfo *info);
  * @param redisInfo The information about the Redis database connection to etablish
  * @return true on success, false otherwise.
  */
-bool redisInit(Redis *self, RedisStartupInfo *info);
+bool redisInit(Redis *self, RedisInfo *info);
 
 /**
- * @brief Initialize an allocated RedisStartupInfo structure.
- * @param self An allocated RedisStartupInfo to initialize.
+ * @brief Initialize an allocated RedisInfo structure.
+ * @param self An allocated RedisInfo to initialize.
  * @param hostname The IP address of the Redis server
  * @param port The port of the Redis server
  * @return true on success, false otherwise.
  */
-bool redisStartupInfoInit(RedisStartupInfo *self, char *ip, int port);
+bool redisInfoInit(RedisInfo *self, char *ip, int port);
 
 /**
  * @brief : Connect to the Redis database
@@ -110,10 +110,10 @@ size_t redisAnyElementIsNull(redisReply **elements,size_t nbElements);
 void redisPrintElements(redisReply **elements, size_t nbElements, const char **elementsName);
 
 /**
- * @brief Free the members of the RedisStartupInfo structure
- * @param self A pointer to an allocated RedisStartupInfo.
+ * @brief Free the members of the RedisInfo structure
+ * @param self A pointer to an allocated RedisInfo.
  */
-void redisStartupInfoFree(RedisStartupInfo *self);
+void redisInfoFree(RedisInfo *self);
 
 /**
  * @brief Free an allocated redisReply structure and nullify the content of the pointer.

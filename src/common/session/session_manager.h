@@ -26,9 +26,9 @@
 #define SESSION_MANAGER_ENDPOINT "inproc://sessionManagerRep-%d"
 
 // ------ Structure declaration -------
-typedef struct SessionManagerStartupInfo {
+typedef struct SessionManagerInfo {
     uint16_t routerId;
-}   SessionManagerStartupInfo;
+}   SessionManagerInfo;
 
 typedef struct SessionManager SessionManager;
 
@@ -50,14 +50,14 @@ typedef enum {
  * @param startInfo The info for starting the SessionManager
  * @return A pointer to an allocated SessionManager, or NULL if an error occured.
  */
-SessionManager *sessionManagerNew(SessionManagerStartupInfo *startInfo);
+SessionManager *sessionManagerNew(SessionManagerInfo *startInfo);
 
 /**
  * Initialize an allocated SessionManager structure.
  * @param self An allocated SessionManager to initialize.
  * @return true on success, false otherwise.
  */
-bool sessionManagerInit(SessionManager *self, SessionManagerStartupInfo *startInfo);
+bool sessionManagerInit(SessionManager *self, SessionManagerInfo *startInfo);
 
 /**
  * Start the SessionManager.

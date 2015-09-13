@@ -116,33 +116,33 @@ typedef struct {
     ZoneServersConf zonesConf;
 
     // database
-    MySQLStartupInfo sqlInfo;
-    RedisStartupInfo redisInfo;
+    MySQLInfo sqlInfo;
+    RedisInfo redisInfo;
 
-} GlobalServerStartupInfo;
+} GlobalServerInfo;
 
 /**
  * @brief Allocate a new GlobalServer structure.
- * @param info An allocated GlobalServerStartupInfo.
+ * @param info An allocated GlobalServerInfo.
  * @return A pointer to an allocated GlobalServer.
  */
-GlobalServer *globalServerNew(GlobalServerStartupInfo *info);
+GlobalServer *globalServerNew(GlobalServerInfo *info);
 
 /**
  * @brief Initialize an allocated GlobalServer structure.
  * @param self An allocated GlobalServer to initialize.
- * @param info An allocated GlobalServerStartupInfo.
+ * @param info An allocated GlobalServerInfo.
  * @return true on success, false otherwise.
  */
-bool globalServerInit(GlobalServer *self, GlobalServerStartupInfo *info);
+bool globalServerInit(GlobalServer *self, GlobalServerInfo *info);
 
 /**
- * @brief Initialize an allocated GlobalServerStartupInfo structure.
- * @param self An allocated GlobalServerStartupInfo to initialize.
+ * @brief Initialize an allocated GlobalServerInfo structure.
+ * @param self An allocated GlobalServerInfo to initialize.
  * @param confFilePath The configuration file of the Global Server.
  * @return true on success, false otherwise.
  */
-bool globalServerStartupInfoInit(GlobalServerStartupInfo *self, char *confFilePath);
+bool globalServerInfoInit(GlobalServerInfo *self, char *confFilePath);
 
 /**
  * @brief Request to the GlobalServer to flush the Redis Server

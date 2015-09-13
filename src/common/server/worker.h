@@ -30,7 +30,7 @@
 #include "common/session/session.h"
 
 typedef struct _PacketHandler PacketHandler;
-typedef struct _WorkerStartupInfo WorkerStartupInfo;
+typedef struct _WorkerInfo WorkerInfo;
 typedef struct _Worker Worker;
 typedef enum _PacketHandlerState PacketHandlerState;
 
@@ -55,9 +55,9 @@ typedef PacketHandlerState(*PacketHandlerFunction)(
     zmsg_t *reply);
 
 /**
- * @brief WorkerStartupInfo contains all the information needed for a worker to start.
+ * @brief WorkerInfo contains all the information needed for a worker to start.
  */
-struct _WorkerStartupInfo {
+struct _WorkerInfo {
     // the worker ID
     uint16_t workerId;
 
@@ -74,10 +74,10 @@ struct _WorkerStartupInfo {
     int globalServerPort;
 
     // MySQL startup information
-    MySQLStartupInfo sqlInfo;
+    MySQLInfo sqlInfo;
 
     // Redis startup information
-    RedisStartupInfo redisInfo;
+    RedisInfo redisInfo;
 
     // array of packet handlers
     const PacketHandler *packetHandlers;
@@ -96,7 +96,7 @@ struct _WorkerStartupInfo {
  */
 struct _Worker {
     // start up information
-    WorkerStartupInfo info;
+    WorkerInfo info;
 
     // the publisher socket to send asynchronous messages to the Event Server
     zsock_t *eventServer;
@@ -137,22 +137,22 @@ enum _PacketHandlerState {
 
 /**
  * @brief Allocate a new Worker structure.
- * @param info An initialized WorkerStartupInfo structure.
+ * @param info An initialized WorkerInfo structure.
  * @return A pointer to an allocated Worker.
  */
-Worker *workerNew(WorkerStartupInfo *info);
+Worker *workerNew(WorkerInfo *info);
 
 /**
  * @brief Initialize an allocated Worker structure.
  * @param self An allocated Worker to initialize.
- * @param info An initialized WorkerStartupInfo structure.
+ * @param info An initialized WorkerInfo structure.
  * @return true on success, false otherwise.
  */
-bool workerInit(Worker *self, WorkerStartupInfo *info);
+bool workerInit(Worker *self, WorkerInfo *info);
 
 /**
- * @brief Initialize an allocated WorkerStartupInfo structure.
- * @param self An allocated WorkerStartupInfo to initialize.
+ * @brief Initialize an allocated WorkerInfo structure.
+ * @param self An allocated WorkerInfo to initialize.
  * @param workerId The worker ID.
  * @param routerId The Server ID
  * @param serverType The Server type having the responsibility of the worker
@@ -165,15 +165,15 @@ bool workerInit(Worker *self, WorkerStartupInfo *info);
  * @param routerIp, routerPort IP and port of the router responsable of the worker
  * @return true on success, false otherwise.
  */
-bool workerStartupInfoInit(
-    WorkerStartupInfo *self,
+bool workerInfoInit(
+    WorkerInfo *self,
     uint16_t workerId,
     uint16_t routerId,
     ServerType serverType,
     char *globalServerIp,
     int globalServerPort,
-    MySQLStartupInfo *sqlInfo,
-    RedisStartupInfo *redisInfo,
+    MySQLInfo *sqlInfo,
+    RedisInfo *redisInfo,
     const PacketHandler *packetHandlers,
     int packetHandlersCount,
     char *routerIp, int routerPort);

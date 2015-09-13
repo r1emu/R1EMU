@@ -25,7 +25,7 @@
 struct Redis
 {
     /** Start up information about the Redis connection */
-    RedisStartupInfo info;
+    RedisInfo info;
 
     /** Redis context, handle of the connection to the redis server */
     redisContext *context;
@@ -36,7 +36,7 @@ struct Redis
 
 // ------ Extern function implementation -------
 
-Redis *redisNew(RedisStartupInfo *info) {
+Redis *redisNew(RedisInfo *info) {
 
     Redis *self;
 
@@ -53,14 +53,14 @@ Redis *redisNew(RedisStartupInfo *info) {
     return self;
 }
 
-bool redisInit(Redis *self, RedisStartupInfo *info) {
+bool redisInit(Redis *self, RedisInfo *info) {
 
-    redisStartupInfoInit(&self->info, info->hostname, info->port);
+    redisInfoInit(&self->info, info->hostname, info->port);
 
     return true;
 }
 
-bool redisStartupInfoInit(RedisStartupInfo *self, char *hostname, int port) {
+bool redisInfoInit(RedisInfo *self, char *hostname, int port) {
 
     self->hostname = strdup(hostname);
     self->port = port;
@@ -70,7 +70,7 @@ bool redisStartupInfoInit(RedisStartupInfo *self, char *hostname, int port) {
 
 bool redisConnection(Redis *self) {
 
-    RedisStartupInfo *info = &self->info;
+    RedisInfo *info = &self->info;
 
     info("Connecting to the Redis Server (%s:%d)...", info->hostname, info->port);
 
@@ -238,7 +238,7 @@ bool redisSet(Redis *self, SocketSession *socketSession, ...) {
 }
 */
 
-void redisStartupInfoFree(RedisStartupInfo *self) {
+void redisInfoFree(RedisInfo *self) {
 
     free(self->hostname);
 }
@@ -248,7 +248,7 @@ void redisDestroy(Redis **_self) {
     Redis *self = *_self;
 
     if (_self && self) {
-        redisStartupInfoFree (&self->info);
+        redisInfoFree (&self->info);
 
         if (self->context) {
             redisFree (self->context);

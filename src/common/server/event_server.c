@@ -39,7 +39,7 @@ struct EventServer
     Graph *clientsGraph;
 
     // EventServer information
-    EventServerStartupInfo info;
+    EventServerInfo info;
 
     // EventServer process routine
     bool (*eventServerProcess)(EventServer *self, EventType type, void *eventData);
@@ -47,7 +47,7 @@ struct EventServer
 
 static int eventServerSubscribe(EventServer *self);
 
-EventServer *eventServerNew(EventServerStartupInfo *info, ServerType serverType) {
+EventServer *eventServerNew(EventServerInfo *info, ServerType serverType) {
     EventServer *self;
 
     if ((self = calloc(1, sizeof(EventServer))) == NULL) {
@@ -63,7 +63,7 @@ EventServer *eventServerNew(EventServerStartupInfo *info, ServerType serverType)
     return self;
 }
 
-bool eventServerInit(EventServer *self, EventServerStartupInfo *info, ServerType serverType) {
+bool eventServerInit(EventServer *self, EventServerInfo *info, ServerType serverType) {
     memcpy(&self->info, info, sizeof(self->info));
 
     // create a unique publisher for the EventServer
@@ -147,18 +147,18 @@ bool graphNodeClientInit (GraphNodeClient *self) {
     return true;
 }
 
-bool eventServerStartupInfoInit (EventServerStartupInfo *self,
+bool eventServerInfoInit (EventServerInfo *self,
     uint16_t routerId,
     uint16_t workersCount,
     char *redisHostname,
     int redisPort
 ) {
-    memset(self, 0, sizeof(EventServerStartupInfo));
+    memset(self, 0, sizeof(EventServerInfo));
 
     self->routerId = routerId;
     self->workersCount = workersCount;
 
-    if (!(redisStartupInfoInit(&self->redisInfo, redisHostname, redisPort))) {
+    if (!(redisInfoInit(&self->redisInfo, redisHostname, redisPort))) {
         error("Cannot initialize Redis startup.");
         return false;
     }

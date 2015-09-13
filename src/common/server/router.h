@@ -68,28 +68,28 @@ typedef struct {
     char *ip;
     int port;
     int workersCount;
-    RedisStartupInfo redisInfo;
-    MySQLStartupInfo sqlInfo;
+    RedisInfo redisInfo;
+    MySQLInfo sqlInfo;
     DisconnectEventHandler disconnectHandler;
-} RouterStartupInfo;
+} RouterInfo;
 
 /**
  * @brief Allocate a new Router structure.
- * @param info An allocated RouterStartupInfo already initialized.
+ * @param info An allocated RouterInfo already initialized.
  * @return A pointer to an allocated Router.
  */
-Router *routerNew(RouterStartupInfo *info);
+Router *routerNew(RouterInfo *info);
 
 /**
  * @brief Initialize an allocated Router structure.
  * @param self An allocated Router to initialize.
  * @return true on success, false otherwise.
  */
-bool routerInit(Router *self, RouterStartupInfo *info);
+bool routerInit(Router *self, RouterInfo *info);
 
 /**
- * @brief Initialize an allocated RouterStartupInfo structure.
- * @param self An allocated RouterStartupInfo to initialize.
+ * @brief Initialize an allocated RouterInfo structure.
+ * @param self An allocated RouterInfo to initialize.
  * @param routerId The Server ID
  * @param ip The IP of the router
  * @param port The port binded by the Router
@@ -97,14 +97,14 @@ bool routerInit(Router *self, RouterStartupInfo *info);
  * @param disconnectHandler A server specific disconnection handler
  * @return true on success, false otherwise
  */
-bool routerStartupInfoInit(
-    RouterStartupInfo *self,
+bool routerInfoInit(
+    RouterInfo *self,
     uint16_t routerId,
     char *ip,
     int port,
     int workersCount,
-    RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo,
+    RedisInfo *redisInfo,
+    MySQLInfo *sqlInfo,
     DisconnectEventHandler disconnectHandler);
 
 /**
@@ -122,10 +122,10 @@ bool routerStart(Router *self);
 int routerGetId(Router *self);
 
 /**
- * @brief Free the members of the RouterStartupInfo structure
- * @param self A pointer to an allocated RouterStartupInfo.
+ * @brief Free the members of the RouterInfo structure
+ * @param self A pointer to an allocated RouterInfo.
  */
-void routerStartupInfoFree(RouterStartupInfo *self);
+void routerInfoFree(RouterInfo *self);
 
 /**
  * @brief Free an allocated Router structure and nullify the content of the pointer.

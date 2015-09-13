@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     char *confFilePath = NULL;
 
     GlobalServer *globalServer = NULL;
-    GlobalServerStartupInfo info;
+    GlobalServerInfo info;
 
     // force the initialization of the CZMQ layer here.
     if (!(zsys_init ())) {
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
         confFilePath = DEFAULT_SERVER_CONF_PATH;
     }
 
-    if (!(globalServerStartupInfoInit(&info, confFilePath))) {
+    if (!(globalServerInfoInit(&info, confFilePath))) {
         error("Cannot initialize GlobalServer init information. (%s)", confFilePath);
         goto cleanup;
     }

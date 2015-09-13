@@ -25,7 +25,7 @@ typedef enum MySQLStatus {
 
 #define MAX_QUERY_SIZE 1024
 
-typedef struct MySQLStartupInfo {
+typedef struct MySQLInfo {
     // the MySQL hostname
     char *hostname;
 
@@ -38,11 +38,11 @@ typedef struct MySQLStartupInfo {
     // the database name containing all the data
     char *database;
 
-} MySQLStartupInfo;
+} MySQLInfo;
 
 struct MySQL {
     // information about the database connection
-    MySQLStartupInfo info;
+    MySQLInfo info;
 
     // handle to the MySQL connection
 	MYSQL *handle;
@@ -55,29 +55,29 @@ typedef struct MySQL MySQL;
 
 /**
  * @brief Allocate a new MySQL structure.
- * @param info An initialized MySQLStartupInfo.
+ * @param info An initialized MySQLInfo.
  * @return A pointer to an allocated MySQL, or NULL if an error occured.
  */
-MySQL *mySqlNew(MySQLStartupInfo *info);
+MySQL *mySqlNew(MySQLInfo *info);
 
 /**
  * @brief Initialize an allocated MySQL structure.
  * @param self An allocated MySQL to initialize.
- * @param info An initialized MySQLStartupInfo.
+ * @param info An initialized MySQLInfo.
  * @return true on success, false otherwise.
  */
-bool mySqlInit(MySQL *self, MySQLStartupInfo *info);
+bool mySqlInit(MySQL *self, MySQLInfo *info);
 
 /**
- * @brief Initialize an allocated MySQLStartupInfo structure.
- * @param self An allocated MySQLStartupInfo to initialize.
+ * @brief Initialize an allocated MySQLInfo structure.
+ * @param self An allocated MySQLInfo to initialize.
  * @param hostname The MySQL hostname
  * @param login The username of the MySQL user with read/write privilege
  * @param password The password of the MySQL user
  * @param database The database name containing all the data
  * @return true on success, false otherwise.
  */
-bool mySqlStartupInfoInit(MySQLStartupInfo *self, char *hostname, char *login, char *password, char *database);
+bool mySqlInfoInit(MySQLInfo *self, char *hostname, char *login, char *password, char *database);
 
 /**
  * @brief : Connect to the MySQL database
@@ -101,10 +101,10 @@ MySQLStatus mySqlQuery(MySQL *self, const char *query, ...);
 void mySqlFreeResult(MySQL *self);
 
 /**
- * @brief Free the members of the MySQLStartupInfo structure
- * @param self A pointer to an allocated MySQLStartupInfo.
+ * @brief Free the members of the MySQLInfo structure
+ * @param self A pointer to an allocated MySQLInfo.
  */
-void mySqlStartupInfoFree(MySQLStartupInfo *self);
+void mySqlInfoFree(MySQLInfo *self);
 
 /**
  * @brief Free an allocated MySQL structure and nullify the content of the pointer

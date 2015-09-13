@@ -48,59 +48,59 @@ typedef struct {
     zsock_t *frontend;
 
     // database info
-    RedisStartupInfo redisInfo;
-    MySQLStartupInfo sqlInfo;
+    RedisInfo redisInfo;
+    MySQLInfo sqlInfo;
 
     /** Server specific handler when a client disconnects */
     DisconnectEventHandler disconnectHandler;
 
-} RouterMonitorStartupInfo;
+} RouterMonitorInfo;
 
 /**
  * @brief Allocate a new RouterMonitor structure.
- * @param info A RouterMonitorStartupInfo initialized
+ * @param info A RouterMonitorInfo initialized
  * @return A pointer to an allocated RouterMonitor, or NULL if an error occured.
  */
-RouterMonitor *routerMonitorNew(RouterMonitorStartupInfo *info);
+RouterMonitor *routerMonitorNew(RouterMonitorInfo *info);
 
 /**
  * @brief Initialize an allocated RouterMonitor structure.
  * @param self An allocated RouterMonitor to initialize.
- * @param info A RouterMonitorStartupInfo initialized
+ * @param info A RouterMonitorInfo initialized
  * @return true on success, false otherwise.
  */
-bool routerMonitorInit(RouterMonitor *self, RouterMonitorStartupInfo *info);
+bool routerMonitorInit(RouterMonitor *self, RouterMonitorInfo *info);
 
 /**
- * @brief Allocate a new RouterMonitorStartupInfo structure.
+ * @brief Allocate a new RouterMonitorInfo structure.
  * @param
- * @return A pointer to an allocated RouterMonitorStartupInfo, or NULL if an error occured.
+ * @return A pointer to an allocated RouterMonitorInfo, or NULL if an error occured.
  */
-RouterMonitorStartupInfo *routerMonitorStartupInfoNew(
+RouterMonitorInfo *routerMonitorInfoNew(
     zsock_t *frontend,
     uint16_t routerId,
-    RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo,
+    RedisInfo *redisInfo,
+    MySQLInfo *sqlInfo,
     DisconnectEventHandler disconnectHandler);
 
 /**
- * @brief Initialize an allocated RouterMonitorStartupInfo structure.
- * @param self An allocated RouterMonitorStartupInfo to initialize.
+ * @brief Initialize an allocated RouterMonitorInfo structure.
+ * @param self An allocated RouterMonitorInfo to initialize.
  * @param
  * @return true on success, false otherwise.
  */
-bool routerMonitorStartupInfoInit(
-    RouterMonitorStartupInfo *self,
+bool routerMonitorInfoInit(
+    RouterMonitorInfo *self,
     zsock_t *frontend,
     uint16_t routerId,
-    RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo,
+    RedisInfo *redisInfo,
+    MySQLInfo *sqlInfo,
     DisconnectEventHandler disconnectHandler);
 
 /**
  * @brief Start the Router Monitor
  * @param pipe A pipe to the parent process
- * @param info a RouterMonitorStartupInfo initialized
+ * @param info a RouterMonitorInfo initialized
  */
 void routerMonitorStart(zsock_t *pipe, void *info);
 
@@ -125,7 +125,7 @@ void routerMonitorFree(RouterMonitor *self);
 void routerMonitorDestroy(RouterMonitor **self);
 
 /**
- * @brief Free an allocated RouterMonitorStartupInfo structure and nullify the content of the pointer.
- * @param self A pointer to an allocated RouterMonitorStartupInfo.
+ * @brief Free an allocated RouterMonitorInfo structure and nullify the content of the pointer.
+ * @param self A pointer to an allocated RouterMonitorInfo.
  */
-void routerMonitorStartupInfoDestroy(RouterMonitorStartupInfo **_self);
+void routerMonitorInfoDestroy(RouterMonitorInfo **_self);

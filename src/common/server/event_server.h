@@ -82,8 +82,8 @@ typedef enum EventType {
 typedef struct {
     uint16_t routerId;
     uint16_t workersCount;
-    RedisStartupInfo redisInfo;
-} EventServerStartupInfo;
+    RedisInfo redisInfo;
+} EventServerInfo;
 
 typedef struct {
     bool around;
@@ -93,20 +93,20 @@ typedef struct EventServer EventServer;
 
 /**
  * @brief Allocate a new EventServer structure.
- * @param info An allocated EventServerStartupInfo containing the information for starting up the event server.
+ * @param info An allocated EventServerInfo containing the information for starting up the event server.
  * @param serverType The type of the server linked to the EventServer
  * @return A pointer to an allocated EventServer.
  */
-EventServer *eventServerNew(EventServerStartupInfo *info, ServerType serverType);
+EventServer *eventServerNew(EventServerInfo *info, ServerType serverType);
 
 /**
  * @brief Initialize an allocated EventServer structure.
  * @param self An allocated EventServer to initialize.
- * @param info An allocated EventServerStartupInfo containing the information for starting up the event server.
+ * @param info An allocated EventServerInfo containing the information for starting up the event server.
  * @param serverType The type of the server linked to the EventServer
  * @return true on success, false otherwise.
  */
-bool eventServerInit(EventServer *self, EventServerStartupInfo *info, ServerType serverType);
+bool eventServerInit(EventServer *self, EventServerInfo *info, ServerType serverType);
 
 /**
  * @brief Allocate a new GraphNodeClient structure.
@@ -172,14 +172,14 @@ bool eventServerLinkClients(EventServer *self, GraphNode *node1, GraphNode *node
 bool eventServerUnlinkClients(EventServer *self, GraphNode *node1, GraphNode *node2);
 
 /**
- * @brief Initialize an allocated EventServerStartupInfo structure.
- * @param self An allocated EventServerStartupInfo to initialize.
+ * @brief Initialize an allocated EventServerInfo structure.
+ * @param self An allocated EventServerInfo to initialize.
  * @param routerId The routerID
  * @param workersCount The workers count
  * @return true on success, false otherwise.
  */
-bool eventServerStartupInfoInit(
-    EventServerStartupInfo *self,
+bool eventServerInfoInit(
+    EventServerInfo *self,
     uint16_t routerId,
     uint16_t workersCount,
     char *redisHostname,

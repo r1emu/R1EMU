@@ -35,7 +35,7 @@ Server *serverFactoryCreateServer (
 {
     Server *server;
 
-    ServerStartupInfo serverInfo;
+    ServerInfo serverInfo;
     if (!(serverFactoryInitServerInfo (&serverInfo,
         serverType,
         routerId, routerIp,
@@ -46,7 +46,7 @@ Server *serverFactoryCreateServer (
         sqlHostname, sqlUsername, sqlPassword, sqlDatabase,
         redisHostname, redisPort, disconnectHandler
     ))) {
-        error("Cannot build a ServerStartupInfo.");
+        error("Cannot build a ServerInfo.");
         return NULL;
     }
 
@@ -61,7 +61,7 @@ Server *serverFactoryCreateServer (
 
 bool
 serverFactoryInitServerInfo (
-    ServerStartupInfo *serverInfo,
+    ServerInfo *serverInfo,
     ServerType serverType,
     uint16_t routerId,
     char *routerIp,
@@ -79,30 +79,30 @@ serverFactoryInitServerInfo (
     DisconnectEventHandler disconnectHandler
 ) {
     // Initialize MySQL start up information
-    MySQLStartupInfo sqlInfo;
-    if (!(mySqlStartupInfoInit(&sqlInfo, sqlHostname, sqlUsername, sqlPassword, sqlDatabase))) {
+    MySQLInfo sqlInfo;
+    if (!(mySqlInfoInit(&sqlInfo, sqlHostname, sqlUsername, sqlPassword, sqlDatabase))) {
         error("Cannot initialize correctly the MySQL start up information.");
         return false;
     }
 
     // Initialize Redis start up information
-    RedisStartupInfo redisInfo;
-    if (!(redisStartupInfoInit(&redisInfo, redisHostname, redisPort))) {
+    RedisInfo redisInfo;
+    if (!(redisInfoInit(&redisInfo, redisHostname, redisPort))) {
         error("Cannot initialize correctly the Redis start up information.");
         return false;
     }
 
     // Initialize Router start up information
-    RouterStartupInfo routerInfo;
-    if (!(routerStartupInfoInit (&routerInfo, routerId, routerIp, routerPort, workersCount,
+    RouterInfo routerInfo;
+    if (!(routerInfoInit (&routerInfo, routerId, routerIp, routerPort, workersCount,
                                  &redisInfo, &sqlInfo, disconnectHandler))) {
         error("Cannot initialize correctly the Router start up information.");
         return false;
     }
 
     // Initialize Worker start up information
-    WorkerStartupInfo *workersInfo;
-    if (!(workersInfo = malloc (sizeof(WorkerStartupInfo) * workersCount))) {
+    WorkerInfo *workersInfo;
+    if (!(workersInfo = malloc (sizeof(WorkerInfo) * workersCount))) {
         error("Cannot allocate an array of %d WorkerStartUpInfo.", workersCount);
         return false;
     }
@@ -134,7 +134,7 @@ serverFactoryInitServerInfo (
     }
 
     for (uint16_t workerId = 0; workerId < workersCount; workerId++) {
-        if (!(workerStartupInfoInit (
+        if (!(workerInfoInit (
             &workersInfo[workerId],
             workerId, routerId,
             serverType,
@@ -148,7 +148,7 @@ serverFactoryInitServerInfo (
     }
 
     // Initialize Server start up information
-    if (!(serverStartupInfoInit (serverInfo, serverType, &routerInfo, workersInfo, workersCount, output))) {
+    if (!(serverInfoInit (serverInfo, serverType, &routerInfo, workersInfo, workersCount, output))) {
         error("Cannot initialize correctly the Server start up information.");
         return false;
     }

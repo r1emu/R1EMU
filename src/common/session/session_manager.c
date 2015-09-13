@@ -20,7 +20,7 @@
 struct SessionManager
 {
     /** Info for starting session manager */
-    SessionManagerStartupInfo info;
+    SessionManagerInfo info;
 
     /** Session hashtable<Session *> */
     zhash_t *sessions;
@@ -29,7 +29,7 @@ struct SessionManager
     zsock_t *endpoint;
 };
 
-SessionManager *sessionManagerNew(SessionManagerStartupInfo *startInfo) {
+SessionManager *sessionManagerNew(SessionManagerInfo *startInfo) {
     SessionManager *self;
 
     if ((self = malloc(sizeof(SessionManager))) == NULL) {
@@ -45,7 +45,7 @@ SessionManager *sessionManagerNew(SessionManagerStartupInfo *startInfo) {
     return self;
 }
 
-bool sessionManagerInit(SessionManager *self, SessionManagerStartupInfo *startInfo) {
+bool sessionManagerInit(SessionManager *self, SessionManagerInfo *startInfo) {
     memset(self, 0, sizeof(SessionManager));
 
     memcpy(&self->info, startInfo, sizeof(self->info));

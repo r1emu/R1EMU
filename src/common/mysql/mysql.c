@@ -13,7 +13,7 @@
 
 #include "mysql.h"
 
-MySQL *mySqlNew(MySQLStartupInfo *info) {
+MySQL *mySqlNew(MySQLInfo *info) {
     MySQL *self;
 
     if ((self = calloc(1, sizeof(MySQL))) == NULL) {
@@ -29,17 +29,17 @@ MySQL *mySqlNew(MySQLStartupInfo *info) {
     return self;
 }
 
-bool mySqlInit(MySQL *self, MySQLStartupInfo *info) {
+bool mySqlInit(MySQL *self, MySQLInfo *info) {
     self->result = NULL;
     self->handle = mysql_init(NULL);
 
-    mySqlStartupInfoInit(&self->info, info->hostname, info->user, info->password, info->database);
+    mySqlInfoInit(&self->info, info->hostname, info->user, info->password, info->database);
 
     return true;
 }
 
-bool mySqlStartupInfoInit(
-    MySQLStartupInfo *self,
+bool mySqlInfoInit(
+    MySQLInfo *self,
     char *hostname,
     char *user,
     char *password,
@@ -54,7 +54,7 @@ bool mySqlStartupInfoInit(
 }
 
 bool mySqlConnect(MySQL *self) {
-    MySQLStartupInfo *sqlInfo = &self->info;
+    MySQLInfo *sqlInfo = &self->info;
 
     info("Connecting to the MySQL Server(%s@%s -> %s)...", sqlInfo->user, sqlInfo->hostname, sqlInfo->database);
 
@@ -107,7 +107,7 @@ void mySqlFreeResult(MySQL *self) {
 	}
 }
 
-void mySqlStartupInfoFree(MySQLStartupInfo *self) {
+void mySqlInfoFree(MySQLInfo *self) {
     free(self->hostname);
     free(self->database);
     free(self->user);
@@ -117,7 +117,7 @@ void mySqlStartupInfoFree(MySQLStartupInfo *self) {
 void mySqlDestroy(MySQL **_self) {
     MySQL *self = *_self;
 
-    mySqlStartupInfoFree(&self->info);
+    mySqlInfoFree(&self->info);
     mySqlFreeResult(self);
     mysql_close(self->handle);
 

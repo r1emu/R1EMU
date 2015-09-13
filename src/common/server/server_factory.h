@@ -43,7 +43,7 @@ Server *serverFactoryCreateServer(
  * @brief : Factory for initializing a generic Server
  */
 bool serverFactoryInitServerInfo(
-    ServerStartupInfo *serverInfo,
+    ServerInfo *serverInfo,
     ServerType serverType,
     uint16_t routerId,
     char *routerIp,

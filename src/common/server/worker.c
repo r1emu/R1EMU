@@ -172,7 +172,7 @@ Worker_getCryptedPacketInfo (
 
 Worker *
 workerNew (
-    WorkerStartupInfo *info
+    WorkerInfo *info
 ) {
     Worker *self;
 
@@ -192,10 +192,10 @@ workerNew (
 bool
 workerInit (
     Worker *self,
-    WorkerStartupInfo *workerInfo
+    WorkerInfo *workerInfo
 ) {
-    // Make a private copy of the WorkerStartupInfo
-    if (!(workerStartupInfoInit (
+    // Make a private copy of the WorkerInfo
+    if (!(workerInfoInit (
         &self->info, workerInfo->workerId, workerInfo->routerId, workerInfo->serverType,
         workerInfo->globalServerIp, workerInfo->globalServerPort,
         &workerInfo->sqlInfo, &workerInfo->redisInfo,
@@ -252,15 +252,15 @@ workerInit (
 }
 
 bool
-workerStartupInfoInit (
-    WorkerStartupInfo *self,
+workerInfoInit (
+    WorkerInfo *self,
     uint16_t workerId,
     uint16_t routerId,
     ServerType serverType,
     char *globalServerIp,
     int globalServerPort,
-    MySQLStartupInfo *sqlInfo,
-    RedisStartupInfo *redisInfo,
+    MySQLInfo *sqlInfo,
+    RedisInfo *redisInfo,
     const PacketHandler *packetHandlers,
     int packetHandlersCount,
     char *routerIp, int routerPort
@@ -278,12 +278,12 @@ workerStartupInfoInit (
 
     self->globalServerPort = globalServerPort;
 
-    if (!(redisStartupInfoInit(&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
+    if (!(redisInfoInit(&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
         error("Cannot initialize Redis Start up info.");
         return false;
     }
 
-    if (!(mySqlStartupInfoInit(&self->sqlInfo,
+    if (!(mySqlInfoInit(&self->sqlInfo,
         sqlInfo->hostname, sqlInfo->user, sqlInfo->password, sqlInfo->database)))
     {
         error("Cannot initialize MySQL start up info.");
@@ -919,11 +919,11 @@ bool workerDispatchEvent (Worker *self, uint8_t *emitterSk, EventType eventType,
 }
 
 void
-WorkerStartupInfo_free(
-    WorkerStartupInfo *self
+WorkerInfo_free(
+    WorkerInfo *self
 ) {
-    mySqlStartupInfoFree (&self->sqlInfo);
-    redisStartupInfoFree (&self->redisInfo);
+    mySqlInfoFree (&self->sqlInfo);
+    redisInfoFree (&self->redisInfo);
     free(self->globalServerIp);
 }
 

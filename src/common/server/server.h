@@ -28,42 +28,42 @@
 typedef struct Server Server;
 
 typedef struct {
-    RouterStartupInfo routerInfo;
-    WorkerStartupInfo *workersInfo;
+    RouterInfo routerInfo;
+    WorkerInfo *workersInfo;
     int workersInfoCount;
     char *output;
     ServerType serverType;
-} ServerStartupInfo;
+} ServerInfo;
 
 /**
  * @brief Allocate a new Server structure.
- * @param info An allocated ServerStartupInfo already initialized
+ * @param info An allocated ServerInfo already initialized
  * @return A pointer to an allocated Server, or NULL if an error occured.
  */
-Server *serverNew(ServerStartupInfo *info);
+Server *serverNew(ServerInfo *info);
 
 /**
  * @brief Initialize an allocated Server structure.
  * @param self An allocated Server to initialize.
- * @param info An allocated ServerStartupInfo already initialized
+ * @param info An allocated ServerInfo already initialized
  * @return true on success, false otherwise.
  */
-bool serverInit(Server *self, ServerStartupInfo *info);
+bool serverInit(Server *self, ServerInfo *info);
 
 /**
- * @brief Initialize an allocated ServerStartupInfo structure.
- * @param self An allocated ServerStartupInfo to initialize.
+ * @brief Initialize an allocated ServerInfo structure.
+ * @param self An allocated ServerInfo to initialize.
  * @param serverType The type of the server to initialize
- * @param routerInfo An allocated RouterStartupInfo already initialized
- * @param workersInfo An allocated WorkerStartupInfo array all already initialized
+ * @param routerInfo An allocated RouterInfo already initialized
+ * @param workersInfo An allocated WorkerInfo array all already initialized
  * @param workersInfoCount The workersInfo elements count.
  * @return true on success, false otherwise.
  */
-bool serverStartupInfoInit(
-    ServerStartupInfo *self,
+bool serverInfoInit(
+    ServerInfo *self,
     ServerType serverType,
-    RouterStartupInfo *routerInfo,
-    WorkerStartupInfo *workersInfo,
+    RouterInfo *routerInfo,
+    WorkerInfo *workersInfo,
     int workersInfoCount,
     char *output);
 
@@ -76,11 +76,11 @@ bool serverStart(Server *self);
 
 /**
  * @brief Launch a new Server process
- * @param info An allocated ServerStartupInfo already initialized
+ * @param info An allocated ServerInfo already initialized
  * @param executableName The executable name to launch
  * @return true on success, false otherwise.
  */
-bool serverCreateProcess(ServerStartupInfo *info, char *executableName);
+bool serverCreateProcess(ServerInfo *info, char *executableName);
 
 /**
  * @brief Get the routerId of the Server

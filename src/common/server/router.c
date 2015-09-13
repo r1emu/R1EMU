@@ -75,7 +75,7 @@ struct Router
 
     // === Startup information ===
     /** Router information */
-    RouterStartupInfo info;
+    RouterInfo info;
 
     // === Handlers ===
     /** Array of packet handlers */
@@ -165,7 +165,7 @@ Router_initBackend (
 
 Router *
 routerNew (
-    RouterStartupInfo *info
+    RouterInfo *info
 ) {
     Router *self;
 
@@ -185,10 +185,10 @@ routerNew (
 bool
 routerInit (
     Router *self,
-    RouterStartupInfo *info
+    RouterInfo *info
 ) {
     // Get a private copy of the Router Information
-    if (!(routerStartupInfoInit (
+    if (!(routerInfoInit (
             &self->info, info->routerId, info->ip,
             info->port, info->workersCount,
             &info->redisInfo, &info->sqlInfo,
@@ -234,7 +234,7 @@ routerInit (
     }
 
     // Allocate session manager
-    SessionManagerStartupInfo sessionManagerInfo = {
+    SessionManagerInfo sessionManagerInfo = {
         .routerId = self->info.routerId
     };
     if (!(self->sessionManager = sessionManagerNew(&sessionManagerInfo))) {
@@ -258,14 +258,14 @@ routerInit (
 }
 
 bool
-routerStartupInfoInit (
-    RouterStartupInfo *self,
+routerInfoInit (
+    RouterInfo *self,
     uint16_t routerId,
     char *ip,
     int port,
     int workersCount,
-    RedisStartupInfo *redisInfo,
-    MySQLStartupInfo *sqlInfo,
+    RedisInfo *redisInfo,
+    MySQLInfo *sqlInfo,
     DisconnectEventHandler disconnectHandler
 ) {
     self->routerId = routerId;
@@ -278,12 +278,12 @@ routerStartupInfoInit (
     self->workersCount = workersCount;
     self->disconnectHandler = disconnectHandler;
 
-    if (!(redisStartupInfoInit(&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
+    if (!(redisInfoInit(&self->redisInfo, redisInfo->hostname, redisInfo->port))) {
         error("Cannot initialize Redis Start up info.");
         return false;
     }
 
-    if (!(mySqlStartupInfoInit(&self->sqlInfo,
+    if (!(mySqlInfoInit(&self->sqlInfo,
             sqlInfo->hostname, sqlInfo->user, sqlInfo->password, sqlInfo->database))) {
         error("Cannot initialize MySQL start up info.");
         return false;
@@ -603,8 +603,8 @@ Router_initMonitor (
     }
     info("Binded to the Router Monitor endpoint %s", zsys_sprintf(ROUTER_MONITOR_SUBSCRIBER_ENDPOINT, self->info.routerId));
 
-    RouterMonitorStartupInfo *routerMonitorInfo;
-    if (!(routerMonitorInfo = routerMonitorStartupInfoNew(
+    RouterMonitorInfo *routerMonitorInfo;
+    if (!(routerMonitorInfo = routerMonitorInfoNew(
         self->frontend,
         self->info.routerId,
         &self->info.redisInfo,
@@ -767,8 +767,8 @@ routerGetId (
 }
 
 void
-routerStartupInfoFree (
-    RouterStartupInfo *self
+routerInfoFree (
+    RouterInfo *self
 ) {
     free(self->ip);
 }
@@ -797,7 +797,7 @@ routerDestroy (
         zlist_destroy (&self->readyWorkers);
     }
 
-    routerStartupInfoFree (&self->info);
+    routerInfoFree (&self->info);
 
     free(self);
     *_self = NULL;

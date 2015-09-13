@@ -32,7 +32,7 @@ struct Server
     /** 1-* Workers of the Server */
     Worker **workers;
 
-    ServerStartupInfo info;
+    ServerInfo info;
 };
 
 // ------ Static declaration -------
@@ -42,7 +42,7 @@ struct Server
 
 Server *
 serverNew (
-    ServerStartupInfo *info
+    ServerInfo *info
 ) {
     Server *self;
 
@@ -62,10 +62,10 @@ serverNew (
 bool
 serverInit (
     Server *self,
-    ServerStartupInfo *serverInfo
+    ServerInfo *serverInfo
 ) {
     // Make a private copy
-    if (!(serverStartupInfoInit (
+    if (!(serverInfoInit (
         &self->info,
         serverInfo->serverType,
         &serverInfo->routerInfo,
@@ -73,7 +73,7 @@ serverInit (
         serverInfo->workersInfoCount,
         serverInfo->output)))
     {
-        error("Cannot init the ServerStartupInfo");
+        error("Cannot init the ServerInfo");
         return false;
     }
 
@@ -108,11 +108,11 @@ serverInit (
 }
 
 bool
-serverStartupInfoInit (
-    ServerStartupInfo *self,
+serverInfoInit (
+    ServerInfo *self,
     ServerType serverType,
-    RouterStartupInfo *routerInfo,
-    WorkerStartupInfo *workersInfo,
+    RouterInfo *routerInfo,
+    WorkerInfo *workersInfo,
     int workersInfoCount,
     char *output
 ) {
@@ -120,9 +120,9 @@ serverStartupInfoInit (
     memcpy(&self->routerInfo, routerInfo, sizeof(self->routerInfo));
 
     // Copy Worker info
-    self->workersInfo = malloc (sizeof(WorkerStartupInfo) * workersInfoCount);
+    self->workersInfo = malloc (sizeof(WorkerInfo) * workersInfoCount);
     for (int i = 0; i < workersInfoCount; i++) {
-        memcpy(&self->workersInfo[i], &workersInfo[i], sizeof(WorkerStartupInfo));
+        memcpy(&self->workersInfo[i], &workersInfo[i], sizeof(WorkerInfo));
     }
 
     self->serverType = serverType;
@@ -135,11 +135,11 @@ serverStartupInfoInit (
 
 bool
 serverCreateProcess (
-    ServerStartupInfo *self,
+    ServerInfo *self,
     char *executableName
 ) {
-    MySQLStartupInfo *sqlInfo = &self->workersInfo[0].sqlInfo;
-    RedisStartupInfo *redisInfo = &self->workersInfo[0].redisInfo;
+    MySQLInfo *sqlInfo = &self->workersInfo[0].sqlInfo;
+    RedisInfo *redisInfo = &self->workersInfo[0].redisInfo;
     char *globalServerIp = self->workersInfo[0].globalServerIp;
     int globalServerPort = self->workersInfo[0].globalServerPort;
 
