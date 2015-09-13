@@ -101,6 +101,12 @@ bool dbInfoInit(
     DbProcessMsgHandler handler);
 
 /**
+ * Start the db actor
+ * @param self A pointer to an allocated Db.
+ */
+bool dbStart(Db *self);
+
+/**
  * Free an allocated Db structure.
  * @param self A pointer to an allocated Db.
  */

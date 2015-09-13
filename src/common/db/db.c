@@ -55,6 +55,8 @@ Db *dbNew(DbInfo *dbInfo) {
 bool dbInit(Db *self, DbInfo *dbInfo) {
     memset(self, 0, sizeof(Db));
 
+    memcpy(&self->info, dbInfo, sizeof(self->info));
+
     if (!(self->hashtable = zhash_new())) {
         error("Cannot allocate a new object hashtable.");
         return false;
@@ -364,7 +366,7 @@ void *dbMainLoop(void *arg) {
 
             default:
                 // extended messages
-                if (!(self->info.handler(self->info.heritage, msg, out))) {
+                if (!(self->info.handler) || !(self->info.handler(self->info.heritage, msg, out))) {
                     // message type unhandled
                     error("%s:%d : Cannot process db message type=%d.",
                           self->info.name, self->info.routerId, packetType);

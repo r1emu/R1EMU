@@ -102,6 +102,15 @@
 		</Unit>
 		<Unit filename="../../../src/common/crypto/crypto.h" />
 		<Unit filename="../../../src/common/crypto/schedule.h" />
+		<Unit filename="../../../src/common/db/db.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/db/db.h" />
+		<Unit filename="../../../src/common/db/db_client.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/db/db_client.h" />
+		<Unit filename="../../../src/common/db/db_connection.h" />
 		<Unit filename="../../../src/common/dbg/dbg.c">
 			<Option compilerVar="CC" />
 		</Unit>
