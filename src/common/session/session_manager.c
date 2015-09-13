@@ -133,33 +133,35 @@ void *sessionManagerMainLoop (void *arg) {
                 SessionManagerStatus status = SESSION_MANAGER_STATUS_SUCCESS;
                 zframe_t *sessionFrame = zmsg_pop(msg);
                 Session *session = (Session *) zframe_data(sessionFrame);
-                // TODO : fix memleak
 
                 if (!session) {
                     error("Cannot retrieve the session.");
                     status = SESSION_MANAGER_CANNOT_STORE;
+                    goto cleanupStore;
                 }
 
                 // header : status
                 if ((zmsg_addmem(msg, PACKET_HEADER(status), sizeof(PACKET_HEADER(status))) != 0)) {
                     error("Cannot add the packet header to the msg.");
-                    break;
+                    goto cleanupStore;
                 }
 
                 // store data only in case of success
                 if (status == SESSION_MANAGER_STATUS_SUCCESS) {
                     if (!(sessionManagerStoreSession(self, sessionKey, session))) {
                         error("Cannot store the session.");
-                        break;
+                        goto cleanupStore;
                     }
                 }
 
                 // send packet
                 if (zmsg_send(&msg, self->endpoint) != 0) {
                     error("Cannot send the reply packet.");
-                    break;
+                    goto cleanupStore;
                 }
 
+                cleanupStore:
+                    zframe_destroy(&sessionFrame);
             }   break;
         }
 
@@ -178,7 +180,10 @@ bool sessionManagerStart(SessionManager *self) {
         return false;
     }
 
-    zthread_new(sessionManagerMainLoop, self);
+    if (zthread_new(sessionManagerMainLoop, self) != 0) {
+        error("Cannot start a new session manager loop.");
+        return false;
+    }
 
     return true;
 }
