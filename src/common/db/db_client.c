@@ -23,6 +23,12 @@ struct DbClient
     zsock_t *connection;
 };
 
+typedef struct _DbObject
+{
+    size_t dataSize;
+    char data[0];
+}   DbObject;
+
 DbClient *dbClientNew(DbClientInfo *startInfo) {
     DbClient *self;
 
@@ -91,6 +97,62 @@ bool dbClientStart(DbClient *self) {
     return true;
 }
 
+
+bool dbClientGetValue(DbClient *self, DbKey key, char **value) {
+
+    bool status = false;
+    zmsg_t *request = zmsg_new();
+    zmsg_t *response = NULL;
+    zframe_t *responseStatusFrame = NULL;
+    zframe_t *valueFrame = NULL;
+
+    if(zmsg_addmem(request, PACKET_HEADER(DB_GET_ARRAY), sizeof(DB_GET_ARRAY) != 0)){
+        error("%s:%d : Cannot add DB_GET_ARRAY to dbClient GET message.",
+              self->info.name, self->info.routerId);
+        goto cleanup;
+    }
+
+    if(zmsg_addmem(request, &key, sizeof(key)) != 0){
+        error("%s:%d : Cannot add key to dbClient GET message.",
+              self->info.name, self->info.routerId);
+        goto cleanup;
+    }
+
+    zmsg_send(&request, self->connection);
+
+    if(!(response = zmsg_recv(self->connection))){
+        error("%s:%d : Cannot receive a message.",
+              self->info.name, self->info.routerId);
+        goto cleanup;
+    }
+
+    if(!(responseStatusFrame = zmsg_pop(response))){
+        error("%s:%d : Cannot read result header.",
+              self->info.name, self->info.routerId);
+        goto cleanup;
+    }
+
+    DbStatus responseStatus = *((typeof(responseStatus) *) zframe_data(responseStatusFrame));
+    if (responseStatus == DB_STATUS_CANNOT_GET){
+        error("%s:%d : Database could not GET key.",
+              self->info.name, self->info.routerId);
+        goto cleanup;
+    }
+
+    if(!(valueFrame = zmsg_pop(response))){
+        error("%s:%d : Could not read value from GET response.",
+              self->info.name, self->info.routerId);
+        goto cleanup;
+    }
+
+    *value = strdup((char *) zframe_data(valueFrame));
+    status = true;
+
+cleanup:
+    // TODO
+
+    return status;
+}
 
 void dbClientFree(DbClient *self) {
     // TODO
