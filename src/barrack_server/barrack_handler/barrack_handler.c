@@ -433,8 +433,8 @@ static PacketHandlerState barrackHandlerCommanderCreate(
         case COMMANDER_JOB_ARCHER:
             appearance->classId = COMMANDER_CLASS_ARCHER;
             break;
-        case COMMANDER_JOB_MAGE:
-            appearance->classId = COMMANDER_CLASS_MAGE;
+        case COMMANDER_JOB_WIZARD:
+            appearance->classId = COMMANDER_CLASS_WIZARD;
             break;
         case COMMANDER_JOB_CLERIC:
             appearance->classId = COMMANDER_CLASS_CLERIC;
