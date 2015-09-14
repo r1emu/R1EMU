@@ -91,59 +91,119 @@ bool dbClientStart(DbClient *self) {
     return true;
 }
 
-
-bool dbClientGetValue(DbClient *self, DbKey key, char **value) {
+bool dbClientRequestValues(DbClient *self, char **keys, size_t keysCount) {
 
     bool status = false;
-    zmsg_t *request = zmsg_new();
-    zmsg_t *response = NULL;
-    zframe_t *responseStatusFrame = NULL;
-    zframe_t *valueFrame = NULL;
+    zmsg_t *request = NULL;
 
-    if(zmsg_addmem(request, PACKET_HEADER(DB_GET_ARRAY), sizeof(DB_GET_ARRAY) != 0)){
+    if (!(request = zmsg_new())) {
+        error("Cannot allocate a new request msg.");
+        goto cleanup;
+    }
+
+    if (zmsg_addmem(request, PACKET_HEADER(DB_GET_ARRAY), sizeof(DB_GET_ARRAY) != 0)){
         error("%s:%d : Cannot add DB_GET_ARRAY to dbClient GET message.",
               self->info.name, self->info.routerId);
         goto cleanup;
     }
 
-    if(zmsg_addmem(request, &key, sizeof(key)) != 0){
-        error("%s:%d : Cannot add key to dbClient GET message.",
-              self->info.name, self->info.routerId);
-        goto cleanup;
+    for (size_t keyIdx; keyIdx < keysCount; keyIdx++) {
+        // add all the keys requested to the message
+        if (zmsg_addmem(request, keys[keyIdx], strlen(keys[keyIdx])) != 0) {
+            error("%s:%d : Cannot add key to dbClient GET message.",
+                  self->info.name, self->info.routerId);
+            goto cleanup;
+        }
     }
 
     zmsg_send(&request, self->connection);
 
-    if(!(response = zmsg_recv(self->connection))){
+    status = true;
+
+cleanup:
+    zmsg_destroy(&request);
+
+    return status;
+}
+
+bool dbClientRequestValue(DbClient *self, char *key) {
+    return dbClientRequestValues(self, (typeof(key)[]) {key}, 1);
+}
+
+bool dbClientGetValues(DbClient *self, zhash_t **_out) {
+
+    bool status = false;
+    zmsg_t *response = NULL;
+    zframe_t *responseStatusFrame = NULL;
+    zframe_t *valueFrame = NULL;
+    zhash_t *out = *_out = NULL;
+
+    // wait for db answer
+    if (!(response = zmsg_recv(self->connection))) {
         error("%s:%d : Cannot receive a message.",
               self->info.name, self->info.routerId);
         goto cleanup;
     }
 
-    if(!(responseStatusFrame = zmsg_pop(response))){
+    // get header status
+    if (!(responseStatusFrame = zmsg_pop(response))) {
         error("%s:%d : Cannot read result header.",
               self->info.name, self->info.routerId);
         goto cleanup;
     }
 
+    // check header status
     DbStatus responseStatus = *((typeof(responseStatus) *) zframe_data(responseStatusFrame));
-    if (responseStatus == DB_STATUS_CANNOT_GET){
-        error("%s:%d : Database could not GET key.",
-              self->info.name, self->info.routerId);
+    if (responseStatus != DB_STATUS_SUCCESS) {
+        error("%s:%d : Database could not GET key. Status = %d",
+              self->info.name, self->info.routerId, responseStatus);
         goto cleanup;
     }
 
-    if(!(valueFrame = zmsg_pop(response))){
-        error("%s:%d : Could not read value from GET response.",
-              self->info.name, self->info.routerId);
+    // Allocate result hashtable
+    if (!(out = zhash_new())) {
+        error("Cannot allocate a new values hashtable.");
         goto cleanup;
     }
 
-    *value = strdup((char *) zframe_data(valueFrame));
+    char *key;
+    while ((key = zmsg_popstr(response)) != NULL) {
+
+        // key is followed by the value associated to the key
+        if (!(valueFrame = zmsg_pop(response))) {
+            error("Cannot get the object associated to the key '%s'");
+            goto cleanup;
+        }
+
+        void *value = zframe_data(valueFrame);
+        size_t valueSize = zframe_size(valueFrame);
+
+        // create a copy
+        void *valueCopy = NULL;
+        if (!(valueCopy = malloc(valueSize))) {
+            error("Cannot create a copy of the object '%s' of size %d.", key, valueSize);
+            goto cleanup;
+        }
+
+        memcpy(valueCopy, value, valueSize);
+
+        if (zhash_insert(out, key, valueCopy) != 0) {
+            error("Cannot insert value in key '%s'", key);
+            goto cleanup;
+        }
+
+        zframe_destroy(&valueFrame);
+    }
+
     status = true;
 
 cleanup:
-    // TODO
+    if (!status) {
+        zhash_destroy(_out);
+    }
+    zmsg_destroy(&response);
+    zframe_destroy(&responseStatusFrame);
+    zframe_destroy(&valueFrame);
 
     return status;
 }
