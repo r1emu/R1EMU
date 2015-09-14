@@ -23,6 +23,11 @@ struct DbClient
     zsock_t *connection;
 };
 
+/**
+ * Add keys to the request message
+ */
+static bool dbClientAddKeys(DbClient *self, zmsg_t *request, char **keys, size_t keysCount);
+
 DbClient *dbClientNew(DbClientInfo *startInfo) {
     DbClient *self;
 
@@ -45,7 +50,8 @@ bool dbClientInit(DbClient *self, DbClientInfo *startInfo) {
     memcpy(&self->info, startInfo, sizeof(self->info));
 
     if (!(self->connection = zsock_new(ZMQ_REQ))) {
-        error("Cannot create connection socket.");
+        error("%s:%d : Cannot create connection socket.",
+              self->info.name, self->info.routerId);
         return false;
     }
 
@@ -82,13 +88,90 @@ bool dbClientStart(DbClient *self) {
     char *endpointStr = zsys_sprintf(DB_ENDPOINT, self->info.name, self->info.routerId);
 
     if (zsock_connect(self->connection, endpointStr) != 0) {
-        error("Cannot connect to %s.", endpointStr);
+        error("%s:%d : Cannot connect to %s.",
+              self->info.name, self->info.routerId, endpointStr);
         return false;
     }
 
-    info("%s connected.", endpointStr);
+    info("%s:%d : %s connected.", self->info.name, self->info.routerId, endpointStr);
 
     return true;
+}
+
+static bool dbClientAddKeys(DbClient *self, zmsg_t *request, char **keys, size_t keysCount) {
+
+    bool status = false;
+
+    for (size_t keyIdx; keyIdx < keysCount; keyIdx++) {
+        // add all the keys requested to the message
+        if (zmsg_addstr(request, keys[keyIdx]) != 0) {
+            error("%s:%d : Cannot add key to dbClient GET message.",
+                  self->info.name, self->info.routerId);
+            goto cleanup;
+        }
+    }
+
+    status = true;
+
+cleanup:
+    return status;
+}
+
+bool dbClientRemoveValues(DbClient *self, char **keys, size_t keysCount) {
+
+    bool status = false;
+    zmsg_t *request = NULL;
+    zmsg_t *response = NULL;
+    zframe_t *responseStatusFrame = NULL;
+
+    if (!(request = zmsg_new())) {
+        error("%s:%d : Cannot allocate a new request msg.",
+              self->info.name, self->info.routerId);
+        goto cleanup;
+    }
+
+    // add header
+    if (zmsg_addmem(request, PACKET_HEADER(DB_REMOVE_ARRAY), sizeof(DB_REMOVE_ARRAY) != 0)){
+        error("%s:%d : Cannot add DB_REMOVE_ARRAY to dbClient REMOVE message.",
+              self->info.name, self->info.routerId);
+        goto cleanup;
+    }
+
+    // add keys to the request
+    if (!(dbClientAddKeys(self, request, keys, keysCount))) {
+        error("Cannot add keys to the request message.");
+        goto cleanup;
+    }
+
+    // wait for db answer
+    if (!(response = zmsg_recv(self->connection))) {
+        error("%s:%d : Cannot receive a message.",
+              self->info.name, self->info.routerId);
+        goto cleanup;
+    }
+
+    // get header status
+    if (!(responseStatusFrame = zmsg_pop(response))) {
+        error("%s:%d : Cannot read result header.",
+              self->info.name, self->info.routerId);
+        goto cleanup;
+    }
+
+    // check header status
+    DbStatus responseStatus = *((typeof(responseStatus) *) zframe_data(responseStatusFrame));
+    if (responseStatus != DB_STATUS_SUCCESS) {
+        error("%s:%d : Database could not REMOVE keys. Status = %d",
+              self->info.name, self->info.routerId, responseStatus);
+        goto cleanup;
+    }
+
+    status = true;
+
+cleanup:
+    zmsg_destroy(&request);
+    zframe_destroy(&responseStatusFrame);
+
+    return status;
 }
 
 bool dbClientRequestValues(DbClient *self, char **keys, size_t keysCount) {
@@ -97,7 +180,8 @@ bool dbClientRequestValues(DbClient *self, char **keys, size_t keysCount) {
     zmsg_t *request = NULL;
 
     if (!(request = zmsg_new())) {
-        error("Cannot allocate a new request msg.");
+        error("%s:%d : Cannot allocate a new request msg.",
+              self->info.name, self->info.routerId);
         goto cleanup;
     }
 
@@ -107,13 +191,9 @@ bool dbClientRequestValues(DbClient *self, char **keys, size_t keysCount) {
         goto cleanup;
     }
 
-    for (size_t keyIdx; keyIdx < keysCount; keyIdx++) {
-        // add all the keys requested to the message
-        if (zmsg_addmem(request, keys[keyIdx], strlen(keys[keyIdx])) != 0) {
-            error("%s:%d : Cannot add key to dbClient GET message.",
-                  self->info.name, self->info.routerId);
-            goto cleanup;
-        }
+    if (!(dbClientAddKeys(self, request, keys, keysCount))) {
+        error("Cannot add keys to the request message.");
+        goto cleanup;
     }
 
     zmsg_send(&request, self->connection);
@@ -162,7 +242,8 @@ bool dbClientGetValues(DbClient *self, zhash_t **_out) {
 
     // Allocate result hashtable
     if (!(out = zhash_new())) {
-        error("Cannot allocate a new values hashtable.");
+        error("%s:%d : Cannot allocate a new values hashtable.",
+              self->info.name, self->info.routerId);
         goto cleanup;
     }
 
@@ -171,7 +252,8 @@ bool dbClientGetValues(DbClient *self, zhash_t **_out) {
 
         // key is followed by the value associated to the key
         if (!(valueFrame = zmsg_pop(response))) {
-            error("Cannot get the object associated to the key '%s'");
+            error("%s:%d : Cannot get the object associated to the key '%s'",
+                  self->info.name, self->info.routerId, key);
             goto cleanup;
         }
 
@@ -181,14 +263,16 @@ bool dbClientGetValues(DbClient *self, zhash_t **_out) {
         // create a copy
         void *valueCopy = NULL;
         if (!(valueCopy = malloc(valueSize))) {
-            error("Cannot create a copy of the object '%s' of size %d.", key, valueSize);
+            error("%s:%d : Cannot create a copy of the object '%s' of size %d.",
+                  self->info.name, self->info.routerId, key, valueSize);
             goto cleanup;
         }
 
         memcpy(valueCopy, value, valueSize);
 
         if (zhash_insert(out, key, valueCopy) != 0) {
-            error("Cannot insert value in key '%s'", key);
+            error("%s:%d : Cannot insert value in key '%s'",
+                  self->info.name, self->info.routerId, key);
             goto cleanup;
         }
 
@@ -209,7 +293,8 @@ cleanup:
 }
 
 void dbClientFree(DbClient *self) {
-    // TODO
+    zsock_destroy(&self->connection);
+    dbClientInfoFree(&self->info);
 }
 
 void dbClientDestroy(DbClient **_self) {
@@ -223,7 +308,7 @@ void dbClientDestroy(DbClient **_self) {
 }
 
 void dbClientInfoFree(DbClientInfo *self) {
-    // TODO
+    free(self->name);
 }
 
 void dbClientInfoDestroy(DbClientInfo **_self) {
