@@ -46,7 +46,7 @@ typedef enum {
     DB_UPDATE_ARRAY,
 
     // format : [key1][key2][...]
-    // Answer : [status][object1][object2][...]
+    // Answer : [status][key1][object1][key2][object2][...]
     DB_GET_OBJECT,
     DB_GET_ARRAY,
 

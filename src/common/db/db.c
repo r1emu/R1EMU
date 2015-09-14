@@ -279,7 +279,13 @@ bool dbGetArray(Db *self, zmsg_t *in, zmsg_t *out) {
             goto cleanup;
         }
 
-        // add to the object to the message
+        // add to the key to the message
+        if (zmsg_addstr(out, key) != 0) {
+            error("'%s:%d' : Cannot add key '%s' to the message.", self->info.name, self->info.routerId, key);
+            goto cleanup;
+        }
+
+        // add to the associated object to the message
         if (zmsg_addmem(out, dbObject->data, dbObject->dataSize) != 0) {
             error("'%s:%d' : Cannot add object '%s' to the message.", self->info.name, self->info.routerId, key);
             goto cleanup;
