@@ -23,12 +23,6 @@ struct DbClient
     zsock_t *connection;
 };
 
-typedef struct _DbObject
-{
-    size_t dataSize;
-    char data[0];
-}   DbObject;
-
 DbClient *dbClientNew(DbClientInfo *startInfo) {
     DbClient *self;
 
