@@ -176,8 +176,18 @@ bool dbClientGetValues(DbClient *self, zhash_t **_out) {
         }
 
         void *value = zframe_data(valueFrame);
+        size_t valueSize = zframe_size(valueFrame);
 
-        if (zhash_insert(out, key, value) != 0) {
+        // create a copy
+        void *valueCopy = NULL;
+        if (!(valueCopy = malloc(valueSize))) {
+            error("Cannot create a copy of the object '%s' of size %d.", key, valueSize);
+            goto cleanup;
+        }
+
+        memcpy(valueCopy, value, valueSize);
+
+        if (zhash_insert(out, key, valueCopy) != 0) {
             error("Cannot insert value in key '%s'", key);
             goto cleanup;
         }
