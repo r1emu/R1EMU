@@ -23,10 +23,6 @@
 
 // ---------- Defines -------------
 
-typedef enum {
-    TESTKEY
-} DbKey;
-
 // ------ Structure declaration -------
 typedef struct DbClient DbClient;
 
@@ -62,16 +58,6 @@ DbClientInfo *dbClientInfoNew(char *name, uint16_t routerId);
  * @return true on success, false otherwise.
  */
 bool dbClientInfoInit(DbClientInfo *self, char *name, uint16_t routerId);
-
-/**
- * Get by value from database by key
- * @param self A connected dbClient
- * @param key A key from DbKey enum
- * @param value A pointer to a string which will become the corresponding
- *        value of the key
- * @return true on success, false otherwise.
- */
-bool dbClientGetValue(DbClient *self, DbKey key, char **value);
 
 /**
  * Free an allocated DbClient structure.
