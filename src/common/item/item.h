@@ -28,6 +28,27 @@
 #define ITEM_EQUIP_NOATTR_SIZE 24
 
 // ------ Structure declaration -------
+typedef struct ItemAttributes {
+    float durability;
+    float cooldown;
+    char *memo;
+    char *customName;
+    char *crafterName;
+    float pr; // dont know what it means yet
+    float reinforce_2; // I belive it is +1, +2, +3
+} ItemAttributes;
+
+typedef enum ItemAttributeType
+{
+    ITEM_ATTRIBUTE_DURABILITY = 3770,
+    ITEM_ATTRIBUTE_PR = 3781,
+    ITEM_ATTRIBUTE_COOLDOWN   = 3843,
+    ITEM_ATTRIBUTE_REINFORCE_2   = 3852,
+    ITEM_ATTRIBUTE_MEMO   = 3972,
+    ITEM_ATTRIBUTE_CUSTOM_NAME   = 3975,
+    ITEM_ATTRIBUTE_CRAFTER_NAME   = 3978,
+} ItemAttributeType;
+
 typedef struct {
     uint64_t uniqueId;
     uint32_t amount;
@@ -46,13 +67,12 @@ typedef struct Attribute{
 } Attribute;
 
 typedef struct FloatAttribute{
-    uint16_t attributeType;
+    ItemAttributeType attributeType;
     float value;
 } FloatAttribute;
 
 typedef struct StringAttribute{
-    uint16_t attributeType;
-    size_t valueLength;
+    ItemAttributeType attributeType;
     char *value;
 } StringAttribute;
 
@@ -70,9 +90,12 @@ typedef struct ItemEquip{
 
 // ----------- Functions ------------
 
-bool initStringAttribute(StringAttribute *self, uint16_t attributeType, size_t valueLength, char *value);
+bool initItemAttributes(ItemAttributes *self, float durability, float cooldown, char *memo, char *customName, char *crafterName,
+                        float pr, float reinforce_2);
 
-bool initFloatAttribute(FloatAttribute *self, uint16_t attributeType, float value);
+bool initStringAttribute(StringAttribute *self, ItemAttributeType attributeType, char *value);
+
+bool initFloatAttribute(FloatAttribute *self, ItemAttributeType attributeType, float value);
 
 bool initAttribute(Attribute *self, void *attribute, AttributeType attributeType);
 
@@ -86,6 +109,14 @@ bool getAttributeListPacket(AttributeList *attributeList, char *packet);
 
 bool getFloatAttributePacket(FloatAttribute *attribute, char *packetBytes);
 
+size_t getStringAttributeSize(StringAttribute *attribute);
+
 bool getStringAttributePacket(StringAttribute *attribute, char *packetBytes);
 
 size_t getItemEquipPacketSize(ItemEquip *itemEquip);
+
+int getNumItemAttributes(ItemAttributes *itemAttributes);
+
+bool getItemAttributesPacket(ItemAttributes *itemAttributes, char *packet);
+
+size_t getItemAttributesPacketSize(ItemAttributes *itemAttributes);
