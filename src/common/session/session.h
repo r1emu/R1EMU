@@ -32,7 +32,7 @@ typedef struct Session Session;
 
 /**
  * @brief Allocate a new Session structure.
- * @return A pointer to an allocated Session, or NULL if an error occured.
+ * @return A pointer to an allocated Session, or NULL if an error occurred.
  */
 Session *sessionNew (uint16_t routerId, uint8_t *sessionKey);
 

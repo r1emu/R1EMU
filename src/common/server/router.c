@@ -15,7 +15,6 @@
 #include "router.h"
 #include "worker.h"
 #include "common/packet/packet.h"
-#include "common/session/session_manager.h"
 
 // ------ Structure declaration -------
 typedef struct {
@@ -60,9 +59,6 @@ struct Router
 
     /** Subscriber to the Event Server */
     zsock_t *eventServer;
-
-    /** Connection to the Session Manager */
-    SessionManager *sessionManager;
 
     /** List of workers entities. */
     zlist_t *readyWorkers;
@@ -230,15 +226,6 @@ routerInit (
     // EventServer publish messages to the Router for asynchronous messages.
     if (!(self->eventServer = zsock_new (ZMQ_SUB))) {
         error("Cannot allocate ROUTER backend");
-        return false;
-    }
-
-    // Allocate session manager
-    SessionManagerInfo sessionManagerInfo = {
-        .routerId = self->info.routerId
-    };
-    if (!(self->sessionManager = sessionManagerNew(&sessionManagerInfo))) {
-        error("Cannot allocate a session manager.");
         return false;
     }
 
@@ -679,25 +666,13 @@ Router_initEventServerSubscriber (
     //       Initialize subscriber
     // ===================================
     if (zsock_connect (self->eventServer, ROUTER_SUBSCRIBER_ENDPOINT, self->info.routerId) != 0) {
-        error("Failed to connect to the eventServer subscriber endpoint %s.", zsys_sprintf(ROUTER_SUBSCRIBER_ENDPOINT, self->info.routerId));
+        error("Failed to connect to the eventServer subscriber endpoint %s.",
+            zsys_sprintf(ROUTER_SUBSCRIBER_ENDPOINT, self->info.routerId));
         return false;
     }
 
     // Subscribe for all messages
     zsock_set_subscribe(self->eventServer, "");
-
-    return true;
-}
-
-bool
-Router_initSessionManager (
-    Router *self
-) {
-    if (!(sessionManagerStart(self->sessionManager))) {
-        error("Cannot start session manager.");
-    }
-
-    info("Session manager started.");
 
     return true;
 }
@@ -717,12 +692,6 @@ routerStart (
     // Initialize the subscriber
     if (!(Router_initEventServerSubscriber (self))) {
         error("Cannot initialize the subscriber.");
-        return false;
-    }
-
-    // Initialize the session manager
-    if (!(Router_initSessionManager (self))) {
-        error("Cannot initialize the session manager.");
         return false;
     }
 

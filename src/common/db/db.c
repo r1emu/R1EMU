@@ -24,6 +24,9 @@ struct Db
 
     zsock_t *endpoint;
     zhash_t *hashtable;
+
+    void *heritage;
+    DbProcessMsgHandler handler;
 };
 
 Db *dbNew(DbInfo *dbInfo) {
@@ -60,19 +63,23 @@ bool dbInit(Db *self, DbInfo *dbInfo) {
     return true;
 }
 
-DbInfo *dbInfoNew(
-    uint16_t routerId,
-    char *dbName,
-    void *heritage,
-    DbProcessMsgHandler handler)
-{
+bool dbSetHeritage(Db *self, void *heritage, DbProcessMsgHandler handler) {
+
+    self->heritage = heritage;
+    self->handler = handler;
+
+    return true;
+}
+
+DbInfo *dbInfoNew(uint16_t routerId, char *dbName) {
+
     DbInfo *self;
 
     if ((self = malloc(sizeof(DbInfo))) == NULL) {
         return NULL;
     }
 
-    if (!dbInfoInit(self, routerId, dbName, heritage, handler)) {
+    if (!dbInfoInit(self, routerId, dbName)) {
         dbInfoDestroy(&self);
         error("DbInfo failed to initialize.");
         return NULL;
@@ -81,19 +88,12 @@ DbInfo *dbInfoNew(
     return self;
 }
 
-bool dbInfoInit(
-    DbInfo *self,
-    uint16_t routerId,
-    char *dbName,
-    void *heritage,
-    DbProcessMsgHandler handler)
-{
+bool dbInfoInit(DbInfo *self, uint16_t routerId, char *dbName) {
+
     memset(self, 0, sizeof(DbInfo));
 
     self->routerId = routerId;
     self->name = strdup(dbName);
-    self->heritage = heritage;
-    self->handler = handler;
 
     return true;
 }
@@ -126,9 +126,10 @@ bool dbUpdateArray(Db *self, zmsg_t *msg, zmsg_t *out) {
         DbObject *dbObject = NULL;
 
         if (!(dbObject = zhash_lookup(self->hashtable, key))) {
+            // dbObject doesn't already exist
 
-            // dbObject doesn't already exist : create it
-            if (!(dbObject = dbObjectNew(dataSize, data))) {
+            // create it
+            if (!(dbObject = dbObjectNew(dataSize, data, false))) {
                 error("'%s:%d' : Cannot allocate a new object for '%s'.", self->info.name, self->info.routerId, key);
                 goto cleanup;
             }
@@ -337,7 +338,7 @@ void *dbMainLoop(void *arg) {
 
             default:
                 // extended messages
-                if (!(self->info.handler) || !(self->info.handler(self->info.heritage, msg, out))) {
+                if (!(self->handler) || !(self->handler(self->heritage, msg, out))) {
                     // message type unhandled
                     error("%s:%d : Cannot process db message type=%d.",
                           self->info.name, self->info.routerId, packetType);

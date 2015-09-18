@@ -28,6 +28,7 @@
 #include "common/mysql/mysql.h"
 #include "common/redis/redis.h"
 #include "common/session/session.h"
+#include "common/db/db_client.h"
 
 typedef struct _PacketHandler PacketHandler;
 typedef struct _WorkerInfo WorkerInfo;
@@ -101,8 +102,8 @@ struct _Worker {
     // the publisher socket to send asynchronous messages to the Event Server
     zsock_t *eventServer;
 
-    // the connection to the session manager
-    zsock_t *sessionManager;
+    // the connection to the session db
+    DbClient *dbSession;
 
     // seed for the random generator
     uint32_t seed;

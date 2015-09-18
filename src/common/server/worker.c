@@ -240,8 +240,14 @@ workerInit (
         return false;
     }
 
-    if (!(self->sessionManager = zsock_new (ZMQ_REQ))) {
-        error("Cannot allocate session manager zsock.");
+    DbClientInfo dbClientInfo;
+    if (!(dbClientInfoInit(&dbClientInfo, "dbSession", self->info.routerId))) {
+        error("Cannot initialize dbClientInfo.");
+        return false;
+    }
+
+    if (!(self->dbSession = dbClientNew(&dbClientInfo))) {
+        error("Cannot allocate session db client.");
         return false;
     }
 
@@ -303,130 +309,6 @@ Worker_handlePingPacket (
     return zframe_new (PACKET_HEADER (ROUTER_PONG), sizeof(ROUTER_PONG));
 }
 
-bool workerRequestSession(Worker *self, uint8_t *sessionKey) {
-    bool status = false;
-    zmsg_t *msg = NULL;
-
-    if (!(msg = zmsg_new ())) {
-        error ("Cannot allocate a new zmsg.");
-        goto cleanup;
-    }
-
-    if ((zmsg_addmem(msg, PACKET_HEADER(SESSION_MANAGER_LOAD_SESSION), sizeof(SESSION_MANAGER_LOAD_SESSION))) != 0) {
-        error("Cannot add header to the message.");
-        goto cleanup;
-    }
-
-    if ((zmsg_addmem(msg, sessionKey, SOCKET_SESSION_ID_SIZE)) != 0) {
-        error("Cannot add sessionKey to the message.");
-        goto cleanup;
-    }
-
-    if (zmsg_send(&msg, self->sessionManager) != 0) {
-        error("Cannot send session request to the session manager.");
-        goto cleanup;
-    }
-
-    status = true;
-
-cleanup:
-    zmsg_destroy(&msg);
-    return status;
-}
-
-bool workerStoreSession(Worker *self, Session *session) {
-    bool status = false;
-    zmsg_t *msg = NULL;
-    zframe_t *sessionManagerStatusFrame = NULL;
-
-    if (!(msg = zmsg_new ())) {
-        error ("Cannot allocate a new zmsg.");
-        goto cleanup;
-    }
-
-    if ((zmsg_addmem(msg, PACKET_HEADER(SESSION_MANAGER_STORE_SESSION), sizeof(SESSION_MANAGER_STORE_SESSION))) != 0) {
-        error("Cannot add header to the message.");
-        goto cleanup;
-    }
-
-    if ((zmsg_addmem(msg, session->socket.sessionKey, SOCKET_SESSION_ID_SIZE)) != 0) {
-        error("Cannot add sessionKey to the message.");
-        goto cleanup;
-    }
-
-    if ((zmsg_addmem(msg, session, sizeof(*session))) != 0) {
-        error("Cannot add the session to the message.");
-        goto cleanup;
-    }
-
-    if (zmsg_send(&msg, self->sessionManager) != 0) {
-        error("Cannot send session request to the session manager.");
-        goto cleanup;
-    }
-
-    if (!(msg = zmsg_recv(self->sessionManager))) {
-        error("Cannot receive answer of the session request from the session manager.");
-        goto cleanup;
-    }
-
-    if (!(sessionManagerStatusFrame = zmsg_first(msg))) {
-        error("Cannot get status frame.");
-        goto cleanup;
-    }
-    SessionManagerStatus sessionManagerStatus = *(SessionManagerStatus *) zframe_data(sessionManagerStatusFrame);
-
-    if (sessionManagerStatus != SESSION_MANAGER_STATUS_SUCCESS) {
-        error("Session manager returned an error : %d", sessionManagerStatus);
-        goto cleanup;
-    }
-
-    status = true;
-
-cleanup:
-    zmsg_destroy(&msg);
-    return status;
-}
-
-bool workerGetSession(Worker *self, uint8_t *sessionKey, Session *session) {
-    bool status = false;
-    zmsg_t *msg = NULL;
-    zframe_t *frame = NULL;
-
-    // Wait for the session manager to answer
-    if (!(msg = zmsg_recv(self->sessionManager))) {
-        error("Cannot retrieve the session");
-        goto cleanup;
-    }
-
-    // Get header frame
-    if (!(frame = zmsg_first(msg))) {
-        error("Cannot read frame header.");
-        goto cleanup;
-    }
-
-    // Check header
-    SessionManagerStatus sessionManagerStatus;
-    if ((sessionManagerStatus = *(SessionManagerStatus *) zframe_data(frame)) != SESSION_MANAGER_STATUS_SUCCESS) {
-        error("SessionManager sent an error : %d", sessionManagerStatus);
-        goto cleanup;
-    }
-
-    // Get session frame
-    if (!(frame = zmsg_next(msg))) {
-        error("Cannot read session frame.");
-        goto cleanup;
-    }
-
-    // Copy it
-    Session *sessionFromManager = (Session *) zframe_data(frame);
-    memcpy(session, sessionFromManager, sizeof(*session));
-    status = true;
-
-cleanup:
-    zmsg_destroy(&msg);
-    return status;
-}
-
 static bool
 Worker_processClientPacket (
     Worker *self,
@@ -448,7 +330,7 @@ Worker_processClientPacket (
     socketSessionGenSessionKey (zframe_data(sessionKeyFrame), sessionKeyStr);
 
     // Request the Session
-    if (!(workerRequestSession(self, sessionKeyStr))) {
+    if (!(dbClientRequestObject(self->dbSession, sessionKeyStr))) {
         error ("Cannot request a Session.");
         goto cleanup;
     }
@@ -476,9 +358,52 @@ cleanup:
 }
 
 static bool
+workerGetSessionObject(Worker *self, uint8_t *sessionKey, DbObject **_object) {
+
+    bool status = false;
+    DbObject *object = NULL;
+    Session *session = NULL;
+
+    if (!(dbClientGetObject(self->dbSession, &object))) {
+        error("Cannot get the session object.");
+        goto cleanup;
+    }
+
+    if (!object) {
+        info("Welcome, %s!", sessionKey);
+        // Session doesn't not exist yet, create it
+        if (!(session = sessionNew(self->info.routerId, sessionKey))) {
+            error("Cannot allocate a new session.");
+            goto cleanup;
+        }
+
+        DbObject newSessionObject;
+        if (!(dbObjectInit(&newSessionObject, sizeof(*session), session, true))) {
+            error("Cannot initialize dbObject.");
+            goto cleanup;
+        }
+
+        if (!(dbClientUpdateObject(self->dbSession, sessionKey, &newSessionObject))) {
+            error("Cannot update the session object.");
+            goto cleanup;
+        }
+    }
+
+    status = true;
+    *_object = object;
+
+cleanup:
+    if (!status) {
+        sessionDestroy(&session);
+    }
+
+    return status;
+}
+
+static bool
 Worker_buildReply (
     Worker *self,
-    uint8_t *sessionKeyStr,
+    uint8_t *sessionKey,
     uint8_t *packet,
     size_t packetSize,
     zmsg_t *msg,
@@ -492,11 +417,13 @@ Worker_buildReply (
     int isCrypted;
 
     // Get the session
-    Session session;
-    if (!(workerGetSession(self, sessionKeyStr, &session))) {
+    DbObject *sessionObject = NULL;
+    Session *session = NULL;
+    if (!(workerGetSessionObject(self, sessionKey, &sessionObject))) {
         error("Cannot get the session.");
         goto cleanup;
     }
+    session = sessionObject->data;
 
     while (packetSizeRemaining > 0)
     {
@@ -513,7 +440,7 @@ Worker_buildReply (
         }
 
         // Process the request
-        if ((!(Worker_processOneRequest (self, &session, &packet[packetPos], subPacketSize, msg, headerAnswer, isCrypted)))) {
+        if ((!(Worker_processOneRequest (self, session, &packet[packetPos], subPacketSize, msg, headerAnswer, isCrypted)))) {
             error("Cannot process properly a reply.");
             goto cleanup;
         }
@@ -526,6 +453,7 @@ Worker_buildReply (
     status = true;
 
 cleanup:
+    dbObjectDestroy(&sessionObject);
     return status;
 }
 
@@ -560,9 +488,14 @@ Worker_processOneRequest (
         case PACKET_HANDLER_OK:
         break;
 
-        case PACKET_HANDLER_UPDATE_SESSION:
+        case PACKET_HANDLER_UPDATE_SESSION: {
+            DbObject object;
+            if (!(dbObjectInit(&object, sizeof(*session), session, true))) {
+                error("Cannot initialize dbObject.");
+                goto cleanup;
+            }
 
-            if (!(workerStoreSession(self, session))) {
+            if (!(dbClientUpdateObject(self->dbSession, session->socket.sessionKey, &object))) {
                 error("Cannot update the memory session.");
                 goto cleanup;
             }
@@ -571,7 +504,7 @@ Worker_processOneRequest (
                 error("Cannot update the Redis session.");
                 goto cleanup;
             }
-        break;
+        }   break;
 
         case PACKET_HANDLER_DELETE_SESSION: {
             RedisSessionKey sessionKey = {
@@ -698,7 +631,7 @@ workerStart (
         return false;
     }
 
-    if (zsock_connect(self->sessionManager, SESSION_MANAGER_ENDPOINT, self->info.routerId) != 0) {
+    if (!(dbClientStart(self->dbSession))) {
         error("[routerId=%d][WorkerId=%d] Cannot connect to session manager.",
               self->info.routerId, self->info.workerId);
         return false;

@@ -38,7 +38,7 @@ typedef struct {
 /**
  * @brief Allocate a new Server structure.
  * @param info An allocated ServerInfo already initialized
- * @return A pointer to an allocated Server, or NULL if an error occured.
+ * @return A pointer to an allocated Server, or NULL if an error occurred.
  */
 Server *serverNew(ServerInfo *info);
 

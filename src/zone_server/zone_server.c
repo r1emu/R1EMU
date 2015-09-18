@@ -18,17 +18,21 @@
 #include "zone_handler/admin_cmd.h"
 #include "common/server/server.h"
 #include "common/db/db.h"
+#include "common/session/session_manager.h"
 
 /**
  * @brief ZoneServer is the representation of the zone server system
  */
 struct ZoneServer
 {
-    // ZoneServer inherits from Server object
+    /** ZoneServer inherits from Server object */
     Server *server;
 
-    // Items db
-    Db *itemsDb;
+    /** Items db */
+    Db *dbItems;
+
+    /** Connection to the dbSession */
+    Db *dbSession;
 };
 
 ZoneServer *zoneServerNew(Server *server) {
@@ -49,13 +53,22 @@ ZoneServer *zoneServerNew(Server *server) {
 
 bool zoneServerInit(ZoneServer *self, Server *server) {
 
-    self->server = server;
-
-    // Initialize itemsDb
     DbInfo dbInfo;
-    dbInfoInit(&dbInfo, serverGetRouterId(server), "itemsDb", NULL, NULL);
-    if (!(self->itemsDb = dbNew(&dbInfo))) {
-        error("Cannot initialize itemsDb");
+
+    self->server = server;
+    uint16_t routerId = serverGetRouterId(server);
+
+    // Initialize dbItems
+    dbInfoInit(&dbInfo, routerId, "dbItems");
+    if (!(self->dbItems = dbNew(&dbInfo))) {
+        error("Cannot allocate a dbItems");
+        return false;
+    }
+
+    // Initialize dbSession
+    dbInfoInit(&dbInfo, routerId, "dbSession");
+    if (!(self->dbSession = dbNew(&dbInfo))) {
+        error("Cannot allocate a dbSession.");
         return false;
     }
 
@@ -67,9 +80,15 @@ bool zoneServerStart(ZoneServer *self) {
     special("=== Zone server %d ===", serverGetRouterId(self->server));
     special("=====================");
 
-    // Start itemsDb actor
-    if (!(dbStart(self->itemsDb))) {
-        error("Cannot start itemsDb actor.");
+    // Start dbItems
+    if (!(dbStart(self->dbItems))) {
+        error("Cannot start items db.");
+        return false;
+    }
+
+    // Start dbSession
+    if (!(dbStart(self->dbSession))) {
+        error("Cannot start sessions db.");
         return false;
     }
 

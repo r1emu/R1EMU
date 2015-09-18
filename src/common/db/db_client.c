@@ -143,7 +143,7 @@ cleanup:
     return status;
 }
 
-bool dbClientRemoveValues(DbClient *self, char **keys, size_t keysCount) {
+bool dbClientRemoveObjects(DbClient *self, char **keys, size_t keysCount) {
 
     bool status = false;
     zmsg_t *request = NULL;
@@ -200,8 +200,8 @@ cleanup:
     return status;
 }
 
-bool dbClientRemoveValue(DbClient *self, char *key) {
-    if (!(dbClientRemoveValues(self, (char *[]){key}, 1))) {
+bool dbClientRemoveObject(DbClient *self, char *key) {
+    if (!(dbClientRemoveObjects(self, (char *[]){key}, 1))) {
         error("Cannot remove value '%s'", key);
         return false;
     }
@@ -209,7 +209,7 @@ bool dbClientRemoveValue(DbClient *self, char *key) {
     return true;
 }
 
-bool dbClientRequestValues(DbClient *self, char **keys, size_t keysCount) {
+bool dbClientRequestObjects(DbClient *self, char **keys, size_t keysCount) {
 
     bool status = false;
     zmsg_t *request = NULL;
@@ -247,8 +247,8 @@ cleanup:
     return status;
 }
 
-bool dbClientRequestValue(DbClient *self, char *key) {
-    if (!(dbClientRequestValues(self, (char *[]){key}, 1))) {
+bool dbClientRequestObject(DbClient *self, char *key) {
+    if (!(dbClientRequestObjects(self, (char *[]){key}, 1))) {
         error("Cannot request value '%s'", key);
         return false;
     }
@@ -256,7 +256,7 @@ bool dbClientRequestValue(DbClient *self, char *key) {
     return true;
 }
 
-bool dbClientGetValues(DbClient *self, zhash_t **_out) {
+bool dbClientGetObjects(DbClient *self, zhash_t **_out) {
 
     bool status = false;
     zmsg_t *response = NULL;
@@ -308,7 +308,7 @@ bool dbClientGetValues(DbClient *self, zhash_t **_out) {
 
         // Construct a dbObject from the frame
         DbObject *object = NULL;
-        if (!(object = dbObjectNew(valueSize, value))) {
+        if (!(object = dbObjectNew(valueSize, value, false))) {
             error("%s:%d : Cannot create an object '%s' of size %d.",
                   self->info.name, self->info.routerId, key, valueSize);
             goto cleanup;
@@ -336,16 +336,16 @@ cleanup:
     return status;
 }
 
-bool dbClientGetValue(DbClient *self, DbObject **out) {
+bool dbClientGetObject(DbClient *self, DbObject **out) {
     zhash_t *objects = NULL;
 
-    if (!(dbClientGetValues(self, &objects))) {
+    if (!(dbClientGetObjects(self, &objects))) {
         error("Cannot get values.");
         return false;
     }
 
-    if (zhash_size(objects) != 1) {
-        error("Objects retrieved must be egal to 1.");
+    if (zhash_size(objects) != 1 && zhash_size(objects) != 0) {
+        error("Objects count retrieved must be egal to 0 or 1.");
         return false;
     }
 
@@ -357,7 +357,7 @@ bool dbClientGetValue(DbClient *self, DbObject **out) {
     return true;
 }
 
-bool dbClientUpdateValues(DbClient *self, zhash_t *objects) {
+bool dbClientUpdateObjects(DbClient *self, zhash_t *objects) {
 
     bool status = false;
     zmsg_t *request = NULL;
@@ -399,7 +399,7 @@ cleanup:
     return status;
 }
 
-bool dbClientUpdateValue(DbClient *self, char *key, DbObject *object) {
+bool dbClientUpdateObject(DbClient *self, char *key, DbObject *object) {
 
     bool status = false;
     zhash_t *ht = NULL;
@@ -414,7 +414,7 @@ bool dbClientUpdateValue(DbClient *self, char *key, DbObject *object) {
         goto cleanup;
     }
 
-    if (!(dbClientUpdateValues(self, ht))) {
+    if (!(dbClientUpdateObjects(self, ht))) {
         error("Cannot update value of object '%s'", key);
         goto cleanup;
     }

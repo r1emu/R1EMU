@@ -111,6 +111,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/db/db_client.h" />
+		<Unit filename="../../../src/common/db/db_object.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/db/db_object.h" />
 		<Unit filename="../../../src/common/dbg/dbg.c">
 			<Option compilerVar="CC" />
 		</Unit>

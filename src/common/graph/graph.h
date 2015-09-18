@@ -48,7 +48,7 @@ typedef struct GraphArc {
 
 /**
  * @brief Allocate a new Graph structure.
- * @return A pointer to an allocated Graph, or NULL if an error occured.
+ * @return A pointer to an allocated Graph, or NULL if an error occurred.
  */
 Graph *graphNew(void);
 
@@ -63,7 +63,7 @@ bool graphInit(Graph *self);
  * @brief Allocate a new GraphNode structure.
  * @param hashKey A string to the hashtable key. Must be unique.
  * @param user_data A custom user data
- * @return A pointer to an allocated GraphNode, or NULL if an error occured.
+ * @return A pointer to an allocated GraphNode, or NULL if an error occurred.
  */
 GraphNode *graphNodeNew(char *hashKey, void *user_data);
 

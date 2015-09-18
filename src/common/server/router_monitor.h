@@ -59,7 +59,7 @@ typedef struct {
 /**
  * @brief Allocate a new RouterMonitor structure.
  * @param info A RouterMonitorInfo initialized
- * @return A pointer to an allocated RouterMonitor, or NULL if an error occured.
+ * @return A pointer to an allocated RouterMonitor, or NULL if an error occurred.
  */
 RouterMonitor *routerMonitorNew(RouterMonitorInfo *info);
 
@@ -74,7 +74,7 @@ bool routerMonitorInit(RouterMonitor *self, RouterMonitorInfo *info);
 /**
  * @brief Allocate a new RouterMonitorInfo structure.
  * @param
- * @return A pointer to an allocated RouterMonitorInfo, or NULL if an error occured.
+ * @return A pointer to an allocated RouterMonitorInfo, or NULL if an error occurred.
  */
 RouterMonitorInfo *routerMonitorInfoNew(
     zsock_t *frontend,

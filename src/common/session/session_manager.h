@@ -20,44 +20,29 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
+#include "common/db/db.h"
 #include "common/Session/Session.h"
 
 // ---------- Defines -------------
-#define SESSION_MANAGER_ENDPOINT "inproc://sessionManagerRep-%d"
 
 // ------ Structure declaration -------
-typedef struct SessionManagerInfo {
-    uint16_t routerId;
-}   SessionManagerInfo;
-
 typedef struct SessionManager SessionManager;
-
-typedef enum {
-    SESSION_MANAGER_STORE_SESSION,
-    SESSION_MANAGER_LOAD_SESSION,
-} SessionManagerPacketType;
-
-typedef enum {
-    SESSION_MANAGER_STATUS_SUCCESS,
-    SESSION_MANAGER_CANNOT_LOAD,
-    SESSION_MANAGER_CANNOT_STORE,
-} SessionManagerStatus;
 
 // ----------- Functions ------------
 
 /**
  * Allocate a new SessionManager structure.
  * @param startInfo The info for starting the SessionManager
- * @return A pointer to an allocated SessionManager, or NULL if an error occured.
+ * @return A pointer to an allocated SessionManager, or NULL if an error occurred.
  */
-SessionManager *sessionManagerNew(SessionManagerInfo *startInfo);
+SessionManager *sessionManagerNew(DbInfo *startInfo);
 
 /**
  * Initialize an allocated SessionManager structure.
  * @param self An allocated SessionManager to initialize.
  * @return true on success, false otherwise.
  */
-bool sessionManagerInit(SessionManager *self, SessionManagerInfo *startInfo);
+bool sessionManagerInit(SessionManager *self, DbInfo *startInfo);
 
 /**
  * Start the SessionManager.

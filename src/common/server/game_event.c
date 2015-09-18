@@ -16,7 +16,7 @@
 
 /**
  * Allocate a new GameEvent structure.
- * @return A pointer to an allocated GameEvent, or NULL if an error occured.
+ * @return A pointer to an allocated GameEvent, or NULL if an error occurred.
  */
 GameEvent *gameEventNew(uint8_t *sessionKey, EventType type, void *event, size_t eventSize) {
     GameEvent *self;

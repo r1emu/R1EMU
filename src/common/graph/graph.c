@@ -25,7 +25,7 @@ struct Graph {
  * @brief Allocate a new GraphArc structure.
  * @param from A source node
  * @param to A destination node
- * @return A pointer to an allocated GraphArc, or NULL if an error occured.
+ * @return A pointer to an allocated GraphArc, or NULL if an error occurred.
  */
 static GraphArc *graphArcNew(GraphNode *from, GraphNode *to);
 

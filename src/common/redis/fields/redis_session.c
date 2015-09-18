@@ -26,42 +26,6 @@
 
 // ------ Extern function implementation -------
 
-bool redisGetSession (Redis *self, RedisSessionKey *key, Session *session) {
-
-    GameSession *gameSession = &session->game;
-    SocketSession *socketSession = &session->socket;
-    RedisSocketSessionKey *socketKey = &key->socketKey;
-
-    // Search for the Socket Session
-    if (!redisGetSocketSession(self, socketKey, socketSession)) {
-        error("Cannot get Socket Session.");
-        return false;
-    }
-
-    if (!socketSession->authenticated) {
-        // This is the first time the client connect.
-        // Initialize an empty game session
-        CommanderInfo commander;
-        commanderInfoInit (&commander);
-        gameSessionInit (gameSession, &commander);
-        dbg("Welcome, SOCKET_%s ! A new session has been initialized for you.", socketKey->sessionKey);
-    } else {
-        // The client already exist in the game, get Game Session
-        RedisGameSessionKey gameKey = {
-            .routerId  = socketSession->routerId,
-            .mapId     = socketSession->mapId,
-            .accountId = socketSession->accountId
-        };
-        if (!redisGetGameSession(self, &gameKey, gameSession)) {
-            error("Cannot get Game Session.");
-            return false;
-        }
-        // dbg("Welcome back, SOCKET_%s !", sessionKey);
-    }
-
-    return true;
-}
-
 bool redisUpdateSession (Redis *self, Session *session) {
 
     RedisSocketSessionKey socketKey = {
@@ -116,3 +80,42 @@ bool redisFlushSession (Redis *self, RedisSessionKey *key) {
 
     return true;
 }
+
+
+/*
+bool redisGetSession (Redis *self, RedisSessionKey *key, Session *session) {
+
+    GameSession *gameSession = &session->game;
+    SocketSession *socketSession = &session->socket;
+    RedisSocketSessionKey *socketKey = &key->socketKey;
+
+    // Search for the Socket Session
+    if (!redisGetSocketSession(self, socketKey, socketSession)) {
+        error("Cannot get Socket Session.");
+        return false;
+    }
+
+    if (!socketSession->authenticated) {
+        // This is the first time the client connect.
+        // Initialize an empty game session
+        CommanderInfo commander;
+        commanderInfoInit (&commander);
+        gameSessionInit (gameSession, &commander);
+        dbg("Welcome, SOCKET_%s ! A new session has been initialized for you.", socketKey->sessionKey);
+    } else {
+        // The client already exist in the game, get Game Session
+        RedisGameSessionKey gameKey = {
+            .routerId  = socketSession->routerId,
+            .mapId     = socketSession->mapId,
+            .accountId = socketSession->accountId
+        };
+        if (!redisGetGameSession(self, &gameKey, gameSession)) {
+            error("Cannot get Game Session.");
+            return false;
+        }
+        // dbg("Welcome back, SOCKET_%s !", sessionKey);
+    }
+
+    return true;
+}
+*/

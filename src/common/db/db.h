@@ -34,9 +34,8 @@ typedef bool (*DbProcessMsgHandler)(void *heritage, zmsg_t *msg, zmsg_t *out);
 typedef struct DbInfo {
     char *name;
     uint16_t routerId;
-    void *heritage;
-    DbProcessMsgHandler handler;
 }   DbInfo;
+
 
 typedef enum {
     // format :
@@ -67,7 +66,7 @@ typedef enum {
 
 /**
  * Allocate a new Db structure.
- * @return A pointer to an allocated Db, or NULL if an error occured.
+ * @return A pointer to an allocated Db, or NULL if an error occurred.
  */
 Db *dbNew(DbInfo *dbInfo);
 
@@ -80,25 +79,16 @@ bool dbInit(Db *self, DbInfo *dbInfo);
 
 /**
  * Allocate a new DbInfo structure.
- * @return A pointer to an allocated DbInfo, or NULL if an error occured.
+ * @return A pointer to an allocated DbInfo, or NULL if an error occurred.
  */
-DbInfo *dbInfoNew(
-    uint16_t routerId,
-    char *dbName,
-    void *heritage,
-    DbProcessMsgHandler handler);
+DbInfo *dbInfoNew(uint16_t routerId, char *dbName);
 
 /**
  * Initialize an allocated DbInfo structure.
  * @param self An allocated DbInfo to initialize.
  * @return true on success, false otherwise.
  */
-bool dbInfoInit(
-    DbInfo *self,
-    uint16_t routerId,
-    char *dbName,
-    void *heritage,
-    DbProcessMsgHandler handler);
+bool dbInfoInit(DbInfo *self, uint16_t routerId, char *dbName);
 
 /**
  * Start the db actor

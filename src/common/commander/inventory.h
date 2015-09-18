@@ -65,7 +65,7 @@ struct Inventory
 // ----------- Functions ------------
 /**
  * Allocate a new Inventory structure.
- * @return A pointer to an allocated Inventory, or NULL if an error occured.
+ * @return A pointer to an allocated Inventory, or NULL if an error occurred.
  */
 Inventory *inventoryNew(void);
 

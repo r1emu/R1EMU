@@ -56,7 +56,7 @@ typedef struct MySQL MySQL;
 /**
  * @brief Allocate a new MySQL structure.
  * @param info An initialized MySQLInfo.
- * @return A pointer to an allocated MySQL, or NULL if an error occured.
+ * @return A pointer to an allocated MySQL, or NULL if an error occurred.
  */
 MySQL *mySqlNew(MySQLInfo *info);
 
