@@ -156,14 +156,14 @@ bool dbClientRemoveValues(DbClient *self, char **keys, size_t keysCount) {
         goto cleanup;
     }
 
-    // add header
+    // add the header
     if (zmsg_addmem(request, PACKET_HEADER(DB_REMOVE_ARRAY), sizeof(DB_REMOVE_ARRAY) != 0)){
         error("%s:%d : Cannot add DB_REMOVE_ARRAY to dbClient REMOVE message.",
               self->info.name, self->info.routerId);
         goto cleanup;
     }
 
-    // add keys to the request
+    // add the keys to the message
     if (!(dbClientAddKeysToMessage(self, request, keys, keysCount))) {
         error("Cannot add keys to the request message.");
         goto cleanup;
@@ -220,17 +220,20 @@ bool dbClientRequestValues(DbClient *self, char **keys, size_t keysCount) {
         goto cleanup;
     }
 
+    // add the header
     if (zmsg_addmem(request, PACKET_HEADER(DB_GET_ARRAY), sizeof(DB_GET_ARRAY) != 0)) {
         error("%s:%d : Cannot add DB_GET_ARRAY to dbClient GET message.",
               self->info.name, self->info.routerId);
         goto cleanup;
     }
 
+    // add the keys to the message
     if (!(dbClientAddKeysToMessage(self, request, keys, keysCount))) {
         error("Cannot add keys to the request message.");
         goto cleanup;
     }
 
+    // send the request
     if (zmsg_send(&request, self->connection) != 0) {
         error("Cannot send the message to the Db.");
         goto cleanup;
@@ -283,7 +286,7 @@ bool dbClientGetValues(DbClient *self, zhash_t **_out) {
         goto cleanup;
     }
 
-    // Allocate result hashtable
+    // allocate result hashtable
     if (!(out = zhash_new())) {
         error("%s:%d : Cannot allocate a new values hashtable.",
               self->info.name, self->info.routerId);
@@ -365,6 +368,7 @@ bool dbClientUpdateValues(DbClient *self, zhash_t *objects) {
         goto cleanup;
     }
 
+    // set the header
     if (zmsg_addmem(request, PACKET_HEADER(DB_UPDATE_ARRAY), sizeof(DB_UPDATE_ARRAY) != 0)) {
         error("%s:%d : Cannot add DB_UPDATE_ARRAY to dbClient message.",
               self->info.name, self->info.routerId);
@@ -373,12 +377,15 @@ bool dbClientUpdateValues(DbClient *self, zhash_t *objects) {
 
     for (DbObject *object = zhash_first(objects); object != NULL; object = zhash_next(objects)) {
         char *key = (char *) zhash_cursor(objects);
+
+        // add all the objects to the message
         if (!(dbClientAddObjectToMessage(self, request, key, object))) {
             error("Cannot add object '%s' to message.", key);
             goto cleanup;
         }
     }
 
+    // send the request
     if (zmsg_send(&request, self->connection) != 0) {
         error("Cannot send the message to the Db.");
         goto cleanup;
