@@ -12,6 +12,7 @@
  */
 
 #include "db.h"
+#include "db_object.h"
 
 /**
  * @brief Db contains a hashtable of generic objects that can be inserted, requested and deleted.
@@ -24,17 +25,6 @@ struct Db
     zsock_t *endpoint;
     zhash_t *hashtable;
 };
-
-typedef struct _DbObject
-{
-    size_t dataSize;
-    char data[0];
-}   DbObject;
-
-static DbObject *dbObjectNew(size_t dataSize, void *data);
-static bool dbObjectInit(DbObject *self, size_t dataSize, void *data);
-static void dbObjectFree(DbObject *self);
-static void dbObjectDestroy(DbObject **_self);
 
 Db *dbNew(DbInfo *dbInfo) {
     Db *self;
@@ -104,31 +94,6 @@ bool dbInfoInit(
     self->name = strdup(dbName);
     self->heritage = heritage;
     self->handler = handler;
-
-    return true;
-}
-
-static DbObject *dbObjectNew(size_t dataSize, void *data) {
-    DbObject *self;
-
-    if ((self = malloc(sizeof_struct_member(DbObject, dataSize) + dataSize)) == NULL) {
-        return NULL;
-    }
-
-    if (!dbObjectInit(self, dataSize, data)) {
-        dbObjectDestroy(&self);
-        error("DbObject failed to initialize.");
-        return NULL;
-    }
-
-    return self;
-}
-
-static bool dbObjectInit(DbObject *self, size_t dataSize, void *data) {
-    memset(self, 0, sizeof(DbObject));
-
-    self->dataSize = dataSize;
-    memcpy(self->data, data, dataSize);
 
     return true;
 }
@@ -442,18 +407,3 @@ void dbInfoDestroy(DbInfo **_self) {
         *_self = NULL;
     }
 }
-
-static void dbObjectFree(DbObject *self) {
-    // TODO
-}
-
-static void dbObjectDestroy(DbObject **_self) {
-    DbObject *self = *_self;
-
-    if (_self && self) {
-        dbObjectFree(self);
-        free(self);
-        *_self = NULL;
-    }
-}
-
