@@ -26,9 +26,6 @@ struct ZoneServer
 {
     // ZoneServer inherits from Server object
     Server *server;
-
-    // Items db
-    Db *itemsDb;
 };
 
 ZoneServer *zoneServerNew(Server *server) {
@@ -51,14 +48,6 @@ bool zoneServerInit(ZoneServer *self, Server *server) {
 
     self->server = server;
 
-    // Initialize itemsDb
-    DbInfo dbInfo;
-    dbInfoInit(&dbInfo, serverGetRouterId(server), "itemsDb", NULL, NULL);
-    if (!(self->itemsDb = dbNew(&dbInfo))) {
-        error("Cannot initialize itemsDb");
-        return false;
-    }
-
     return true;
 }
 
@@ -66,12 +55,6 @@ bool zoneServerStart(ZoneServer *self) {
     special("=====================");
     special("=== Zone server %d ===", serverGetRouterId(self->server));
     special("=====================");
-
-    // Start itemsDb actor
-    if (!(dbStart(self->itemsDb))) {
-        error("Cannot start itemsDb actor.");
-        return false;
-    }
 
     // Initialize admin commands module
     if (!(adminCmdInit())) {
