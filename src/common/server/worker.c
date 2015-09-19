@@ -56,26 +56,30 @@ Worker_processClientPacket (
 
 /**
  * @brief Handle a request from the public ports
- * @param self An allocated Worker structure
+ * @param loop A pointer to the reactor
  * @param worker The socket listening on the public port
+ * @param self An allocated Worker structure
  * @return -2 on end of stream, -1 on error, 0 on success
 */
 static int
 Worker_handlePublicRequest (
-    Worker *self,
-    zsock_t *worker
+    zloop_t *loop,
+    zsock_t *worker,
+    void *_self
 );
 
 /**
  * @brief Handle a request from the private ports (coming from global server)
- * @param self An allocated Worker structure
+ * @param loop A pointer to the reactor
  * @param worker The socket listening on the public port
+ * @param self An allocated Worker structure
  * @return -2 on end of stream, -1 on error, 0 on success
 */
 static int
 Worker_handlePrivateRequest (
-    Worker *self,
-    zsock_t *global
+    zloop_t *loop,
+    zsock_t *global,
+    void *_self
 );
 
 /**
@@ -717,9 +721,9 @@ void *
 workerMainLoop (
     void *arg
 ) {
-    zpoller_t *poller = NULL;
     zsock_t *worker = NULL, *global = NULL;
-    bool isRunning = true;
+    zloop_t *reactor;
+
 
     Worker *self = (Worker *) arg;
 
@@ -740,11 +744,6 @@ workerMainLoop (
         goto cleanup;
     }
 
-    // Define a poller with the global and the worker socket
-    if (!(poller = zpoller_new (global, worker, NULL))) {
-        error("[routerId=%d][WorkerId=%d] cannot create a poller.", self->info.routerId, self->info.workerId);
-        goto cleanup;
-    }
 
     // Tell to the broker we're ready for work
     zmsg_t *readyMsg = zmsg_new ();
@@ -757,44 +756,22 @@ workerMainLoop (
         goto cleanup;
     }
 
-    // TODO : Refactor zpoller into zreactor ?
-    while (isRunning) {
+    if (!(reactor = zloop_new())) {
+        error("Cannot allocate a new reactor.");
+    }
 
-        zsock_t *actor = zpoller_wait (poller, -1);
-        typedef int (*WorkerRequestHandler) (Worker *self, zsock_t *actor);
-        WorkerRequestHandler handler;
-
-        // Get the correct handler based on the actor
-        if (actor == worker) {
-            handler = Worker_handlePublicRequest;
-        } else if (actor == global) {
-            handler = Worker_handlePrivateRequest;
-        }
-        else {
-            warning("[routerId=%d][WorkerId=%d] received a message from an unknown actor. Maybe it is a SIGINT signal?",
-                    self->info.routerId, self->info.workerId);
-            break;
-        }
-
-        switch (handler (self, actor)) {
-            case -1: // ERROR
-                error("[routerId=%d][WorkerId=%d] encountered an error when handling a request.",
-                      self->info.routerId, self->info.workerId);
-            break;
-
-            case -2: // Connection stopped
-                error("[routerId=%d][WorkerId=%d] The worker has been requested to stop.",
-                      self->info.routerId, self->info.workerId);
-                isRunning = false;
-            break;
-
-            case 0: /* OK */ break;
-        }
+    if (zloop_reader(reactor, worker,  Worker_handlePublicRequest,  self) == -1
+    ||  zloop_reader(reactor, global, Worker_handlePrivateRequest, self) == -1
+    ) {
+        error("Cannot register the sockets with the reactor.");
+    }
+    if (zloop_start (reactor) != 0) {
+        error("An error occurred in the reactor.");
     }
 
 cleanup:
     // Cleanup
-    zpoller_destroy (&poller);
+    zloop_destroy (&reactor);
     zsock_destroy (&worker);
     zsock_destroy (&global);
 
@@ -804,22 +781,24 @@ cleanup:
 
 static int
 Worker_handlePrivateRequest (
-    Worker *self,
-    zsock_t *global
+    zloop_t *loop,
+    zsock_t *global,
+    void *_self
 ) {
     int result = 0;
     zmsg_t *msg = NULL;
+    Worker *self = (Worker *) _self;
 
     // Process messages as they arrive
     if (!(msg = zmsg_recv(global))) {
         error("[routerId=%d][WorkerId=%d] stops working.", self->info.routerId, self->info.workerId);
-        result = -2;
+        result = -1;
         goto cleanup;
     }
 
     if (!(Worker_processGlobalPacket (self, msg))) {
         error("[routerId=%d][WorkerId=%d] Worker cannot process the global packet.", self->info.routerId, self->info.workerId);
-        result = -2;
+        result = -1;
         goto cleanup;
     }
 
@@ -872,16 +851,19 @@ cleanup:
 
 static int
 Worker_handlePublicRequest (
-    Worker *self,
-    zsock_t *worker
+    zloop_t *loop,
+    zsock_t *worker,
+    void *_self
 ) {
+
     int result = 0;
     zmsg_t *msg = NULL;
+    Worker *self = (Worker *) _self;
 
     // Process messages as they arrive
     if (!(msg = zmsg_recv(worker))) {
         dbg("[routerId=%d][WorkerId=%d] stops working.", self->info.routerId, self->info.workerId);
-        result = -2;
+        result = -1;
         goto cleanup;
     }
 
@@ -912,6 +894,8 @@ cleanup:
     zmsg_destroy(&msg);
     return result;
 }
+
+
 
 bool workerDispatchEvent (Worker *self, uint8_t *emitterSk, EventType eventType, void *event, size_t eventSize)
 {
