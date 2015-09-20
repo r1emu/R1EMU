@@ -131,7 +131,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/mysql/fields/mysql_account_session.h" />
-		<Unit filename="../../../src/common/mysql/fields/mysql_commander.h" />
 		<Unit filename="../../../src/common/mysql/fields/mysql_commander_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
