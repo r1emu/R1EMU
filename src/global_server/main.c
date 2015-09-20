@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     }
 
     // start the Global Server
-    else if(!globalServerStart(globalServer)) {
+    else if (!globalServerStart(globalServer)) {
         error("Cannot start the GlobalServer properly.");
         goto cleanup;
     }

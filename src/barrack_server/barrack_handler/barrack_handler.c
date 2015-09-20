@@ -422,7 +422,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     appearance->accountId = session->socket.accountId;
 
     // JobID
-    switch(clientPacket->jobId) {
+    switch (clientPacket->jobId) {
         default:
             error("Invalid commander Job ID(%x)", clientPacket->jobId);
             return PACKET_HANDLER_ERROR;
@@ -444,7 +444,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     appearance->jobId = clientPacket->jobId;
 
     // Gender
-    switch(clientPacket->gender) {
+    switch (clientPacket->gender) {
         case COMMANDER_GENDER_MALE:
         case COMMANDER_GENDER_FEMALE:
             appearance->gender = clientPacket->gender;
