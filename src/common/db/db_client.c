@@ -56,8 +56,7 @@ bool dbClientInit(DbClient *self, DbClientInfo *startInfo) {
     memcpy(&self->info, startInfo, sizeof(self->info));
 
     if (!(self->connection = zsock_new(ZMQ_REQ))) {
-        error("%s:%d : Cannot create connection socket.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot create connection socket.");
         return false;
     }
 
@@ -94,12 +93,11 @@ bool dbClientStart(DbClient *self) {
     char *endpointStr = zsys_sprintf(DB_ENDPOINT, self->info.name, self->info.routerId);
 
     if (zsock_connect(self->connection, endpointStr) != 0) {
-        error("%s:%d : Cannot connect to %s.",
-              self->info.name, self->info.routerId, endpointStr);
+        dbClientError(self, "Cannot connect to %s.", endpointStr);
         return false;
     }
 
-    info("%s:%d : %s connected.", self->info.name, self->info.routerId, endpointStr);
+    dbClientInfo(self, "%s connected.", endpointStr);
 
     return true;
 }
@@ -111,8 +109,7 @@ static bool dbClientAddKeysToMessage(DbClient *self, zmsg_t *request, char **key
     for (size_t keyIdx; keyIdx < keysCount; keyIdx++) {
         // add all the keys requested to the message
         if (zmsg_addstr(request, keys[keyIdx]) != 0) {
-            error("%s:%d : Cannot add key to message.",
-                  self->info.name, self->info.routerId);
+            dbClientError(self, "Cannot add key to message.");
             goto cleanup;
         }
     }
@@ -128,12 +125,12 @@ static bool dbClientAddObjectToMessage(DbClient *self, zmsg_t *request, char *ke
     bool status = false;
 
     if (zmsg_addstr(request, key) != 0) {
-        error("%s:%d : Cannot add key to message.", self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot add key to message.");
         goto cleanup;
     }
 
     if (zmsg_addmem(request, object->data, object->dataSize) != 0) {
-        error("%s:%d : Cannot add object to message.", self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot add object to message.");
         goto cleanup;
     }
 
@@ -151,43 +148,43 @@ bool dbClientRemoveObjects(DbClient *self, char **keys, size_t keysCount) {
     zframe_t *responseStatusFrame = NULL;
 
     if (!(request = zmsg_new())) {
-        error("%s:%d : Cannot allocate a new request msg.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot allocate a new request msg.");
         goto cleanup;
     }
 
     // add the header
     if (zmsg_addmem(request, PACKET_HEADER(DB_REMOVE_ARRAY), sizeof(DB_REMOVE_ARRAY) != 0)){
-        error("%s:%d : Cannot add DB_REMOVE_ARRAY to dbClient REMOVE message.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot add DB_REMOVE_ARRAY to dbClient REMOVE message.");
         goto cleanup;
     }
 
     // add the keys to the message
     if (!(dbClientAddKeysToMessage(self, request, keys, keysCount))) {
-        error("Cannot add keys to the request message.");
+        dbClientError(self, "Cannot add keys to the request message.");
+        goto cleanup;
+    }
+
+    if (zmsg_send(&request, self->connection) != 0) {
+        dbClientError(self, "Cannot send remove request.");
         goto cleanup;
     }
 
     // wait for db answer
     if (!(response = zmsg_recv(self->connection))) {
-        error("%s:%d : Cannot receive a message.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot receive a message.");
         goto cleanup;
     }
 
     // get header status
     if (!(responseStatusFrame = zmsg_pop(response))) {
-        error("%s:%d : Cannot read result header.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot read result header.");
         goto cleanup;
     }
 
     // check header status
     DbStatus responseStatus = *((typeof(responseStatus) *) zframe_data(responseStatusFrame));
     if (responseStatus != DB_STATUS_SUCCESS) {
-        error("%s:%d : Database could not REMOVE keys. Status = %d",
-              self->info.name, self->info.routerId, responseStatus);
+        dbClientError(self, "Database could not REMOVE keys. Status = %d", responseStatus);
         goto cleanup;
     }
 
@@ -202,7 +199,7 @@ cleanup:
 
 bool dbClientRemoveObject(DbClient *self, char *key) {
     if (!(dbClientRemoveObjects(self, (char *[]){key}, 1))) {
-        error("Cannot remove value '%s'", key);
+        dbClientError(self, "Cannot remove value '%s'", key);
         return false;
     }
 
@@ -215,27 +212,25 @@ bool dbClientRequestObjects(DbClient *self, char **keys, size_t keysCount) {
     zmsg_t *request = NULL;
 
     if (!(request = zmsg_new())) {
-        error("%s:%d : Cannot allocate a new request msg.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot allocate a new request msg.");
         goto cleanup;
     }
 
     // add the header
     if (zmsg_addmem(request, PACKET_HEADER(DB_GET_ARRAY), sizeof(DB_GET_ARRAY) != 0)) {
-        error("%s:%d : Cannot add DB_GET_ARRAY to dbClient GET message.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot add DB_GET_ARRAY to dbClient GET message.");
         goto cleanup;
     }
 
     // add the keys to the message
     if (!(dbClientAddKeysToMessage(self, request, keys, keysCount))) {
-        error("Cannot add keys to the request message.");
+        dbClientError(self, "Cannot add keys to the request message.");
         goto cleanup;
     }
 
     // send the request
     if (zmsg_send(&request, self->connection) != 0) {
-        error("Cannot send the message to the Db.");
+        dbClientError(self, "Cannot send the message to the Db.");
         goto cleanup;
     }
 
@@ -249,7 +244,7 @@ cleanup:
 
 bool dbClientRequestObject(DbClient *self, char *key) {
     if (!(dbClientRequestObjects(self, (char *[]){key}, 1))) {
-        error("Cannot request value '%s'", key);
+        dbClientError(self, "Cannot request value '%s'", key);
         return false;
     }
 
@@ -266,30 +261,26 @@ bool dbClientGetObjects(DbClient *self, zhash_t **_out) {
 
     // wait for db answer
     if (!(response = zmsg_recv(self->connection))) {
-        error("%s:%d : Cannot receive a message.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot receive a message.");
         goto cleanup;
     }
 
     // get header status
     if (!(responseStatusFrame = zmsg_pop(response))) {
-        error("%s:%d : Cannot read result header.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot read result header.");
         goto cleanup;
     }
 
     // check header status
     DbStatus responseStatus = *((typeof(responseStatus) *) zframe_data(responseStatusFrame));
     if (responseStatus != DB_STATUS_SUCCESS) {
-        error("%s:%d : Database could not GET key. Status = %d",
-              self->info.name, self->info.routerId, responseStatus);
+        dbClientError(self, "Error status. Status = %d", responseStatus);
         goto cleanup;
     }
 
     // allocate result hashtable
     if (!(out = zhash_new())) {
-        error("%s:%d : Cannot allocate a new values hashtable.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot allocate a new values hashtable.");
         goto cleanup;
     }
 
@@ -298,8 +289,7 @@ bool dbClientGetObjects(DbClient *self, zhash_t **_out) {
 
         // key is followed by the value associated to the key
         if (!(valueFrame = zmsg_pop(response))) {
-            error("%s:%d : Cannot get the object associated to the key '%s'",
-                  self->info.name, self->info.routerId, key);
+            dbClientError(self, "Cannot get the object associated to the key '%s'", key);
             goto cleanup;
         }
 
@@ -309,14 +299,12 @@ bool dbClientGetObjects(DbClient *self, zhash_t **_out) {
         // Construct a dbObject from the frame
         DbObject *object = NULL;
         if (!(object = dbObjectNew(valueSize, value, false))) {
-            error("%s:%d : Cannot create an object '%s' of size %d.",
-                  self->info.name, self->info.routerId, key, valueSize);
+            dbClientError(self, "Cannot create an object '%s' of size %d.", key, valueSize);
             goto cleanup;
         }
 
         if (zhash_insert(out, key, object) != 0) {
-            error("%s:%d : Cannot insert value in key '%s'",
-                  self->info.name, self->info.routerId, key);
+            dbClientError(self, "Cannot insert value in key '%s'", key);
             goto cleanup;
         }
 
@@ -340,12 +328,12 @@ bool dbClientGetObject(DbClient *self, DbObject **out) {
     zhash_t *objects = NULL;
 
     if (!(dbClientGetObjects(self, &objects))) {
-        error("Cannot get values.");
+        dbClientError(self, "Cannot get values.");
         return false;
     }
 
     if (zhash_size(objects) != 1 && zhash_size(objects) != 0) {
-        error("Objects count retrieved must be egal to 0 or 1.");
+        dbClientError(self, "Objects count retrieved must be egal to 0 or 1.");
         return false;
     }
 
@@ -363,15 +351,13 @@ bool dbClientUpdateObjects(DbClient *self, zhash_t *objects) {
     zmsg_t *request = NULL;
 
     if (!(request = zmsg_new())) {
-        error("%s:%d : Cannot allocate a new request msg.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot allocate a new request msg.");
         goto cleanup;
     }
 
     // set the header
     if (zmsg_addmem(request, PACKET_HEADER(DB_UPDATE_ARRAY), sizeof(DB_UPDATE_ARRAY) != 0)) {
-        error("%s:%d : Cannot add DB_UPDATE_ARRAY to dbClient message.",
-              self->info.name, self->info.routerId);
+        dbClientError(self, "Cannot add DB_UPDATE_ARRAY to dbClient message.");
         goto cleanup;
     }
 
@@ -380,14 +366,14 @@ bool dbClientUpdateObjects(DbClient *self, zhash_t *objects) {
 
         // add all the objects to the message
         if (!(dbClientAddObjectToMessage(self, request, key, object))) {
-            error("Cannot add object '%s' to message.", key);
+            dbClientError(self, "Cannot add object '%s' to message.", key);
             goto cleanup;
         }
     }
 
     // send the request
     if (zmsg_send(&request, self->connection) != 0) {
-        error("Cannot send the message to the Db.");
+        dbClientError(self, "Cannot send the message to the Db.");
         goto cleanup;
     }
 
@@ -405,17 +391,17 @@ bool dbClientUpdateObject(DbClient *self, char *key, DbObject *object) {
     zhash_t *ht = NULL;
 
     if (!(ht = zhash_new())) {
-        error("Cannot allocate a hashtable.");
+        dbClientError(self, "Cannot allocate a hashtable.");
         goto cleanup;
     }
 
     if (zhash_insert(ht, key, object) != 0) {
-        error("Cannot insert the object.");
+        dbClientError(self, "Cannot insert the object.");
         goto cleanup;
     }
 
     if (!(dbClientUpdateObjects(self, ht))) {
-        error("Cannot update value of object '%s'", key);
+        dbClientError(self, "Cannot update value of object '%s'", key);
         goto cleanup;
     }
 

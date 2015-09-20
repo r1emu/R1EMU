@@ -24,6 +24,11 @@
 
 // ---------- Defines -------------
 
+// extend debug messages
+#define dbClientError(self, x, ...) error("[%s:%d] " x, self->info.name, self->info.routerId, ##__VA_ARGS__)
+#define dbClientInfo(self, x, ...)  info("[%s:%d] " x, self->info.name, self->info.routerId, ##__VA_ARGS__)
+#define dbClientSpecial(self, x, ...) special("[%s:%d] " x, self->info.name, self->info.routerId, ##__VA_ARGS__)
+
 // ------ Structure declaration -------
 typedef struct DbClient DbClient;
 

@@ -26,6 +26,11 @@
 // ---------- Defines -------------
 #define DB_ENDPOINT "inproc://db-%s-%d"
 
+// extend debug messages
+#define dbError(self, x, ...) error("[%s:%d] " x, self->info.name, self->info.routerId, ##__VA_ARGS__)
+#define dbInfo(self, x, ...)  info("[%s:%d] " x, self->info.name, self->info.routerId, ##__VA_ARGS__)
+#define dbSpecial(self, x, ...)  special("[%s:%d] " x, self->info.name, self->info.routerId, ##__VA_ARGS__)
+
 // ------ Structure declaration -------
 typedef struct Db Db;
 

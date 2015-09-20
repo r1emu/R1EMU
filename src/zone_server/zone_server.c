@@ -18,7 +18,6 @@
 #include "zone_handler/admin_cmd.h"
 #include "common/server/server.h"
 #include "common/db/db.h"
-#include "common/session/session_manager.h"
 
 /**
  * @brief ZoneServer is the representation of the zone server system
@@ -27,9 +26,6 @@ struct ZoneServer
 {
     /** ZoneServer inherits from Server object */
     Server *server;
-
-    /** Items db */
-    Db *dbItems;
 
     /** Connection to the dbSession */
     Db *dbSession;
@@ -58,13 +54,6 @@ bool zoneServerInit(ZoneServer *self, Server *server) {
     self->server = server;
     uint16_t routerId = serverGetRouterId(server);
 
-    // Initialize dbItems
-    dbInfoInit(&dbInfo, routerId, "dbItems");
-    if (!(self->dbItems = dbNew(&dbInfo))) {
-        error("Cannot allocate a dbItems");
-        return false;
-    }
-
     // Initialize dbSession
     dbInfoInit(&dbInfo, routerId, "dbSession");
     if (!(self->dbSession = dbNew(&dbInfo))) {
@@ -80,12 +69,6 @@ bool zoneServerStart(ZoneServer *self) {
     special("=== Zone server %d ===", serverGetRouterId(self->server));
     special("=====================");
 
-    // Start dbItems
-    if (!(dbStart(self->dbItems))) {
-        error("Cannot start items db.");
-        return false;
-    }
-
     // Start dbSession
     if (!(dbStart(self->dbSession))) {
         error("Cannot start sessions db.");
@@ -93,6 +76,7 @@ bool zoneServerStart(ZoneServer *self) {
     }
 
     // Initialize admin commands module
+    // TODO : Initialize it in ZoneWorker (when ZoneWorker will exist...)
     if (!(adminCmdInit())) {
         error ("Cannot initialize admin commands module.");
         return false;

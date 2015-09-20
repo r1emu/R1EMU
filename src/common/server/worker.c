@@ -26,7 +26,6 @@
 #include "common/crypto/crypto.h"
 #include "common/packet/packet.h"
 #include "common/server/game_event.h"
-#include "common/session/session_manager.h"
 
 
 // ------ Structure declaration -------
@@ -362,15 +361,14 @@ cleanup:
 }
 
 static bool
-workerGetSessionObject(Worker *self, uint8_t *sessionKey, DbObject **_object) {
+workerGetOrCreateSessionObject(Worker *self, uint8_t *sessionKey, DbObject **_object) {
 
     bool status = false;
     DbObject *object = NULL;
     Session *session = NULL;
 
     if (!(dbClientGetObject(self->dbSession, &object))) {
-        error("Cannot get the session object.");
-        goto cleanup;
+        info("Cannot get the session object, create a new one.");
     }
 
     if (!object) {
@@ -381,13 +379,12 @@ workerGetSessionObject(Worker *self, uint8_t *sessionKey, DbObject **_object) {
             goto cleanup;
         }
 
-        DbObject newSessionObject;
-        if (!(dbObjectInit(&newSessionObject, sizeof(*session), session, true))) {
-            error("Cannot initialize dbObject.");
+        if (!(object = dbObjectNew(sizeof(*session), session, true))) {
+            error("Cannot allocate a new dbObject.");
             goto cleanup;
         }
 
-        if (!(dbClientUpdateObject(self->dbSession, sessionKey, &newSessionObject))) {
+        if (!(dbClientUpdateObject(self->dbSession, sessionKey, object))) {
             error("Cannot update the session object.");
             goto cleanup;
         }
@@ -423,8 +420,8 @@ workerBuildReply (
     // Get the session
     DbObject *sessionObject = NULL;
     Session *session = NULL;
-    if (!(workerGetSessionObject(self, sessionKey, &sessionObject))) {
-        error("Cannot get the session.");
+    if (!(workerGetOrCreateSessionObject(self, sessionKey, &sessionObject))) {
+        error("Cannot get or create the session.");
         goto cleanup;
     }
     session = sessionObject->data;

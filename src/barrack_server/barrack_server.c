@@ -16,14 +16,18 @@
 
 #include "barrack_server.h"
 #include "common/server/server.h"
+#include "common/db/db.h"
 
 /**
  * @brief BarrackServer is the representation of the barrack server system
  */
 struct BarrackServer
 {
-    // BarrackServer inherits from Server object
+    /** BarrackServer inherits from Server object */
     Server *server;
+
+    /** Connection to the dbSession */
+    Db *dbSession;
 };
 
 BarrackServer *barrackServerNew(Server *server) {
@@ -43,7 +47,18 @@ BarrackServer *barrackServerNew(Server *server) {
 }
 
 bool barrackServerInit(BarrackServer *self, Server *server) {
+    DbInfo dbInfo;
+
     self->server = server;
+    uint16_t routerId = serverGetRouterId(server);
+
+    // Initialize dbSession
+    dbInfoInit(&dbInfo, routerId, "dbSession");
+    if (!(self->dbSession = dbNew(&dbInfo))) {
+        error("Cannot allocate a dbSession.");
+        return false;
+    }
+
     return true;
 }
 
@@ -51,6 +66,12 @@ bool barrackServerStart(BarrackServer *self) {
     special("======================");
     special("=== Barrack server ===");
     special("======================");
+
+    // Start dbSession
+    if (!(dbStart(self->dbSession))) {
+        error("Cannot start sessions db.");
+        return false;
+    }
 
     if (!(serverStart (self->server))) {
         error("Cannot start the Server.");
