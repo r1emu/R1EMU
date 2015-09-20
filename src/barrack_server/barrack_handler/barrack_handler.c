@@ -42,6 +42,8 @@ static PacketHandlerState barrackHandlerCommanderDestroy (Worker *self, Session 
 static PacketHandlerState barrackHandlerCommanderMove    (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Request for the player to enter in game */
 static PacketHandlerState barrackHandlerStartGame        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+/** Request for the player to logout */
+static PacketHandlerState barrackHandlerLogout        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 
 /**
  * @brief barrackHandlers is a global table containing all the barrack handlers.
@@ -60,6 +62,7 @@ const PacketHandler barrackHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CB_COMMANDER_MOVE,     barrackHandlerCommanderMove),
     // REGISTER_PACKET_HANDLER(CB_JUMP,               barrackHandlerJump),
     REGISTER_PACKET_HANDLER(CB_START_GAME,         barrackHandlerStartGame),
+    REGISTER_PACKET_HANDLER(CB_LOGOUT,         barrackHandlerLogout),
 
     #undef REGISTER_PACKET_HANDLER
 };
@@ -567,6 +570,27 @@ static PacketHandlerState barrackHandlerCommanderCreate(
         .dir2 = commanderDir,
     };
     barrackBuilderCommanderCreate(&commanderCreate, reply);
+
+    return PACKET_HANDLER_UPDATE_SESSION;
+}
+
+static PacketHandlerState barrackHandlerLogout(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *reply)
+{
+    /// TODO
+
+    /*
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_LOGOUT);
+    */
+
+
+    barrackBuilderLogoutOk(
+        reply
+    );
 
     return PACKET_HANDLER_UPDATE_SESSION;
 }

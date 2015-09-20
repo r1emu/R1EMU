@@ -419,3 +419,19 @@ void barrackBuilderCommanderCreate(CommanderCreateInfo *commanderCreate, zmsg_t 
         memcpy(&replyPacket.commanderCreate, commanderCreate, sizeof(replyPacket.commanderCreate));
     }
 }
+
+void barrackBuilderLogoutOk(zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = BC_LOGOUTOK;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+    }
+}

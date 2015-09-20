@@ -140,3 +140,8 @@ void barrackBuilderIesModifyList(zmsg_t *replyMsg);
  * @brief @unknown ; Makes the character selection appear directly without asking for the family name
  */
 void barrackBuilderNormalUnk1(uint64_t accountId, zmsg_t *replyMsg);
+
+/**
+ * @brief Logout
+ */
+void barrackBuilderLogoutOk(zmsg_t *replyMsg);
