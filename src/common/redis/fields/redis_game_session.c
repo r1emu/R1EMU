@@ -52,7 +52,7 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_equipment_body_armor] = REDIS_GAME_SESSION_equipment_body_armor_str,
     [REDIS_GAME_SESSION_equipment_gloves] = REDIS_GAME_SESSION_equipment_gloves_str,
     [REDIS_GAME_SESSION_equipment_boots] = REDIS_GAME_SESSION_equipment_boots_str,
-    [REDIS_GAME_SESSION_equipment_itemUnk2] = REDIS_GAME_SESSION_equipment_itemUnk2_str,
+    [REDIS_GAME_SESSION_equipment_helmet] = REDIS_GAME_SESSION_equipment_helmet_str,
     [REDIS_GAME_SESSION_equipment_bracelet] = REDIS_GAME_SESSION_equipment_bracelet_str,
     [REDIS_GAME_SESSION_equipment_weapon] = REDIS_GAME_SESSION_equipment_weapon_str,
     [REDIS_GAME_SESSION_equipment_shield] = REDIS_GAME_SESSION_equipment_shield_str,
@@ -121,7 +121,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         " " REDIS_GAME_SESSION_equipment_body_armor_str
         " " REDIS_GAME_SESSION_equipment_gloves_str
         " " REDIS_GAME_SESSION_equipment_boots_str
-        " " REDIS_GAME_SESSION_equipment_itemUnk2_str
+        " " REDIS_GAME_SESSION_equipment_helmet_str
         " " REDIS_GAME_SESSION_equipment_bracelet_str
         " " REDIS_GAME_SESSION_equipment_weapon_str
         " " REDIS_GAME_SESSION_equipment_shield_str
@@ -225,7 +225,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             equipment->body_armor  = GET_REDIS_32(equipment_body_armor);
             equipment->gloves      = GET_REDIS_32(equipment_gloves);
             equipment->boots       = GET_REDIS_32(equipment_boots);
-            equipment->itemUnk2    = GET_REDIS_32(equipment_itemUnk2);
+            equipment->helmet      = GET_REDIS_32(equipment_helmet);
             equipment->bracelet    = GET_REDIS_32(equipment_bracelet);
             equipment->weapon      = GET_REDIS_32(equipment_weapon);
             equipment->shield      = GET_REDIS_32(equipment_shield);
@@ -343,7 +343,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         " " REDIS_GAME_SESSION_equipment_body_armor_str " %x"
         " " REDIS_GAME_SESSION_equipment_gloves_str " %x"
         " " REDIS_GAME_SESSION_equipment_boots_str " %x"
-        " " REDIS_GAME_SESSION_equipment_itemUnk2_str " %x"
+        " " REDIS_GAME_SESSION_equipment_helmet_str " %x"
         " " REDIS_GAME_SESSION_equipment_bracelet_str " %x"
         " " REDIS_GAME_SESSION_equipment_weapon_str " %x"
         " " REDIS_GAME_SESSION_equipment_shield_str " %x"
@@ -403,7 +403,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         equipment->body_armor,
         equipment->gloves,
         equipment->boots,
-        equipment->itemUnk2,
+        equipment->helmet,
         equipment->bracelet,
         equipment->weapon,
         equipment->shield,
