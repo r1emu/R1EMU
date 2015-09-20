@@ -45,7 +45,7 @@ Redis *redisNew(RedisInfo *info) {
     }
 
     if (!redisInit (self, info)) {
-        redisDestroy (&self);
+        redisDestroy(&self);
         error("Redis failed to initialize.");
         return NULL;
     }

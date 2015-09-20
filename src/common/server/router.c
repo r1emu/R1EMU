@@ -311,7 +311,7 @@ Router_subscribe (
             // The worker send a 'multicast' message : It is addressed to a group of destination clients.
             // [1 frame data] + [1 frame identity] + [1 frame identity] + ...
             zframe_t *dataFrame = zmsg_pop (msg);
-            size_t identityCount = zmsg_size (msg);
+            size_t identityCount = zmsg_size(msg);
             for (size_t count = 0; count < identityCount; count++) {
                 // TODO : Don't allocate a new zmsg_t for every submessage ?
                 zmsg_t *subMsg = zmsg_new ();
@@ -409,7 +409,7 @@ Router_backend (
 
         case ROUTER_WORKER_NORMAL: {
             // The worker send a 'normal' message to the client
-            if (zmsg_size (msg) == 2) {
+            if (zmsg_size(msg) == 2) {
                 // Simple message : [1 frame identity] + [1 frame data]
                 if (zmsg_send (&msg, self->frontend) != 0) {
                     error("Cannot send message to the frontend.");
@@ -420,7 +420,7 @@ Router_backend (
                 // Multiple messages : [1 frame identity] + [1 frame data] + [1 frame data] + ... + [1 frame data]
                 // Send N messages [1 frame identity] + [1 frame data]
                 zframe_t *identity = zmsg_pop (msg);
-                size_t msgCount = zmsg_size (msg);
+                size_t msgCount = zmsg_size(msg);
                 for (int i = 0; i < msgCount; i++) {
                     zmsg_t *subMsg = zmsg_new ();
                     zmsg_add(subMsg, zframe_dup (identity));

@@ -454,8 +454,8 @@ routerMonitorFree (
     RouterMonitor *self
 ) {
     zhash_destroy (&self->connected);
-    redisDestroy (&self->redis);
-    mySqlDestroy (&self->sql);
+    redisDestroy(&self->redis);
+    mySqlDestroy(&self->sql);
 }
 
 void
