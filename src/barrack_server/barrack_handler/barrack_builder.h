@@ -112,7 +112,7 @@ void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg);
  * @brief Change the name of the barrack
  */
 void
-barrackBuilderBarrackNameChange(uint8_t *barrackName, zmsg_t *replyMsg);
+barrackBuilderBarrackNameChange(BarrackNameResultType resultType, uint8_t *barrackName, zmsg_t *replyMsg);
 
 /**
  * @brief Destroy commanders

@@ -33,7 +33,7 @@ static PacketHandlerState barrackHandlerStartBarrack     (Worker *self, Session 
 /** Once the commander list has been received, request to start the barrack */
 static PacketHandlerState barrackHandlerCurrentBarrack   (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Change a barrack name */
-static PacketHandlerState barrackHandlerBarracknameChange(Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerBarrackNameChange(Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Create a commander */
 static PacketHandlerState barrackHandlerCommanderCreate  (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Send a list of zone servers */
@@ -54,7 +54,7 @@ const PacketHandler barrackHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CB_LOGIN_BY_PASSPORT,  barrackHandlerLoginByPassport),
     REGISTER_PACKET_HANDLER(CB_START_BARRACK,      barrackHandlerStartBarrack),
     REGISTER_PACKET_HANDLER(CB_CURRENT_BARRACK,    barrackHandlerCurrentBarrack),
-    REGISTER_PACKET_HANDLER(CB_BARRACKNAME_CHANGE, barrackHandlerBarracknameChange),
+    REGISTER_PACKET_HANDLER(CB_BARRACKNAME_CHANGE, barrackHandlerBarrackNameChange),
     REGISTER_PACKET_HANDLER(CB_COMMANDER_CREATE,   barrackHandlerCommanderCreate),
     REGISTER_PACKET_HANDLER(CB_COMMANDER_DESTROY,  barrackHandlerCommanderDestroy),
     REGISTER_PACKET_HANDLER(CB_COMMANDER_MOVE,     barrackHandlerCommanderMove),
@@ -367,13 +367,16 @@ static PacketHandlerState barrackHandlerCurrentBarrack(
     return PACKET_HANDLER_OK;
 }
 
-static PacketHandlerState barrackHandlerBarracknameChange(
+static PacketHandlerState barrackHandlerBarrackNameChange(
     Worker *self,
     Session *session,
     uint8_t *packet,
     size_t packetSize,
     zmsg_t *reply)
 {
+
+    BarrackNameResultType ResultType = BC_BARRACKNAME_CHANGE_OK;
+
     #pragma pack(push, 1)
     struct{
         uint8_t barrackName[64];
@@ -382,31 +385,45 @@ static PacketHandlerState barrackHandlerBarracknameChange(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_BARRACKNAME_CHANGE);
 
-    CommanderInfo *commander = &session->game.commanderSession.currentCommander.info;
-    CommanderAppearance *appearance = &commander->appearance;
+    CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander.info;
+    CommanderAppearance *commander = &commanderInfo->appearance;
 
     // Check if the barrack name is not empty and contains only ASCII characters
     size_t barrackNameLen = strlen(clientPacket->barrackName);
 
     if (barrackNameLen == 0) {
         error("Empty barrack name");
-        return PACKET_HANDLER_ERROR;
+        ResultType = BC_BARRACKNAME_CHANGE_ERROR;
     }
 
     for (size_t i = 0; i < barrackNameLen; i++) {
          if (!isprint(clientPacket->barrackName[i])) {
             dbg("Wrong barrack name character in BC_BARRACKNAME_CHANGE");
-            return PACKET_HANDLER_ERROR;
+            ResultType = BC_BARRACKNAME_CHANGE_ERROR;
          }
     }
 
-    // Update the session
-    strncpy(appearance->familyName, clientPacket->barrackName, sizeof(appearance->familyName));
+    dbg("AccountId: %11x", session->game.accountSession.accountId);
+
+    // Try to perform the change
+    ResultType = mySqlSetFamilyName(self->sqlConn, &session->game.accountSession, clientPacket->barrackName);
+
+    if (ResultType == BC_BARRACKNAME_CHANGE_OK) {
+        // Update the session
+        strncpy(commander->familyName, clientPacket->barrackName, sizeof(commander->familyName));
+        strncpy(session->game.accountSession.familyName, clientPacket->barrackName, sizeof(session->game.accountSession.familyName));
+
+    }
 
     // Build the reply packet
-    barrackBuilderBarrackNameChange(appearance->familyName, reply);
+    barrackBuilderBarrackNameChange(ResultType, commander->familyName, reply);
 
-    return PACKET_HANDLER_UPDATE_SESSION;
+    // Update session only if barrack name changed.
+    if (ResultType == BC_BARRACKNAME_CHANGE_OK) {
+        return PACKET_HANDLER_UPDATE_SESSION;
+    } else {
+        return PACKET_HANDLER_OK;
+    }
 }
 
 static PacketHandlerState barrackHandlerCommanderDestroy(
