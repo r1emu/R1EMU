@@ -49,7 +49,7 @@
 #define REDIS_GAME_SESSION_equipment_body_armor_str      "equipment_body_armor"
 #define REDIS_GAME_SESSION_equipment_gloves_str          "equipment_gloves"
 #define REDIS_GAME_SESSION_equipment_boots_str           "equipment_boots"
-#define REDIS_GAME_SESSION_equipment_itemUnk2_str        "equipment_itemUnk2"
+#define REDIS_GAME_SESSION_equipment_helmet_str          "equipment_ihelmet"
 #define REDIS_GAME_SESSION_equipment_bracelet_str        "equipment_bracelet"
 #define REDIS_GAME_SESSION_equipment_weapon_str          "equipment_weapon"
 #define REDIS_GAME_SESSION_equipment_shield_str          "equipment_shield"
@@ -112,7 +112,7 @@ enum RedisGameSessionFields {
     REDIS_GAME_SESSION_equipment_body_armor,
     REDIS_GAME_SESSION_equipment_gloves,
     REDIS_GAME_SESSION_equipment_boots,
-    REDIS_GAME_SESSION_equipment_itemUnk2,
+    REDIS_GAME_SESSION_equipment_helmet,
     REDIS_GAME_SESSION_equipment_bracelet,
     REDIS_GAME_SESSION_equipment_weapon,
     REDIS_GAME_SESSION_equipment_shield,

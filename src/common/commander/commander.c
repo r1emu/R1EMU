@@ -20,7 +20,7 @@ void commanderEquipmentInit(CommanderEquipment *equipment) {
     equipment->body_armor = 0x81a9d;
     equipment->gloves = 6;
     equipment->boots = 7;
-    equipment->itemUnk2 = 0x2710;
+    equipment->helmet = 0x2710;
     equipment->bracelet = 0x2af8;
     equipment->weapon = 0x3118d;
     equipment->shield = 0x98967c;
@@ -79,7 +79,7 @@ void commanderEquipmentPrint(CommanderEquipment *equipment) {
     dbg("body_armor = %d (%x)", equipment->body_armor, equipment->body_armor);
     dbg("gloves = %d (%x)", equipment->gloves, equipment->gloves);
     dbg("boots = %d (%x)", equipment->boots, equipment->boots);
-    dbg("itemUnk2 = %d (%x)", equipment->itemUnk2, equipment->itemUnk2);
+    dbg("helmet = %d (%x)", equipment->helmet, equipment->helmet);
     dbg("bracelet = %d (%x)", equipment->bracelet, equipment->bracelet);
     dbg("weapon = %d (%x)", equipment->weapon, equipment->weapon);
     dbg("shield = %d (%x)", equipment->shield, equipment->shield);
