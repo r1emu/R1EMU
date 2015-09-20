@@ -126,6 +126,7 @@ typedef struct
 typedef struct
 {
     CommanderInfo info;
+    Inventory inventory;
 
 } Commander;
 #pragma pack(pop)
