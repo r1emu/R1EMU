@@ -17,6 +17,31 @@
 #include "common/packet/packet_stream.h"
 #include "common/packet/packet_type.h"
 
+void barrackBuilderMessage(uint8_t msgType, uint8_t *message, zmsg_t *replyMsg) {
+
+    // Length of Message
+    int messageLength = strlen(message);
+
+    #pragma pack(push, 1)
+    struct {
+        VariableSizePacketHeader variableSizeHeader;
+        uint8_t msgType;
+        uint8_t unk[40];
+        uint8_t message[messageLength+1];
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = BC_MESSAGE;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
+        replyPacket.msgType = msgType;
+        strncpy(replyPacket.message, message, sizeof(replyPacket.message));
+    }
+}
+
 void barrackBuilderLoginOk(
     uint64_t accountId,
     uint8_t *accountLogin,

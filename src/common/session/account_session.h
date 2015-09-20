@@ -44,6 +44,16 @@ struct AccountSession {
 
     // Account privilege level
     AccountSessionPrivileges privilege;
+
+    uint64_t accountId;
+    bool isBanned;
+    time_t timeBanned;
+    float credits;
+    time_t timeLastLogin;
+    uint8_t familyName [64]; ///TODO SIZE
+    uint32_t barrackType;
+    uint8_t charactersCreatedCount; // Makes any sense to have a variable to store this information? Copied for deprecated "BarrackSession"
+
 };
 
 typedef struct AccountSession AccountSession;

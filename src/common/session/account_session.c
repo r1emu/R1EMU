@@ -40,6 +40,7 @@ bool accountSessionInit(AccountSession *self, uint8_t *login, uint8_t *socketId,
 
     memset(self, 0, sizeof(AccountSession));
 
+    self->accountId = 0;
     memcpy(self->login, login, sizeof(self->login));
     memcpy(self->sessionKey, socketId, sizeof(self->sessionKey));
     self->privilege = privilege;

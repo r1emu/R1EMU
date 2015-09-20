@@ -36,6 +36,21 @@ typedef enum PacketTypeBarrackNormal {
 
 } PacketTypeBarrackNormal;
 
+/**
+ * BC_BARRACKNAME_CHANGE result types
+ */
+typedef enum BarrackNameResultType {
+
+    BC_BARRACKNAME_CHANGE_ALREADYEXIST = -1,
+    BC_BARRACKNAME_CHANGE_OK = 0,
+    BC_BARRACKNAME_CHANGE_ERROR = 1,
+
+} BarrackNameResultType;
+
+/**
+ * @brief Send message to client
+ */
+void barrackBuilderMessage(uint8_t msgType, uint8_t *message, zmsg_t *replyMsg);
 
 /**
  * @brief Send back the information of the account after a successful log in
