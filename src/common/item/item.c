@@ -16,18 +16,58 @@
 #include "item.h"
 #include "common/packet/packet_stream.h"
 
+// Private functions
+static bool stringAttributeInit(StringAttribute *self, ItemAttributeType attributeType, char *value);
+static bool floatAttributeInit(FloatAttribute *self, ItemAttributeType attributeType, float value);
+static bool attributeInit(Attribute *self, void *attribute, AttributeType attributeType);
+static bool attributeArrayInit(AttributeArray *self, Attribute *attributes, int numAttributes);
+static size_t attributeArrayGetPacketSize(AttributeArray *attributeArray);
+static bool attributeArrayGetPacket(AttributeArray *attributeArray, char *packet);
+static bool floatAttributeGetPacket(FloatAttribute *attribute, char *packetBytes);
+static size_t stringAttributeGetSize(StringAttribute *attribute);
+static bool stringAttributeGetPacket(StringAttribute *attribute, char *packetBytes);
+static size_t itemAttributesGetNum(ItemAttributes *itemAttributes);
 
-bool stringAttributeInit(StringAttribute *self, ItemAttributeType attributeType, char *value);
-bool floatAttributeInit(FloatAttribute *self, ItemAttributeType attributeType, float value);
-bool attributeInit(Attribute *self, void *attribute, AttributeType attributeType);
-bool attributeArrayInit(AttributeArray *self, Attribute *attributes, int numAttributes);
-size_t attributeArrayGetPacketSize(AttributeArray *attributeArray);
-bool attributeArrayGetPacket(AttributeArray *attributeArray, char *packet);
-bool floatAttributeGetPacket(FloatAttribute *attribute, char *packetBytes);
-size_t stringAttributeGetSize(StringAttribute *attribute);
-bool stringAttributeGetPacket(StringAttribute *attribute, char *packetBytes);
-size_t itemAttributesGetNum(ItemAttributes *itemAttributes);
+struct AttributeTypesEntry {
+    char *key;
+    AttributeType type;
+} attributeTypesEntries [] = {
+    [ITEM_ATTRIBUTE_DURABILITY]   = {.key = "durability",   .type = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_PR]           = {.key = "pr",           .type = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_COOLDOWN]     = {.key = "cooldown",     .type = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_REINFORCE_2]  = {.key = "reinforce_2",  .type = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_MEMO]         = {.key = "memo",         .type = STRING_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_CUSTOM_NAME]  = {.key = "custom_name", . type = STRING_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_CRAFTER_NAME] = {.key = "crafter_name", .type = STRING_ATTRIBUTE}
+};
 
+bool itemAttributesGetAttribute(ItemAttributes *self, ItemAttributeType itemAttrType, void *_output) {
+
+    struct AttributeTypesEntry typeEntry = attributeTypesEntries[itemAttrType];
+
+    switch (typeEntry.type)
+    {
+        case FLOAT_ATTRIBUTE: {
+            float *output = _output;
+            Attribute *attr = zhash_lookup(self->hashtable, typeEntry.key);
+            FloatAttribute *fAttr = attr->attribute;
+            *output = fAttr->value;
+            break;
+        }
+
+        case STRING_ATTRIBUTE: {
+            char **output = _output;
+            Attribute *attr = zhash_lookup(self->hashtable, typeEntry.key);
+            StringAttribute *sAttr = attr->attribute;
+            *output = sAttr->value;
+            break;
+        }
+
+        default: error("Unknown attribute type."); break;
+    }
+
+    return true;
+}
 
 ItemAttributes *itemAttributesNew(
     float durability,

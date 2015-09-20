@@ -29,6 +29,9 @@
 
 // ------ Structure declaration -------
 typedef struct ItemAttributes {
+
+    zhash_t *hashtable; // TODO
+
     float durability;
     float cooldown;
     char *memo;
@@ -90,7 +93,7 @@ typedef struct ItemEquip {
 // ----------- Functions ------------
 
 /**
- * @brief Equip an item in the inventory
+ * @brief Initialize an ItemAttributes
  */
 bool itemAttributesInit(
     ItemAttributes *self,
