@@ -28,6 +28,7 @@ struct DbClient
  * Add keys to the request message
  */
 static bool dbClientAddKeysToMessage(DbClient *self, zmsg_t *request, char **keys, size_t keysCount);
+static bool dbClientIsSuccess(DbClient *self, zmsg_t *msg);
 
 /**
  * Add key+object to the request message
@@ -144,8 +145,7 @@ bool dbClientRemoveObjects(DbClient *self, char **keys, size_t keysCount) {
 
     bool status = false;
     zmsg_t *request = NULL;
-    zmsg_t *response = NULL;
-    zframe_t *responseStatusFrame = NULL;
+    zmsg_t *answer = NULL;
 
     if (!(request = zmsg_new())) {
         dbClientError(self, "Cannot allocate a new request msg.");
@@ -170,21 +170,14 @@ bool dbClientRemoveObjects(DbClient *self, char **keys, size_t keysCount) {
     }
 
     // wait for db answer
-    if (!(response = zmsg_recv(self->connection))) {
+    if (!(answer = zmsg_recv(self->connection))) {
         dbClientError(self, "Cannot receive a message.");
         goto cleanup;
     }
 
-    // get header status
-    if (!(responseStatusFrame = zmsg_pop(response))) {
-        dbClientError(self, "Cannot read result header.");
-        goto cleanup;
-    }
-
     // check header status
-    DbStatus responseStatus = *((typeof(responseStatus) *) zframe_data(responseStatusFrame));
-    if (responseStatus != DB_STATUS_SUCCESS) {
-        dbClientError(self, "Database could not REMOVE keys. Status = %d", responseStatus);
+    if (!(dbClientIsSuccess(self, answer))) {
+        dbClientError(self, "Cannot get object from db.");
         goto cleanup;
     }
 
@@ -192,7 +185,6 @@ bool dbClientRemoveObjects(DbClient *self, char **keys, size_t keysCount) {
 
 cleanup:
     zmsg_destroy(&request);
-    zframe_destroy(&responseStatusFrame);
 
     return status;
 }
@@ -251,30 +243,48 @@ bool dbClientRequestObject(DbClient *self, char *key) {
     return true;
 }
 
-bool dbClientGetObjects(DbClient *self, zhash_t **_out) {
+static bool dbClientIsSuccess(DbClient *self, zmsg_t *msg) {
 
     bool status = false;
-    zmsg_t *response = NULL;
-    zframe_t *responseStatusFrame = NULL;
-    zframe_t *valueFrame = NULL;
-    zhash_t *out = *_out = NULL;
-
-    // wait for db answer
-    if (!(response = zmsg_recv(self->connection))) {
-        dbClientError(self, "Cannot receive a message.");
-        goto cleanup;
-    }
+    zframe_t *answerStatusFrame = NULL;
 
     // get header status
-    if (!(responseStatusFrame = zmsg_pop(response))) {
+    if (!(answerStatusFrame = zmsg_pop(msg))) {
         dbClientError(self, "Cannot read result header.");
         goto cleanup;
     }
 
     // check header status
-    DbStatus responseStatus = *((typeof(responseStatus) *) zframe_data(responseStatusFrame));
-    if (responseStatus != DB_STATUS_SUCCESS) {
-        dbClientError(self, "Error status. Status = %d", responseStatus);
+    DbStatus answerStatus = *((typeof(answerStatus) *) zframe_data(answerStatusFrame));
+    if (answerStatus != DB_STATUS_SUCCESS) {
+        dbClientError(self, "Error status. Status = %d", answerStatus);
+        goto cleanup;
+    }
+
+    status = true;
+
+cleanup:
+    zframe_destroy(&answerStatusFrame);
+
+    return status;
+}
+
+bool dbClientGetObjects(DbClient *self, zhash_t **_out) {
+
+    bool status = false;
+    zmsg_t *answer = NULL;
+    zframe_t *valueFrame = NULL;
+    zhash_t *out = *_out = NULL;
+
+    // wait for db answer
+    if (!(answer = zmsg_recv(self->connection))) {
+        dbClientError(self, "Cannot receive a message.");
+        goto cleanup;
+    }
+
+    // check header status
+    if (!(dbClientIsSuccess(self, answer))) {
+        dbClientError(self, "Cannot get object from db.");
         goto cleanup;
     }
 
@@ -285,10 +295,10 @@ bool dbClientGetObjects(DbClient *self, zhash_t **_out) {
     }
 
     char *key;
-    while ((key = zmsg_popstr(response)) != NULL) {
+    while ((key = zmsg_popstr(answer)) != NULL) {
 
         // key is followed by the value associated to the key
-        if (!(valueFrame = zmsg_pop(response))) {
+        if (!(valueFrame = zmsg_pop(answer))) {
             dbClientError(self, "Cannot get the object associated to the key '%s'", key);
             goto cleanup;
         }
@@ -311,44 +321,56 @@ bool dbClientGetObjects(DbClient *self, zhash_t **_out) {
         zframe_destroy(&valueFrame);
     }
 
+    *_out = out;
     status = true;
 
 cleanup:
     if (!status) {
         zhash_destroy(_out);
     }
-    zmsg_destroy(&response);
-    zframe_destroy(&responseStatusFrame);
+    zmsg_destroy(&answer);
     zframe_destroy(&valueFrame);
 
     return status;
 }
 
 bool dbClientGetObject(DbClient *self, DbObject **out) {
+
+    bool status = false;
     zhash_t *objects = NULL;
 
     if (!(dbClientGetObjects(self, &objects))) {
         dbClientError(self, "Cannot get values.");
-        return false;
+        goto cleanup;
+    }
+
+    if (!objects) {
+        dbClientError(self, "Cannot get object hashtable.");
+        goto cleanup;
     }
 
     if (zhash_size(objects) != 1 && zhash_size(objects) != 0) {
         dbClientError(self, "Objects count retrieved must be egal to 0 or 1.");
-        return false;
+        // TODO : Cleanup memory inside hashtable
+        goto cleanup;
     }
 
     DbObject *object = zhash_first(objects);
     *out = object;
 
+    status = true;
+
+cleanup:
     zhash_destroy(&objects);
 
-    return true;
+    return status;
 }
 
 bool dbClientUpdateObjects(DbClient *self, zhash_t *objects) {
 
     bool status = false;
     zmsg_t *request = NULL;
+    zmsg_t *answer = NULL;
 
     if (!(request = zmsg_new())) {
         dbClientError(self, "Cannot allocate a new request msg.");
@@ -377,10 +399,23 @@ bool dbClientUpdateObjects(DbClient *self, zhash_t *objects) {
         goto cleanup;
     }
 
+    // wait for the answer
+    if (!(answer = zmsg_recv(self->connection))) {
+        dbClientError(self, "Cannot receive a message from the Db.");
+        goto cleanup;
+    }
+
+    // check header status
+    if (!(dbClientIsSuccess(self, answer))) {
+        dbClientError(self, "Cannot get object from db.");
+        goto cleanup;
+    }
+
     status = true;
 
 cleanup:
     zmsg_destroy(&request);
+    zmsg_destroy(&answer);
 
     return status;
 }

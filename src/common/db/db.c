@@ -271,13 +271,10 @@ void *dbMainLoop(void *arg) {
     zmsg_t *msg = NULL;
     zframe_t *packetTypeFrame = NULL;
 
-    dbSpecial (self, "Listening...");
+    dbInfo (self, "Listening to requests...");
 
     while (true) {
-        special ("Hey ! Listen !");
         msg = zmsg_recv(self->endpoint);
-        special ("Db IN = ");
-        zmsg_print(msg);
 
         if (!msg) {
             dbError(self, "Cannot receive a message.");
@@ -350,8 +347,6 @@ void *dbMainLoop(void *arg) {
         }
 
         // send answer
-        special ("Db Out = ");
-        zmsg_print(out);
         if (zmsg_send(&out, self->endpoint) != 0) {
             dbError(self, "Cannot send back the answer.");
             break;
