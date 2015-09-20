@@ -21,6 +21,10 @@ set(ZONEHANDLERS_SRC
     ${ROOT_PATH}/zone_server/zone_handler/zone_builder.h
     ${ROOT_PATH}/zone_server/zone_handler/zone_handler.c
     ${ROOT_PATH}/zone_server/zone_handler/zone_handler.h
+    ${ROOT_PATH}/zone_server/zone_event_server.c
+    ${ROOT_PATH}/zone_server/zone_event_server.h
+    ${ROOT_PATH}/zone_server/zone_handler/zone_event_handler.c
+    ${ROOT_PATH}/zone_server/zone_handler/zone_event_handler.h
 )
 add_library(zone_handlers STATIC ${ZONEHANDLERS_SRC})
 target_link_libraries(zone_handlers common)
@@ -31,9 +35,14 @@ set(COMMON_SRC
     ${ROOT_PATH}/common/crypto/bf/bf_enc.c
     ${ROOT_PATH}/common/crypto/bf/bf_skey.c
     ${ROOT_PATH}/common/crypto/crypto.c
+    ${ROOT_PATH}/common/db/db_client.c
+    ${ROOT_PATH}/common/db/db_object.c
+    ${ROOT_PATH}/common/db/db.c
     ${ROOT_PATH}/common/dbg/dbg.c
     ${ROOT_PATH}/common/graph/graph.c
     ${ROOT_PATH}/common/mysql/fields/mysql_session.c
+    ${ROOT_PATH}/common/mysql/fields/mysql_account_session.c
+    ${ROOT_PATH}/common/mysql/fields/mysql_commander_session.c
     ${ROOT_PATH}/common/mysql/mysql.c
     ${ROOT_PATH}/common/packet/packet.c
     ${ROOT_PATH}/common/packet/packet_stream.c
@@ -70,6 +79,10 @@ set(BARRACK_SRC
     ${ROOT_PATH}/barrack_server/barrack_handler/barrack_builder.c
     ${ROOT_PATH}/barrack_server/barrack_handler/barrack_handler.c
     ${ROOT_PATH}/barrack_server/barrack_server.c
+    ${ROOT_PATH}/barrack_server/barrack_event_server.c
+    ${ROOT_PATH}/barrack_server/barrack_event_server.h
+    ${ROOT_PATH}/barrack_server/barrack_handler/barrack_event_handler.c
+    ${ROOT_PATH}/barrack_server/barrack_handler/barrack_event_handler.h
 )
 add_library(barrack STATIC ${BARRACK_SRC})
 target_link_libraries(barrack common)
@@ -79,11 +92,15 @@ set(SOCIAL_SRC
     ${ROOT_PATH}/social_server/social_handler/social_handler.h
     ${ROOT_PATH}/social_server/social_server.c
     ${ROOT_PATH}/social_server/social_server.h
+    ${ROOT_PATH}/social_server/social_event_server.c
+    ${ROOT_PATH}/social_server/social_event_server.h
+    ${ROOT_PATH}/social_server/social_handler/social_event_handler.c
+    ${ROOT_PATH}/social_server/social_handler/social_event_handler.h
 )
 add_library(social STATIC ${SOCIAL_SRC})
 target_link_libraries(social common)
 
-set(LIBS common barrack social z czmq hiredis zmq mysqlclient)
+set(LIBS common barrack social z czmq hiredis zmq mysqlclient jansson)
 
 set(GLOBAL_SRC
     ${ROOT_PATH}/global_server/global_server.c

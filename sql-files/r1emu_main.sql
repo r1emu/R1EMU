@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS `commanders` (
   `eqslot_body_armor` int(11) NOT NULL DEFAULT '0',
   `eqslot_gloves` int(11) NOT NULL DEFAULT '0',
   `eqslot_boots` int(11) NOT NULL DEFAULT '0',
-  `eqslot_unkown_2` int(11) NOT NULL DEFAULT '0',
+  `eqslot_helmet` int(11) NOT NULL DEFAULT '0',
   `eqslot_bracelet` int(11) NOT NULL DEFAULT '0',
   `eqslot_weapon` int(11) NOT NULL DEFAULT '0',
   `eqslot_shield` int(11) NOT NULL DEFAULT '0',

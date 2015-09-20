@@ -34,7 +34,7 @@ typedef struct CommanderEquipment {
     uint32_t body_armor;
     uint32_t gloves;
     uint32_t boots;
-    uint32_t itemUnk2;
+    uint32_t helmet;
     uint32_t bracelet;
     uint32_t weapon;
     uint32_t shield;
@@ -126,6 +126,7 @@ typedef struct
 typedef struct
 {
     CommanderInfo info;
+    Inventory inventory;
 
 } Commander;
 #pragma pack(pop)

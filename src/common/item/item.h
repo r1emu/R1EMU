@@ -28,6 +28,23 @@
 #define ITEM_EQUIP_NOATTR_SIZE 24
 
 // ------ Structure declaration -------
+typedef enum {
+    INVENTORY_CAT_WEAPON = 1,
+    INVENTORY_CAT_ARMOR = 2,
+    INVENTORY_CAT_SUBWEAPON = 3,
+    INVENTORY_CAT_COSTUME = 4,
+    INVENTORY_CAT_ACCESSORY = 5,
+    INVENTORY_CAT_CONSUMABLE = 6,
+    INVENTORY_CAT_GEM = 7,
+    INVENTORY_CAT_MATERIAL = 8,
+    INVENTORY_CAT_CARD = 9,
+    INVENTORY_CAT_COLLECTION = 10,
+    INVENTORY_CAT_BOOK = 11,
+    INVENTORY_CAT_QUEST = 12,
+    INVENTORY_CAT_PETWEAPON = 13,
+    INVENTORY_CAT_PETARMOR = 14,
+}   InventoryCategory;
+
 typedef struct ItemAttributes {
 
     zhash_t *hashtable; // TODO
@@ -58,14 +75,14 @@ typedef struct ItemPkt {
     uint32_t id;
 }   ItemPkt;
 
-typedef enum AttributeType {
+typedef enum AttributeFormat {
     FLOAT_ATTRIBUTE,
     STRING_ATTRIBUTE,
-} AttributeType;
+} AttributeFormat;
 
 typedef struct Attribute {
     void *attribute;
-    AttributeType type;
+    AttributeFormat format;
 } Attribute;
 
 typedef struct FloatAttribute {
@@ -90,7 +107,38 @@ typedef struct ItemEquip {
     AttributeArray attributeArray;
 } ItemEquip;
 
+/**
+ * @brief Item contains
+ */
+
+typedef struct Item
+{
+    uint64_t itemId; // Unique ID for an Item - key.
+    InventoryCategory itemCategory;
+    uint32_t itemType; // ID of this item indicating which item is it.
+    uint32_t amount; // amount of this item
+    ItemAttributes *attributes;
+    uint8_t useGender;
+    uint8_t useJob;
+    bool isTwoHanded;
+    uint8_t equipSlot;
+    bool isDummy; // When an item is created for dummy porpuses.
+    uint32_t inventoryIndex;
+} Item;
+
 // ----------- Functions ------------
+
+/**
+ * @brief Creates memory and initializes an ItemAttributes
+ */
+ItemAttributes *itemAttributesNew(
+    float durability,
+    float cooldown,
+    char *memo,
+    char *customName,
+    char *crafterName,
+    float pr,
+    float reinforce_2);
 
 /**
  * @brief Initialize an ItemAttributes
