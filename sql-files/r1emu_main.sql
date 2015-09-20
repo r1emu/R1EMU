@@ -1,83 +1,133 @@
-use r1emu;
-
 --
 -- Database: `r1emu`
 --
 
+DELIMITER $$
+--
+-- Procedimientos
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `bSetFamilyName`(IN `accountId` INT, IN `newName` VARCHAR(64))
+    MODIFIES SQL DATA
+    COMMENT 'set Family Name'
+BEGIN
+	DECLARE current_name varchar(64);
+
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    BEGIN
+          SET @flag = 1;
+          ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    	SELECT family_name INTO current_name 
+        FROM accounts
+        WHERE family_name = newName
+        LIMIT 1;
+        
+        IF current_name <> "" THEN
+        	SET @flag = -1;
+            ROLLBACK;
+        ELSE
+        	UPDATE accounts
+            SET family_name = newName
+            WHERE account_id = accountId;
+        	SET @flag = 0;
+        END IF;
+
+
+    COMMIT;
+
+
+END$$
+
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `barrack`
+-- Estructura de tabla para la tabla `accounts`
 --
 
-CREATE TABLE IF NOT EXISTS `barrack` (
-  `account_id` int(11) NOT NULL DEFAULT '0',
-  `barrack_name` varchar(63) NOT NULL,
-  `type` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`account_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `commander`
---
-
-CREATE TABLE IF NOT EXISTS `commander` (
-  `commander_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `account_id` int(11) unsigned NOT NULL DEFAULT '0',
-  `commander_num` smallint(2) NOT NULL DEFAULT '0',
-  `name` varchar(64) NOT NULL,
+CREATE TABLE IF NOT EXISTS `accounts` (
+  `account_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `account_name` varchar(32) NOT NULL,
+  `passwd` varchar(32) NOT NULL,
+  `is_banned` enum('n','y') NOT NULL DEFAULT 'n',
+  `time_banned` datetime NOT NULL,
+  `credits` float NOT NULL DEFAULT '0',
+  `privilege_level` int(11) NOT NULL DEFAULT '3',
+  `time_last_login` datetime NOT NULL,
   `family_name` varchar(64) NOT NULL,
-  `class` int(11) NOT NULL DEFAULT '0',
-  `gender` tinyint(1) NOT NULL DEFAULT '0',
-  `level` int(11) NOT NULL DEFAULT '1',
-  `head_top` int(11) NOT NULL DEFAULT '0',
-  `head_middle` int(11) NOT NULL DEFAULT '0',
-  `necklace` int(11) NOT NULL DEFAULT '0',
-  `body_armor` int(11) NOT NULL DEFAULT '0',
-  `leg_armor` int(11) NOT NULL DEFAULT '0',
-  `gloves` int(11) NOT NULL DEFAULT '0',
-  `shoes` int(11) NOT NULL DEFAULT '0',
-  `weapon` int(11) NOT NULL DEFAULT '0',
-  `shield` int(11) NOT NULL DEFAULT '0',
-  `costume` int(11) NOT NULL DEFAULT '0',
-  `ring` int(11) NOT NULL DEFAULT '0',
-  `bracelet_left` int(11) NOT NULL DEFAULT '0',
-  `bracelet_right` int(11) NOT NULL DEFAULT '0',
-  `hair_type` int(11) NOT NULL DEFAULT '0',
-  `last_map` int(11) NOT NULL DEFAULT '1032',
-  `last_x` int(11) NOT NULL DEFAULT '0',
-  `last_y` int(11) NOT NULL DEFAULT '0',
-  `last_z` int(11) NOT NULL DEFAULT '0',
-  `current_xp` int(11) NOT NULL DEFAULT '0',
-  `pose` int(11) NOT NULL,
-  `current_hp` int(11) NOT NULL DEFAULT '0',
-  `current_sp` mediumint(5) NOT NULL DEFAULT '0',
-  `str` int(11) NOT NULL DEFAULT '0',
-  `vit` int(11) NOT NULL DEFAULT '0',
-  `int` int(11) NOT NULL DEFAULT '0',
-  `spi` int(11) NOT NULL DEFAULT '0',
-  `agi` int(11) NOT NULL DEFAULT '0',
-  `online` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`commander_id`)
+  `barrack_type` int(11) NOT NULL,
+  PRIMARY KEY (`account_id`),
+  KEY `acc_name-passwd` (`account_name`,`passwd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `login`
+-- Estructura de tabla para la tabla `commanders`
 --
 
-CREATE TABLE IF NOT EXISTS `login` (
-  `account_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `login` varchar(32) NOT NULL,
-  `password` varchar(32) NOT NULL,
-  `email` varchar(39) NOT NULL,
-  `state` int(11) NOT NULL DEFAULT '0',
-  `unban_time` date NOT NULL DEFAULT '0000-00-00',
-  `logincount` int(10) unsigned NOT NULL,
-  `lastlogin` date NOT NULL DEFAULT '0000-00-00',
-  `lastip` varchar(100) NOT NULL,
-  PRIMARY KEY (`account_id`)
+CREATE TABLE IF NOT EXISTS `commanders` (
+  `commander_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `commander_name` varchar(64) NOT NULL,
+  `account_id` int(10) unsigned NOT NULL,
+  `last_login` datetime NOT NULL,
+  `last_logout` datetime NOT NULL,
+  `time_created` datetime NOT NULL,
+  `is_deleted` enum('n','y') NOT NULL DEFAULT 'n',
+  `time_deleted` datetime NOT NULL,
+  `gender` int(11) NOT NULL,
+  `level` int(11) NOT NULL,
+  `exp` int(11) NOT NULL,
+  `job_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `hair_id` int(11) NOT NULL,
+  `map_id` int(11) NOT NULL,
+  `position_x` float NOT NULL,
+  `position_y` float NOT NULL,
+  `position_z` float NOT NULL,
+  `hp` float NOT NULL,
+  `mp` float NOT NULL,
+  `eqslot_head_top` int(11) NOT NULL,
+  `eqslot_head_middle` int(11) NOT NULL DEFAULT '0',
+  `eqslot_unkown_1` int(11) NOT NULL DEFAULT '0',
+  `eqslot_body_armor` int(11) NOT NULL DEFAULT '0',
+  `eqslot_gloves` int(11) NOT NULL DEFAULT '0',
+  `eqslot_boots` int(11) NOT NULL DEFAULT '0',
+  `eqslot_unkown_2` int(11) NOT NULL DEFAULT '0',
+  `eqslot_bracelet` int(11) NOT NULL DEFAULT '0',
+  `eqslot_weapon` int(11) NOT NULL DEFAULT '0',
+  `eqslot_shield` int(11) NOT NULL DEFAULT '0',
+  `eqslot_costume` int(11) NOT NULL DEFAULT '0',
+  `eqslot_unkown_3` int(11) NOT NULL,
+  `eqslot_unkown_4` int(11) NOT NULL DEFAULT '0',
+  `eqslot_unkown_5` int(11) NOT NULL DEFAULT '0',
+  `eqslot_leg_armor` int(11) NOT NULL DEFAULT '0',
+  `eqslot_unkown_6` int(11) NOT NULL DEFAULT '0',
+  `eqslot_unkown_7` int(11) NOT NULL DEFAULT '0',
+  `eqslot_ring_left` int(11) NOT NULL DEFAULT '0',
+  `eqslot_ring_right` int(11) NOT NULL DEFAULT '0',
+  `eqslot_necklace` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`commander_id`),
+  KEY `account_id-is_deleted` (`account_id`,`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `items`
+--
+
+CREATE TABLE IF NOT EXISTS `items` (
+  `item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `commander_id` int(10) unsigned NOT NULL,
+  `item_type` int(10) unsigned NOT NULL,
+  `amount` int(10) unsigned NOT NULL,
+  `position_in_inventory` int(11) NOT NULL,
+  PRIMARY KEY (`item_id`),
+  KEY `item_id-commander_id` (`item_id`,`commander_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+

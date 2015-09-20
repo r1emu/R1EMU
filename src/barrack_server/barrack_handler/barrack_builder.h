@@ -36,6 +36,21 @@ typedef enum PacketTypeBarrackNormal {
 
 } PacketTypeBarrackNormal;
 
+/**
+ * BC_BARRACKNAME_CHANGE result types
+ */
+typedef enum BarrackNameResultType {
+
+    BC_BARRACKNAME_CHANGE_ALREADYEXIST = -1,
+    BC_BARRACKNAME_CHANGE_OK = 0,
+    BC_BARRACKNAME_CHANGE_ERROR = 1,
+
+} BarrackNameResultType;
+
+/**
+ * @brief Send message to client
+ */
+void barrackBuilderMessage(uint8_t msgType, uint8_t *message, zmsg_t *replyMsg);
 
 /**
  * @brief Send back the information of the account after a successful log in
@@ -97,7 +112,7 @@ void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg);
  * @brief Change the name of the barrack
  */
 void
-barrackBuilderBarrackNameChange(uint8_t *barrackName, zmsg_t *replyMsg);
+barrackBuilderBarrackNameChange(BarrackNameResultType resultType, uint8_t *barrackName, zmsg_t *replyMsg);
 
 /**
  * @brief Destroy commanders
@@ -125,3 +140,8 @@ void barrackBuilderIesModifyList(zmsg_t *replyMsg);
  * @brief @unknown ; Makes the character selection appear directly without asking for the family name
  */
 void barrackBuilderNormalUnk1(uint64_t accountId, zmsg_t *replyMsg);
+
+/**
+ * @brief Logout
+ */
+void barrackBuilderLogoutOk(zmsg_t *replyMsg);

@@ -17,6 +17,31 @@
 #include "common/packet/packet_stream.h"
 #include "common/packet/packet_type.h"
 
+void barrackBuilderMessage(uint8_t msgType, uint8_t *message, zmsg_t *replyMsg) {
+
+    // Length of Message
+    int messageLength = strlen(message);
+
+    #pragma pack(push, 1)
+    struct {
+        VariableSizePacketHeader variableSizeHeader;
+        uint8_t msgType;
+        uint8_t unk[40];
+        uint8_t message[messageLength+1];
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = BC_MESSAGE;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
+        replyPacket.msgType = msgType;
+        strncpy(replyPacket.message, message, sizeof(replyPacket.message));
+    }
+}
+
 void barrackBuilderLoginOk(
     uint64_t accountId,
     uint8_t *accountLogin,
@@ -333,11 +358,12 @@ void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg) {
     zmsg_add(replyMsg, zframe_new (&compressedPacket, outPacketSize));
 }
 
-void barrackBuilderBarrackNameChange(uint8_t *barrackName, zmsg_t *replyMsg) {
+void barrackBuilderBarrackNameChange(BarrackNameResultType resultType, uint8_t *barrackName, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint8_t unk1[5];
+        uint8_t changed;
+        uint32_t resultType;
         uint8_t barrackName[64];
     } replyPacket;
     #pragma pack(pop)
@@ -348,7 +374,8 @@ void barrackBuilderBarrackNameChange(uint8_t *barrackName, zmsg_t *replyMsg) {
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
-        memcpy(replyPacket.unk1, "\x01\x01\x01\x01\x01", sizeof(replyPacket.unk1));
+        replyPacket.changed = (resultType == BC_BARRACKNAME_CHANGE_OK);
+        replyPacket.resultType = resultType;
         strncpy(replyPacket.barrackName, barrackName, sizeof(replyPacket.barrackName));
     }
 }
@@ -390,5 +417,21 @@ void barrackBuilderCommanderCreate(CommanderCreateInfo *commanderCreate, zmsg_t 
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
         memcpy(&replyPacket.commanderCreate, commanderCreate, sizeof(replyPacket.commanderCreate));
+    }
+}
+
+void barrackBuilderLogoutOk(zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = BC_LOGOUTOK;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
     }
 }
