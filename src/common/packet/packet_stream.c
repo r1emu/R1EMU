@@ -24,7 +24,7 @@
 
 // ------ Extern function implementation ------
 
-PacketStream *packetStreamNew(uint8_t *buffer) {
+PacketStream *packetStreamNew(void *buffer) {
     PacketStream *self;
 
     if ((self = calloc(1, sizeof(PacketStream))) == NULL) {
@@ -41,7 +41,7 @@ PacketStream *packetStreamNew(uint8_t *buffer) {
 }
 
 bool
-packetStreamInit(PacketStream *self, uint8_t *buffer) {
+packetStreamInit(PacketStream *self, void *buffer) {
     self->buffer = buffer;
     self->position = 0;
     return true;
@@ -51,6 +51,10 @@ void
 packetStreamAppend(PacketStream *self, void *data, size_t dataSize) {
     memcpy(&self->buffer[self->position], data, dataSize);
     self->position += dataSize;
+}
+
+void *packetStreamGetCurrentBuffer(PacketStream *self) {
+    return &self->buffer[self->position];
 }
 
 void
