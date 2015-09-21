@@ -14,7 +14,7 @@
 #include "mysql_commander.h"
 #include "common/commander/commander.h"
 
-bool mySqlGetCommandersByAccountId(MySQL *self, uint64_t accountId, Commander *commanders) {
+bool mySqlGetCommanders(MySQL *self, Commander *commanders) {
 
     MYSQL_ROW row;
 
@@ -69,7 +69,7 @@ bool mySqlRequestCommandersByAccountId(MySQL *self, uint64_t accountId, size_t *
 
     // check if current commander exists
     if (mySqlQuery(self, "SELECT "
-        " " MYSQL_COMMANDER_FIELD_commander_id_str
+        " "  MYSQL_COMMANDER_FIELD_commander_id_str
         ", " MYSQL_COMMANDER_FIELD_commanderName_str
         ", " MYSQL_COMMANDER_FIELD_time_deleted_str
         ", " MYSQL_COMMANDER_FIELD_level_str
@@ -113,12 +113,6 @@ bool mySqlRequestCommandersByAccountId(MySQL *self, uint64_t accountId, size_t *
         goto cleanup;
     }
 
-    // check count of commanders retrieved
-    if ((commandersCount = mysql_num_rows(self->result)) == 0) {
-        error("No commanders for this accountId '%llx'", accountId);
-        goto cleanup;
-    }
-
     *_commandersCount = commandersCount;
     status = true;
 
@@ -126,8 +120,9 @@ cleanup:
     return status;
 }
 
-bool mySqlCommanderCreate(MySQL *self, uint64_t accountId, CommanderCreateInfo *commanderCreate) {
+bool mySqlCommanderInsert(MySQL *self, uint64_t accountId, CommanderCreateInfo *commanderCreate) {
 
+    bool status = false;
     CommanderAppearance *commander = &commanderCreate->appearance;
 
     // Insert a new commander
@@ -203,10 +198,14 @@ bool mySqlCommanderCreate(MySQL *self, uint64_t accountId, CommanderCreateInfo *
        commander->equipment.necklace))
     {
         error("SQL Error : %s" , mysql_error(self->handle));
-        return false;
+        goto cleanup;
     }
 
     // TODO : check last insert id
 
-    return true;
+
+    status = true;
+
+cleanup:
+    return status;
 }

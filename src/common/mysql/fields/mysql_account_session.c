@@ -25,16 +25,16 @@ bool mySqlGetAccountData(MySQL *self, char *accountName, unsigned char *password
     // flush the commander
     if (mySqlQuery(self,
         "SELECT "
-            "account_id, "
-            "is_banned, "
-            "Unix_Timestamp(time_banned), "
-            "credits, "
-            "privilege_level, "
-            "family_name, "
-            "barrack_type "
+            MYSQL_ACCOUNT_SESSION_FIELD_account_id_str ", "
+            MYSQL_ACCOUNT_SESSION_FIELD_is_banned_str ", "
+            "Unix_Timestamp(" MYSQL_ACCOUNT_SESSION_FIELD_time_banned_str "), "
+            MYSQL_ACCOUNT_SESSION_FIELD_credits_str ", "
+            MYSQL_ACCOUNT_SESSION_FIELD_privilege_level_str ", "
+            MYSQL_ACCOUNT_SESSION_FIELD_family_name_str ", "
+            MYSQL_ACCOUNT_SESSION_FIELD_barrack_type_str " "
         "FROM accounts "
-        "WHERE account_name = '%s' "
-        "AND passwd = '%s' "
+        "WHERE " MYSQL_ACCOUNT_SESSION_FIELD_account_name_str " = '%s' "
+        "AND " MYSQL_ACCOUNT_SESSION_FIELD_passwd_str " = '%s' "
         "LIMIT 1",
         accountName, md5Password))
     {
@@ -58,8 +58,6 @@ bool mySqlGetAccountData(MySQL *self, char *accountName, unsigned char *password
     accountSession->privilege = strtol(row[4], NULL, 10);
     strncpy(accountSession->familyName, row[5], sizeof(accountSession->familyName));
     accountSession->barrackType = strtol(row[6], NULL, 10);
-
-    dbg("MySQL: Account found and loaded.");
 
     status = true;
 

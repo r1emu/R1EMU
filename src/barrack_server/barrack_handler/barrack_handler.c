@@ -345,7 +345,7 @@ barrackHandlerStartBarrack(
 
     {
         Commander commanders[commandersCount];
-        if (!(mySqlGetCommandersByAccountId(self->sqlConn, session->socket.accountId, commanders))) {
+        if (!(mySqlGetCommanders(self->sqlConn, commanders))) {
             error("Cannot get commanders by accountId = %llx", session->socket.accountId);
             goto cleanup;
         }
