@@ -35,7 +35,7 @@ typedef struct PacketStream PacketStream;
  * @param buffer An allocated buffer for the stream. It must be big enough for the stream or it will overflow.
  * @return A pointer to an allocated PacketStream.
  */
-PacketStream *packetStreamNew(uint8_t *buffer);
+PacketStream *packetStreamNew(void *buffer);
 
 /**
  * @brief Initialize an allocated PacketStream structure.
@@ -43,7 +43,7 @@ PacketStream *packetStreamNew(uint8_t *buffer);
  * @param buffer An allocated buffer for the stream. It must be big enough for the stream or it will overflow.
  * @return true on success, false otherwise.
  */
-bool packetStreamInit(PacketStream *self, uint8_t *buffer);
+bool packetStreamInit(PacketStream *self, void *buffer);
 
 /**
  * @brief Move the position depending of the offset argument (position = position + offet)
@@ -51,6 +51,12 @@ bool packetStreamInit(PacketStream *self, uint8_t *buffer);
  * @param offset An offset
  */
 void packetStreamAddOffset(PacketStream *self, unsigned int offset);
+
+/**
+ * @brief Get the stream at the current position
+ * @param self An allocated PacketStream
+ */
+void *packetStreamGetCurrentBuffer(PacketStream *self);
 
 /**
  * @brief
@@ -67,3 +73,18 @@ void packetStreamAppend(PacketStream *self, void *data, size_t dataSize);
  * @param self A pointer to an allocated PacketStream.
  */
 void packetStreamDestroy(PacketStream **self);
+
+/**
+ * @brief Get a position of an allocated PacketStream
+ * @param self An allocated PacketStream
+ * @return a position
+ */
+unsigned int packetStreamGetOffset(PacketStream *self);
+
+
+/**
+ * @brief Set the stream position to a given position
+ * @param self An allocated PacketStream
+ * @param position a given position
+ */
+void packetStreamSetOffset(PacketStream *self, unsigned int position);

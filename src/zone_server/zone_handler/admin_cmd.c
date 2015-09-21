@@ -13,6 +13,8 @@
 
 #include "admin_cmd.h"
 #include "common/commander/commander.h"
+#include "common/commander/inventory.h"
+#include "common/item/item.h"
 #include "common/redis/fields/redis_game_session.h"
 #include "common/redis/fields/redis_socket_session.h"
 #include "common/session/session.h"
@@ -64,18 +66,18 @@ void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *repl
 void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
 
     // add a fake commander with a fake account
-    CommanderInfo fakePc;
-    commanderInfoInit(&fakePc);
+    Commander fakePc;
+    commanderInit(&fakePc);
 
-    fakePc.pos = session->game.commanderSession.currentCommander.info.pos;
-    fakePc.appearance.accountId = r1emuGenerateRandom64(&self->seed);
-    fakePc.socialInfoId = r1emuGenerateRandom64(&self->seed);
-    fakePc.pcId = r1emuGenerateRandom(&self->seed);
-    fakePc.commanderId = r1emuGenerateRandom64(&self->seed);
-    snprintf(fakePc.appearance.familyName, sizeof(fakePc.appearance.familyName),
-        "PcID_%x", fakePc.pcId);
-    snprintf(fakePc.appearance.commanderName, sizeof(fakePc.appearance.commanderName),
-        "AccountID_%llx", fakePc.appearance.accountId);
+    fakePc.info.pos = session->game.commanderSession.currentCommander.info.pos;
+    fakePc.info.appearance.accountId = r1emuGenerateRandom64(&self->seed);
+    fakePc.info.socialInfoId = r1emuGenerateRandom64(&self->seed);
+    fakePc.info.pcId = r1emuGenerateRandom(&self->seed);
+    fakePc.info.commanderId = r1emuGenerateRandom64(&self->seed);
+    snprintf(fakePc.info.appearance.familyName, sizeof(fakePc.info.appearance.familyName),
+        "PcID_%x", fakePc.info.pcId);
+    snprintf(fakePc.info.appearance.commanderName, sizeof(fakePc.info.appearance.commanderName),
+        "AccountID_%llx", fakePc.info.appearance.accountId);
 
     // register the fake socket session
     SocketSession fakeSocketSession;
@@ -84,7 +86,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
     socketSessionGenSessionKey((uint8_t *)&sessionKey, sessionKeyStr);
     sprintf(sessionKeyStr, "%.08x", sessionKey);
-    socketSessionInit(&fakeSocketSession, fakePc.appearance.accountId, self->info.routerId, session->socket.mapId,
+    socketSessionInit(&fakeSocketSession, fakePc.info.appearance.accountId, self->info.routerId, session->socket.mapId,
         sessionKeyStr, true);
 
     RedisSocketSessionKey socketKey = {
@@ -107,12 +109,12 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
     redisUpdateGameSession(self->redis, &gameKey, sessionKeyStr, &fakeGameSession);
     info("Fake PC spawned.(SocketID=%s, SocialID=%I64x, AccID=%I64x, PcID=%x, CommID=%I64x)",
-         sessionKeyStr, fakePc.socialInfoId, fakePc.appearance.accountId, fakePc.pcId, fakePc.commanderId);
+         sessionKeyStr, fakePc.info.socialInfoId, fakePc.info.appearance.accountId, fakePc.info.pcId, fakePc.info.commanderId);
 
     GameEventEnterPc event = {
         .updatePosEvent = {
             .mapId = fakeSocketSession.mapId,
-            .info = fakePc
+            .info = fakePc.info
         }
     };
 
@@ -121,19 +123,26 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
 
-    uint32_t itemId = strtol(args, &args, 10);
+    uint32_t itemType = strtol(args, &args, 10);
     args++;
     uint32_t amount = strtol(args, &args, 10);
 
     uint32_t itemPosition = 1;
 
-    ItemPkt item = {
-        .uniqueId = r1emuGenerateRandom64(&self->seed),
-        .amount = (!amount) ? 1 : amount,
-        .inventoryIndex = INVENTORY_CAT_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition,
-        .id = itemId
-    };
-    zoneBuilderItemAdd(&item, INVENTORY_ADD_PICKUP, replyMsg);
+    Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+
+    Item newItem;
+    newItem.itemId = r1emuGenerateRandom64(&self->seed);
+    newItem.itemType = itemType;
+    newItem.amount =  (!amount) ? 1 : amount;
+    newItem.equipSlot = EQSLOT_BODY_ARMOR;
+    newItem.attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    newItem.inventoryIndex = INVENTORY_CAT_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition;
+    inventoryAddItem(inventory, &newItem);
+
+
+
+    zoneBuilderItemAdd(&newItem, INVENTORY_ADD_PICKUP, replyMsg);
 }
 
 void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
