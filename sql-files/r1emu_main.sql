@@ -1,3 +1,5 @@
+use r1emu;
+
 --
 -- Database: `r1emu`
 --
