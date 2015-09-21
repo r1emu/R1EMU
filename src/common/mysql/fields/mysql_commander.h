@@ -40,7 +40,7 @@
 #define MYSQL_COMMANDER_FIELD_eqslot_body_armor_str "eqslot_body_armor"
 #define MYSQL_COMMANDER_FIELD_eqslot_gloves_str "eqslot_gloves"
 #define MYSQL_COMMANDER_FIELD_eqslot_boots_str "eqslot_boots"
-#define MYSQL_COMMANDER_FIELD_eqslot_helmet_str "eqslot_helmet_2"
+#define MYSQL_COMMANDER_FIELD_eqslot_helmet_str "eqslot_helmet"
 #define MYSQL_COMMANDER_FIELD_eqslot_bracelet_str "eqslot_bracelet"
 #define MYSQL_COMMANDER_FIELD_eqslot_weapon_str "eqslot_weapon"
 #define MYSQL_COMMANDER_FIELD_eqslot_shield_str "eqslot_shield"

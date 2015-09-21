@@ -128,6 +128,15 @@ typedef struct Item
 
 // ----------- Functions ------------
 
+ItemAttributes *itemAttributesNew(
+    float durability,
+    float cooldown,
+    char *memo,
+    char *customName,
+    char *crafterName,
+    float pr,
+    float reinforce_2);
+
 /**
  * @brief Initialize an ItemAttributes
  */

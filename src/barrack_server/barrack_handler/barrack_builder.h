@@ -101,7 +101,7 @@ void barrackBuilderServerEntry(
 /**
  * @brief Build the list of commanders in the barrack
  */
-void barrackBuilderCommanderList(uint64_t accountId, zmsg_t *replyMsg);
+void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, int commandersCount, Commander *commanders ,zmsg_t *replyMsg);
 
 /**
  * @brief Build the list of zone servers

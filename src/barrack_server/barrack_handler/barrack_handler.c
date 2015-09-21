@@ -23,6 +23,7 @@
 #include "common/redis/fields/redis_game_session.h"
 #include "common/redis/fields/redis_socket_session.h"
 #include "common/mysql/fields/mysql_account_session.h"
+#include "common/mysql/fields/mysql_commander.h"
 
 /** Read the passport and accepts or refuse the authentification */
 static PacketHandlerState barrackHandlerLoginByPassport  (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
@@ -332,22 +333,43 @@ barrackHandlerStartBarrack(
     );
     */
 
-    // Connect to S Server at localhost:1337 and localhost:1338
-    barrackBuilderServerEntry(
-        *(uint32_t *)((char[]) {127, 0, 0, 1}),
-        *(uint32_t *)((char[]) {127, 0, 0, 1}),
-        1337,
-        1338,
-        reply
-    );
+    // Get list of Commanders for this AccountId
+
+    Commander *commanders;
+    CommanderInfo *commandersInfo;
+
+    dbg("accountId: %11x", session->socket.accountId);
+
+    int commandersCount = mySqlGetCommandersByAccountId(self->sqlConn, session->socket.accountId, &commandersInfo);
+
+    session->game.accountSession.charactersCreatedCount = commandersCount;
+
+    if (commandersCount == -1) {
+        // Error
+        /// TODO
+        return PACKET_HANDLER_ERROR;
+    } else {
+        if ((commanders = malloc(sizeof(Commander) * commandersCount)) == NULL) {
+            return PACKET_HANDLER_ERROR;
+        }
+        // Iterate and populate commanders;
+        for (int i = 0; i < commandersCount; i++) {
+            commanders[i].info = commandersInfo[i];
+        }
+    }
+
+
 
     // Send the commander list
     barrackBuilderCommanderList(
         session->socket.accountId,
+        &session->game,
+        commandersCount,
+        commanders,
         reply
     );
 
-    return PACKET_HANDLER_OK;
+    return PACKET_HANDLER_UPDATE_SESSION;
 }
 
 static PacketHandlerState barrackHandlerCurrentBarrack(
