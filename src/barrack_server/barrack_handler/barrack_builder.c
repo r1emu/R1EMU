@@ -235,9 +235,13 @@ void barrackBuilderServerEntry(
     }
 }
 
-void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, int commandersCount, Commander *commanders ,zmsg_t *replyMsg) {
-
-
+void barrackBuilderCommanderList(
+    uint64_t accountId,
+    GameSession *gameSession,
+    Commander *commanders,
+    int commandersCount,
+    zmsg_t *replyMsg)
+{
     size_t commandersSize = 0;
     char *commandersPacket;
     char *tempCommandersPacket;
@@ -250,12 +254,11 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
     // Commanders list
     for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
 
-        Commander commanderData = commanders[commanderIndex];
-        CommanderAppearance *commanderAppearance = &commanderData.info.appearance;
-
-        CommanderEquipment *dataEquipment = &commanderAppearance->equipment;
-
-        Inventory *inventory = &commanderData.inventory;
+        Commander *curCommander = &commanders[commanderIndex];
+        CommanderInfo *cInfo = &curCommander->info;
+        CommanderAppearance *appearance = &cInfo->appearance;
+        CommanderEquipment *dataEquipment = &appearance->equipment;
+        Inventory *inventory = &curCommander->inventory;
 
         ///TODO
         inventoryInit(inventory); /// TESTING PURPOSES, INVENTORY SHOULD BE INITIALIZED IN OTHER PLACE.
@@ -280,7 +283,7 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
         for (int i = 0; i < EQSLOT_Count; i++) {
 
             // Get item from inventory.
-            Item* item = inventory->equippedItems[i];
+            Item *item = inventory->equippedItems[i];
 
             if (item != NULL) {
                 // Get attributes packet for this item
@@ -353,16 +356,16 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
 
 
         // Set commanders Info
-        strncpy(currentCommander->commanderName, commanderAppearance->commanderName, sizeof(currentCommander->commanderName));
+        strncpy(currentCommander->commanderName, appearance->commanderName, sizeof(currentCommander->commanderName));
 
         //
         currentCommander->accountId = 0x0; // Not needed
-        currentCommander->classId = commanderAppearance->classId;
+        currentCommander->classId = appearance->classId;
         currentCommander->unk4 = 0x0;
-        currentCommander->jobId = commanderAppearance->jobId;
-        currentCommander->level = commanderAppearance->level;
-        currentCommander->gender = commanderAppearance->gender;
-        currentCommander->hairId = commanderAppearance->hairId;
+        currentCommander->jobId = appearance->jobId;
+        currentCommander->level = appearance->level;
+        currentCommander->gender = appearance->gender;
+        currentCommander->hairId = appearance->hairId;
 
         // Equipment
         cEquipment->head_top = dataEquipment->head_top;
@@ -386,12 +389,12 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
         cEquipment->ring_right = dataEquipment->ring_right;
         cEquipment->necklace = dataEquipment->necklace;
 
-        currentCommanderBarrackInfo.socialInfoId = commanderData.info.socialInfoId; // CharUniqueId?
+        currentCommanderBarrackInfo.socialInfoId = cInfo->socialInfoId; // CharUniqueId?
         currentCommanderBarrackInfo.commanderPosition = commanderIndex+1;
-        currentCommanderBarrackInfo.mapId = 1002; /// TODO FIX Not MapId in currecnt structure!
+        currentCommanderBarrackInfo.mapId = 1002; /// FIXME : No MapId in the current structure!
         currentCommanderBarrackInfo.unk4 = SWAP_UINT32(0x02000000); //
         currentCommanderBarrackInfo.unk5 = 0;
-        currentCommanderBarrackInfo.maxXP = commanderData.info.maxXP; // ?? Or current XP?
+        currentCommanderBarrackInfo.maxXP = cInfo->maxXP;
         currentCommanderBarrackInfo.unk6 = SWAP_UINT32(0xC01C761C); //
 
         currentCommanderBarrackInfo.pos.x = SWAP_UINT32(0x25e852c1);

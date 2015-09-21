@@ -55,11 +55,11 @@ bool mySqlGetAccountData(MySQL *self, char *accountName, unsigned char *password
 BarrackNameResultType mySqlSetFamilyName(MySQL *self, AccountSession *accountSession, char *familyName) {
     MYSQL_ROW row;
 
-    dbg("accountId: %11x", accountSession->accountId);
+    dbg("accountId: %llx", accountSession->accountId);
     dbg("newName: %s", familyName);
 
     // Perform query to change name
-    if (mySqlQuery(self, "CALL bSetFamilyName(%11x, '%s');", accountSession->accountId, familyName)) {
+    if (mySqlQuery(self, "CALL bSetFamilyName(%llx, '%s');", accountSession->accountId, familyName)) {
         error("SQL Error : %s" , mysql_error(self->handle));
         return BC_BARRACKNAME_CHANGE_ERROR;
     }
