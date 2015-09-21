@@ -46,16 +46,7 @@ typedef enum {
 }   InventoryCategory;
 
 typedef struct ItemAttributes {
-
-    zhash_t *hashtable; // TODO
-
-    float durability;
-    float cooldown;
-    char *memo;
-    char *customName;
-    char *crafterName;
-    float pr; // dont know what it means yet
-    float reinforce_2; // I believe it is +1, +2, +3
+    zhash_t *hashtable;
 } ItemAttributes;
 
 typedef enum ItemAttributeType {
@@ -128,39 +119,17 @@ typedef struct Item
 
 // ----------- Functions ------------
 
-ItemAttributes *itemAttributesNew(
-    float durability,
-    float cooldown,
-    char *memo,
-    char *customName,
-    char *crafterName,
-    float pr,
-    float reinforce_2);
+ItemAttributes *itemAttributesNew(void);
 
 /**
  * @brief Creates memory and initializes an ItemAttributes
  */
-ItemAttributes *itemAttributesNew(
-    float durability,
-    float cooldown,
-    char *memo,
-    char *customName,
-    char *crafterName,
-    float pr,
-    float reinforce_2);
+ItemAttributes *itemAttributesNew(void);
 
 /**
  * @brief Initialize an ItemAttributes
  */
-bool itemAttributesInit(
-    ItemAttributes *self,
-    float durability,
-    float cooldown,
-    char *memo,
-    char *customName,
-    char *crafterName,
-    float pr,
-    float reinforce_2);
+bool itemAttributesInit(ItemAttributes *self);
 
 /**
  * @brief Equip an item in the inventory

@@ -28,63 +28,43 @@ static size_t stringAttributeGetSize(StringAttribute *attribute);
 static bool stringAttributeGetPacket(StringAttribute *attribute, char *packetBytes);
 static size_t itemAttributesGetNum(ItemAttributes *itemAttributes);
 
-struct AttributeFormatsEntry {
-    char *key;
-    AttributeFormat format;
-} attributeFormatsEntries [] = {
-    [ITEM_ATTRIBUTE_DURABILITY]   = {.key = "durability",   .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_PR]           = {.key = "pr",           .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_COOLDOWN]     = {.key = "cooldown",     .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_REINFORCE_2]  = {.key = "reinforce_2",  .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_MEMO]         = {.key = "memo",         .format = STRING_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_CUSTOM_NAME]  = {.key = "custom_name", . format = STRING_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_CRAFTER_NAME] = {.key = "crafter_name", .format = STRING_ATTRIBUTE}
+char *attributeKeys [] = {
+    [ITEM_ATTRIBUTE_DURABILITY]   = "durability",
+    [ITEM_ATTRIBUTE_PR]           = "pr",
+    [ITEM_ATTRIBUTE_COOLDOWN]     = "cooldown",
+    [ITEM_ATTRIBUTE_REINFORCE_2]  = "reinforce_2",
+    [ITEM_ATTRIBUTE_MEMO]         = "memo",
+    [ITEM_ATTRIBUTE_CUSTOM_NAME]  = "custom_name",
+    [ITEM_ATTRIBUTE_CRAFTER_NAME] = "crafter_name"
 };
 
-bool itemAttributesGetAttribute(ItemAttributes *self, ItemAttributeType itemAttrType, void *_output) {
+bool itemAttributesGetAttribute(ItemAttributes *self, ItemAttributeType itemAttrType, void **_output) {
 
-    struct AttributeFormatsEntry formatEntry = attributeFormatsEntries[itemAttrType];
+    bool status = false;
+    char *attributeKey = NULL;
 
-    switch (formatEntry.format)
-    {
-        case FLOAT_ATTRIBUTE: {
-            float *output = _output;
-            Attribute *attr = zhash_lookup(self->hashtable, formatEntry.key);
-            FloatAttribute *fAttr = attr->attribute;
-            *output = fAttr->value;
-            break;
-        }
-
-        case STRING_ATTRIBUTE: {
-            char **output = _output;
-            Attribute *attr = zhash_lookup(self->hashtable, formatEntry.key);
-            StringAttribute *sAttr = attr->attribute;
-            *output = sAttr->value;
-            break;
-        }
-
-        default: error("Unknown attribute format."); break;
+    if (!(attributeKey = attributeKeys[itemAttrType])) {
+        error("No attribute key for '%d'", itemAttrType);
+        goto cleanup;
     }
 
-    return true;
+    void *value = zhash_lookup(self->hashtable, attributeKey);
+    *_output = value;
+
+    status = true;
+
+cleanup:
+    return status;
 }
 
-ItemAttributes *itemAttributesNew(
-    float durability,
-    float cooldown,
-    char *memo,
-    char *customName,
-    char *crafterName,
-    float pr,
-    float reinforce_2)
-{
+ItemAttributes *itemAttributesNew(void) {
     ItemAttributes *self;
 
     if ((self = malloc(sizeof(ItemAttributes))) == NULL) {
         return NULL;
     }
 
-    if (!itemAttributesInit(self, durability, cooldown, memo, customName, crafterName, pr, reinforce_2)) {
+    if (!itemAttributesInit(self)) {
         itemAttributesDestroy(&self);
         error("ItemAttributes failed to initialize.");
         return NULL;
@@ -93,23 +73,12 @@ ItemAttributes *itemAttributesNew(
     return self;
 }
 
-bool itemAttributesInit(
-    ItemAttributes *self,
-    float durability,
-    float cooldown,
-    char *memo,
-    char *customName,
-    char *crafterName,
-    float pr,
-    float reinforce_2)
-{
-    self->durability = durability;
-    self->cooldown = cooldown;
-    self->memo = memo;
-    self->customName = customName;
-    self->crafterName = crafterName;
-    self->pr = pr;
-    self->reinforce_2 = reinforce_2;
+bool itemAttributesInit(ItemAttributes *self) {
+
+    if (!(self->hashtable = zhash_new())) {
+        error("Cannot allocate a new hashtable.");
+        return false;
+    }
 
     return true;
 }
@@ -279,45 +248,15 @@ size_t itemEquipGetPacketSize(ItemEquip *itemEquip) {
 }
 
 size_t itemAttributesGetNum(ItemAttributes *itemAttributes) {
-    size_t total = 0;
-
-    if (itemAttributes->durability) {
-        total++;
-    }
-
-    if (true) { // Cooldown is always present
-        total++;
-    }
-
-    if (itemAttributes->memo) {
-        total++;
-    }
-
-    if (itemAttributes->customName) {
-        total++;
-    }
-
-    if (itemAttributes->crafterName) {
-        total++;
-    }
-
-    if (itemAttributes->pr) {
-        total++;
-    }
-
-    if (itemAttributes->reinforce_2) {
-        total++;
-    }
-
-    return total;
+    return zhash_size(itemAttributes->hashtable);
 }
 
 bool itemAttributesGetPacket(ItemAttributes *itemAttributes, char *packet) {
 
     bool status = false;
 
+    /*
     int numAttributes = itemAttributesGetNum(itemAttributes);
-
     Attribute attributes[numAttributes];
     AttributeArray attributeArray;
     attributeArrayInit(&attributeArray, attributes, numAttributes);
@@ -442,10 +381,11 @@ bool itemAttributesGetPacket(ItemAttributes *itemAttributes, char *packet) {
         error("Cannot get attribute list packet.");
         goto cleanup;
     }
+    */
 
     status = true;
 
-cleanup:
+//cleanup:
     return status;
 }
 
@@ -453,6 +393,7 @@ size_t itemAttributesGetPacketSize(ItemAttributes *itemAttributes) {
 
     size_t total = 0;
 
+    /*
     if (itemAttributes->durability) {
         total += FLOAT_ATTRIBUTE_SIZE;
     }
@@ -480,6 +421,7 @@ size_t itemAttributesGetPacketSize(ItemAttributes *itemAttributes) {
     if (itemAttributes->reinforce_2) {
         total += FLOAT_ATTRIBUTE_SIZE;
     }
+    */
 
     return total;
 }
