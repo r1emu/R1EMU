@@ -49,7 +49,7 @@
 #define REDIS_GAME_SESSION_equipment_body_armor_str      "equipment_body_armor"
 #define REDIS_GAME_SESSION_equipment_gloves_str          "equipment_gloves"
 #define REDIS_GAME_SESSION_equipment_boots_str           "equipment_boots"
-#define REDIS_GAME_SESSION_equipment_helmet_str          "equipment_ihelmet"
+#define REDIS_GAME_SESSION_equipment_helmet_str          "equipment_helmet"
 #define REDIS_GAME_SESSION_equipment_bracelet_str        "equipment_bracelet"
 #define REDIS_GAME_SESSION_equipment_weapon_str          "equipment_weapon"
 #define REDIS_GAME_SESSION_equipment_shield_str          "equipment_shield"
