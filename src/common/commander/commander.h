@@ -216,6 +216,7 @@ typedef enum CommanderHair
  */
 void commanderInfoInit(CommanderInfo *commander);
 void commanderApparenceInit(CommanderAppearance *appearance);
+void commanderInit(Commander *commander);
 
 /**
  * @brief Dump a CommanderInfo in the console

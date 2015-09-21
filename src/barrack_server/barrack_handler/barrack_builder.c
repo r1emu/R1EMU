@@ -236,29 +236,16 @@ void barrackBuilderServerEntry(
 }
 
 void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, int commandersCount, Commander *commanders ,zmsg_t *replyMsg) {
+    // Keep sizes in memory
+    size_t commanderBarrackInfoPacketSize = 0;
+    size_t attributesSizeAllCommanders[commandersCount];
+    size_t attributeSizeAllCommanders[commandersCount][EQSLOT_Count];
 
-
-    size_t commandersSize = 0;
-    char *commandersPacket;
-    char *tempCommandersPacket;
-    char *emptyCommanderBuffer;
-
-    // Alloc memory for initial commandersPacket pointer
-    if ((commandersPacket = malloc(sizeof(commandersPacket))) == NULL) {
-        return;
-    }
-    // Commanders list
     for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
 
-        Commander commanderData = commanders[commanderIndex];
-        CommanderAppearance *commanderAppearance = &commanderData.info.appearance;
-
-        CommanderEquipment *dataEquipment = &commanderAppearance->equipment;
-
-        Inventory *inventory = &commanderData.inventory;
-
-        ///TODO
-        inventoryInit(inventory); /// TESTING PURPOSES, INVENTORY SHOULD BE INITIALIZED IN OTHER PLACE.
+        // iterate through all commander
+        Commander *curCommander = &commanders[commanderIndex];
+        Inventory *inventory = &curCommander->inventory;
 
         // TESTIG PURPOSES, DELETE LATER
         /*
@@ -272,42 +259,32 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
         inventoryEquipItem(inventory, newItem.itemId, EQSLOT_BODY_ARMOR);
         */
 
-        size_t attributeSizes[EQSLOT_Count]; // Size of each item attributes
-        char *attributes[EQSLOT_Count]; // each item attributes
-        size_t equipmentAttrSize = 0; // size of all item attributes + item attribute size headers
+        // get attributes size
+        size_t attributesSize = 0;
+        for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_Count; eqSlotIndex++) {
 
-        // Iterate through equipment
-        for (int i = 0; i < EQSLOT_Count; i++) {
+            Item *item = inventory->equippedItems[eqSlotIndex];
 
-            // Get item from inventory.
-            Item* item = inventory->equippedItems[i];
+            // get attribute size
+            size_t attrSize = item ? itemAttributesGetPacketSize(item->attributes) : 0;
 
-            if (item != NULL) {
-                // Get attributes packet for this item
+            // get total structure size
+            #pragma pack(push, 1)
+            typedef struct {
+                uint16_t attrSize;
+                uint8_t attrBuffer[attrSize];
+            } AttributePacket;
+            #pragma pack(pop)
 
-                // Attributes size
-                attributeSizes[i] = itemAttributesGetPacketSize(item->attributes);
-
-                // Attributes packet
-                char packet[attributeSizes[i]];
-                itemAttributesGetPacket(item->attributes, packet);
-                attributes[i] = packet;
-
-            } else {
-                // No item in this slot.
-                attributeSizes[i] = 0;
-            }
-
-            // Keep track of size of all attributes, add space for "length" of each packet.
-            equipmentAttrSize += sizeof(uint16_t) + attributeSizes[i];
+            attributesSize += sizeof(AttributePacket);
+            attributeSizeAllCommanders[commanderIndex][eqSlotIndex] = attrSize;
         }
 
-        /**
-         * Structure of variables needed for BC_COMMANDER_CREATE
-         * 314 bytes + attributes (variable length)
-         */
+        attributesSizeAllCommanders[commanderIndex] = attributesSize;
+
+        // get CommanderBarrackInfoPacket size
         #pragma pack(push, 1)
-        typedef struct CommanderBarrackInfo2 {
+        typedef struct {
             CommanderAppearance commander;
             uint64_t socialInfoId;
             uint16_t commanderPosition;
@@ -321,175 +298,53 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
             PositionXYZ pos2;
             PositionXZ dir2;
             uint32_t unk8;
-            char equipmentAttributes[equipmentAttrSize];
+            uint8_t attributesPacket[attributesSize];
             uint16_t unk9;
-        } CommanderBarrackInfo2;
+        } CommanderBarrackInfoPacket;
         #pragma pack(pop)
 
-        // IS ALLOC'ING HERE.. REALLY NEEDED? Or CommanderBarrackInfo2 can be used to memcpy into Packet structure?
-        // realloc memory to add space for this commander
-        tempCommandersPacket = realloc(commandersPacket, commandersSize + sizeof(CommanderBarrackInfo2));
-        if (tempCommandersPacket != NULL) {
-            commandersPacket = tempCommandersPacket;
-        } else {
-            return; /// TODO, how to handle errors in this part of the code?
-        }
-
-        // Get a pointer to the empty space in memry to copy the new commander
-        emptyCommanderBuffer = commandersPacket+commandersSize;
-
-        // Update commandersSize size, with the total size.
-        commandersSize = commandersSize + sizeof(CommanderBarrackInfo2);
-
-        // Creates a new structure to hold new commanders data
-        CommanderBarrackInfo2 currentCommanderBarrackInfo;
-
-        // Set strcture to 00
-        memset(&currentCommanderBarrackInfo, 0, sizeof(currentCommanderBarrackInfo));
-
-        // Set some pointers to make code easier to read.
-        CommanderAppearance *currentCommander = &currentCommanderBarrackInfo.commander;
-        CommanderEquipment *cEquipment = &currentCommander->equipment;
-
-
-        // Set commanders Info
-        strncpy(currentCommander->commanderName, commanderAppearance->commanderName, sizeof(currentCommander->commanderName));
-
-        //
-        currentCommander->accountId = 0x0; // Not needed
-        currentCommander->classId = commanderAppearance->classId;
-        currentCommander->unk4 = 0x0;
-        currentCommander->jobId = commanderAppearance->jobId;
-        currentCommander->level = commanderAppearance->level;
-        currentCommander->gender = commanderAppearance->gender;
-        currentCommander->hairId = commanderAppearance->hairId;
-
-        // Equipment
-        cEquipment->head_top = dataEquipment->head_top;
-        cEquipment->head_middle = dataEquipment->head_middle;
-        cEquipment->itemUnk1 = dataEquipment->itemUnk1;
-        cEquipment->body_armor = dataEquipment->body_armor;
-        cEquipment->gloves = dataEquipment->gloves;
-        cEquipment->boots = dataEquipment->boots;
-        cEquipment->helmet = dataEquipment->helmet;
-        cEquipment->bracelet = dataEquipment->bracelet;
-        cEquipment->weapon = dataEquipment->weapon;
-        cEquipment->shield = dataEquipment->shield;
-        cEquipment->costume = dataEquipment->costume;
-        cEquipment->itemUnk3 = dataEquipment->itemUnk3;
-        cEquipment->itemUnk4 = dataEquipment->itemUnk4;
-        cEquipment->itemUnk5 = dataEquipment->itemUnk5;
-        cEquipment->leg_armor = dataEquipment->leg_armor;
-        cEquipment->itemUnk6 = dataEquipment->itemUnk6;
-        cEquipment->itemUnk7 = dataEquipment->itemUnk7;
-        cEquipment->ring_left = dataEquipment->ring_left;
-        cEquipment->ring_right = dataEquipment->ring_right;
-        cEquipment->necklace = dataEquipment->necklace;
-
-        currentCommanderBarrackInfo.socialInfoId = commanderData.info.socialInfoId; // CharUniqueId?
-        currentCommanderBarrackInfo.commanderPosition = commanderIndex+1;
-        currentCommanderBarrackInfo.mapId = 1002; /// TODO FIX Not MapId in currecnt structure!
-        currentCommanderBarrackInfo.unk4 = SWAP_UINT32(0x02000000); //
-        currentCommanderBarrackInfo.unk5 = 0;
-        currentCommanderBarrackInfo.maxXP = commanderData.info.maxXP; // ?? Or current XP?
-        currentCommanderBarrackInfo.unk6 = SWAP_UINT32(0xC01C761C); //
-
-        currentCommanderBarrackInfo.pos.x = SWAP_UINT32(0x25e852c1);
-        currentCommanderBarrackInfo.pos.y = SWAP_UINT32(0x6519e541);
-        currentCommanderBarrackInfo.pos.z = SWAP_UINT32(0x39f4ef42);
-
-        currentCommanderBarrackInfo.dir.x = 0; // Set direction to face camera.
-        currentCommanderBarrackInfo.dir.z = 0; // Set direction to face camera.
-
-        currentCommanderBarrackInfo.pos2.x = SWAP_UINT32(0x25e852c1);
-        currentCommanderBarrackInfo.pos2.y = SWAP_UINT32(0x6519e541);
-        currentCommanderBarrackInfo.pos2.z = SWAP_UINT32(0x39f4ef42);
-        currentCommanderBarrackInfo.dir2.x = 0;
-        currentCommanderBarrackInfo.dir2.z = 0;
-        currentCommanderBarrackInfo.unk8 = 0;
-
-        // Concatenate all "item attributes packets" in one packet.
-        size_t offset = 0; // Offset inside "equipmentAttributes" packet.
-        for (int i = 0; i < EQSLOT_Count; i++) {
-
-            uint16_t attrSize = (uint16_t) attributeSizes[i];
-            // Size of item's attributes
-            memcpy(currentCommanderBarrackInfo.equipmentAttributes+offset, &attrSize, sizeof(uint16_t));
-            // Actual item's attributes (only if any)
-            if (attributeSizes[i] > 0) {
-                memcpy(currentCommanderBarrackInfo.equipmentAttributes+sizeof(uint16_t)+offset, attributes[i], attributeSizes[i]);
-            }
-            // Increase offset
-            offset += sizeof(uint16_t) + attributeSizes[i];
-        }
-
-        currentCommanderBarrackInfo.unk9 = 0;
-
-        // copy struct to the space
-        memcpy(emptyCommanderBuffer, &currentCommanderBarrackInfo, sizeof(currentCommanderBarrackInfo));
-
-        // Print buffers for debugging purposes
-        //buffer_print (emptyCommanderBuffer, sizeof(currentCommanderBarrackInfo), NULL);
-        //buffer_print (commandersPacket, commandersSize, NULL);
-
+        commanderBarrackInfoPacketSize += sizeof(CommanderBarrackInfoPacket);
     }
-    /// FOR EACH ACCOUNT INFO (yet hard to know which they are)
-    // Account Info struct
-    /*
-    #pragma pack(push, 1)
-    struct AccountInfo {
-        uint16_t accountInfoType;
-        uint8_t *AccountInfoContent;
-    } AccountInfo;
-    #pragma pack(pop)
-    */
 
-    //int accountInfoCount = 3;
-
+    // We got the final packet size, allocate replyPacket
     #pragma pack(push, 1)
-    struct {
+    struct BarrackBuilderCommanderListPacket {
         VariableSizePacketHeader variableSizeHeader;
         uint64_t accountId;
         uint8_t unk1;
         uint8_t commandersCount;
         uint8_t familyName [COMMANDER_FAMILY_NAME_SIZE];
+
         uint16_t accountInfoLength; // sizeof(accountInfo)
         //AccountInfo accountInfo[accountInfoCount];
 
+        // AccountInfo
         uint16_t typeCredits;
         float creditsAmount;
         uint16_t typeCredits2;
         float creditsAmount2;
         uint16_t typeCredits3;
         float creditsAmount3;
-        char commandersPacket[commandersSize];
+
+        uint8_t commandersBarrackInfoPacket[commanderBarrackInfoPacketSize];
     } replyPacket;
     #pragma pack(pop)
 
+    PacketStream packetStream;
+    packetStreamInit(&packetStream, &replyPacket);
 
+    // Now fill it
     PacketType packetType = BC_COMMANDER_LIST;
     CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-
+        // fill replyPacket
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
         replyPacket.accountId = accountId;
         replyPacket.unk1 = 1; // ICBT - equal to 1 or 4
         replyPacket.commandersCount = commandersCount;
-
-        // Family name
         strncpy(replyPacket.familyName, gameSession->accountSession.familyName, sizeof(replyPacket.familyName));
-        /*
-        // Account Info
-        //replyPacket.accountInfoLength = sizeof(replyPacket.accountInfo) / sizeof(uint8_t); // Is this right? (total bytes / 8)
-        replyPacket.accountInfo[0].accountInfoType = SWAP_UINT16(0x940e); // 94 0E = Medal (iCoin)
-        replyPacket.accountInfo[0].AccountInfoContent = gameSession->accountSession.credits;
-        replyPacket.accountInfo[1].accountInfoType = SWAP_UINT16(0x970e); // 97 0E = GiftMedal
-        replyPacket.accountInfo[2].AccountInfoContent = 0;
-        replyPacket.accountInfo[2].accountInfoType = SWAP_UINT16(0x950e); // 95 0E = ReceiveGiftMedal
-        replyPacket.accountInfo[2].AccountInfoContent = 0;
-        */
         replyPacket.accountInfoLength = 0x12; // 3 sets
         replyPacket.typeCredits = SWAP_UINT16(0x940e); // 94 0E = Medal (iCoin)
         replyPacket.creditsAmount = gameSession->accountSession.credits;
@@ -498,8 +353,106 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
         replyPacket.typeCredits3 = SWAP_UINT16(0x950e); // 94 0E = Medal (iCoin)
         replyPacket.creditsAmount3 = 0;
 
-        memcpy(replyPacket.commandersPacket, commandersPacket, commandersSize);
+
+        // we want to start writing at the offset of commandersBarrackInfoPacket
+        size_t offset = offsetof(struct BarrackBuilderCommanderListPacket, commandersBarrackInfoPacket);
+        packetStreamAddOffset(&packetStream, offset);
+
+        // Store the base position of commanderlist.
+        unsigned int CommandersListBasePosition = packetStreamGetOffset(&packetStream);
+
+        // fill commandersBarrackInfoPacket
+        for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
+
+            // iterate through all commander
+            Commander *curCommander = &commanders[commanderIndex];
+            CommanderInfo *cInfo = &curCommander->info;
+            Inventory *inventory = &curCommander->inventory;
+
+
+
+            // Define CommanderBarrackInfoPacket current structure
+            size_t attributesSize = attributesSizeAllCommanders[commanderIndex];
+            #pragma pack(push, 1)
+            struct CommanderBarrackInfoPacket {
+                CommanderAppearance appearance;
+                uint64_t socialInfoId;
+                uint16_t commanderPosition;
+                uint16_t mapId;
+                uint32_t unk4;
+                uint32_t unk5;
+                uint32_t maxXP;
+                uint32_t unk6;
+                PositionXYZ pos;
+                PositionXZ dir;
+                PositionXYZ pos2;
+                PositionXZ dir2;
+                uint32_t unk8;
+                uint8_t attributesPacket[attributesSize];
+                uint16_t unk9;
+            } *curCommandersBarrackInfoPacket;
+            #pragma pack(pop)
+
+            // Set the stream position to current commander
+            packetStreamSetOffset(&packetStream, CommandersListBasePosition + (commanderIndex * sizeof(struct CommanderBarrackInfoPacket)));
+
+            // Set struct address to the right place in the stream
+            curCommandersBarrackInfoPacket = packetStreamGetCurrentBuffer(&packetStream);
+
+            // fill it
+            curCommandersBarrackInfoPacket->appearance = cInfo->appearance;
+
+            curCommandersBarrackInfoPacket->socialInfoId = cInfo->socialInfoId; // CharUniqueId?
+            curCommandersBarrackInfoPacket->commanderPosition = commanderIndex + 1;
+            curCommandersBarrackInfoPacket->mapId = 1002; /// FIXME : No MapId in the current structure!
+            curCommandersBarrackInfoPacket->unk4 = SWAP_UINT32(0x02000000);
+            curCommandersBarrackInfoPacket->unk5 = 0;
+            curCommandersBarrackInfoPacket->maxXP = cInfo->maxXP;
+            curCommandersBarrackInfoPacket->unk6 = SWAP_UINT32(0xC01C761C);
+            curCommandersBarrackInfoPacket->pos = PositionXYZ_decl(
+                SWAP_UINT32(0x25e852c1), SWAP_UINT32(0x6519e541), SWAP_UINT32(0x39f4ef42)
+            );
+            curCommandersBarrackInfoPacket->dir = PositionXZ_decl(0, 0); // Set direction to face camera.
+            curCommandersBarrackInfoPacket->pos2 = curCommandersBarrackInfoPacket->pos;
+            curCommandersBarrackInfoPacket->dir2 = curCommandersBarrackInfoPacket->dir;
+            curCommandersBarrackInfoPacket->unk8 = 0;
+            curCommandersBarrackInfoPacket->unk9 = 0;
+
+            // fill attributes
+            size_t offset = offsetof(struct CommanderBarrackInfoPacket, attributesPacket);
+            packetStreamAddOffset(&packetStream, offset);
+
+            for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_Count; eqSlotIndex++) {
+
+                Item *item = inventory->equippedItems[eqSlotIndex];
+
+                // get attribute size
+                size_t attrSize = attributeSizeAllCommanders[commanderIndex][eqSlotIndex];
+
+                // Define AttributePacket current structure
+                #pragma pack(push, 1)
+                struct AttributePacket {
+                    uint16_t attrSize;
+                    uint8_t attrBuffer[attrSize];
+                } *attributePacket = packetStreamGetCurrentBuffer(&packetStream);
+                #pragma pack(pop)
+
+                attributePacket->attrSize = attrSize;
+
+                // fill attribute buffer
+                size_t offset = offsetof(struct AttributePacket, attrBuffer);
+                packetStreamAddOffset(&packetStream, offset);
+
+                // write in the buffer
+                if (item) {
+                    itemAttributesGetPacket(item->attributes, packetStreamGetCurrentBuffer(&packetStream));
+                    // relocate the stream position
+                    packetStreamAddOffset(&packetStream, attrSize);
+                }
+            }
+        }
     }
+
 }
 
 void barrackBuilderPetInformation(zmsg_t *replyMsg) {

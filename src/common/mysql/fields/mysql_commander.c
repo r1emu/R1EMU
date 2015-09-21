@@ -17,7 +17,7 @@
 int mySqlGetCommandersByAccountId(MySQL *self, uint64_t accountId, CommanderInfo **commanders) {
     MYSQL_ROW row;
 
-    dbg("accountId: %11x", accountId);
+    dbg("accountId: %llx", accountId);
 
     int commandersCount = 0;
 
@@ -59,7 +59,7 @@ int mySqlGetCommandersByAccountId(MySQL *self, uint64_t accountId, CommanderInfo
                    ", " MYSQL_COMMANDER_FIELD_eqslot_ring_right_str
                    ", " MYSQL_COMMANDER_FIELD_eqslot_necklace_str
                    " FROM commanders "
-                   "WHERE account_id = %11x "
+                   "WHERE account_id = %llx "
                    "AND is_deleted = 'n' "
                    "LIMIT 20 ", // Add a limit, just in case
                    accountId)) {
@@ -131,9 +131,9 @@ bool mySqlCommanderCreate(MySQL *self, uint64_t accountId, CommanderCreateInfo *
     CommanderAppearance *commander = &commanderCreate->appearance;
 
     // flush the commander
-    //if (mySqlQuery(self, "CALL bCreateCommander(%11x) "
+    //if (mySqlQuery(self, "CALL bCreateCommander(%llx) "
     if (mySqlQuery(self, "INSERT INTO commanders "
-                   "SET account_id = '%11x'"
+                   "SET account_id = '%llx'"
                    ", " MYSQL_COMMANDER_FIELD_commanderName_str " = '%s'"
                    ", " MYSQL_COMMANDER_FIELD_level_str " = %i"
                    ", " MYSQL_COMMANDER_FIELD_exp_str " = %i"

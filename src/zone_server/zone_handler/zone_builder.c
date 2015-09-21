@@ -37,16 +37,19 @@ void zoneBuilderRestSit(uint32_t targetPcId, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderItemAdd(ItemPkt *item, InventoryAddType addType, zmsg_t *replyMsg) {
+void zoneBuilderItemAdd(Item *item, InventoryAddType addType, zmsg_t *replyMsg) {
+
+    size_t attrSize = itemAttributesGetPacketSize(item->attributes);
 
     #pragma pack(push, 1)
     struct {
         VariableSizePacketHeader variableSizeHeader;
         ItemPkt item;
-        uint16_t unk1; // 06 00
+        uint16_t attributesSize;
         uint8_t addType;
         float notificationDelay;
-        uint16_t unk2; // 00 00
+        uint8_t inventoryType;
+        uint8_t attributes[attrSize];
     } replyPacket;
     #pragma pack(pop)
 
@@ -56,13 +59,15 @@ void zoneBuilderItemAdd(ItemPkt *item, InventoryAddType addType, zmsg_t *replyMs
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
-        replyPacket.item = *item;
-        replyPacket.unk1 = SWAP_UINT16(0x0600);
+        replyPacket.item.uniqueId = item->itemId;
+        replyPacket.item.amount = item->amount;
+        replyPacket.item.inventoryIndex = item->inventoryIndex;
+        replyPacket.item.id = item->itemType;
+        replyPacket.attributesSize = attrSize;
         replyPacket.addType = addType;
         replyPacket.notificationDelay = 0.0f;
-        replyPacket.unk2 = 0;
-        //replyPacket.unk3 = SWAP_UINT16(0xA60E);
-        //replyPacket.unk4 = 30000.0;
+        replyPacket.inventoryType = 0;
+        itemAttributesGetPacket(item->attributes, replyPacket.attributes);
     }
 }
 

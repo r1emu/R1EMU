@@ -40,8 +40,8 @@ bool sessionInit(Session *self, uint16_t routerId, uint8_t *sessionKey) {
         false);
 
     // Initialize a dummy commander info
-    CommanderInfo commander;
-    commanderInfoInit(&commander);
+    Commander commander;
+    commanderInit(&commander);
     gameSessionInit(&self->game, &commander);
 
     return true;

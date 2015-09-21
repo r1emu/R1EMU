@@ -21,7 +21,7 @@
 
 CommanderSession *
 commanderSessionNew (
-    CommanderInfo *commander
+    Commander *commander
 ) {
     CommanderSession *self;
 
@@ -41,7 +41,7 @@ commanderSessionNew (
 bool
 commanderSessionInit (
     CommanderSession *self,
-    CommanderInfo *commander
+    Commander *commander
 ) {
     memset(self, 0, sizeof(CommanderSession));
 
