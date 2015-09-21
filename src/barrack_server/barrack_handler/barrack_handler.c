@@ -316,6 +316,8 @@ barrackHandlerStartBarrack(
     size_t packetSize,
     zmsg_t *reply)
 {
+    PacketHandlerState status = PACKET_HANDLER_ERROR;
+
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_START_BARRACK);
 
     // IES Modify List
@@ -334,43 +336,34 @@ barrackHandlerStartBarrack(
     */
 
     // Get list of Commanders for this AccountId
+    size_t commandersCount;
 
-    Commander *commanders;
-    CommanderInfo *commandersInfo;
-
-    dbg("accountId: %11x", session->socket.accountId);
-
-    int commandersCount = mySqlGetCommandersByAccountId(self->sqlConn, session->socket.accountId, &commandersInfo);
-
-    session->game.accountSession.charactersCreatedCount = commandersCount;
-
-    if (commandersCount == -1) {
-        // Error
-        /// TODO
-        return PACKET_HANDLER_ERROR;
-    } else {
-        if ((commanders = malloc(sizeof(Commander) * commandersCount)) == NULL) {
-            return PACKET_HANDLER_ERROR;
-        }
-        // Iterate and populate commanders;
-        for (int i = 0; i < commandersCount; i++) {
-            commanderInit(&commanders[i]);
-            commanders[i].info = commandersInfo[i];
-        }
+    if (!(mySqlRequestCommandersByAccountId(self->sqlConn, session->socket.accountId, &commandersCount))) {
+        error("Cannot request commanders by accountId = %llx", session->socket.accountId);
+        goto cleanup;
     }
 
+    {
+        Commander commanders[commandersCount];
+        if (!(mySqlGetCommanders(self->sqlConn, commanders))) {
+            error("Cannot get commanders by accountId = %llx", session->socket.accountId);
+            goto cleanup;
+        }
 
+        // Send the commander list
+        barrackBuilderCommanderList(
+            session->socket.accountId,
+            &session->game,
+            commanders,
+            commandersCount,
+            reply
+        );
+    }
 
-    // Send the commander list
-    barrackBuilderCommanderList(
-        session->socket.accountId,
-        &session->game,
-        commandersCount,
-        commanders,
-        reply
-    );
+    status = PACKET_HANDLER_OK;
 
-    return PACKET_HANDLER_UPDATE_SESSION;
+cleanup:
+    return status;
 }
 
 static PacketHandlerState barrackHandlerCurrentBarrack(
@@ -429,7 +422,7 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
          }
     }
 
-    dbg("AccountId: %11x", session->game.accountSession.accountId);
+    dbg("AccountId: %llx", session->game.accountSession.accountId);
 
     // Try to perform the change
     ResultType = mySqlSetFamilyName(self->sqlConn, &session->game.accountSession, clientPacket->barrackName);

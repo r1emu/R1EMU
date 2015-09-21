@@ -15,72 +15,82 @@
 #include "barrack_server/barrack_handler/barrack_builder.h"
 
 bool mySqlGetAccountData(MySQL *self, char *accountName, unsigned char *password, AccountSession * accountSession) {
+
+    bool status = false;
     MYSQL_ROW row;
 
     char md5Password[33];
-    for (int i = 0; i < 16; i++) {
-        sprintf (&md5Password[i*2], "%.02x", password[i]);
-    }
+    md5BytesToStr(password, md5Password);
 
     // flush the commander
-    if (mySqlQuery(self, "SELECT account_id, is_banned, Unix_Timestamp(time_banned), credits, privilege_level, family_name, barrack_type FROM accounts WHERE account_name = '%s' AND passwd = '%s' LIMIT 1",
-    //if (mySqlQuery(self, "SELECT account_id, is_banned, Unix_Timestamp(time_banned), credits, privilege_level, family_name, barrack_type FROM accounts WHERE account_name = '%s' LIMIT 1",
-                   accountName, md5Password)) {
+    if (mySqlQuery(self,
+        "SELECT "
+            MYSQL_ACCOUNT_SESSION_FIELD_account_id_str ", "
+            MYSQL_ACCOUNT_SESSION_FIELD_is_banned_str ", "
+            "Unix_Timestamp(" MYSQL_ACCOUNT_SESSION_FIELD_time_banned_str "), "
+            MYSQL_ACCOUNT_SESSION_FIELD_credits_str ", "
+            MYSQL_ACCOUNT_SESSION_FIELD_privilege_level_str ", "
+            MYSQL_ACCOUNT_SESSION_FIELD_family_name_str ", "
+            MYSQL_ACCOUNT_SESSION_FIELD_barrack_type_str " "
+        "FROM accounts "
+        "WHERE " MYSQL_ACCOUNT_SESSION_FIELD_account_name_str " = '%s' "
+        "AND " MYSQL_ACCOUNT_SESSION_FIELD_passwd_str " = '%s' "
+        "LIMIT 1",
+        accountName, md5Password))
+    {
         error("SQL Error : %s" , mysql_error(self->handle));
+        goto cleanup;
     }
-    else {
 
-        if (mysql_num_rows(self->result) == 0) {
-            dbg("MySQL: Account/Password is incorrect.");
-        }
-        else {
-            row = mysql_fetch_row(self->result);
-            // update the commander
-            strncpy(accountSession->login, accountName, sizeof(accountSession->login));
-            accountSession->accountId = strtoll(row[0], NULL, 10);
-            accountSession->isBanned = strcmp(row[1], "y") == 0 ? true : false;
-            accountSession->timeBanned = strtol(row[2], NULL, 10); // not sure if 32 or 64 bits
-            accountSession->credits = strtof(row[3], NULL);
-            accountSession->privilege = strtol(row[4], NULL, 10);
-            strncpy(accountSession->familyName, row[5], sizeof(accountSession->familyName));
-            accountSession->barrackType = strtol(row[6], NULL, 10);
-
-            dbg("MySQL: Account found and loaded.");
-            return true;
-        }
+    if (mysql_num_rows(self->result) == 0) {
+        dbg("MySQL: Account/Password is incorrect.");
+        goto cleanup;
     }
-    return false;
+
+    row = mysql_fetch_row(self->result);
+
+    // update the commander
+    strncpy(accountSession->login, accountName, sizeof(accountSession->login));
+    accountSession->accountId = strtoll(row[0], NULL, 10);
+    accountSession->isBanned = row[1][0] == 'y';
+    accountSession->timeBanned = strtol(row[2], NULL, 10); // FIXME : not sure if 32 or 64 bits
+    accountSession->credits = strtof(row[3], NULL);
+    accountSession->privilege = strtol(row[4], NULL, 10);
+    strncpy(accountSession->familyName, row[5], sizeof(accountSession->familyName));
+    accountSession->barrackType = strtol(row[6], NULL, 10);
+
+    status = true;
+
+cleanup:
+    return status;
 }
 
 BarrackNameResultType mySqlSetFamilyName(MySQL *self, AccountSession *accountSession, char *familyName) {
+
+    BarrackNameResultType status = BC_BARRACKNAME_CHANGE_ERROR;
     MYSQL_ROW row;
 
-    dbg("accountId: %11x", accountSession->accountId);
-    dbg("newName: %s", familyName);
-
     // Perform query to change name
-    if (mySqlQuery(self, "CALL bSetFamilyName(%11x, '%s');", accountSession->accountId, familyName)) {
+    if (mySqlQuery(self, "CALL bSetFamilyName(%llx, '%s');", accountSession->accountId, familyName)) {
         error("SQL Error : %s" , mysql_error(self->handle));
-        return BC_BARRACKNAME_CHANGE_ERROR;
+        goto cleanup;
     }
+
     // Check query results
     if (mySqlQuery(self, "SELECT @flag;")) {
         error("SQL Error : %s" , mysql_error(self->handle));
-        return BC_BARRACKNAME_CHANGE_ERROR;
-    } else {
-        if (mysql_num_rows(self->result) == 0) {
-            dbg("MySQL: Procedure bSetFamilyName(accountId, newName) didnt return value", accountSession->accountId, familyName);
-            return BC_BARRACKNAME_CHANGE_ERROR;
-        }
-        else {
-
-            row = mysql_fetch_row(self->result);
-            //
-            BarrackNameResultType operationResult = strtol(row[0], NULL, 10);
-
-            dbg("MySQL: SetFamilyName result: %x", operationResult);
-            return operationResult;
-        }
+        goto cleanup;
     }
-    return false;
+
+    if (mysql_num_rows(self->result) == 0) {
+        error("MySQL: Procedure bSetFamilyName(%llx, '%s') didn't return value",
+            accountSession->accountId, familyName);
+        goto cleanup;
+    }
+
+    row = mysql_fetch_row(self->result);
+    status = strtol(row[0], NULL, 10);
+
+cleanup:
+    return status;
 }

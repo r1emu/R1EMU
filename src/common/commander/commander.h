@@ -128,6 +128,8 @@ typedef struct
     CommanderInfo info;
     Inventory inventory;
 
+    uint16_t mapId; // Is it the right place?
+
 } Commander;
 #pragma pack(pop)
 

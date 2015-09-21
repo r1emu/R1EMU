@@ -235,7 +235,13 @@ void barrackBuilderServerEntry(
     }
 }
 
-void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, int commandersCount, Commander *commanders ,zmsg_t *replyMsg) {
+void barrackBuilderCommanderList(
+    uint64_t accountId,
+    GameSession *gameSession,
+    Commander *commanders,
+    int commandersCount,
+    zmsg_t *replyMsg)
+{
     // Keep sizes in memory
     size_t commanderBarrackInfoPacketSize = 0;
     size_t attributesSizeAllCommanders[commandersCount];
@@ -246,18 +252,6 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
         // iterate through all commander
         Commander *curCommander = &commanders[commanderIndex];
         Inventory *inventory = &curCommander->inventory;
-
-        // TESTIG PURPOSES, DELETE LATER
-        /*
-        Item newItem;
-        newItem.itemId = 1234;
-        newItem.itemType = 531101;
-        newItem.amount = 1;
-        newItem.equipSlot = EQSLOT_BODY_ARMOR;
-        newItem.attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
-        inventoryAddItem(inventory, &newItem);
-        inventoryEquipItem(inventory, newItem.itemId, EQSLOT_BODY_ARMOR);
-        */
 
         // get attributes size
         size_t attributesSize = 0;
@@ -277,9 +271,8 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
             #pragma pack(pop)
 
             attributesSize += sizeof(AttributePacket);
-            attributeSizeAllCommanders[commanderIndex][eqSlotIndex] = attrSize;
+            attributeSizeAllCommanders[commanderIndex][eqSlotIndex] = sizeof(AttributePacket);
         }
-
         attributesSizeAllCommanders[commanderIndex] = attributesSize;
 
         // get CommanderBarrackInfoPacket size
@@ -353,13 +346,9 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
         replyPacket.typeCredits3 = SWAP_UINT16(0x950e); // 94 0E = Medal (iCoin)
         replyPacket.creditsAmount3 = 0;
 
-
         // we want to start writing at the offset of commandersBarrackInfoPacket
         size_t offset = offsetof(struct BarrackBuilderCommanderListPacket, commandersBarrackInfoPacket);
         packetStreamAddOffset(&packetStream, offset);
-
-        // Store the base position of commanderlist.
-        unsigned int CommandersListBasePosition = packetStreamGetOffset(&packetStream);
 
         // fill commandersBarrackInfoPacket
         for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
@@ -368,8 +357,6 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
             Commander *curCommander = &commanders[commanderIndex];
             CommanderInfo *cInfo = &curCommander->info;
             Inventory *inventory = &curCommander->inventory;
-
-
 
             // Define CommanderBarrackInfoPacket current structure
             size_t attributesSize = attributesSizeAllCommanders[commanderIndex];
@@ -390,14 +377,8 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
                 uint32_t unk8;
                 uint8_t attributesPacket[attributesSize];
                 uint16_t unk9;
-            } *curCommandersBarrackInfoPacket;
+            } *curCommandersBarrackInfoPacket = packetStreamGetCurrentBuffer(&packetStream);
             #pragma pack(pop)
-
-            // Set the stream position to current commander
-            packetStreamSetOffset(&packetStream, CommandersListBasePosition + (commanderIndex * sizeof(struct CommanderBarrackInfoPacket)));
-
-            // Set struct address to the right place in the stream
-            curCommandersBarrackInfoPacket = packetStreamGetCurrentBuffer(&packetStream);
 
             // fill it
             curCommandersBarrackInfoPacket->appearance = cInfo->appearance;
@@ -442,17 +423,13 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
                 // fill attribute buffer
                 size_t offset = offsetof(struct AttributePacket, attrBuffer);
                 packetStreamAddOffset(&packetStream, offset);
-
                 // write in the buffer
-                if (item) {
-                    itemAttributesGetPacket(item->attributes, packetStreamGetCurrentBuffer(&packetStream));
-                    // relocate the stream position
-                    packetStreamAddOffset(&packetStream, attrSize);
-                }
+                itemAttributesGetPacket(item->attributes, packetStreamGetCurrentBuffer(&packetStream));
+                // relocate the stream position
+                packetStreamAddOffset(&packetStream, attrSize);
             }
         }
     }
-
 }
 
 void barrackBuilderPetInformation(zmsg_t *replyMsg) {

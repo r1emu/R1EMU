@@ -28,45 +28,33 @@ static size_t stringAttributeGetSize(StringAttribute *attribute);
 static bool stringAttributeGetPacket(StringAttribute *attribute, char *packetBytes);
 static size_t itemAttributesGetNum(ItemAttributes *itemAttributes);
 
-struct AttributeFormatsEntry {
-    char *key;
-    AttributeFormat format;
-} attributeFormatsEntries [] = {
-    [ITEM_ATTRIBUTE_DURABILITY]   = {.key = "durability",   .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_PR]           = {.key = "pr",           .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_COOLDOWN]     = {.key = "cooldown",     .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_REINFORCE_2]  = {.key = "reinforce_2",  .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_MEMO]         = {.key = "memo",         .format = STRING_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_CUSTOM_NAME]  = {.key = "custom_name", . format = STRING_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_CRAFTER_NAME] = {.key = "crafter_name", .format = STRING_ATTRIBUTE}
+char *attributeKeys [] = {
+    [ITEM_ATTRIBUTE_DURABILITY]   = "durability",
+    [ITEM_ATTRIBUTE_PR]           = "pr",
+    [ITEM_ATTRIBUTE_COOLDOWN]     = "cooldown",
+    [ITEM_ATTRIBUTE_REINFORCE_2]  = "reinforce_2",
+    [ITEM_ATTRIBUTE_MEMO]         = "memo",
+    [ITEM_ATTRIBUTE_CUSTOM_NAME]  = "custom_name",
+    [ITEM_ATTRIBUTE_CRAFTER_NAME] = "crafter_name"
 };
 
-bool itemAttributesGetAttribute(ItemAttributes *self, ItemAttributeType itemAttrType, void *_output) {
+bool itemAttributesGetAttribute(ItemAttributes *self, ItemAttributeType itemAttrType, void **_output) {
 
-    struct AttributeFormatsEntry formatEntry = attributeFormatsEntries[itemAttrType];
+    bool status = false;
+    char *attributeKey = NULL;
 
-    switch (formatEntry.format)
-    {
-        case FLOAT_ATTRIBUTE: {
-            float *output = _output;
-            Attribute *attr = zhash_lookup(self->hashtable, formatEntry.key);
-            FloatAttribute *fAttr = attr->attribute;
-            *output = fAttr->value;
-            break;
-        }
-
-        case STRING_ATTRIBUTE: {
-            char **output = _output;
-            Attribute *attr = zhash_lookup(self->hashtable, formatEntry.key);
-            StringAttribute *sAttr = attr->attribute;
-            *output = sAttr->value;
-            break;
-        }
-
-        default: error("Unknown attribute format."); break;
+    if (!(attributeKey = attributeKeys[itemAttrType])) {
+        error("No attribute key for '%d'", itemAttrType);
+        goto cleanup;
     }
 
-    return true;
+    void *value = zhash_lookup(self->hashtable, attributeKey);
+    *_output = value;
+
+    status = true;
+
+cleanup:
+    return status;
 }
 
 ItemAttributes *itemAttributesNew(
