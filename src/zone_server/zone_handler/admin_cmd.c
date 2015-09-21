@@ -136,7 +136,7 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
     newItem.itemType = itemType;
     newItem.amount =  (!amount) ? 1 : amount;
     newItem.equipSlot = EQSLOT_BODY_ARMOR;
-    newItem.attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    newItem.attributes = itemAttributesNew();
     newItem.inventoryIndex = INVENTORY_CAT_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition;
     inventoryAddItem(inventory, &newItem);
 
