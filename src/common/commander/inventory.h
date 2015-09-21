@@ -113,3 +113,5 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd);
  */
 size_t inventoryGetItemsCount(Inventory *self);
 
+bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot);
+

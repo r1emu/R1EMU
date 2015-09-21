@@ -285,7 +285,7 @@ size_t itemAttributesGetNum(ItemAttributes *itemAttributes) {
         total++;
     }
 
-    if (itemAttributes->cooldown) {
+    if (true) { // Cooldown is always present
         total++;
     }
 
@@ -346,7 +346,7 @@ bool itemAttributesGetPacket(ItemAttributes *itemAttributes, char *packet) {
         attributeArray.attributes[cur_idx++] = attribute;
     }
 
-    if (cooldown) {
+    if (true) { // Cooldown is always present
         FloatAttribute cooldownAttribute;
         if (!(floatAttributeInit(&cooldownAttribute, ITEM_ATTRIBUTE_COOLDOWN, cooldown))) {
             error("Cannot initialize float attribute.");
@@ -457,7 +457,7 @@ size_t itemAttributesGetPacketSize(ItemAttributes *itemAttributes) {
         total += FLOAT_ATTRIBUTE_SIZE;
     }
 
-    if (itemAttributes->cooldown) {
+    if (true) { // Cooldown is always present
         total += FLOAT_ATTRIBUTE_SIZE;
     }
 
