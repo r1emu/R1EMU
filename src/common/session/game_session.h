@@ -51,7 +51,7 @@ typedef struct GameSession GameSession;
  * @param commander An initialized commander information
  * @return A pointer to an allocated GameSession.
  */
-GameSession *gameSessionNew(CommanderInfo *commander);
+GameSession *gameSessionNew(Commander *commander);
 
 /**
  * @brief Initialize an allocated GameSession structure.
@@ -59,7 +59,7 @@ GameSession *gameSessionNew(CommanderInfo *commander);
  * @param commander An initialized commander information
  * @return true on success, false otherwise.
  */
-bool gameSessionInit(GameSession *self, CommanderInfo *commander);
+bool gameSessionInit(GameSession *self, Commander *commander);
 
 /**
  * @brief Prints a GameSession structure.

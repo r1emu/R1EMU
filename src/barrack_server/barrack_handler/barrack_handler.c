@@ -354,6 +354,7 @@ barrackHandlerStartBarrack(
         }
         // Iterate and populate commanders;
         for (int i = 0; i < commandersCount; i++) {
+            commanderInit(&commanders[i]);
             commanders[i].info = commandersInfo[i];
         }
     }

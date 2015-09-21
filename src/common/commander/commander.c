@@ -72,6 +72,13 @@ void commanderInfoInit(CommanderInfo *commander) {
     commander->unk7 = SWAP_UINT16(0x5910); // ICBT
 }
 
+void commanderInit(Commander *commander) {
+    memset(commander, 0, sizeof(*commander));
+
+    commanderInfoInit(&commander->info);
+    inventoryInit(&commander->inventory);
+}
+
 void commanderEquipmentPrint(CommanderEquipment *equipment) {
     dbg("head_top = %d (%x)", equipment->head_top, equipment->head_top);
     dbg("head_middle = %d (%x)", equipment->head_middle, equipment->head_middle);

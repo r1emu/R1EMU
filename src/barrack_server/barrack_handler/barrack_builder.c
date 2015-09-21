@@ -247,10 +247,6 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
         Commander *curCommander = &commanders[commanderIndex];
         Inventory *inventory = &curCommander->inventory;
 
-        ///FIX
-        inventoryInit(inventory); /// THIS SHOULD BE INIT somewhere else!!
-
-
         // TESTIG PURPOSES, DELETE LATER
         /*
         Item newItem;
