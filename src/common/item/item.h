@@ -75,14 +75,14 @@ typedef struct ItemPkt {
     uint32_t id;
 }   ItemPkt;
 
-typedef enum AttributeType {
+typedef enum AttributeFormat {
     FLOAT_ATTRIBUTE,
     STRING_ATTRIBUTE,
-} AttributeType;
+} AttributeFormat;
 
 typedef struct Attribute {
     void *attribute;
-    AttributeType type;
+    AttributeFormat format;
 } Attribute;
 
 typedef struct FloatAttribute {
@@ -128,6 +128,18 @@ typedef struct Item
 
 // ----------- Functions ------------
 
+ItemAttributes *itemAttributesNew(
+    float durability,
+    float cooldown,
+    char *memo,
+    char *customName,
+    char *crafterName,
+    float pr,
+    float reinforce_2);
+
+/**
+ * @brief Creates memory and initializes an ItemAttributes
+ */
 ItemAttributes *itemAttributesNew(
     float durability,
     float cooldown,

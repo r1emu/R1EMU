@@ -19,7 +19,7 @@
 // Private functions
 static bool stringAttributeInit(StringAttribute *self, ItemAttributeType attributeType, char *value);
 static bool floatAttributeInit(FloatAttribute *self, ItemAttributeType attributeType, float value);
-static bool attributeInit(Attribute *self, void *attribute, AttributeType attributeType);
+static bool attributeInit(Attribute *self, void *attribute, AttributeFormat attributeFormat);
 static bool attributeArrayInit(AttributeArray *self, Attribute *attributes, int numAttributes);
 static size_t attributeArrayGetPacketSize(AttributeArray *attributeArray);
 static bool attributeArrayGetPacket(AttributeArray *attributeArray, char *packet);
@@ -28,28 +28,28 @@ static size_t stringAttributeGetSize(StringAttribute *attribute);
 static bool stringAttributeGetPacket(StringAttribute *attribute, char *packetBytes);
 static size_t itemAttributesGetNum(ItemAttributes *itemAttributes);
 
-struct AttributeTypesEntry {
+struct AttributeFormatsEntry {
     char *key;
-    AttributeType type;
-} attributeTypesEntries [] = {
-    [ITEM_ATTRIBUTE_DURABILITY]   = {.key = "durability",   .type = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_PR]           = {.key = "pr",           .type = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_COOLDOWN]     = {.key = "cooldown",     .type = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_REINFORCE_2]  = {.key = "reinforce_2",  .type = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_MEMO]         = {.key = "memo",         .type = STRING_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_CUSTOM_NAME]  = {.key = "custom_name", . type = STRING_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_CRAFTER_NAME] = {.key = "crafter_name", .type = STRING_ATTRIBUTE}
+    AttributeFormat format;
+} attributeFormatsEntries [] = {
+    [ITEM_ATTRIBUTE_DURABILITY]   = {.key = "durability",   .format = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_PR]           = {.key = "pr",           .format = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_COOLDOWN]     = {.key = "cooldown",     .format = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_REINFORCE_2]  = {.key = "reinforce_2",  .format = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_MEMO]         = {.key = "memo",         .format = STRING_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_CUSTOM_NAME]  = {.key = "custom_name", . format = STRING_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_CRAFTER_NAME] = {.key = "crafter_name", .format = STRING_ATTRIBUTE}
 };
 
 bool itemAttributesGetAttribute(ItemAttributes *self, ItemAttributeType itemAttrType, void *_output) {
 
-    struct AttributeTypesEntry typeEntry = attributeTypesEntries[itemAttrType];
+    struct AttributeFormatsEntry formatEntry = attributeFormatsEntries[itemAttrType];
 
-    switch (typeEntry.type)
+    switch (formatEntry.format)
     {
         case FLOAT_ATTRIBUTE: {
             float *output = _output;
-            Attribute *attr = zhash_lookup(self->hashtable, typeEntry.key);
+            Attribute *attr = zhash_lookup(self->hashtable, formatEntry.key);
             FloatAttribute *fAttr = attr->attribute;
             *output = fAttr->value;
             break;
@@ -57,13 +57,13 @@ bool itemAttributesGetAttribute(ItemAttributes *self, ItemAttributeType itemAttr
 
         case STRING_ATTRIBUTE: {
             char **output = _output;
-            Attribute *attr = zhash_lookup(self->hashtable, typeEntry.key);
+            Attribute *attr = zhash_lookup(self->hashtable, formatEntry.key);
             StringAttribute *sAttr = attr->attribute;
             *output = sAttr->value;
             break;
         }
 
-        default: error("Unknown attribute type."); break;
+        default: error("Unknown attribute format."); break;
     }
 
     return true;
@@ -142,9 +142,9 @@ bool floatAttributeInit(FloatAttribute *self, ItemAttributeType attributeType, f
     return true;
 }
 
-bool attributeInit(Attribute *self, void *attribute, AttributeType type) {
+bool attributeInit(Attribute *self, void *attribute, AttributeFormat format) {
     self->attribute = attribute;
-    self->type = type;
+    self->format = format;
 
     return true;
 }
@@ -178,9 +178,9 @@ size_t attributeArrayGetPacketSize(AttributeArray *attributeArray) {
     Attribute *attributes = attributeArray->attributes;
 
     for (int i = 0; i < numAttributes; i++) {
-        AttributeType type = attributes[i].type;
+        AttributeFormat format = attributes[i].format;
 
-        switch (type) {
+        switch (format) {
             case FLOAT_ATTRIBUTE: {
                 totalSize += FLOAT_ATTRIBUTE_SIZE;
                 break;
@@ -204,9 +204,9 @@ bool attributeArrayGetPacket(AttributeArray *attributeArray, char *packet) {
     PacketStream *packetStream = packetStreamNew(packet);
 
     for (int i = 0; i < numAttributes; i++) {
-        AttributeType type = attributes[i].type;
+        AttributeFormat format = attributes[i].format;
 
-        switch (type) {
+        switch (format) {
             case FLOAT_ATTRIBUTE: {
                 FloatAttribute *attribute = (FloatAttribute *) (attributes[i].attribute);
 
