@@ -37,6 +37,23 @@ typedef enum {
 }   InventoryAddType;
 
 typedef enum {
+    INVENTORY_CAT_WEAPON = 1,
+    INVENTORY_CAT_ARMOR = 2,
+    INVENTORY_CAT_SUBWEAPON = 3,
+    INVENTORY_CAT_COSTUME = 4,
+    INVENTORY_CAT_ACCESSORY = 5,
+    INVENTORY_CAT_CONSUMABLE = 6,
+    INVENTORY_CAT_GEM = 7,
+    INVENTORY_CAT_MATERIAL = 8,
+    INVENTORY_CAT_CARD = 9,
+    INVENTORY_CAT_COLLECTION = 10,
+    INVENTORY_CAT_BOOK = 11,
+    INVENTORY_CAT_QUEST = 12,
+    INVENTORY_CAT_PETWEAPON = 13,
+    INVENTORY_CAT_PETARMOR = 14,
+}   InventoryCategory;
+
+typedef enum {
     EQSLOT_HEAD_TOP = 0,
     EQSLOT_HEAD_MIDDLE,
     EQSLOT_UNKOWN1,
@@ -137,6 +154,9 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd);
  * @return count of items in inventory
  */
 size_t inventoryGetItemsCount(Inventory *self);
+
+Item *inventoryGetFirstItem(Inventory *self);
+Item *inventoryGetNextItem(Inventory *self);
 
 bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot);
 void inventoryPrintEquipment(Inventory *self);

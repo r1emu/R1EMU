@@ -426,7 +426,42 @@ static PacketHandlerState zoneHandlerGameReady(
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_GAME_READY);
     CommanderInfo *cInfo = &session->game.commanderSession.currentCommander.info;
 
-    zoneBuilderItemInventoryList(replyMsg);
+    /* /// TESTING PURPOSES
+    Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+    Item items[20];
+    items[0].itemId = 1111;
+    items[0].itemType = 640092;
+    items[0].amount = 5;
+    items[0].itemCategory = INVENTORY_CAT_CONSUMABLE;
+    items[0].attributes = itemAttributesNew(0, 45, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[0]);
+
+
+    items[1].itemId = 2222;
+    items[1].itemType = 640102;
+    items[1].amount = 1;
+    items[0].itemCategory = INVENTORY_CAT_CONSUMABLE;
+    items[1].attributes = itemAttributesNew(0, 30, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[1]);
+
+    items[2].itemId = 3333;
+    items[2].itemType = 531102;
+    items[2].amount = 1;
+    items[0].itemCategory = INVENTORY_CAT_ARMOR;
+    items[2].equipSlot = EQSLOT_BODY_ARMOR;
+    items[2].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[2]);
+
+    items[3].itemId = 4444;
+    items[3].itemType = 531101;
+    items[3].amount = 1;
+    items[0].itemCategory = INVENTORY_CAT_ARMOR;
+    items[3].equipSlot = EQSLOT_BODY_ARMOR;
+    items[3].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[3]);
+    */
+
+    zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander.inventory, replyMsg);
     zoneBuilderSessionObjects(replyMsg);
     zoneBuilderOptionList(replyMsg);
     zoneBuilderSkillmapList(replyMsg);

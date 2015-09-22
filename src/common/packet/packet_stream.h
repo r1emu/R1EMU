@@ -43,7 +43,7 @@ PacketStream *packetStreamNew(void *buffer);
  * @param buffer An allocated buffer for the stream. It must be big enough for the stream or it will overflow.
  * @return true on success, false otherwise.
  */
-bool packetStreamInit(PacketStream *self, void *buffer);
+void packetStreamInit(PacketStream *self, void *buffer);
 
 /**
  * @brief Move the position depending of the offset argument (position = position + offet)

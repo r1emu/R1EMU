@@ -20,181 +20,78 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
+#include "item_attribute.h"
 
 // ---------- Defines -------------
 
-#define FLOAT_ATTRIBUTE_SIZE 6
-#define STRING_ATTRIBUTE_HEADER_SIZE 4
-#define ITEM_EQUIP_NOATTR_SIZE 24
-
 // ------ Structure declaration -------
-typedef enum {
-    INVENTORY_CAT_WEAPON = 1,
-    INVENTORY_CAT_ARMOR = 2,
-    INVENTORY_CAT_SUBWEAPON = 3,
-    INVENTORY_CAT_COSTUME = 4,
-    INVENTORY_CAT_ACCESSORY = 5,
-    INVENTORY_CAT_CONSUMABLE = 6,
-    INVENTORY_CAT_GEM = 7,
-    INVENTORY_CAT_MATERIAL = 8,
-    INVENTORY_CAT_CARD = 9,
-    INVENTORY_CAT_COLLECTION = 10,
-    INVENTORY_CAT_BOOK = 11,
-    INVENTORY_CAT_QUEST = 12,
-    INVENTORY_CAT_PETWEAPON = 13,
-    INVENTORY_CAT_PETARMOR = 14,
-}   InventoryCategory;
+/**
+ * @brief Item contains basic information about an item
+ */
+typedef struct Item {
 
-typedef struct ItemAttributes {
-
-    zhash_t *hashtable; // TODO
-
-    float durability;
-    float cooldown;
-    char *memo;
-    char *customName;
-    char *crafterName;
-    float pr; // dont know what it means yet
-    float reinforce_2; // I believe it is +1, +2, +3
-} ItemAttributes;
-
-typedef enum ItemAttributeType {
-    ITEM_ATTRIBUTE_DURABILITY     = 3770,
-    ITEM_ATTRIBUTE_PR             = 3781,
-    ITEM_ATTRIBUTE_COOLDOWN       = 3843,
-    ITEM_ATTRIBUTE_REINFORCE_2    = 3852,
-    ITEM_ATTRIBUTE_MEMO           = 3972,
-    ITEM_ATTRIBUTE_CUSTOM_NAME    = 3975,
-    ITEM_ATTRIBUTE_CRAFTER_NAME   = 3978,
-} ItemAttributeType;
-
-typedef struct ItemPkt {
-    uint64_t uniqueId;
-    uint32_t amount;
-    uint32_t inventoryIndex;
-    uint32_t id;
-}   ItemPkt;
-
-typedef enum AttributeFormat {
-    FLOAT_ATTRIBUTE,
-    STRING_ATTRIBUTE,
-} AttributeFormat;
-
-typedef struct Attribute {
-    void *attribute;
-    AttributeFormat format;
-} Attribute;
-
-typedef struct FloatAttribute {
-    ItemAttributeType attributeType;
-    float value;
-} FloatAttribute;
-
-typedef struct StringAttribute {
-    ItemAttributeType attributeType;
-    char *value;
-} StringAttribute;
-
-typedef struct AttributeArray {
-    Attribute *attributes;
-    int numAttributes;
-} AttributeArray;
-
-typedef struct ItemEquip {
-    uint32_t itemType;
+    /** Unique ID for an Item - key. */
     uint64_t itemId;
+
+    /** ID of this item indicating which item is it. */
+    uint32_t itemType;
+
+    /** Amount of this item */
+    uint32_t amount;
+
+    /** Index of the item in the inventory */
     uint32_t inventoryIndex;
-    AttributeArray attributeArray;
-} ItemEquip;
+
+    /** Attributes of the item */
+    ItemAttributes attributes;
+} Item;
 
 /**
- * @brief Item contains
+ * @brief ItemPacket is the packet structure of an item
  */
-
-typedef struct Item
-{
-    uint64_t itemId; // Unique ID for an Item - key.
-    InventoryCategory itemCategory;
-    uint32_t itemType; // ID of this item indicating which item is it.
-    uint32_t amount; // amount of this item
-    ItemAttributes *attributes;
-    uint8_t useGender;
-    uint8_t useJob;
-    bool isTwoHanded;
-    uint8_t equipSlot;
-    bool isDummy; // When an item is created for dummy porpuses.
+typedef struct ItemPacket {
+    uint64_t uniqueId;
+    uint32_t id;
+    uint32_t amount;
     uint32_t inventoryIndex;
-} Item;
+} ItemPacket;
 
 // ----------- Functions ------------
 
-ItemAttributes *itemAttributesNew(
-    float durability,
-    float cooldown,
-    char *memo,
-    char *customName,
-    char *crafterName,
-    float pr,
-    float reinforce_2);
+/**
+ * Allocate a new Item structure.
+ * @return A pointer to an allocated Item, or NULL if an error occured.
+ */
+Item *itemNew(uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inventoryIndex);
 
 /**
- * @brief Creates memory and initializes an ItemAttributes
+ * Initialize an allocated Item structure.
+ * @param self An allocated Item to initialize.
+ * @return true on success, false otherwise.
  */
-ItemAttributes *itemAttributesNew(
-    float durability,
-    float cooldown,
-    char *memo,
-    char *customName,
-    char *crafterName,
-    float pr,
-    float reinforce_2);
+bool itemInit(Item *self, uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inventoryIndex);
 
 /**
- * @brief Initialize an ItemAttributes
+ * Generate a key for an item from ItemId
  */
-bool itemAttributesInit(
-    ItemAttributes *self,
-    float durability,
-    float cooldown,
-    char *memo,
-    char *customName,
-    char *crafterName,
-    float pr,
-    float reinforce_2);
+void itemGenKey(uint64_t itemIdKey, char itemKey[17]);
 
 /**
- * @brief Equip an item in the inventory
+ * Free an allocated Item structure.
+ * @param self A pointer to an allocated Item.
  */
-bool itemEquipInit(
-    ItemEquip *self,
-    uint32_t itemType,
-    uint64_t itemId,
-    uint32_t inventoryIndex,
-    AttributeArray *attributeArray);
+void itemFree(Item *self);
 
 /**
- * @brief Free an allocated ItemAttributes structure.
- * @param self A pointer to an allocated ItemAttributes.
+ * Free an allocated Item structure and nullify the content of the pointer.
+ * @param self A pointer to an allocated Item.
  */
-void itemAttributesFree(ItemAttributes *self);
+void itemDestroy(Item **self);
 
 /**
- * @brief Free an allocated ItemAttributes structure and nullify the content of the pointer.
- * @param self A pointer to an allocated ItemAttributes.
+ * Add, get, update or remove attributes from an item
  */
-void itemAttributesDestroy(ItemAttributes **_self);
-
-/**
- * Get the packet structure of the ItemEquip
- */
-size_t itemEquipGetPacketSize(ItemEquip *itemEquip);
-
-/**
- * Get the packet structure of the ItemAttributes
- */
-bool itemAttributesGetPacket(ItemAttributes *itemAttributes, char *packet);
-
-/**
- * Get the packet size of the itemAttributes
- */
-size_t itemAttributesGetPacketSize(ItemAttributes *itemAttributes);
+bool itemAddAttribute(Item *self, ItemAttributeId itemAttrId, void *value);
+bool itemGetAttribute(Item *self, ItemAttributeId itemAttrId, void **value);
+bool itemUpdateAttribute(Item *self, ItemAttributeId itemAttrId, void *value);
+bool itemRemoveAttribute(Item *self, ItemAttributeId itemAttrId);

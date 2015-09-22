@@ -31,24 +31,17 @@ PacketStream *packetStreamNew(void *buffer) {
         return NULL;
     }
 
-    if (!packetStreamInit(self, buffer)) {
-        packetStreamDestroy (&self);
-        error("PacketStream failed to initialize.");
-        return NULL;
-    }
+    packetStreamInit(self, buffer);
 
     return self;
 }
 
-bool
-packetStreamInit(PacketStream *self, void *buffer) {
+void packetStreamInit(PacketStream *self, void *buffer) {
     self->buffer = buffer;
     self->position = 0;
-    return true;
 }
 
-void
-packetStreamAppend(PacketStream *self, void *data, size_t dataSize) {
+void packetStreamAppend(PacketStream *self, void *data, size_t dataSize) {
     memcpy(&self->buffer[self->position], data, dataSize);
     self->position += dataSize;
 }
@@ -57,13 +50,11 @@ void *packetStreamGetCurrentBuffer(PacketStream *self) {
     return &self->buffer[self->position];
 }
 
-void
-packetStreamAddOffset(PacketStream *self, unsigned int offset) {
+void packetStreamAddOffset(PacketStream *self, unsigned int offset) {
     self->position += offset;
 }
 
-void
-packetStreamDestroy(PacketStream **_self) {
+void packetStreamDestroy(PacketStream **_self) {
     PacketStream *self = *_self;
 
     free(self);
