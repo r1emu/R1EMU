@@ -88,3 +88,10 @@ void itemFree(Item *self);
  */
 void itemDestroy(Item **self);
 
+/**
+ * Add, get, update or remove attributes from an item
+ */
+bool itemAddAttribute(Item *self, ItemAttributeId itemAttrId, void *value);
+bool itemGetAttribute(Item *self, ItemAttributeId itemAttrId, void **value);
+bool itemUpdateAttribute(Item *self, ItemAttributeId itemAttrId, void *value);
+bool itemRemoveAttribute(Item *self, ItemAttributeId itemAttrId);

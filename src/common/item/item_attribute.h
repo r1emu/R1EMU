@@ -30,13 +30,13 @@ typedef struct ItemAttributes {
 } ItemAttributes;
 
 typedef enum ItemAttributeId {
-    ITEM_ATTRIBUTE_TYPE_DURABILITY     = 3770,
-    ITEM_ATTRIBUTE_TYPE_PR             = 3781,
-    ITEM_ATTRIBUTE_TYPE_COOLDOWN       = 3843,
-    ITEM_ATTRIBUTE_TYPE_REINFORCE_2    = 3852,
-    ITEM_ATTRIBUTE_TYPE_MEMO           = 3972,
-    ITEM_ATTRIBUTE_TYPE_CUSTOM_NAME    = 3975,
-    ITEM_ATTRIBUTE_TYPE_CRAFTER_NAME   = 3978,
+    ITEM_ATTRIBUTE_ID_DURABILITY     = 3770,
+    ITEM_ATTRIBUTE_ID_PR             = 3781,
+    ITEM_ATTRIBUTE_ID_COOLDOWN       = 3843,
+    ITEM_ATTRIBUTE_ID_REINFORCE_2    = 3852,
+    ITEM_ATTRIBUTE_ID_MEMO           = 3972,
+    ITEM_ATTRIBUTE_ID_CUSTOM_NAME    = 3975,
+    ITEM_ATTRIBUTE_ID_CRAFTER_NAME   = 3978,
 } ItemAttributeId;
 
 // ----------- Functions ------------

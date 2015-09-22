@@ -116,6 +116,14 @@ size_t inventoryGetItemsCount(Inventory *self) {
     return zhash_size(self->items);
 }
 
+Item *inventoryGetFirstItem(Inventory *self) {
+    return (Item*) zhash_first(self->items);
+}
+
+Item *inventoryGetNextItem(Inventory *self) {
+    return (Item*) zhash_next(self->items);
+}
+
 bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
 
     Item *itemToUnequip = self->equippedItems[eqSlot];

@@ -128,9 +128,9 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
     uint32_t amount = strtol(args, &args, 10);
     amount = amount ? amount : 1;
 
-    uint32_t itemPosition = 1;
-
     Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+
+    uint32_t itemPosition = inventoryGetItemsCount(inventory) + 1;
 
     Item newItem;
     itemInit(&newItem,
@@ -139,6 +139,7 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
         amount,
         INVENTORY_CAT_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition
     );
+    itemAddAttribute(&newItem, ITEM_ATTRIBUTE_ID_DURABILITY, (float[]) {4200});
 
     inventoryAddItem(inventory, &newItem);
 
