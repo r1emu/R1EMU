@@ -60,11 +60,3 @@ void packetStreamDestroy(PacketStream **_self) {
     free(self);
     *_self = NULL;
 }
-
-unsigned int packetStreamGetOffset(PacketStream *self) {
-    return self->position;
-}
-
-void packetStreamSetOffset(PacketStream *self, unsigned int position) {
-    self->position = position;
-}
