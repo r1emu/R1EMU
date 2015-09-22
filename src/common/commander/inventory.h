@@ -131,6 +131,7 @@ void inventoryDestroy(Inventory **self);
  * @param item an Item.
  */
 bool inventoryAddItem(Inventory *self, Item *itemToAdd);
+bool inventoryRemoveItem(Inventory *self, Item *itemToRemove);
 
 /**
  * Get count (size) of items in inventory
@@ -139,10 +140,11 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd);
  */
 size_t inventoryGetItemsCount(Inventory *self);
 
-Item *inventoryGetFirstItem(Inventory *self);
-Item *inventoryGetNextItem(Inventory *self);
+Item *inventoryGetFirstItem(Inventory *self, InventoryCategory category);
+Item *inventoryGetNextItem(Inventory *self, InventoryCategory category);
 
 bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot);
 void inventoryPrintEquipment(Inventory *self);
 bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value);
+void inventoryPrintBag(Inventory *self, InventoryCategory category);
 

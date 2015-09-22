@@ -99,7 +99,7 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
         return false;
     }
 
-    result = zlist_push(self->bags[itemToAdd->itemCategory], itemToAdd);
+    result = zlist_append(self->bags[itemToAdd->itemCategory], itemToAdd);
     if (result == -1) {
         error("Cannot push item into the category bag in inventory");
         return false;
@@ -109,6 +109,13 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 }
 
 bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
+
+    //if (zlist_exists(self->bags[itemToRemove->itemCategory], itemToRemove)) {
+        zlist_remove(self->bags[itemToRemove->itemCategory], itemToRemove);
+    //} else {
+    //    error("Item was not found in bag [%d] of inventory", itemToRemove->itemCategory);
+    //    return false;
+    //}
 
     char itemIdKey[17];
     snprintf(itemIdKey, sizeof(itemIdKey), "%I64x", itemToRemove->itemId);
@@ -141,12 +148,12 @@ size_t inventoryGetItemsCount(Inventory *self) {
     return zhash_size(self->items);
 }
 
-Item *inventoryGetFirstItem(Inventory *self) {
-    return (Item*) zhash_first(self->items);
+Item *inventoryGetFirstItem(Inventory *self, InventoryCategory category) {
+    return (Item*) zlist_first(self->bags[category]);
 }
 
-Item *inventoryGetNextItem(Inventory *self) {
-    return (Item*) zhash_next(self->items);
+Item *inventoryGetNextItem(Inventory *self, InventoryCategory category) {
+    return (Item*) zlist_next(self->bags[category]);
 }
 
 bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
@@ -271,4 +278,23 @@ void inventoryPrintEquipment(Inventory *self) {
     dbg("ring_left = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[17]);
     dbg("ring_right = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[18]);
     dbg("necklace = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[19]);
+}
+
+void inventoryPrintBag(Inventory *self, InventoryCategory category) {
+    Item *item;
+    item = zlist_first(self->bags[category]);
+
+    dbg("Printing Inventory bag[%d]", category);
+
+    if (!item) {
+        dbg("-- Bag [%d] is empty --", category);
+    }
+
+    int index = 0;
+    while (item) {
+        dbg("[%d] item: [%d]", index, item->itemType);
+
+        item = zlist_next(self->bags[category]);
+        index++;
+    }
 }
