@@ -48,6 +48,13 @@ bool inventoryInit(Inventory *self) {
         return false;
     }
 
+    for (int i = 0; i < INVENTORY_CAT_Count; i++) {
+        if (!(self->bags[i] = zlist_new())) {
+            error("Cannot allocate list for bag [%d]", i);
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -68,6 +75,16 @@ void inventoryDestroy(Inventory **_self) {
 
 bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
+    if (!itemToAdd->itemCategory) {
+        error("Item has no category");
+        return false;
+    }
+
+    if (itemToAdd->itemCategory > INVENTORY_CAT_Count) {
+        error("Item has invalid category");
+        return false;
+    }
+
     dbg("itemIdKey: %d", itemToAdd->itemId);
 
     char itemIdKey[17];
@@ -75,14 +92,16 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
     dbg("itemIdKey: %s", itemIdKey);
 
-    if (self->items == NULL) {
-        self->items = zhash_new();
-    }
-
     int result;
     result = zhash_insert(self->items, itemIdKey, itemToAdd);
     if (result != 0) {
         error("Cannot insert the item in the hashtable. Error: %d", result);
+        return false;
+    }
+
+    result = zlist_push(self->bags[itemToAdd->itemCategory], itemToAdd);
+    if (result == -1) {
+        error("Cannot push item into the category bag in inventory");
         return false;
     }
 

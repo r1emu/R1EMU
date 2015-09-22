@@ -43,6 +43,7 @@ typedef enum {
     INVENTORY_CAT_QUEST = 12,
     INVENTORY_CAT_PETWEAPON = 13,
     INVENTORY_CAT_PETARMOR = 14,
+    INVENTORY_CAT_Count,
 }   InventoryCategory;
 
 typedef struct ItemAttributes {
@@ -61,7 +62,7 @@ typedef struct ItemAttributes {
 typedef enum ItemAttributeType {
     ITEM_ATTRIBUTE_DURABILITY     = 3770,
     ITEM_ATTRIBUTE_PR             = 3781,
-    ITEM_ATTRIBUTE_COOLDOWN       = 3843,
+    ITEM_ATTRIBUTE_COOLDOWN       = 3750,
     ITEM_ATTRIBUTE_REINFORCE_2    = 3852,
     ITEM_ATTRIBUTE_MEMO           = 3972,
     ITEM_ATTRIBUTE_CUSTOM_NAME    = 3975,

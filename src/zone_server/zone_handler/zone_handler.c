@@ -426,17 +426,26 @@ static PacketHandlerState zoneHandlerGameReady(
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_GAME_READY);
     CommanderInfo *cInfo = &session->game.commanderSession.currentCommander.info;
 
-    /* /// TESTING PURPOSES
+    /// TESTING PURPOSES
     Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
     Item items[20];
     items[0].itemId = 1111;
-    items[0].itemType = 640092;
-    items[0].amount = 5;
+    items[0].itemType = 645001;
+    items[0].amount = 5003;
     items[0].itemCategory = INVENTORY_CAT_CONSUMABLE;
-    items[0].attributes = itemAttributesNew(0, 45, NULL, NULL, NULL, 0, 0);
+    items[0].inventoryIndex = 1;
+    items[0].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[0]);
 
+    items[1].itemId = 2222;
+    items[1].itemType = 640026;
+    items[1].amount = 5;
+    items[1].itemCategory = INVENTORY_CAT_CONSUMABLE;
+    items[1].inventoryIndex = 2;
+    items[1].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[1]);
 
+    /*
     items[1].itemId = 2222;
     items[1].itemType = 640102;
     items[1].amount = 1;
@@ -460,6 +469,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[3].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[3]);
     */
+
 
     zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander.inventory, replyMsg);
     zoneBuilderSessionObjects(replyMsg);

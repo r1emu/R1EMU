@@ -95,6 +95,7 @@ typedef struct Inventory Inventory;
 struct Inventory
 {
     zhash_t *items;
+    zlist_t *bags[INVENTORY_CAT_Count];
     Item *equippedItems[EQSLOT_Count];
 };
 

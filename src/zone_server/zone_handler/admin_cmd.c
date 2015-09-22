@@ -134,10 +134,9 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
     Item newItem;
     newItem.itemId = r1emuGenerateRandom64(&self->seed);
     newItem.itemType = itemType;
-    newItem.itemCategory = INVENTORY_CAT_ARMOR;
+    newItem.itemCategory = INVENTORY_CAT_CONSUMABLE;
     newItem.amount =  (!amount) ? 1 : amount;
-    newItem.equipSlot = EQSLOT_BODY_ARMOR;
-    newItem.attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    newItem.attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
     newItem.inventoryIndex = INVENTORY_CAT_SIZE * newItem.itemCategory + itemPosition;
     inventoryAddItem(inventory, &newItem);
 
