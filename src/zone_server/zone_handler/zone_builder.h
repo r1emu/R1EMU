@@ -300,7 +300,7 @@ void zoneBuilderSkillmapList(zmsg_t *replyMsg);
 /**
  * @brief Send information about item inventory list
  */
-void zoneBuilderItemInventoryList(zmsg_t *replyMsg);
+void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg);
 
 /**
  * @brief Send a target commander movement speed

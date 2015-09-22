@@ -138,6 +138,9 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd);
  */
 size_t inventoryGetItemsCount(Inventory *self);
 
+Item *inventoryGetFirstItem(Inventory *self);
+Item *inventoryGetNextItem(Inventory *self);
+
 bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot);
 void inventoryPrintEquipment(Inventory *self);
 bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value);
