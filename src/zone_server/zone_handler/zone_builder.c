@@ -1215,27 +1215,23 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
             #pragma pack(pop)
 
             dbg("Set item info");
-            if (eqSlotIndex == 19) {
-                equippedItemPacket->itemType = item ? item->itemType : inventoryGetEquipmentEmptySlot(eqSlotIndex);
-                equippedItemPacket->sizeOfAttributes = attrSize;
-                equippedItemPacket->unkown = SWAP_UINT16(0x9416);
-                equippedItemPacket->itemId = 0;
-                equippedItemPacket->eqSlotIndex = eqSlotIndex;
-                equippedItemPacket->unk1 = 0;
-                equippedItemPacket->unk2 = SWAP_UINT16(0x5f94);
-                equippedItemPacket->unk3 = SWAP_UINT32(0x7d0068db);
+
+            uint32_t itemType;
+            if (!item) {
+                if (!inventoryGetEquipmentEmptySlot(eqSlotIndex, &itemType)) {
+                    error("Couldn't find default itemType for a given EquipmentSlot");
+                }
             } else {
-                equippedItemPacket->itemType = item ? item->itemType : inventoryGetEquipmentEmptySlot(eqSlotIndex);
-                equippedItemPacket->sizeOfAttributes = attrSize;
-                equippedItemPacket->unkown = 0;
-                equippedItemPacket->itemId = item ? item->itemId : 0;
-                equippedItemPacket->eqSlotIndex = eqSlotIndex;
-                equippedItemPacket->unk1 = 1;
-                equippedItemPacket->unk2 = 2;
-                equippedItemPacket->unk3 = 3;
+                itemType = item->itemType;
             }
-
-
+            equippedItemPacket->itemType = itemType;
+            equippedItemPacket->sizeOfAttributes = attrSize;
+            equippedItemPacket->unkown = 0;
+            equippedItemPacket->itemId = item ? item->itemId : 0;
+            equippedItemPacket->eqSlotIndex = eqSlotIndex;
+            equippedItemPacket->unk1 = 0;
+            equippedItemPacket->unk2 = 0;
+            equippedItemPacket->unk3 = 0;
 
             dbg("get attributes offset for stream");
 
