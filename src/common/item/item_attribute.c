@@ -61,13 +61,13 @@ struct ItemAttributeKeyFormat {
     char *key;
     AttributeFormat format;
 } itemAttributeKeyFormats [] = {
-    [ITEM_ATTRIBUTE_TYPE_DURABILITY]   = {.key = ITEM_ATTRIBUTE_DURABILITY,   .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_TYPE_PR]           = {.key = ITEM_ATTRIBUTE_PR,           .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_TYPE_COOLDOWN]     = {.key = ITEM_ATTRIBUTE_COOLDOWN,     .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_TYPE_REINFORCE_2]  = {.key = ITEM_ATTRIBUTE_REINFORCE_2,  .format = FLOAT_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_TYPE_MEMO]         = {.key = ITEM_ATTRIBUTE_MEMO,         .format = STRING_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_TYPE_CUSTOM_NAME]  = {.key = ITEM_ATTRIBUTE_CUSTOM_NAME,  .format = STRING_ATTRIBUTE},
-    [ITEM_ATTRIBUTE_TYPE_CRAFTER_NAME] = {.key = ITEM_ATTRIBUTE_CRAFTER_NAME, .format = STRING_ATTRIBUTE}
+    [ITEM_ATTRIBUTE_ID_DURABILITY]   = {.key = ITEM_ATTRIBUTE_DURABILITY,   .format = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_ID_PR]           = {.key = ITEM_ATTRIBUTE_PR,           .format = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_ID_COOLDOWN]     = {.key = ITEM_ATTRIBUTE_COOLDOWN,     .format = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_ID_REINFORCE_2]  = {.key = ITEM_ATTRIBUTE_REINFORCE_2,  .format = FLOAT_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_ID_MEMO]         = {.key = ITEM_ATTRIBUTE_MEMO,         .format = STRING_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_ID_CUSTOM_NAME]  = {.key = ITEM_ATTRIBUTE_CUSTOM_NAME,  .format = STRING_ATTRIBUTE},
+    [ITEM_ATTRIBUTE_ID_CRAFTER_NAME] = {.key = ITEM_ATTRIBUTE_CRAFTER_NAME, .format = STRING_ATTRIBUTE}
 };
 
 /** Private ItemAttribute functions */
@@ -253,8 +253,40 @@ bool itemAttributesGet(ItemAttributes *self, ItemAttributeId itemAttrId, void **
         goto cleanup;
     }
 
-    void *value = zhash_lookup(self->hashtable, attributeKey);
-    *_output = value;
+    ItemAttribute *itemAttribute = zhash_lookup(self->hashtable, attributeKey);
+    *_output = itemAttribute->value;
+
+    status = true;
+
+cleanup:
+    return status;
+}
+
+bool itemAttributesUpdate(ItemAttributes *self, ItemAttributeId itemAttrId, void *value) {
+
+    bool status = false;
+    char *attributeKey = NULL;
+
+    if (!(attributeKey = itemAttributeKeyFormats[itemAttrId].key)) {
+        error("No attribute key for '%d'", itemAttrId);
+        goto cleanup;
+    }
+
+    ItemAttribute *itemAttribute = NULL;
+
+    if (!(itemAttribute = zhash_lookup(self->hashtable, attributeKey))) {
+        error("Cannot find itemAttribute %d.", itemAttrId);
+        goto cleanup;
+    }
+
+    // free old value
+    free(itemAttribute->value);
+
+    // replace it with the new one
+    if (!(itemAttributeInit(itemAttribute, itemAttrId, itemAttributeKeyFormats[itemAttrId].format, value))) {
+        error("Cannot remplace the new item attribute.");
+        goto cleanup;
+    }
 
     status = true;
 

@@ -272,7 +272,7 @@ void barrackBuilderCommanderList(
             Item *item = inventory->equippedItems[eqSlotIndex];
 
             // get attribute size
-            size_t attrSize = item ? itemAttributesGetPacketSize(item->attributes) : 0;
+            size_t attrSize = item ? itemAttributesGetPacketSize(&item->attributes) : 0;
 
             // get total structure size
             #pragma pack(push, 1)
@@ -439,7 +439,7 @@ void barrackBuilderCommanderList(
 
                 // write in the buffer
                 if (item) {
-                    itemAttributesGetPacket(item->attributes, packetStreamGetCurrentBuffer(&packetStream));
+                    itemAttributesGetPacket(&item->attributes, packetStreamGetCurrentBuffer(&packetStream));
                     // relocate the stream position
                     packetStreamAddOffset(&packetStream, attrSize);
                 }

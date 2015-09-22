@@ -126,17 +126,21 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
     uint32_t itemType = strtol(args, &args, 10);
     args++;
     uint32_t amount = strtol(args, &args, 10);
-
-    uint32_t itemPosition = 1;
+    amount = amount ? amount : 1;
 
     Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
 
+    uint32_t itemPosition = inventoryGetItemsCount(inventory) + 1;
+
     Item newItem;
-    newItem.itemId = r1emuGenerateRandom64(&self->seed);
-    newItem.itemType = itemType;
-    newItem.amount =  (!amount) ? 1 : amount;
-    newItem.attributes = itemAttributesNew();
-    newItem.inventoryIndex = INVENTORY_CAT_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition;
+    itemInit(&newItem,
+        r1emuGenerateRandom64(&self->seed),
+        itemType,
+        amount,
+        INVENTORY_CAT_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition
+    );
+    itemAddAttribute(&newItem, ITEM_ATTRIBUTE_ID_DURABILITY, (float[]) {4200});
+
     inventoryAddItem(inventory, &newItem);
 
     zoneBuilderItemAdd(&newItem, INVENTORY_ADD_PICKUP, replyMsg);
@@ -211,7 +215,7 @@ void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *re
         pos.x = 0;
         pos.y = 0;
         pos.z = 0;
-        zoneBuilderChangeCamera((uint8_t)0, &pos, (float)0, (float)0, replyMsg);
+        zoneBuilderChangeCamera(0, &pos, 0.0f, 0.0f, replyMsg);
     }
     else {
         char **arg;
@@ -229,11 +233,11 @@ void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *re
                 session->game.commanderSession.currentCommander.info.pos.z : atof(arg[2]);
         }
         if (argc == 3)
-            zoneBuilderChangeCamera((uint8_t)1, &pos, (float)10, (float)0.7, replyMsg);
+            zoneBuilderChangeCamera(1, &pos, 10.0f, 0.7f, replyMsg);
         else if (argc == 5) {
             fspd = atof(arg[3]);
             ispd = atof(arg[4]);
-            zoneBuilderChangeCamera((uint8_t)1, &pos, fspd, ispd, replyMsg);
+            zoneBuilderChangeCamera(1, &pos, fspd, ispd, replyMsg);
         }
         else {
             snprintf(message, sizeof(message), "Bad usage /changeCamera <x> <y> <z> {<fspd> <ispd>}");

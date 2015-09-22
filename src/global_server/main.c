@@ -24,12 +24,6 @@
 
 int main(int argc, char **argv)
 {
-    {
-        #include "common/item/item_attribute.h"
-        ItemAttributes *attrs = itemAttributesNew();
-        itemAttributesAdd(attrs, ITEM_ATTRIBUTE_TYPE_DURABILITY, (float[]) {50.0});
-    }
-
      // Get the configuration file
     char *confFilePath = NULL;
 
