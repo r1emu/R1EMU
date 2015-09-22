@@ -71,7 +71,7 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
     dbg("itemIdKey: %d", itemToAdd->itemId);
 
     char itemIdKey[17];
-    snprintf(itemIdKey, sizeof(itemIdKey), "%I64x", itemToAdd->itemId);
+    itemGenKey(itemToAdd, itemIdKey);
 
     dbg("itemIdKey: %s", itemIdKey);
 
@@ -92,7 +92,7 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
 
     char itemIdKey[17];
-    snprintf(itemIdKey, sizeof(itemIdKey), "%I64x", itemToRemove->itemId);
+    itemGenKey(itemToAdd, itemIdKey);
 
     zhash_delete(self->items, itemIdKey);
 
@@ -104,7 +104,7 @@ bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item) {
     Item *item = NULL;
 
     char itemIdKey[17];
-    snprintf(itemIdKey, sizeof(itemIdKey), "%I64x", itemId);
+    itemGenKey(itemToAdd, itemIdKey);
 
     *_item = NULL;
 

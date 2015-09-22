@@ -83,6 +83,10 @@ bool itemUpdateAttribute(Item *self, ItemAttributeId itemAttrId, void *value) {
     return true;
 }
 
+void itemGenKey(Item *self, char itemKey[17]) {
+    snprintf(itemKey, sizeof(itemKey), "%I64x", self->itemId);
+}
+
 bool itemRemoveAttribute(Item *self, ItemAttributeId itemAttrId) {
 
     if (!(itemAttributesRemove(&self->attributes, itemAttrId))) {

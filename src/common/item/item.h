@@ -72,6 +72,11 @@ Item *itemNew(uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inve
 bool itemInit(Item *self, uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inventoryIndex);
 
 /**
+ * Generate a key for an item from ItemId
+ */
+void itemGenKey(Item *self, char itemKey[17]);
+
+/**
  * Free an allocated Item structure.
  * @param self A pointer to an allocated Item.
  */
