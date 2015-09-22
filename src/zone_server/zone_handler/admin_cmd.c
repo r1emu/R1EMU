@@ -215,7 +215,7 @@ void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *re
         pos.x = 0;
         pos.y = 0;
         pos.z = 0;
-        zoneBuilderChangeCamera((uint8_t)0, &pos, (float)0, (float)0, replyMsg);
+        zoneBuilderChangeCamera(0, &pos, 0.0f, 0.0f, replyMsg);
     }
     else {
         char **arg;
@@ -233,11 +233,11 @@ void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *re
                 session->game.commanderSession.currentCommander.info.pos.z : atof(arg[2]);
         }
         if (argc == 3)
-            zoneBuilderChangeCamera((uint8_t)1, &pos, (float)10, (float)0.7, replyMsg);
+            zoneBuilderChangeCamera(1, &pos, 10.0f, 0.7f, replyMsg);
         else if (argc == 5) {
             fspd = atof(arg[3]);
             ispd = atof(arg[4]);
-            zoneBuilderChangeCamera((uint8_t)1, &pos, fspd, ispd, replyMsg);
+            zoneBuilderChangeCamera(1, &pos, fspd, ispd, replyMsg);
         }
         else {
             snprintf(message, sizeof(message), "Bad usage /changeCamera <x> <y> <z> {<fspd> <ispd>}");
