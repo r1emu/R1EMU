@@ -74,7 +74,7 @@ bool itemInit(Item *self, uint64_t itemId, uint32_t itemType, uint32_t amount, u
 /**
  * Generate a key for an item from ItemId
  */
-void itemGenKey(Item *self, char itemKey[17]);
+void itemGenKey(uint64_t itemIdKey, char itemKey[17]);
 
 /**
  * Free an allocated Item structure.

@@ -71,18 +71,12 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
     dbg("itemIdKey: %d", itemToAdd->itemId);
 
     char itemIdKey[17];
-    itemGenKey(itemToAdd, itemIdKey);
+    itemGenKey(itemToAdd->itemId, itemIdKey);
 
     dbg("itemIdKey: %s", itemIdKey);
 
-    if (self->items == NULL) {
-        self->items = zhash_new();
-    }
-
-    int result;
-    result = zhash_insert(self->items, itemIdKey, itemToAdd);
-    if (result != 0) {
-        error("Cannot insert the item in the hashtable. Error: %d", result);
+    if (zhash_insert(self->items, itemIdKey, itemToAdd) != 0) {
+        error("Cannot insert the item in the hashtable.");
         return false;
     }
 
@@ -92,7 +86,7 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
 
     char itemIdKey[17];
-    itemGenKey(itemToAdd, itemIdKey);
+    itemGenKey(itemToRemove->itemId, itemIdKey);
 
     zhash_delete(self->items, itemIdKey);
 
@@ -104,7 +98,7 @@ bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item) {
     Item *item = NULL;
 
     char itemIdKey[17];
-    itemGenKey(itemToAdd, itemIdKey);
+    itemGenKey(itemId, itemIdKey);
 
     *_item = NULL;
 
@@ -127,7 +121,7 @@ bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
     Item *itemToUnequip = self->equippedItems[eqSlot];
 
     if (itemToUnequip == NULL) {
-        dbg("No item to unequip. Slot is free.");
+        warning("No item to unequip. Slot is free.");
         return true; // Should I return false? Function didn't success to unequip.
     }
 
