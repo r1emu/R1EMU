@@ -191,35 +191,35 @@ Item *inventoryGetEquipment(Inventory *self) {
     return (Item*) self->equippedItems;
 }
 
-uint32_t inventoryGetEquipmentEmptySlot(EquipmentSlot slot) {
-    uint32_t value = 0;
+bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value) {
 
     switch (slot) {
-        case EQSLOT_HEAD_TOP: value = EMPTYEQSLOT_NoHat; break;
-        case EQSLOT_HEAD_MIDDLE: value = EMPTYEQSLOT_NoHat; break;
-        case EQSLOT_UNKOWN1: value = EMPTYEQSLOT_NoOuter; break;
-        case EQSLOT_BODY_ARMOR: value = EMPTYEQSLOT_NoHat; break;
-        case EQSLOT_GLOVES: value = EMPTYEQSLOT_NoGloves; break;
-        case EQSLOT_BOOTS: value = EMPTYEQSLOT_NoBoots; break;
-        case EQSLOT_HELMET: value = EMPTYEQSLOT_NoHelmet; break;
-        case EQSLOT_BRACELET: value = EMPTYEQSLOT_NoArmband; break;
-        case EQSLOT_WEAPON: value = EMPTYEQSLOT_NoWeapon; break;
-        case EQSLOT_SHIELD: value = EMPTYEQSLOT_NoWeapon; break;
-        case EQSLOT_COSTUME: value = EMPTYEQSLOT_NoOuter; break;
-        case EQSLOT_UNKOWN3: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_UNKOWN4: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_UNKOWN5: value = EMPTYEQSLOT_NoOuter; break;
-        case EQSLOT_LEG_ARMOR: value = EMPTYEQSLOT_NoShirt; break;
-        case EQSLOT_UNKOWN6: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_UNKOWN7: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_RIGHT_LEFT: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_RIGHT_RIGHT: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_NECKLACE: value = EMPTYEQSLOT_NoNeck; break;
+        case EQSLOT_HEAD_TOP: *value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_HEAD_MIDDLE: *value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_UNKOWN1: *value = EMPTYEQSLOT_NoOuter; break;
+        case EQSLOT_BODY_ARMOR: *value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_GLOVES: *value = EMPTYEQSLOT_NoGloves; break;
+        case EQSLOT_BOOTS: *value = EMPTYEQSLOT_NoBoots; break;
+        case EQSLOT_HELMET: *value = EMPTYEQSLOT_NoHelmet; break;
+        case EQSLOT_BRACELET: *value = EMPTYEQSLOT_NoArmband; break;
+        case EQSLOT_WEAPON: *value = EMPTYEQSLOT_NoWeapon; break;
+        case EQSLOT_SHIELD: *value = EMPTYEQSLOT_NoWeapon; break;
+        case EQSLOT_COSTUME: *value = EMPTYEQSLOT_NoOuter; break;
+        case EQSLOT_UNKOWN3: *value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKOWN4: *value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKOWN5: *value = EMPTYEQSLOT_NoOuter; break;
+        case EQSLOT_LEG_ARMOR: *value = EMPTYEQSLOT_NoShirt; break;
+        case EQSLOT_UNKOWN6: *value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKOWN7: *value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_RIGHT_LEFT: *value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_RIGHT_RIGHT: *value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_NECKLACE: *value = EMPTYEQSLOT_NoNeck; break;
         default: {
-            error("DefaultEmptySlot value not found for slot [%d]", slot);
+            *value = -1;
+            return false;
         }
     }
-    return value;
+    return true;
 }
 
 
