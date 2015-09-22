@@ -191,25 +191,57 @@ Item *inventoryGetEquipment(Inventory *self) {
     return (Item*) self->equippedItems;
 }
 
+uint32_t inventoryGetEquipmentEmptySlot(EquipmentSlot slot) {
+    uint32_t value = 0;
+
+    switch (slot) {
+        case EQSLOT_HEAD_TOP: value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_HEAD_MIDDLE: value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_UNKOWN1: value = EMPTYEQSLOT_NoOuter; break;
+        case EQSLOT_BODY_ARMOR: value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_GLOVES: value = EMPTYEQSLOT_NoGloves; break;
+        case EQSLOT_BOOTS: value = EMPTYEQSLOT_NoBoots; break;
+        case EQSLOT_HELMET: value = EMPTYEQSLOT_NoHelmet; break;
+        case EQSLOT_BRACELET: value = EMPTYEQSLOT_NoArmband; break;
+        case EQSLOT_WEAPON: value = EMPTYEQSLOT_NoWeapon; break;
+        case EQSLOT_SHIELD: value = EMPTYEQSLOT_NoWeapon; break;
+        case EQSLOT_COSTUME: value = EMPTYEQSLOT_NoOuter; break;
+        case EQSLOT_UNKOWN3: value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKOWN4: value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKOWN5: value = EMPTYEQSLOT_NoOuter; break;
+        case EQSLOT_LEG_ARMOR: value = EMPTYEQSLOT_NoShirt; break;
+        case EQSLOT_UNKOWN6: value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKOWN7: value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_RIGHT_LEFT: value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_RIGHT_RIGHT: value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_NECKLACE: value = EMPTYEQSLOT_NoNeck; break;
+        default: {
+            error("DefaultEmptySlot value not found for slot [%d]", slot);
+        }
+    }
+    return value;
+}
+
+
 void inventoryPrintEquipment(Inventory *self) {
-    dbg("head_top = %d (%x)", self->equippedItems[0], self->equippedItems[0]);
-    dbg("head_middle = %d (%x)", self->equippedItems[1], self->equippedItems[1]);
-    dbg("itemUnk1 = %d (%x)", self->equippedItems[2], self->equippedItems[2]);
-    dbg("body_armor = %d (%x)", self->equippedItems[3], self->equippedItems[3]);
-    dbg("gloves = %d (%x)", self->equippedItems[4], self->equippedItems[4]);
-    dbg("boots = %d (%x)", self->equippedItems[5], self->equippedItems[5]);
-    dbg("helmet = %d (%x)", self->equippedItems[6], self->equippedItems[6]);
-    dbg("bracelet = %d (%x)", self->equippedItems[7], self->equippedItems[7]);
-    dbg("weapon = %d (%x)", self->equippedItems[8], self->equippedItems[8]);
-    dbg("shield = %d (%x)", self->equippedItems[9], self->equippedItems[9]);
-    dbg("costume = %d (%x)", self->equippedItems[10], self->equippedItems[10]);
-    dbg("itemUnk3 = %d (%x)", self->equippedItems[11], self->equippedItems[11]);
-    dbg("itemUnk4 = %d (%x)", self->equippedItems[12], self->equippedItems[12]);
-    dbg("itemUnk5 = %d (%x)", self->equippedItems[13], self->equippedItems[13]);
-    dbg("leg_armor = %d (%x)", self->equippedItems[14], self->equippedItems[14]);
-    dbg("itemUnk6 = %d (%x)", self->equippedItems[15], self->equippedItems[15]);
-    dbg("itemUnk7 = %d (%x)", self->equippedItems[16], self->equippedItems[16]);
-    dbg("ring_left = %d (%x)", self->equippedItems[17], self->equippedItems[17]);
-    dbg("ring_right = %d (%x)", self->equippedItems[18], self->equippedItems[18]);
-    dbg("necklace = %d (%x)", self->equippedItems[19], self->equippedItems[19]);
+    dbg("head_top = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[0]);
+    dbg("head_middle = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[1]);
+    dbg("itemUnk1 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[2]);
+    dbg("body_armor = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[3]);
+    dbg("gloves = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[4]);
+    dbg("boots = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[5]);
+    dbg("helmet = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[6]);
+    dbg("bracelet = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[7]);
+    dbg("weapon = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[8]);
+    dbg("shield = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[9]);
+    dbg("costume = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[10]);
+    dbg("itemUnk3 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[11]);
+    dbg("itemUnk4 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[12]);
+    dbg("itemUnk5 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[13]);
+    dbg("leg_armor = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[14]);
+    dbg("itemUnk6 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[15]);
+    dbg("itemUnk7 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[16]);
+    dbg("ring_left = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[17]);
+    dbg("ring_right = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[18]);
+    dbg("necklace = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[19]);
 }

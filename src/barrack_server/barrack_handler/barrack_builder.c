@@ -358,9 +358,6 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
         size_t offset = offsetof(struct BarrackBuilderCommanderListPacket, commandersBarrackInfoPacket);
         packetStreamAddOffset(&packetStream, offset);
 
-        // Store the base position of commanderlist.
-        unsigned int CommandersListBasePosition = packetStreamGetOffset(&packetStream);
-
         // fill commandersBarrackInfoPacket
         for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
 
@@ -368,8 +365,6 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
             Commander *curCommander = &commanders[commanderIndex];
             CommanderInfo *cInfo = &curCommander->info;
             Inventory *inventory = &curCommander->inventory;
-
-
 
             // Define CommanderBarrackInfoPacket current structure
             size_t attributesSize = attributesSizeAllCommanders[commanderIndex];
@@ -390,14 +385,8 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
                 uint32_t unk8;
                 uint8_t attributesPacket[attributesSize];
                 uint16_t unk9;
-            } *curCommandersBarrackInfoPacket;
+            } *curCommandersBarrackInfoPacket = packetStreamGetCurrentBuffer(&packetStream);
             #pragma pack(pop)
-
-            // Set the stream position to current commander
-            packetStreamSetOffset(&packetStream, CommandersListBasePosition + (commanderIndex * sizeof(struct CommanderBarrackInfoPacket)));
-
-            // Set struct address to the right place in the stream
-            curCommandersBarrackInfoPacket = packetStreamGetCurrentBuffer(&packetStream);
 
             // fill it
             curCommandersBarrackInfoPacket->appearance = cInfo->appearance;
@@ -450,6 +439,8 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
                     packetStreamAddOffset(&packetStream, attrSize);
                 }
             }
+
+            packetStreamAddOffset(&packetStream, sizeof_struct_member(struct CommanderBarrackInfoPacket, unk9));
         }
     }
 
