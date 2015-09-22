@@ -80,6 +80,7 @@ MySQLStatus mySqlQuery(MySQL *self, const char* query, ...) {
 	char buf[MAX_QUERY_SIZE];
 
 	if (self->handle == NULL) {
+        error("MySQL hasn't been initialized yet.");
 		return SQL_ERROR;
 	}
 

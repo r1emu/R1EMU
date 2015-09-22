@@ -93,7 +93,6 @@ bool itemRemoveAttribute(Item *self, ItemAttributeId itemAttrId) {
     return true;
 }
 
-
 void itemGenKey(uint64_t itemIdKey, char itemKey[17]) {
     snprintf(itemKey, sizeof(itemKey), "%I64x", itemIdKey);
 }
