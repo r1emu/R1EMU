@@ -1650,8 +1650,10 @@ void zoneBuilderSessionObjects(zmsg_t *replyMsg) {
 
 void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
 
+    // Get inventory count
     size_t inventoryCount = inventoryGetItemsCount(inventory);
 
+    // Calculate size in packet to store all items
     size_t itemAttributesSize[inventoryCount];
     size_t totalSize = 0;
 
@@ -1685,6 +1687,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
 
     }
 
+    // Populate packet for Items
     uint8_t itemsPacket[totalSize];
 
     PacketStream packetStream;
