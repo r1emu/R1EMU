@@ -225,23 +225,23 @@ bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value) {
 
 void inventoryPrintEquipment(Inventory *self) {
     dbg("head_top = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[0]);
-    dbg("head_middle = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[1]);
-    dbg("itemUnk1 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[2]);
-    dbg("body_armor = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[3]);
-    dbg("gloves = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[4]);
-    dbg("boots = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[5]);
-    dbg("helmet = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[6]);
-    dbg("bracelet = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[7]);
-    dbg("weapon = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[8]);
-    dbg("shield = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[9]);
-    dbg("costume = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[10]);
-    dbg("itemUnk3 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[11]);
-    dbg("itemUnk4 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[12]);
-    dbg("itemUnk5 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[13]);
-    dbg("leg_armor = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[14]);
-    dbg("itemUnk6 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[15]);
-    dbg("itemUnk7 = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[16]);
-    dbg("ring_left = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[17]);
-    dbg("ring_right = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[18]);
-    dbg("necklace = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[19]);
+    dbg("head_middle = %d (%x)", self->equippedItems[1] ? self->equippedItems[1]->itemType : 0, self->equippedItems[1]);
+    dbg("itemUnk1 = %d (%x)", self->equippedItems[2] ? self->equippedItems[2]->itemType : 0, self->equippedItems[2]);
+    dbg("body_armor = %d (%x)", self->equippedItems[3] ? self->equippedItems[3]->itemType : 0, self->equippedItems[3]);
+    dbg("gloves = %d (%x)", self->equippedItems[4] ? self->equippedItems[4]->itemType : 0, self->equippedItems[4]);
+    dbg("boots = %d (%x)", self->equippedItems[5] ? self->equippedItems[5]->itemType : 0, self->equippedItems[5]);
+    dbg("helmet = %d (%x)", self->equippedItems[6] ? self->equippedItems[6]->itemType : 0, self->equippedItems[6]);
+    dbg("bracelet = %d (%x)", self->equippedItems[7] ? self->equippedItems[7]->itemType : 0, self->equippedItems[7]);
+    dbg("weapon = %d (%x)", self->equippedItems[8] ? self->equippedItems[8]->itemType : 0, self->equippedItems[8]);
+    dbg("shield = %d (%x)", self->equippedItems[9] ? self->equippedItems[9]->itemType : 0, self->equippedItems[9]);
+    dbg("costume = %d (%x)", self->equippedItems[10] ? self->equippedItems[10]->itemType : 0, self->equippedItems[10]);
+    dbg("itemUnk3 = %d (%x)", self->equippedItems[11] ? self->equippedItems[11]->itemType : 0, self->equippedItems[11]);
+    dbg("itemUnk4 = %d (%x)", self->equippedItems[12] ? self->equippedItems[12]->itemType : 0, self->equippedItems[12]);
+    dbg("itemUnk5 = %d (%x)", self->equippedItems[13] ? self->equippedItems[13]->itemType : 0, self->equippedItems[13]);
+    dbg("leg_armor = %d (%x)", self->equippedItems[14] ? self->equippedItems[14]->itemType : 0, self->equippedItems[14]);
+    dbg("itemUnk6 = %d (%x)", self->equippedItems[15] ? self->equippedItems[15]->itemType : 0, self->equippedItems[15]);
+    dbg("itemUnk7 = %d (%x)", self->equippedItems[16] ? self->equippedItems[16]->itemType : 0, self->equippedItems[16]);
+    dbg("ring_left = %d (%x)", self->equippedItems[17] ? self->equippedItems[17]->itemType : 0, self->equippedItems[17]);
+    dbg("ring_right = %d (%x)", self->equippedItems[18] ? self->equippedItems[18]->itemType : 0, self->equippedItems[18]);
+    dbg("necklace = %d (%x)", self->equippedItems[19] ? self->equippedItems[19]->itemType : 0, self->equippedItems[19]);
 }
