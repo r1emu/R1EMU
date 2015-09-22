@@ -18,6 +18,8 @@
 
 #include "R1EMU.h"
 
+void md5BytesToStr(char *md5Bytes, char *md5Str);
+
 int strGetLine(char *str, char *dest, int maxlen, int pos);
 
 char **strSplit(const char *s, char c);

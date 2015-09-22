@@ -235,7 +235,13 @@ void barrackBuilderServerEntry(
     }
 }
 
-void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, int commandersCount, Commander *commanders ,zmsg_t *replyMsg) {
+void barrackBuilderCommanderList(
+    uint64_t accountId,
+    GameSession *gameSession,
+    Commander *commanders,
+    int commandersCount,
+    zmsg_t *replyMsg)
+{
     // Keep sizes in memory
     size_t commanderBarrackInfoPacketSize = 0;
     size_t attributesSizeAllCommanders[commandersCount];
@@ -352,7 +358,6 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
         replyPacket.creditsAmount2 = 0;
         replyPacket.typeCredits3 = SWAP_UINT16(0x950e); // 94 0E = Medal (iCoin)
         replyPacket.creditsAmount3 = 0;
-
 
         // we want to start writing at the offset of commandersBarrackInfoPacket
         size_t offset = offsetof(struct BarrackBuilderCommanderListPacket, commandersBarrackInfoPacket);
