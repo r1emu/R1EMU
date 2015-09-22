@@ -140,5 +140,5 @@ size_t inventoryGetItemsCount(Inventory *self);
 
 bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot);
 void inventoryPrintEquipment(Inventory *self);
-uint32_t inventoryGetEquipmentEmptySlot(EquipmentSlot slot);
+bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value);
 
