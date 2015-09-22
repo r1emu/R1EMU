@@ -16,6 +16,9 @@
 #include "common/server/worker.h"
 #include "common/packet/packet.h"
 #include "common/packet/packet_type.h"
+#include "common/packet/packet_stream.h"
+#include "common/commander/inventory.h"
+#include "common/item/item.h"
 
 void zoneBuilderRestSit(uint32_t targetPcId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
@@ -1126,57 +1129,130 @@ void zoneBuilderSkillList(uint32_t targetPcId, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderItemEquipList(zmsg_t *replyMsg) {
+void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
+
+    size_t itemAttributesSize[EQSLOT_Count];
+    size_t totalSize = 0;
+
+    dbg("zoneBuilderItemEquipList");
+
+    for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_Count; eqSlotIndex++) {
+
+        Item *item = inventory->equippedItems[eqSlotIndex];
+        // get attribute size
+        size_t attrSize = item ? itemAttributesGetPacketSize(item->attributes) : 0;
+
+        #pragma pack(push, 1)
+        struct {
+            uint32_t itemType;
+            uint16_t sizeOfAttributes;
+            uint16_t unkown;
+            uint64_t itemId;
+            uint8_t eqSlotIndex;
+            uint8_t unk1;
+            uint16_t unk2;
+            uint32_t unk3;
+            uint8_t attributes[attrSize];
+        } EquippedItemPacket;
+        #pragma pack(pop)
+
+        itemAttributesSize[eqSlotIndex] = attrSize;
+        totalSize += sizeof(EquippedItemPacket);
+
+    }
+    dbg("totalSize %d", totalSize);
+
+
+
+
     #pragma pack(push, 1)
-    struct {
-        // not yet implemented
+    struct EquipmentListPacket {
+        VariableSizePacketHeader variableSizeHeader;
+        uint8_t itemsPacket[totalSize];
     } replyPacket;
-   (void) replyPacket;
     #pragma pack(pop)
 
-    // BUILD_REPLY_PACKET(replyPacket, replyMsg)
-    {
-        size_t memSize;
-        void *memory = dumpToMem(
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  2D 0C FF FF FF FF 12 02 02 00 00 00 00 00 00 00 | -...............\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 00 00 00 00 00 00 01 00 00 02 00 00 | ................\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  02 00 00 00 00 00 00 04 00 00 00 00 00 00 00 00 | ................\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  01 0A 00 00 00 00 0E 00 04 00 00 00 00 00 00 00 | ................\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 00 00 00 00 02 00 27 00 00 00 00 28 | ..........'....(\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  9D 1A 08 00 0C 00 18 00 F0 25 00 00 3C 01 00 00 | .........%..<...\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  03 D9 18 00 12 00 00 00 D0 0E 00 00 00 40 03 0F | .............@..\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 06 00 00 00 00 00 18 00 00 00 00 00 | ................\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 04 D9 18 00 CE CC 73 00 07 00 00 00 | ..........s.....\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 00 00 00 00 00 00 00 00 05 5B 47 47 | .............[GG\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  C9 0B E3 DF 10 27 00 00 00 00 80 93 00 00 00 00 | .....'..........\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 06 F9 18 00 EB 96 9B 00 F8 2A 00 00 | .............*..\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 18 00 00 00 00 00 00 00 00 00 07 88 80 93 | ................\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 80 C9 3E 8D 11 03 00 12 00 71 00 F1 25 00 00 | ...>......q..%..\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  3C 01 00 00 08 D9 18 00 31 00 00 00 D4 0E 00 00 | <.......1.......\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  A0 40 12 0F 00 00 80 40 03 0F 00 00 00 00 7C 96 | .@.....@......|.\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  98 00 00 00 92 F3 00 00 00 00 00 00 00 00 09 00 | ................\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 D0 0E 00 00 70 04 00 00 00 00 00 00 6E 00 00 | .....p.......n..\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 00 00 0A 00 F4 01 4C 19 F4 F1 09 00 | ..........L.....\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 5F 94 00 00 00 00 00 00 00 00 0B 42 | ...._..........B\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  12 A8 80 93 0C 03 09 00 00 00 00 00 24 02 00 00 | ............$...\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 00 00 0C 00 00 00 00 00 84 DA 04 00 | ................\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 78 6E 00 00 00 00 00 00 00 00 0D 00 | ....xn..........\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  D4 00 4C 19 F4 F1 8D F3 07 00 0C 00 5F 94 F2 25 | ..L........._..%\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 3C 01 00 00 0E 42 AA A8 80 93 EC 01 D0 0E | ..<....B........\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 40 03 0F 00 00 00 00 09 00 00 00 00 00 | ...@............\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 00 00 00 00 00 00 0F 00 78 6E 9C 00 | ............xn..\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  FF FF 09 00 00 00 00 00 B4 66 00 00 00 00 00 00 | .........f......\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 10 00 5F 94 7D 00 20 DB 09 00 00 00 00 00 | ...._.}. .......\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  62 A9 00 00 00 00 00 00 00 00 11 00 E4 66 4B 19 | b............fK.\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 09 00 00 00 00 00 00 00 00 00 00 00 00 00 | ................\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 12 00 78 6E 9C 00 FF FF 0A 00 00 00 00 00 | ....xn..........\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  94 65 00 00 00 00 00 00 00 00 13 00 5F 94 7D 00 | .e.........._.}.\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  68 DB                                           | h.\n"
-          , NULL, &memSize
-        );
+    PacketStream packetStream;
+    packetStreamInit(&packetStream, &replyPacket);
 
-        zmsg_add(replyMsg, zframe_new(memory, memSize));
+
+    PacketType packetType = ZC_ITEM_EQUIP_LIST;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+
+    {
+        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
+
+        dbg("set stream in EquipmentListPacket");
+        // we want to start writing at the offset of commandersBarrackInfoPacket
+        size_t offset = offsetof(struct EquipmentListPacket, itemsPacket);
+        packetStreamAddOffset(&packetStream, offset);
+
+
+        dbg("itarate equipment slots");
+        for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_Count; eqSlotIndex++) {
+
+            Item *item = inventory->equippedItems[eqSlotIndex];
+
+            size_t attrSize = itemAttributesSize[eqSlotIndex];
+
+            #pragma pack(push, 1)
+            struct EquippedItemPacket {
+                uint32_t itemType;
+                uint16_t sizeOfAttributes;
+                uint16_t unkown;
+                uint64_t itemId;
+                uint8_t eqSlotIndex;
+                uint8_t unk1;
+                uint16_t unk2;
+                uint32_t unk3;
+                uint8_t attributes[attrSize];
+            } *equippedItemPacket = packetStreamGetCurrentBuffer(&packetStream);
+            #pragma pack(pop)
+
+            dbg("Set item info");
+            if (eqSlotIndex == 19) {
+                equippedItemPacket->itemType = item ? item->itemType : inventoryGetEquipmentEmptySlot(eqSlotIndex);
+                equippedItemPacket->sizeOfAttributes = attrSize;
+                equippedItemPacket->unkown = SWAP_UINT16(0x9416);
+                equippedItemPacket->itemId = 0;
+                equippedItemPacket->eqSlotIndex = eqSlotIndex;
+                equippedItemPacket->unk1 = 0;
+                equippedItemPacket->unk2 = SWAP_UINT16(0x5f94);
+                equippedItemPacket->unk3 = SWAP_UINT32(0x7d0068db);
+            } else {
+                equippedItemPacket->itemType = item ? item->itemType : inventoryGetEquipmentEmptySlot(eqSlotIndex);
+                equippedItemPacket->sizeOfAttributes = attrSize;
+                equippedItemPacket->unkown = 0;
+                equippedItemPacket->itemId = item ? item->itemId : 0;
+                equippedItemPacket->eqSlotIndex = eqSlotIndex;
+                equippedItemPacket->unk1 = 1;
+                equippedItemPacket->unk2 = 2;
+                equippedItemPacket->unk3 = 3;
+            }
+
+
+
+            dbg("get attributes offset for stream");
+
+            // fill attribute buffer
+            size_t offset = offsetof(struct EquippedItemPacket, attributes);
+            packetStreamAddOffset(&packetStream, offset);
+
+            // write in the buffer
+            dbg("add item attributes (attrsize %d)", attrSize);
+            if (attrSize > 0) {
+                dbg("get item attribute itemID:", item->itemId);
+                itemAttributesGetPacket(item->attributes, packetStreamGetCurrentBuffer(&packetStream));
+                // relocate the stream position
+                packetStreamAddOffset(&packetStream, attrSize);
+            }
+
+        }
     }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }
 
 void zoneBuilderStartInfo(zmsg_t *replyMsg) {

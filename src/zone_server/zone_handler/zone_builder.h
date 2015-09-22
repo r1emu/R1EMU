@@ -235,7 +235,7 @@ void zoneBuilderQuickSlotList(zmsg_t *replyMsg);
 /**
  * @brief @unknown
  */
-void zoneBuilderItemEquipList(zmsg_t *replyMsg);
+void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg);
 
 /**
  * @brief Send information about Jobs

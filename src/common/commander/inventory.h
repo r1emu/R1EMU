@@ -60,6 +60,31 @@ typedef enum {
     EQSLOT_Count
 } EquipmentSlot;
 
+typedef enum {
+    EMPTYEQSLOT_NoHat = 2,
+    EMPTYEQSLOT_NoOuter = 4,
+    EMPTYEQSLOT_NoPants = 5,
+    EMPTYEQSLOT_NoGloves = 6,
+    EMPTYEQSLOT_NoBoots = 7,
+    EMPTYEQSLOT_NoShirt = 8,
+    EMPTYEQSLOT_NoRing = 9,
+    EMPTYEQSLOT_NoNeck = 10,
+    EMPTYEQSLOT_NoHelmet = 10000,
+    EMPTYEQSLOT_NoArmband = 11000,
+    EMPTYEQSLOT_NoWeapon_THSpear = 9999983,
+    EMPTYEQSLOT_NoWeapon_Wand = 9999988,
+    EMPTYEQSLOT_NoWeapon_Spear = 9999989,
+    EMPTYEQSLOT_NoWeapon_Sword = 9999991,
+    EMPTYEQSLOT_NoWeapon_THSword = 9999992,
+    EMPTYEQSLOT_NoWeapon_Shield = 9999993,
+    EMPTYEQSLOT_NoWeapon_Staff = 9999994,
+    EMPTYEQSLOT_NoWeapon_Bow = 9999995,
+    EMPTYEQSLOT_NoWeapon = 9999996,
+    EMPTYEQSLOT_NoWeapon_Shotsword = 9999997,
+    EMPTYEQSLOT_NoWeapon_Mace = 9999998,
+    EMPTYEQSLOT_NoWeapon_THStaff = 9999999,
+} EmptyEquipmentSlot;
+
 // ------ Structure declaration -------
 
 typedef struct Inventory Inventory;
@@ -114,4 +139,6 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd);
 size_t inventoryGetItemsCount(Inventory *self);
 
 bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot);
+void inventoryPrintEquipment(Inventory *self);
+uint32_t inventoryGetEquipmentEmptySlot(EquipmentSlot slot);
 

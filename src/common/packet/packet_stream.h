@@ -73,18 +73,3 @@ void packetStreamAppend(PacketStream *self, void *data, size_t dataSize);
  * @param self A pointer to an allocated PacketStream.
  */
 void packetStreamDestroy(PacketStream **self);
-
-/**
- * @brief Get a position of an allocated PacketStream
- * @param self An allocated PacketStream
- * @return a position
- */
-unsigned int packetStreamGetOffset(PacketStream *self);
-
-
-/**
- * @brief Set the stream position to a given position
- * @param self An allocated PacketStream
- * @param position a given position
- */
-void packetStreamSetOffset(PacketStream *self, unsigned int position);

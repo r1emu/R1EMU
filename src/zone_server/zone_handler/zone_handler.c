@@ -440,7 +440,179 @@ static PacketHandlerState zoneHandlerGameReady(
     zoneBuilderGuestPageMap(replyMsg);
     zoneBuilderStartInfo(replyMsg);
 
-    zoneBuilderItemEquipList(replyMsg);
+    /// FOR TESTIG PURPOSES
+    /*
+    Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+    Item items[20];
+
+    items[0].itemId = 1111;
+    items[0].itemType = 2;
+    items[0].amount = 1;
+    items[0].equipSlot = EQSLOT_HEAD_TOP;
+    items[0].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[0]);
+    inventoryEquipItem(inventory, items[0].itemId, EQSLOT_HEAD_TOP);
+
+
+    items[1].itemId = 2222;
+    items[1].itemType = 2;
+    items[1].amount = 1;
+    items[1].equipSlot = EQSLOT_HEAD_MIDDLE;
+    items[1].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[1]);
+    inventoryEquipItem(inventory, items[1].itemId, EQSLOT_HEAD_MIDDLE);
+
+    items[2].itemId = 3333;
+    items[2].itemType = 4;
+    items[2].amount = 1;
+    items[2].equipSlot = EQSLOT_UNKOWN1;
+    items[2].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[2]);
+    inventoryEquipItem(inventory, items[2].itemId, EQSLOT_UNKOWN1);
+
+    items[3].itemId = 4444;
+    items[3].itemType = 531101;
+    items[3].amount = 1;
+    items[3].equipSlot = EQSLOT_BODY_ARMOR;
+    items[3].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[3]);
+    inventoryEquipItem(inventory, items[3].itemId, EQSLOT_BODY_ARMOR);
+
+    items[4].itemId = 5555;
+    items[4].itemType = 6;
+    items[4].amount = 1;
+    items[4].equipSlot = EQSLOT_GLOVES;
+    items[4].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[4]);
+    inventoryEquipItem(inventory, items[4].itemId, EQSLOT_GLOVES);
+
+    items[5].itemId = 6666;
+    items[5].itemType = 7;
+    items[5].amount = 1;
+    items[5].equipSlot = EQSLOT_BOOTS;
+    items[5].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[5]);
+    inventoryEquipItem(inventory, items[5].itemId, EQSLOT_BOOTS);
+
+    items[6].itemId = 7777;
+    items[6].itemType = 10000;
+    items[6].amount = 1;
+    items[6].equipSlot = EQSLOT_HELMET;
+    items[6].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[6]);
+    inventoryEquipItem(inventory, items[6].itemId, EQSLOT_HELMET);
+
+    items[7].itemId = 8888;
+    items[7].itemType = 11000;
+    items[7].amount = 1;
+    items[7].equipSlot = EQSLOT_BRACELET;
+    items[7].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[7]);
+    inventoryEquipItem(inventory, items[7].itemId, EQSLOT_BRACELET);
+
+    items[8].itemId = 9999;
+    items[8].itemType = 9999996;
+    items[8].amount = 1;
+    items[8].equipSlot = EQSLOT_WEAPON;
+    items[8].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory, &items[8]);
+    inventoryEquipItem(inventory, items[8].itemId, EQSLOT_WEAPON);
+
+    items[9].itemId = 101010;
+    items[9].itemType = 9999996;
+    items[9].amount = 1;
+    items[9].equipSlot = EQSLOT_SHIELD;
+    items[9].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory,  &items[9]);
+    inventoryEquipItem(inventory, items[9].itemId, EQSLOT_SHIELD);
+
+    items[10].itemId = 101011;
+    items[10].itemType = 4;
+    items[10].amount = 1;
+    items[10].equipSlot = EQSLOT_COSTUME;
+    items[10].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory,  &items[10]);
+    inventoryEquipItem(inventory, items[10].itemId, EQSLOT_COSTUME);
+
+    items[11].itemId = 111111;
+    items[11].itemType = 9;
+    items[11].amount = 1;
+    items[11].equipSlot = EQSLOT_UNKOWN3;
+    items[11].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory,  &items[11]);
+    inventoryEquipItem(inventory, items[11].itemId, EQSLOT_UNKOWN3);
+
+    items[12].itemId = 121212;
+    items[12].itemType = 9;
+    items[12].amount = 1;
+    items[12].equipSlot = EQSLOT_UNKOWN4;
+    items[12].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory,  &items[12]);
+    inventoryEquipItem(inventory, items[12].itemId, EQSLOT_UNKOWN4);
+
+    items[13].itemId = 131313;
+    items[13].itemType = 4;
+    items[13].amount = 1;
+    items[13].equipSlot = EQSLOT_UNKOWN5;
+    items[13].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory,  &items[13]);
+    inventoryEquipItem(inventory, items[13].itemId, EQSLOT_UNKOWN5);
+
+    items[14].itemId = 141414;
+    items[14].itemType = 8;
+    items[14].amount = 1;
+    items[14].equipSlot = EQSLOT_LEG_ARMOR;
+    items[14].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory,  &items[14]);
+    inventoryEquipItem(inventory, items[14].itemId, EQSLOT_LEG_ARMOR);
+
+    items[15].itemId = 161616;
+    items[15].itemType = 9;
+    items[15].amount = 1;
+    items[15].equipSlot = EQSLOT_UNKOWN6;
+    items[15].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory,  &items[15]);
+    inventoryEquipItem(inventory, items[15].itemId, EQSLOT_UNKOWN6);
+
+    items[16].itemId = 171717;
+    items[16].itemType = 9;
+    items[16].amount = 1;
+    items[16].equipSlot = EQSLOT_UNKOWN7;
+    items[16].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory,  &items[16]);
+    inventoryEquipItem(inventory, items[16].itemId, EQSLOT_UNKOWN7);
+
+    items[17].itemId = 181818;
+    items[17].itemType = 9;
+    items[17].amount = 1;
+    items[17].equipSlot = EQSLOT_RIGHT_LEFT;
+    items[17].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory,  &items[17]);
+    inventoryEquipItem(inventory, items[17].itemId, EQSLOT_RIGHT_LEFT);
+
+    items[18].itemId = 191919;
+    items[18].itemType = 9;
+    items[18].amount = 1;
+    items[18].equipSlot = EQSLOT_RIGHT_RIGHT;
+    items[18].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory,  &items[18]);
+    inventoryEquipItem(inventory, items[18].itemId, EQSLOT_RIGHT_RIGHT);
+
+    items[19].itemId = 202020;
+    items[19].itemType = 10;
+    items[19].amount = 1;
+    items[19].equipSlot = EQSLOT_NECKLACE;
+    items[19].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    inventoryAddItem(inventory,  &items[19]);
+    inventoryEquipItem(inventory, items[19].itemId, EQSLOT_NECKLACE);
+
+    inventoryPrintEquipment(inventory);
+    */
+
+
+
+
+    zoneBuilderItemEquipList(&session->game.commanderSession.currentCommander.inventory, replyMsg);
     // ZoneBuilder_skillList(cInfo->pcId, replyMsg);
     zoneBuilderAbilityList(cInfo->pcId, replyMsg);
     zoneBuilderCooldownList(cInfo->socialInfoId, replyMsg);
