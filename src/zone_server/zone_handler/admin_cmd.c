@@ -135,12 +135,9 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
     newItem.itemId = r1emuGenerateRandom64(&self->seed);
     newItem.itemType = itemType;
     newItem.amount =  (!amount) ? 1 : amount;
-    newItem.equipSlot = EQSLOT_BODY_ARMOR;
     newItem.attributes = itemAttributesNew();
     newItem.inventoryIndex = INVENTORY_CAT_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition;
     inventoryAddItem(inventory, &newItem);
-
-
 
     zoneBuilderItemAdd(&newItem, INVENTORY_ADD_PICKUP, replyMsg);
 }

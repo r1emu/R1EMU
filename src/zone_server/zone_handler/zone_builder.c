@@ -44,7 +44,7 @@ void zoneBuilderItemAdd(Item *item, InventoryAddType addType, zmsg_t *replyMsg) 
     #pragma pack(push, 1)
     struct {
         VariableSizePacketHeader variableSizeHeader;
-        ItemPkt item;
+        ItemPacket item;
         uint16_t attributesSize;
         uint8_t addType;
         float notificationDelay;
@@ -67,7 +67,10 @@ void zoneBuilderItemAdd(Item *item, InventoryAddType addType, zmsg_t *replyMsg) 
         replyPacket.addType = addType;
         replyPacket.notificationDelay = 0.0f;
         replyPacket.inventoryType = 0;
-        itemAttributesGetPacket(item->attributes, replyPacket.attributes);
+
+        PacketStream packetStream;
+        packetStreamInit(&packetStream, replyPacket.attributes);
+        itemAttributesGetPacket(item->attributes, &packetStream);
     }
 }
 
