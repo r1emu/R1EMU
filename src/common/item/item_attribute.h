@@ -61,10 +61,11 @@ void itemAttributesGetPacket(ItemAttributes *self, PacketStream *packetStream);
 size_t itemAttributesGetPacketSize(ItemAttributes *self);
 
 /**
- * Get, add, or remove an attribute from the item attributes
+ * Get, add, update or remove an attribute from the item attributes
  */
 bool itemAttributesGet(ItemAttributes *self, ItemAttributeId itemAttrType, void **_output);
 bool itemAttributesAdd(ItemAttributes *self, ItemAttributeId itemAttrType, void *value);
+bool itemAttributesUpdate(ItemAttributes *self, ItemAttributeId itemAttrId, void *value);
 bool itemAttributesRemove(ItemAttributes *self, ItemAttributeId itemAttrType);
 
 /**

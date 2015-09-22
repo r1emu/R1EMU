@@ -253,8 +253,40 @@ bool itemAttributesGet(ItemAttributes *self, ItemAttributeId itemAttrId, void **
         goto cleanup;
     }
 
-    void *value = zhash_lookup(self->hashtable, attributeKey);
-    *_output = value;
+    ItemAttribute *itemAttribute = zhash_lookup(self->hashtable, attributeKey);
+    *_output = itemAttribute->value;
+
+    status = true;
+
+cleanup:
+    return status;
+}
+
+bool itemAttributesUpdate(ItemAttributes *self, ItemAttributeId itemAttrId, void *value) {
+
+    bool status = false;
+    char *attributeKey = NULL;
+
+    if (!(attributeKey = itemAttributeKeyFormats[itemAttrId].key)) {
+        error("No attribute key for '%d'", itemAttrId);
+        goto cleanup;
+    }
+
+    ItemAttribute *itemAttribute = NULL;
+
+    if (!(itemAttribute = zhash_lookup(self->hashtable, attributeKey))) {
+        error("Cannot find itemAttribute %d.", itemAttrId);
+        goto cleanup;
+    }
+
+    // free old value
+    free(itemAttribute->value);
+
+    // replace it with the new one
+    if (!(itemAttributeInit(itemAttribute, itemAttrId, itemAttributeKeyFormats[itemAttrId].format, value))) {
+        error("Cannot remplace the new item attribute.");
+        goto cleanup;
+    }
 
     status = true;
 

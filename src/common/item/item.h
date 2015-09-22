@@ -43,7 +43,7 @@ typedef struct Item {
     uint32_t inventoryIndex;
 
     /** Attributes of the item */
-    ItemAttributes *attributes;
+    ItemAttributes attributes;
 } Item;
 
 /**
@@ -57,3 +57,29 @@ typedef struct ItemPacket {
 } ItemPacket;
 
 // ----------- Functions ------------
+
+/**
+ * Allocate a new Item structure.
+ * @return A pointer to an allocated Item, or NULL if an error occured.
+ */
+Item *itemNew(uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inventoryIndex);
+
+/**
+ * Initialize an allocated Item structure.
+ * @param self An allocated Item to initialize.
+ * @return true on success, false otherwise.
+ */
+bool itemInit(Item *self, uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inventoryIndex);
+
+/**
+ * Free an allocated Item structure.
+ * @param self A pointer to an allocated Item.
+ */
+void itemFree(Item *self);
+
+/**
+ * Free an allocated Item structure and nullify the content of the pointer.
+ * @param self A pointer to an allocated Item.
+ */
+void itemDestroy(Item **self);
+

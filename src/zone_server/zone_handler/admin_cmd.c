@@ -126,17 +126,20 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
     uint32_t itemType = strtol(args, &args, 10);
     args++;
     uint32_t amount = strtol(args, &args, 10);
+    amount = amount ? amount : 1;
 
     uint32_t itemPosition = 1;
 
     Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
 
     Item newItem;
-    newItem.itemId = r1emuGenerateRandom64(&self->seed);
-    newItem.itemType = itemType;
-    newItem.amount =  (!amount) ? 1 : amount;
-    newItem.attributes = itemAttributesNew();
-    newItem.inventoryIndex = INVENTORY_CAT_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition;
+    itemInit(&newItem,
+        r1emuGenerateRandom64(&self->seed),
+        itemType,
+        amount,
+        INVENTORY_CAT_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition
+    );
+
     inventoryAddItem(inventory, &newItem);
 
     zoneBuilderItemAdd(&newItem, INVENTORY_ADD_PICKUP, replyMsg);

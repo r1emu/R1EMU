@@ -42,7 +42,7 @@ void zoneBuilderRestSit(uint32_t targetPcId, zmsg_t *replyMsg) {
 
 void zoneBuilderItemAdd(Item *item, InventoryAddType addType, zmsg_t *replyMsg) {
 
-    size_t attrSize = itemAttributesGetPacketSize(item->attributes);
+    size_t attrSize = itemAttributesGetPacketSize(&item->attributes);
 
     #pragma pack(push, 1)
     struct {
@@ -73,7 +73,7 @@ void zoneBuilderItemAdd(Item *item, InventoryAddType addType, zmsg_t *replyMsg) 
 
         PacketStream packetStream;
         packetStreamInit(&packetStream, replyPacket.attributes);
-        itemAttributesGetPacket(item->attributes, &packetStream);
+        itemAttributesGetPacket(&item->attributes, &packetStream);
     }
 }
 
@@ -1143,7 +1143,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
 
         Item *item = inventory->equippedItems[eqSlotIndex];
         // get attribute size
-        size_t attrSize = item ? itemAttributesGetPacketSize(item->attributes) : 0;
+        size_t attrSize = item ? itemAttributesGetPacketSize(&item->attributes) : 0;
 
         #pragma pack(push, 1)
         struct {
@@ -1243,7 +1243,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
             dbg("add item attributes (attrsize %d)", attrSize);
             if (attrSize > 0) {
                 dbg("get item attribute itemID:", item->itemId);
-                itemAttributesGetPacket(item->attributes, packetStreamGetCurrentBuffer(&packetStream));
+                itemAttributesGetPacket(&item->attributes, packetStreamGetCurrentBuffer(&packetStream));
                 // relocate the stream position
                 packetStreamAddOffset(&packetStream, attrSize);
             }
