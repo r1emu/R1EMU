@@ -127,6 +127,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/item/item.h" />
+		<Unit filename="../../../src/common/item/item_attribute.h" />
 		<Unit filename="../../../src/common/mysql/fields/mysql_account_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -235,6 +236,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/utils/math.h" />
+		<Unit filename="../../../src/common/utils/memory.h" />
 		<Unit filename="../../../src/common/utils/position.c">
 			<Option compilerVar="CC" />
 		</Unit>

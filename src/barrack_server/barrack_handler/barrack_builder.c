@@ -443,7 +443,6 @@ void barrackBuilderCommanderList(uint64_t accountId, GameSession *gameSession, i
             packetStreamAddOffset(&packetStream, sizeof_struct_member(struct CommanderBarrackInfoPacket, unk9));
         }
     }
-
 }
 
 void barrackBuilderPetInformation(zmsg_t *replyMsg) {
