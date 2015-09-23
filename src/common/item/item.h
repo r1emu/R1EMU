@@ -25,6 +25,8 @@
 // ---------- Defines -------------
 
 // ------ Structure declaration -------
+typedef uint8_t ItemKey[17];
+
 /**
  * @brief Item contains basic information about an item
  */

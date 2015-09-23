@@ -94,7 +94,6 @@ static PacketHandlerState barrackHandlerLogin(
     */
 
     // Get accountData from database
-
     AccountSession *accountSession = &session->game.accountSession;
 
     // Initialize Account Session
@@ -470,8 +469,8 @@ static PacketHandlerState barrackHandlerCommanderDestroy(
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_DESTROY);
 
     // Update session
-    if (session->game.barrackSession.charactersCreatedCount > 0) {
-        session->game.barrackSession.charactersCreatedCount -= 1;
+    if (session->game.accountSession.charactersCreatedCount > 0) {
+        session->game.accountSession.charactersCreatedCount -= 1;
     }
 
     // Build the reply packet
@@ -548,7 +547,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     }
 
     // Character position
-    if (clientPacket->charPosition != session->game.barrackSession.charactersCreatedCount + 1) {
+    if (clientPacket->charPosition != session->game.accountSession.charactersCreatedCount + 1) {
         warning("Client sent a malformed charPosition.");
     }
 
@@ -574,7 +573,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     session->game.commanderSession.mapId = 1002;
 
     // Add the character to the account
-    session->game.barrackSession.charactersCreatedCount++;
+    session->game.accountSession.charactersCreatedCount++;
 
     // Build the reply packet
     PositionXZ commanderDir = PositionXZ_decl(-0.707107f, 0.707107f);
@@ -582,7 +581,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
         .appearance = commander->appearance,
         .mapId = session->game.commanderSession.mapId,
         .socialInfoId = commander->socialInfoId,
-        .commanderPosition = session->game.barrackSession.charactersCreatedCount,
+        .commanderPosition = session->game.accountSession.charactersCreatedCount,
         .unk4 = SWAP_UINT32(0x02000000), // ICBT
         .unk5 = 0,
         .maxXP = 0xC, // ICBT ; TODO : Implement EXP table
