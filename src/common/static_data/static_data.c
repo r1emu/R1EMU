@@ -35,7 +35,7 @@ struct StaticData {
     bool locked;
 };
 
-StaticData *staticDataNew(char *name, size_t keySize) {
+StaticData *staticDataNew(char *name) {
 
     StaticData *self;
 
@@ -43,7 +43,7 @@ StaticData *staticDataNew(char *name, size_t keySize) {
         return NULL;
     }
 
-    if (!staticDataInit(self, name, keySize)) {
+    if (!staticDataInit(self, name)) {
         staticDataDestroy(&self);
         error("StaticData failed to initialize.");
         return NULL;
@@ -52,7 +52,7 @@ StaticData *staticDataNew(char *name, size_t keySize) {
     return self;
 }
 
-bool staticDataInit(StaticData *self, char *name, size_t keySize) {
+bool staticDataInit(StaticData *self, char *name) {
 
     memset(self, 0, sizeof(StaticData));
 

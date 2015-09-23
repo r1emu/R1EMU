@@ -24,17 +24,6 @@
 
 int main(int argc, char **argv)
 {
-    {
-        #include "common/static_data/static_data.h"
-        StaticData *sd;
-        uint8_t id = 123;
-        sd = staticDataNew("ItemData", sizeof(id));
-        void *item = malloc(100);
-        staticDataAdd(sd, id, item);
-        staticDataLock(sd);
-        staticDataAdd(sd, id, item);
-        exit(0);
-    }
     // Get the configuration file
     char *confFilePath = NULL;
 

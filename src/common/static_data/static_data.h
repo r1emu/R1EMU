@@ -28,14 +28,14 @@ typedef uint64_t StaticDataId;
  * @brief Allocate a new StaticData structure.
  * @return A pointer to an allocated StaticData.
  */
-StaticData *staticDataNew(char *name, size_t keySize);
+StaticData *staticDataNew(char *name);
 
 /**
  * @brief Initialize an allocated StaticData structure.
  * @param self An allocated StaticData to initialize.
  * @return true on success, false otherwise.
  */
-bool staticDataInit(StaticData *self, char *name, size_t keySize);
+bool staticDataInit(StaticData *self, char *name);
 
 /**
  * @brief Add a new object in the static data hashtable.
