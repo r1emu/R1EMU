@@ -230,6 +230,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/session/socket_session.h" />
+		<Unit filename="../../../src/common/static_data/static_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/static_data/static_data.h" />
 		<Unit filename="../../../src/common/utils/math.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -363,7 +363,6 @@ void itemAttributesDestroy(ItemAttributes **_self) {
 
 void itemAttributeFree(ItemAttribute *self) {
     free(self->value);
-    free(self);
 }
 
 void itemAttributeDestroy(ItemAttribute **_self) {
@@ -371,6 +370,7 @@ void itemAttributeDestroy(ItemAttribute **_self) {
 
     if (_self && self) {
         itemAttributeFree(self);
+        free(self);
         *_self = NULL;
     }
 }

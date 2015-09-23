@@ -14,6 +14,11 @@
 #include "db.h"
 #include "db_object.h"
 
+// extend debug messages
+#define dbError(self, x, ...) error("[%s:%d] " x, self->info.name, self->info.routerId, ##__VA_ARGS__)
+#define dbInfo(self, x, ...)  info("[%s:%d] " x, self->info.name, self->info.routerId, ##__VA_ARGS__)
+#define dbSpecial(self, x, ...)  special("[%s:%d] " x, self->info.name, self->info.routerId, ##__VA_ARGS__)
+
 /**
  * @brief Db contains a hashtable of generic objects that can be inserted, requested and deleted.
  *        Db is extensible to other modules

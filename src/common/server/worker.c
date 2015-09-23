@@ -27,6 +27,11 @@
 #include "common/packet/packet.h"
 #include "common/server/game_event.h"
 
+// Extend debug messages
+#define workerError(self, x, ...) error("[r%d:w%d] " x, self->info.routerId, self->info.workerId, ##__VA_ARGS__)
+#define workerWarning(self, x, ...) warning("[r%d:w%d] " x, self->info.routerId, self->info.workerId, ##__VA_ARGS__)
+#define workerInfo(self, x, ...)  info("[r%d:w%d] " x, self->info.routerId, self->info.workerId, ##__VA_ARGS__)
+#define workerSpecial(self, x, ...)  special("[r%d:w%d] " x, self->info.routerId, self->info.workerId, ##__VA_ARGS__)
 
 // ------ Structure declaration -------
 
