@@ -215,14 +215,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/session/account_session.h" />
-		<Unit filename="../../../src/common/session/barrack_session.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../../src/common/session/barrack_session.h" />
 		<Unit filename="../../../src/common/session/commander_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../../src/common/session/commander_session.h" />
 		<Unit filename="../../../src/common/session/game_session.c">
 			<Option compilerVar="CC" />
 		</Unit>

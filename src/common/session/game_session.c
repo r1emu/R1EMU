@@ -45,8 +45,8 @@ gameSessionInit (
 ) {
     memset(self, 0, sizeof(GameSession));
 
+    accountSessionInit(&self->accountSession, "undefined", "undefined", ACCOUNT_SESSION_PRIVILEGES_UNKNOWN);
     commanderSessionInit (&self->commanderSession, commander);
-    barrackSessionInit (&self->barrackSession);
 
     return true;
 }
@@ -56,7 +56,7 @@ gameSessionPrint (
     GameSession *self
 ) {
     dbg("==== GameSession %p ====", self);
-    barrackSessionPrint (&self->barrackSession);
+    accountSessionPrint(&self->accountSession);
     commanderSessionPrint (&self->commanderSession);
 }
 
