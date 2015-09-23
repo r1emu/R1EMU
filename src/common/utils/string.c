@@ -23,7 +23,7 @@
 
 
 // ------ Extern function implementation -------
-void md5BytesToStr(char *md5Bytes, char md5Str[33]) {
+void md5BytesToStr(uint8_t *md5Bytes, uint8_t md5Str[33]) {
     for (int i = 0; i < 16; i++) {
         sprintf (&md5Str[i*2], "%.02x", md5Bytes[i]);
     }
