@@ -230,7 +230,7 @@ eventServerSubscribe (
 
     // Convert the header frame to a EventServerHeader
     EventServerHeader packetHeader = *((EventServerHeader *) zframe_data(header));
-    zframe_destroy (&header);
+    zframe_destroy(&header);
 
     switch (packetHeader)
     {
@@ -262,11 +262,11 @@ eventServerSendToClients (
     zmsg_t *msg = NULL;
     zframe_t *frame = zmsg_first (broadcastMsg);
     uint8_t *packet = zframe_data(frame);
-    size_t packetLen = zframe_size (frame);
+    size_t packetLen = zframe_size(frame);
 
     if ((!(msg = zmsg_new ()))
-    ||  zmsg_addmem (msg, PACKET_HEADER (ROUTER_WORKER_MULTICAST), sizeof(ROUTER_WORKER_MULTICAST)) != 0
-    ||  zmsg_addmem (msg, packet, packetLen) != 0
+    ||  zmsg_addmem(msg, PACKET_HEADER (ROUTER_WORKER_MULTICAST), sizeof(ROUTER_WORKER_MULTICAST)) != 0
+    ||  zmsg_addmem(msg, packet, packetLen) != 0
     ) {
         error("Cannot build the multicast packet.");
         result = false;
@@ -279,14 +279,14 @@ eventServerSendToClients (
         // Add all the clients to the packet
         uint8_t identityBytes[5];
         socketSessionGenId (identityKey, identityBytes);
-        if (zmsg_addmem (msg, identityBytes, sizeof(identityBytes)) != 0) {
+        if (zmsg_addmem(msg, identityBytes, sizeof(identityBytes)) != 0) {
             error("Cannot add the identity in the message.");
             result = false;
             goto cleanup;
         }
     }
 
-    if (zmsg_send (&msg, self->router) != 0) {
+    if (zmsg_send(&msg, self->router) != 0) {
         error("Cannot send the multicast packet to the Router.");
         result = false;
         goto cleanup;
@@ -316,16 +316,16 @@ bool eventServerDispatchEvent(
     size_t gameEventSize = sizeof(GameEvent) - sizeof (EventDataCategories) + eventSize;
 
     if ((!(msg = zmsg_new ()))
-    ||  zmsg_addmem (msg, PACKET_HEADER (EVENT_SERVER_EVENT), sizeof(EVENT_SERVER_EVENT)) != 0
-    ||  zmsg_addmem (msg, PACKET_HEADER (eventType), sizeof(eventType)) != 0
-    ||  zmsg_addmem (msg, &gameEvent, gameEventSize) != 0
+    ||  zmsg_addmem(msg, PACKET_HEADER (EVENT_SERVER_EVENT), sizeof(EVENT_SERVER_EVENT)) != 0
+    ||  zmsg_addmem(msg, PACKET_HEADER (eventType), sizeof(eventType)) != 0
+    ||  zmsg_addmem(msg, &gameEvent, gameEventSize) != 0
     ) {
         error("Cannot build the event message.");
         result = false;
         goto cleanup;
     }
 
-    if (zmsg_send (&msg, eventServer) != 0) {
+    if (zmsg_send(&msg, eventServer) != 0) {
         error("Cannot send the event packet.");
         result = false;
         goto cleanup;
@@ -347,8 +347,8 @@ eventServerSendToClient (
     zmsg_t *msg = NULL;
 
     if ((!(msg = zmsg_new ()))
-    ||  zmsg_addmem (msg, PACKET_HEADER (ROUTER_WORKER_MULTICAST), sizeof(ROUTER_WORKER_MULTICAST)) != 0
-    ||  zmsg_addmem (msg, packet, packetLen) != 0
+    ||  zmsg_addmem(msg, PACKET_HEADER (ROUTER_WORKER_MULTICAST), sizeof(ROUTER_WORKER_MULTICAST)) != 0
+    ||  zmsg_addmem(msg, packet, packetLen) != 0
     ) {
         error("Cannot build the multicast packet.");
         result = false;
@@ -358,13 +358,13 @@ eventServerSendToClient (
     // Add the client identity to the packet
     uint8_t identityBytes[5];
     socketSessionGenId (identityKey, identityBytes);
-    if (zmsg_addmem (msg, identityBytes, sizeof(identityBytes)) != 0) {
+    if (zmsg_addmem(msg, identityBytes, sizeof(identityBytes)) != 0) {
         error("Cannot add the identity in the message.");
         result = false;
         goto cleanup;
     }
 
-    if (zmsg_send (&msg, self->router) != 0) {
+    if (zmsg_send(&msg, self->router) != 0) {
         error("Cannot send the multicast packet to the Router.");
         result = false;
         goto cleanup;

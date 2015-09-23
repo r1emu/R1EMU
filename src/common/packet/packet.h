@@ -25,7 +25,7 @@
 #define BUILD_REPLY_PACKET(packetName, msgName)                                             \
     for (bool __sent = false;                                                               \
          !__sent && memset(&packetName, 0, sizeof(packetName));                             \
-         zmsg_add(msgName, zframe_new (&packetName, sizeof(packetName))), __sent = true     \
+         zmsg_add(msgName, zframe_new(&packetName, sizeof(packetName))), __sent = true     \
     )
 
 #define CHECK_SERVER_PACKET_SIZE(packet, packetType)                                        \

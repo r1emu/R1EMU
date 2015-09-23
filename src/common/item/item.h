@@ -25,6 +25,9 @@
 // ---------- Defines -------------
 
 // ------ Structure declaration -------
+#define ITEM_KEY_SIZE 17
+typedef uint8_t ItemKey[ITEM_KEY_SIZE];
+
 /**
  * @brief Item contains basic information about an item
  */
@@ -74,7 +77,7 @@ bool itemInit(Item *self, uint64_t itemId, uint32_t itemType, uint32_t amount, u
 /**
  * Generate a key for an item from ItemId
  */
-void itemGenKey(uint64_t itemIdKey, char itemKey[17]);
+void itemGenKey(uint64_t itemIdKey, ItemKey itemKey);
 
 /**
  * Free an allocated Item structure.

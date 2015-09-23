@@ -23,6 +23,7 @@
 
 #pragma once
 
+// Includes
 #include "R1EMU.h"
 #include "event_server.h"
 #include "common/mysql/mysql.h"
@@ -30,6 +31,13 @@
 #include "common/session/session.h"
 #include "common/db/db_client.h"
 
+// Defines
+#define workerError(self, x, ...) error("[r%d:w%d] " x, self->info.routerId, self->info.workerId, ##__VA_ARGS__)
+#define workerWarning(self, x, ...) warning("[r%d:w%d] " x, self->info.routerId, self->info.workerId, ##__VA_ARGS__)
+#define workerInfo(self, x, ...)  info("[r%d:w%d] " x, self->info.routerId, self->info.workerId, ##__VA_ARGS__)
+#define workerSpecial(self, x, ...)  special("[r%d:w%d] " x, self->info.routerId, self->info.workerId, ##__VA_ARGS__)
+
+// Types definition
 typedef struct _PacketHandler PacketHandler;
 typedef struct _WorkerInfo WorkerInfo;
 typedef struct _Worker Worker;

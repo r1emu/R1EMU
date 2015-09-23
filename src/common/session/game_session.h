@@ -37,9 +37,6 @@ struct GameSession {
     // Account session variables
     AccountSession accountSession;
 
-    // Barrack session variables
-    BarrackSession barrackSession;
-
     // CommanderInfo session variables
     CommanderSession commanderSession;
 };

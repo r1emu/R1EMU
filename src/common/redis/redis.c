@@ -248,7 +248,7 @@ void redisDestroy(Redis **_self) {
     Redis *self = *_self;
 
     if (_self && self) {
-        redisInfoFree (&self->info);
+        redisInfoFree(&self->info);
 
         if (self->context) {
             redisFree (self->context);

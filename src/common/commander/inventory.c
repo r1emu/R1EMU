@@ -70,13 +70,13 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
     dbg("itemIdKey: %d", itemToAdd->itemId);
 
-    char itemIdKey[17];
-    itemGenKey(itemToAdd->itemId, itemIdKey);
+    ItemKey itemKey;
+    itemGenKey(itemToAdd->itemId, itemKey);
 
-    dbg("itemIdKey: %s", itemIdKey);
+    dbg("itemKey: %s", itemKey);
 
-    if (zhash_insert(self->items, itemIdKey, itemToAdd) != 0) {
-        error("Cannot insert the item in the hashtable.");
+    if (zhash_insert(self->items, itemKey, itemToAdd) != 0) {
+        error("Cannot insert the item '%s' in the hashtable.", itemKey);
         return false;
     }
 
@@ -85,10 +85,10 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
 bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
 
-    char itemIdKey[17];
-    itemGenKey(itemToRemove->itemId, itemIdKey);
+    ItemKey itemKey;
+    itemGenKey(itemToRemove->itemId, itemKey);
 
-    zhash_delete(self->items, itemIdKey);
+    zhash_delete(self->items, itemKey);
 
     return true;
 }
@@ -97,13 +97,13 @@ bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item) {
 
     Item *item = NULL;
 
-    char itemIdKey[17];
-    itemGenKey(itemId, itemIdKey);
+    ItemKey itemKey;
+    itemGenKey(itemId, itemKey);
 
     *_item = NULL;
 
-    if (!(item = zhash_lookup(self->items, itemIdKey))) {
-        error("Cannot find the item '%s' in the inventory.", itemIdKey);
+    if (!(item = zhash_lookup(self->items, itemKey))) {
+        error("Cannot find the item '%s' in the inventory.", itemKey);
         return false;
     }
 
@@ -117,11 +117,11 @@ size_t inventoryGetItemsCount(Inventory *self) {
 }
 
 Item *inventoryGetFirstItem(Inventory *self) {
-    return (Item*) zhash_first(self->items);
+    return zhash_first(self->items);
 }
 
 Item *inventoryGetNextItem(Inventory *self) {
-    return (Item*) zhash_next(self->items);
+    return zhash_next(self->items);
 }
 
 bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
@@ -129,12 +129,13 @@ bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
     Item *itemToUnequip = self->equippedItems[eqSlot];
 
     if (itemToUnequip == NULL) {
-        warning("No item to unequip. Slot is free.");
-        return true; // Should I return false? Function didn't success to unequip.
+        // We return false here because the system should have detected earlier that the slot is free
+        error("No item to unequip. Slot is free.");
+        return false;
     }
 
     if (!inventoryAddItem(self, itemToUnequip)) {
-        dbg("Item not unequipped, since it can't be added to Inventory.");
+        error("Cannot add item to the inventory.");
         return false;
     }
 
@@ -166,7 +167,7 @@ bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot) 
         // Unequip Item
         /// TODO
         if (!inventoryUnequipItem(self, eqSlot)) {
-            dbg("No possible to unequip item from slot %d", eqSlot);
+            dbg("Not possible to unequip item from slot %d", eqSlot);
             return false;
         }
     }

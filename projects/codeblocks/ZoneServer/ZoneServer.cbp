@@ -215,10 +215,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/session/account_session.h" />
-		<Unit filename="../../../src/common/session/barrack_session.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../../src/common/session/barrack_session.h" />
 		<Unit filename="../../../src/common/session/commander_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -235,7 +231,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/session/socket_session.h" />
-		<Unit filename="../../../src/common/utils/admin_cmd.h" />
 		<Unit filename="../../../src/common/utils/math.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -268,7 +263,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/utils/zlib.h" />
-		<Unit filename="../../../src/global_server/global_server.h" />
 		<Unit filename="../../../src/social_server/social_event_server.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -322,16 +316,6 @@
 			<code_completion />
 			<envvars />
 			<debugger />
-			<lib_finder disable_auto="1" />
-			<DoxyBlocks>
-				<comment_style block="0" line="0" />
-				<doxyfile_project />
-				<doxyfile_build />
-				<doxyfile_warnings />
-				<doxyfile_output />
-				<doxyfile_dot />
-				<general use_at_in_tags="1" />
-			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

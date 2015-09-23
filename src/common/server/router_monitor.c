@@ -264,7 +264,7 @@ routerMonitorProcess (
             }
             // call router monitor disconnect handler
             routerMonitorDisconnectClient(self, fdClientKey, sessionKeyStr);
-            zframe_destroy (&clientFrame);
+            zframe_destroy(&clientFrame);
             info("%s session successfully flushed !", sessionKeyStr);
         }
     }
@@ -426,9 +426,9 @@ routerMonitorStart (
     info("Router Monitor is ready and running.");
     // Signal to the parent thread that the monitor is ready
     zsock_signal (pipe, 0);
-    zframe_send ((zframe_t *[]) {zframe_new (PACKET_HEADER (ROUTER_MONITOR_READY), sizeof(ROUTER_MONITOR_READY))}, pipe, 0);
+    zframe_send ((zframe_t *[]) {zframe_new(PACKET_HEADER (ROUTER_MONITOR_READY), sizeof(ROUTER_MONITOR_READY))}, pipe, 0);
 
-    if (zloop_start (reactor) != 0) {
+    if (zloop_start(reactor) != 0) {
         error("An error occurred in the reactor.");
         goto cleanup;
     }
@@ -476,8 +476,8 @@ void
 RouterMonitorInfo_free(
     RouterMonitorInfo *self
 ) {
-    redisInfoFree (&self->redisInfo);
-    mySqlInfoFree (&self->sqlInfo);
+    redisInfoFree(&self->redisInfo);
+    mySqlInfoFree(&self->sqlInfo);
 }
 
 void

@@ -1762,7 +1762,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
     size_t outPacketSize = ZLIB_GET_COMPRESSED_PACKET_SIZE(&replyPacket.zlibData, sizeof(replyPacket));
     variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, outPacketSize);
 
-    zmsg_add(replyMsg, zframe_new (&replyPacket, outPacketSize));
+    zmsg_add(replyMsg, zframe_new(&replyPacket, outPacketSize));
 
     // Debug purposes
     // buffer_print(&replyPacket, outPacketSize, NULL);
