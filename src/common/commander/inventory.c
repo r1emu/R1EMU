@@ -70,13 +70,13 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
     dbg("itemIdKey: %d", itemToAdd->itemId);
 
-    char itemIdKey[17];
-    itemGenKey(itemToAdd->itemId, itemIdKey);
+    ItemKey itemKey;
+    itemGenKey(itemToAdd->itemId, itemKey);
 
-    dbg("itemIdKey: %s", itemIdKey);
+    dbg("itemKey: %s", itemKey);
 
-    if (zhash_insert(self->items, itemIdKey, itemToAdd) != 0) {
-        error("Cannot insert the item in the hashtable.");
+    if (zhash_insert(self->items, itemKey, itemToAdd) != 0) {
+        error("Cannot insert the item '%s' in the hashtable.", itemKey);
         return false;
     }
 
@@ -85,10 +85,10 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
 bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
 
-    char itemIdKey[17];
-    itemGenKey(itemToRemove->itemId, itemIdKey);
+    ItemKey itemKey;
+    itemGenKey(itemToRemove->itemId, itemKey);
 
-    zhash_delete(self->items, itemIdKey);
+    zhash_delete(self->items, itemKey);
 
     return true;
 }
@@ -97,13 +97,13 @@ bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item) {
 
     Item *item = NULL;
 
-    char itemIdKey[17];
-    itemGenKey(itemId, itemIdKey);
+    ItemKey itemKey;
+    itemGenKey(itemId, itemKey);
 
     *_item = NULL;
 
-    if (!(item = zhash_lookup(self->items, itemIdKey))) {
-        error("Cannot find the item '%s' in the inventory.", itemIdKey);
+    if (!(item = zhash_lookup(self->items, itemKey))) {
+        error("Cannot find the item '%s' in the inventory.", itemKey);
         return false;
     }
 
