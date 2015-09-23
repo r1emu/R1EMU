@@ -303,7 +303,7 @@ Router_subscribe (
 
     // Convert the header frame to a RouterHeader
     RouterHeader packetHeader = *((RouterHeader *) zframe_data(header));
-    zframe_destroy (&header);
+    zframe_destroy(&header);
 
     switch (packetHeader)
     {
@@ -319,7 +319,7 @@ Router_subscribe (
                 zmsg_add(subMsg, zframe_dup (dataFrame));
                 zmsg_send(&subMsg, self->frontend);
             }
-            zframe_destroy (&dataFrame);
+            zframe_destroy(&dataFrame);
         } break;
 
         default:
@@ -427,7 +427,7 @@ Router_backend (
                     zmsg_add(subMsg, zmsg_pop (msg));
                     zmsg_send(&subMsg, self->frontend);
                 }
-                zframe_destroy (&identity);
+                zframe_destroy(&identity);
             }
         } break;
 
@@ -450,15 +450,15 @@ Router_backend (
     }
 
     // Remove the responsability of the client for the current worker
-    zframe_destroy (&self->workers [workerState->identity.id].curClientId.frame);
+    zframe_destroy(&self->workers [workerState->identity.id].curClientId.frame);
 
     // The worker finished its job; add it at the end of the list (round robin load balancing)
     zlist_append(self->readyWorkers, workerState);
 
 cleanup:
     zmsg_destroy(&msg);
-    zframe_destroy (&workerStateFrame);
-    zframe_destroy (&header);
+    zframe_destroy(&workerStateFrame);
+    zframe_destroy(&header);
 
     return result;
 }
@@ -510,7 +510,7 @@ Router_frontend (
     uint8_t *identity = zframe_data(identityClientDup);
     zmq_getsockopt (zsock_resolve (frontend), ZMQ_IDENTITY_FD, identity, (size_t[]) {5});
     uint64_t fdClient = *((uint64_t *) identity);
-    zframe_destroy (&identityClientDup);
+    zframe_destroy(&identityClientDup);
 
     // Don't process the packet if it is empty, or if an invalid fd is used
     if (zframe_size(data) == 0 || fdClient == -1) {
@@ -560,7 +560,7 @@ Router_frontend (
 
         // Replace the new identity
         if (self->workers[workerIdInCharge].curClientId.frame) {
-            zframe_destroy (&self->workers[workerIdInCharge].curClientId.frame);
+            zframe_destroy(&self->workers[workerIdInCharge].curClientId.frame);
         }
         self->workers[workerIdInCharge].curClientId.frame = zframe_dup (identityClient);
     }
@@ -718,7 +718,7 @@ routerStart (
     }
 
     info("Router is ready and running.");
-    if (zloop_start (reactor) != 0) {
+    if (zloop_start(reactor) != 0) {
         error("An error occurred in the reactor.");
         return false;
     }

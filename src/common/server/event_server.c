@@ -230,7 +230,7 @@ eventServerSubscribe (
 
     // Convert the header frame to a EventServerHeader
     EventServerHeader packetHeader = *((EventServerHeader *) zframe_data(header));
-    zframe_destroy (&header);
+    zframe_destroy(&header);
 
     switch (packetHeader)
     {

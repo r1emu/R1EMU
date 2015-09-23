@@ -545,7 +545,7 @@ void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg) {
     outPacketSize = ZLIB_GET_COMPRESSED_PACKET_SIZE(&compressedPacket.zlibData, sizeof(compressedPacket));
     packetNormalHeaderInit(&compressedPacket.normalHeader, BC_NORMAL_ZONE_TRAFFIC, outPacketSize);
 
-    zmsg_add(replyMsg, zframe_new (&compressedPacket, outPacketSize));
+    zmsg_add(replyMsg, zframe_new(&compressedPacket, outPacketSize));
 }
 
 void barrackBuilderBarrackNameChange(BarrackNameResultType resultType, uint8_t *barrackName, zmsg_t *replyMsg) {
