@@ -8,7 +8,7 @@ DELIMITER $$
 --
 -- Procedimientos
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `bSetFamilyName`(IN `accountId` INT, IN `newName` VARCHAR(64))
+CREATE DEFINER=`r1emu`@`localhost` PROCEDURE `bSetFamilyName`(IN `accountId` INT, IN `newName` VARCHAR(64))
     MODIFIES SQL DATA
     COMMENT 'set Family Name'
 BEGIN
