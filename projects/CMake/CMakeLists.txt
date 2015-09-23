@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(R1Emu)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
+add_definitions(-D__DBG_ACTIVATED__)
 
 set(ROOT_PATH ${PROJECT_SOURCE_DIR}/../../src/)
 
@@ -31,6 +32,7 @@ target_link_libraries(zone_handlers common)
 
 set(COMMON_SRC
     ${ROOT_PATH}/common/commander/commander.c
+    ${ROOT_PATH}/common/commander/inventory.c
     ${ROOT_PATH}/common/crypto/bf/bf_ecb.c
     ${ROOT_PATH}/common/crypto/bf/bf_enc.c
     ${ROOT_PATH}/common/crypto/bf/bf_skey.c
@@ -40,9 +42,12 @@ set(COMMON_SRC
     ${ROOT_PATH}/common/db/db.c
     ${ROOT_PATH}/common/dbg/dbg.c
     ${ROOT_PATH}/common/graph/graph.c
+    ${ROOT_PATH}/common/item/item.c
+    ${ROOT_PATH}/common/item/item_attribute.c
     ${ROOT_PATH}/common/mysql/fields/mysql_session.c
     ${ROOT_PATH}/common/mysql/fields/mysql_account_session.c
     ${ROOT_PATH}/common/mysql/fields/mysql_commander_session.c
+    ${ROOT_PATH}/common/mysql/fields/mysql_commander.c
     ${ROOT_PATH}/common/mysql/mysql.c
     ${ROOT_PATH}/common/packet/packet.c
     ${ROOT_PATH}/common/packet/packet_stream.c
@@ -65,6 +70,7 @@ set(COMMON_SRC
     ${ROOT_PATH}/common/session/session.c
     ${ROOT_PATH}/common/session/socket_session.c
     ${ROOT_PATH}/common/utils/math.c
+    ${ROOT_PATH}/common/utils/memory.c
     ${ROOT_PATH}/common/utils/position.c
     ${ROOT_PATH}/common/utils/random.c
     ${ROOT_PATH}/common/utils/string.c
