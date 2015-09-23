@@ -21,7 +21,7 @@
 /**
  * @brief
  */
-struct BarrackSession {;
+struct BarrackSession {
     // number of characters registered in the barrack
     uint8_t charactersCreatedCount;
 };
