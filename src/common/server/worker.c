@@ -616,7 +616,7 @@ bool workerStart(Worker *self) {
     status = true;
 
 cleanup:
-    free(endpoint);
+    zstr_free(&endpoint);
     return status;
 }
 
