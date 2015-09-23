@@ -188,7 +188,7 @@ bool zoneEventServerUpdateClientPosition (
 
             zoneBuilderEnterPc (&gameSession.commanderSession.currentCommander.info, curPcEnterMsg);
             zframe_t *pcEnterFrame = zmsg_first (curPcEnterMsg);
-            if (!(eventServerSendToClient (self, emitterSk, zframe_data(pcEnterFrame), zframe_size (pcEnterFrame)))) {
+            if (!(eventServerSendToClient (self, emitterSk, zframe_data(pcEnterFrame), zframe_size(pcEnterFrame)))) {
                 error("Failed to send the packet to the clients.");
                 status = false;
                 goto cleanup;
@@ -243,7 +243,7 @@ bool zoneEventServerUpdateClientPosition (
 
             zoneBuilderLeave (gameSession.commanderSession.currentCommander.info.pcId, curPcLeaveMsg);
             zframe_t *pcLeaveFrame = zmsg_first (curPcLeaveMsg);
-            if (!(eventServerSendToClient (self, emitterSk, zframe_data(pcLeaveFrame), zframe_size (pcLeaveFrame)))) {
+            if (!(eventServerSendToClient (self, emitterSk, zframe_data(pcLeaveFrame), zframe_size(pcLeaveFrame)))) {
                 error("Failed to send the packet to the clients.");
                 status = false;
                 goto cleanup;

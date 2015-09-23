@@ -476,8 +476,8 @@ void
 RouterMonitorInfo_free(
     RouterMonitorInfo *self
 ) {
-    redisInfoFree (&self->redisInfo);
-    mySqlInfoFree (&self->sqlInfo);
+    redisInfoFree(&self->redisInfo);
+    mySqlInfoFree(&self->sqlInfo);
 }
 
 void

@@ -317,7 +317,7 @@ Router_subscribe (
                 zmsg_t *subMsg = zmsg_new ();
                 zmsg_add(subMsg, zmsg_pop (msg));
                 zmsg_add(subMsg, zframe_dup (dataFrame));
-                zmsg_send (&subMsg, self->frontend);
+                zmsg_send(&subMsg, self->frontend);
             }
             zframe_destroy (&dataFrame);
         } break;
@@ -411,7 +411,7 @@ Router_backend (
             // The worker send a 'normal' message to the client
             if (zmsg_size(msg) == 2) {
                 // Simple message : [1 frame identity] + [1 frame data]
-                if (zmsg_send (&msg, self->frontend) != 0) {
+                if (zmsg_send(&msg, self->frontend) != 0) {
                     error("Cannot send message to the frontend.");
                     result = -1;
                     goto cleanup;
@@ -425,7 +425,7 @@ Router_backend (
                     zmsg_t *subMsg = zmsg_new ();
                     zmsg_add(subMsg, zframe_dup (identity));
                     zmsg_add(subMsg, zmsg_pop (msg));
-                    zmsg_send (&subMsg, self->frontend);
+                    zmsg_send(&subMsg, self->frontend);
                 }
                 zframe_destroy (&identity);
             }
@@ -474,8 +474,8 @@ Router_informMonitor (
     // Build the message to the Router Monitor
     zmsg_t *msg;
     if ((msg = zmsg_new ()) == NULL
-    ||  zmsg_addmem (msg, PACKET_HEADER (ROUTER_MONITOR_ADD_FD), sizeof(ROUTER_MONITOR_ADD_FD)) != 0
-    ||  zmsg_addmem (msg, PACKET_HEADER (fdClient), sizeof(fdClient)) != 0
+    ||  zmsg_addmem(msg, PACKET_HEADER (ROUTER_MONITOR_ADD_FD), sizeof(ROUTER_MONITOR_ADD_FD)) != 0
+    ||  zmsg_addmem(msg, PACKET_HEADER (fdClient), sizeof(fdClient)) != 0
     ||  zmsg_append (msg, &identityClient) != 0
     ||  zmsg_send   (&msg, self->monitor)
     ) {
@@ -513,7 +513,7 @@ Router_frontend (
     zframe_destroy (&identityClientDup);
 
     // Don't process the packet if it is empty, or if an invalid fd is used
-    if (zframe_size (data) == 0 || fdClient == -1) {
+    if (zframe_size(data) == 0 || fdClient == -1) {
         zmsg_destroy(&msg);
         return 0;
     }
@@ -569,7 +569,7 @@ Router_frontend (
     zmsg_wrap(msg, workerStateDest);
 
     // Forward message to backend
-    if (zmsg_send (&msg, self->backend) != 0) {
+    if (zmsg_send(&msg, self->backend) != 0) {
         error("Frontend cannot send message to the backend");
         return -1;
     }

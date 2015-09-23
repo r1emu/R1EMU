@@ -117,11 +117,11 @@ size_t inventoryGetItemsCount(Inventory *self) {
 }
 
 Item *inventoryGetFirstItem(Inventory *self) {
-    return (Item*) zhash_first(self->items);
+    return zhash_first(self->items);
 }
 
 Item *inventoryGetNextItem(Inventory *self) {
-    return (Item*) zhash_next(self->items);
+    return zhash_next(self->items);
 }
 
 bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
@@ -129,12 +129,13 @@ bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
     Item *itemToUnequip = self->equippedItems[eqSlot];
 
     if (itemToUnequip == NULL) {
-        warning("No item to unequip. Slot is free.");
-        return true; // Should I return false? Function didn't success to unequip.
+        // We return false here because the system should have detected earlier that the slot is free
+        error("No item to unequip. Slot is free.");
+        return false;
     }
 
     if (!inventoryAddItem(self, itemToUnequip)) {
-        dbg("Item not unequipped, since it can't be added to Inventory.");
+        error("Cannot add item to the inventory.");
         return false;
     }
 
@@ -166,7 +167,7 @@ bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot) 
         // Unequip Item
         /// TODO
         if (!inventoryUnequipItem(self, eqSlot)) {
-            dbg("No possible to unequip item from slot %d", eqSlot);
+            dbg("Not possible to unequip item from slot %d", eqSlot);
             return false;
         }
     }
