@@ -91,12 +91,7 @@ struct Router
  * @param self The Router
  * @return 0 on success, -1 on error
  */
-static int
-Router_frontend (
-    zloop_t *loop,
-    zsock_t *frontend,
-    void *self
-);
+static int routerFrontend(zloop_t *loop, zsock_t *frontend, void *self);
 
 /**
  * @brief Backend ROUTER handler
@@ -105,12 +100,7 @@ Router_frontend (
  * @param self The Router
  * @return 0 on success, -1 on error
  */
-static int
-Router_backend (
-    zloop_t *loop,
-    zsock_t *backend,
-    void *self
-);
+static int routerBackend(zloop_t *loop, zsock_t *backend, void *self);
 
 /**
  * @brief SUBSCRIBER handler
@@ -119,50 +109,32 @@ Router_backend (
  * @param self The Router
  * @return 0 on success, -1 on error
  */
-static int
-Router_subscribe (
-    zloop_t *loop,
-    zsock_t *subscribe,
-    void *self
-);
+static int routerSubscribe(zloop_t *loop, zsock_t *subscribe, void *self);
 
 /**
  * @brief Initialize the frontend of the Router
  * @param self The Router
  * @return true on success, false otherwise
  */
-static bool
-Router_initFrontend (
-    Router *self
-);
-
+static bool routerInitFrontend(Router *self);
 
 /**
  * @brief Initialize the monitor of the Router
  * @param self The Router
  * @return true on success, false otherwise
  */
-static bool
-Router_initMonitor (
-    Router *self
-);
+static bool routerInitMonitor(Router *self);
 
 /**
  * @brief Initialize the backend of the Router
  * @param self The Router
  * @return true on success, false otherwise
  */
-static bool
-Router_initBackend (
-    Router *self
-);
+static bool routerInitBackend(Router *self);
 
 // ------ Extern function implementation ------
 
-Router *
-routerNew (
-    RouterInfo *info
-) {
+Router *routerNew(RouterInfo *info) {
     Router *self;
 
     if ((self = calloc(1, sizeof(Router))) == NULL) {
@@ -178,11 +150,8 @@ routerNew (
     return self;
 }
 
-bool
-routerInit (
-    Router *self,
-    RouterInfo *info
-) {
+bool routerInit(Router *self, RouterInfo *info) {
+
     // Get a private copy of the Router Information
     if (!(routerInfoInit (
             &self->info, info->routerId, info->ip,
@@ -244,8 +213,7 @@ routerInit (
     return true;
 }
 
-bool
-routerInfoInit (
+bool routerInfoInit(
     RouterInfo *self,
     uint16_t routerId,
     char *ip,
@@ -253,8 +221,8 @@ routerInfoInit (
     int workersCount,
     RedisInfo *redisInfo,
     MySQLInfo *sqlInfo,
-    DisconnectEventHandler disconnectHandler
-) {
+    DisconnectEventHandler disconnectHandler)
+{
     self->routerId = routerId;
     if (!(self->ip = strdup(ip))) {
         error("Cannot allocate ip.");
@@ -279,12 +247,8 @@ routerInfoInit (
     return true;
 }
 
-static int
-Router_subscribe (
-    zloop_t *loop,
-    zsock_t *publisher,
-    void *_self
-) {
+static int routerSubscribe(zloop_t *loop, zsock_t *publisher, void *_self) {
+
     zmsg_t *msg;
     zframe_t *header;
     Router *self = (Router *) _self;
@@ -333,12 +297,8 @@ Router_subscribe (
     return 0;
 }
 
-static int
-Router_backend (
-    zloop_t *loop,
-    zsock_t *backend,
-    void *_self
-) {
+static int routerBackend(zloop_t *loop, zsock_t *backend, void *_self) {
+
     int result = 0;
     zmsg_t *msg = NULL;
     zframe_t *workerStateFrame = NULL;
@@ -389,14 +349,14 @@ Router_backend (
 
             if (self->workersReadyCount == self->info.workersCount) {
                 // All the workers are ready. Start the monitor
-                if (!(Router_initMonitor (self))) {
+                if (!(routerInitMonitor (self))) {
                     error("Cannot initialize the monitor.");
                     result = -1;
                     goto cleanup;
                 }
 
                 // Everything is ready from here. Open the frontend to the outside world !
-                if (!(Router_initFrontend (self))) {
+                if (!(routerInitFrontend (self))) {
                     error("Cannot initialize the frontend.");
                     result = -1;
                     goto cleanup;
@@ -463,12 +423,8 @@ cleanup:
     return result;
 }
 
-static bool
-Router_informMonitor (
-    Router *self,
-    zframe_t *identityClient,
-    uint64_t fdClient
-) {
+static bool routerInformMonitor(Router *self, zframe_t *identityClient, uint64_t fdClient) {
+
     // TODO : Don't check the FD everytime, keep a connected hashtable in the router ?
 
     // Build the message to the Router Monitor
@@ -486,12 +442,8 @@ Router_informMonitor (
     return true;
 }
 
-static int
-Router_frontend (
-    zloop_t *loop,
-    zsock_t *frontend,
-    void *_self
-) {
+static int routerFrontend(zloop_t *loop, zsock_t *frontend, void *_self) {
+
     zmsg_t *msg;
     WorkerState *workerState = NULL;
     zframe_t *workerStateDest = NULL;
@@ -519,7 +471,7 @@ Router_frontend (
     }
 
     // Inform the RouterMonitor that the client sent a request
-    if (!(Router_informMonitor (self, zframe_dup (identityClient), fdClient))) {
+    if (!(routerInformMonitor (self, zframe_dup (identityClient), fdClient))) {
         error("Cannot inform the Router Monitor.");
         return 0;
     }
@@ -577,16 +529,16 @@ Router_frontend (
     return 0;
 }
 
-static bool
-Router_initMonitor (
-    Router *self
-) {
+static bool routerInitMonitor(Router *self) {
+
+    bool status = false;
+
     // ===================================
     //     Initialize Router Monitor
     // ===================================
     if (zsock_bind(self->monitor, ROUTER_MONITOR_SUBSCRIBER_ENDPOINT, self->info.routerId) == -1) {
         error("Cannot bind to the Router Monitor endpoint");
-        return false;
+        goto cleanup;
     }
     info("Binded to the Router Monitor endpoint %s", zsys_sprintf(ROUTER_MONITOR_SUBSCRIBER_ENDPOINT, self->info.routerId));
 
@@ -602,14 +554,14 @@ Router_initMonitor (
         return false;
     }
 
-    zactor_t *monitorActor;
-    if ((monitorActor = zactor_new (routerMonitorStart, routerMonitorInfo)) == NULL) {
+    zactor_t *monitorActor = NULL;
+    if ((monitorActor = zactor_new(routerMonitorStart, routerMonitorInfo)) == NULL) {
         error("Cannot create a new thread for the Router Monitor.");
         return false;
     }
 
     // Wait for the READY signal from the monitor actor
-    zmsg_t *msg;
+    zmsg_t *msg = NULL;
     if ((!(msg = zmsg_recv(monitorActor)))
     || (memcmp (zframe_data(zmsg_first (msg)), PACKET_HEADER (ROUTER_MONITOR_READY), sizeof(ROUTER_MONITOR_READY)) != 0)
     ) {
@@ -617,15 +569,15 @@ Router_initMonitor (
         return false;
     }
 
-    zmsg_destroy(&msg);
+    status = true;
 
-    return true;
+cleanup:
+    zmsg_destroy(&msg);
+    return status;
 }
 
-static bool
-Router_initFrontend (
-    Router *self
-) {
+static bool routerInitFrontend(Router *self) {
+
     // ===================================
     //        Initialize frontend
     // ===================================
@@ -641,10 +593,8 @@ Router_initFrontend (
     return true;
 }
 
-static bool
-Router_initBackend (
-    Router *self
-) {
+static bool routerInitBackend(Router *self) {
+
     // ===================================
     //       Initialize backend
     // ===================================
@@ -659,9 +609,8 @@ Router_initBackend (
 }
 
 bool
-Router_initEventServerSubscriber (
-    Router *self
-) {
+routerInitEventServerSubscriber(Router *self) {
+
     // ===================================
     //       Initialize subscriber
     // ===================================
@@ -677,22 +626,21 @@ Router_initEventServerSubscriber (
     return true;
 }
 
-bool
-routerStart (
-    Router *self
-) {
-    zloop_t *reactor;
+bool routerStart(Router *self) {
+
+    bool status = false;
+    zloop_t *reactor = NULL;
 
     // Initialize the backend
-    if (!(Router_initBackend (self))) {
+    if (!(routerInitBackend (self))) {
         error("Cannot initialize the backend.");
-        return false;
+        goto cleanup;
     }
 
     // Initialize the subscriber
-    if (!(Router_initEventServerSubscriber (self))) {
+    if (!(routerInitEventServerSubscriber (self))) {
         error("Cannot initialize the subscriber.");
-        return false;
+        goto cleanup;
     }
 
     // ====================================
@@ -700,32 +648,34 @@ routerStart (
     // ====================================
     if (!(reactor = zloop_new())) {
         error("Cannot allocate a new reactor.");
-        return false;
+        goto cleanup;
     }
 
     // Attach a callback to frontend and backend sockets
-    if (zloop_reader(reactor, self->backend,  Router_backend,  self) == -1
-    ||  zloop_reader(reactor, self->frontend, Router_frontend, self) == -1
+    if (zloop_reader(reactor, self->backend,  routerBackend,  self) == -1
+    ||  zloop_reader(reactor, self->frontend, routerFrontend, self) == -1
     ) {
         error("Cannot register the sockets with the reactor.");
-        return false;
+        goto cleanup;
     }
 
     // Attach a callback to subscribers sockets
-    if (zloop_reader(reactor, self->eventServer, Router_subscribe, self) == -1) {
+    if (zloop_reader(reactor, self->eventServer, routerSubscribe, self) == -1) {
         error("Cannot register the subscriber to the reactor.");
-        return false;
+        goto cleanup;
     }
 
     info("Router is ready and running.");
     if (zloop_start(reactor) != 0) {
         error("An error occurred in the reactor.");
-        return false;
+        goto cleanup;
     }
 
-    zloop_destroy (&reactor);
+    status = true;
 
-    return true;
+cleanup:
+    zloop_destroy (&reactor);
+    return status;
 }
 
 int

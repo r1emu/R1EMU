@@ -303,8 +303,12 @@ static bool workerProcessClientPacket(Worker *self, zmsg_t *msg) {
     }
 
     // Consider the message as a "normal" message by default
-    headerAnswer = zframe_new(PACKET_HEADER (ROUTER_WORKER_NORMAL), sizeof(ROUTER_WORKER_NORMAL));
-    zmsg_push (msg, headerAnswer);
+    if (zmsg_pushmem (msg, PACKET_HEADER (ROUTER_WORKER_NORMAL), sizeof(ROUTER_WORKER_NORMAL)) != 0) {
+        error("Cannot push frame to message.");
+        goto cleanup;
+    }
+
+    headerAnswer = zmsg_last(msg);
 
     // === Build the message reply ===
     uint8_t *packet = zframe_data(packetFrame);

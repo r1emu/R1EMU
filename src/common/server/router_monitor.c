@@ -72,7 +72,7 @@ RouterMonitor *routerMonitorNew(RouterMonitorInfo *info) {
 
     RouterMonitor *self;
 
-    if ((self = calloc(1, sizeof(RouterMonitor))) == NULL) {
+    if ((self = malloc(sizeof(RouterMonitor))) == NULL) {
         return NULL;
     }
 
@@ -86,6 +86,8 @@ RouterMonitor *routerMonitorNew(RouterMonitorInfo *info) {
 }
 
 bool routerMonitorInit (RouterMonitor *self, RouterMonitorInfo *info) {
+
+    memset(self, 0, sizeof(*self));
 
     routerMonitorInfoInit (&self->info,
         info->frontend,
@@ -366,8 +368,8 @@ routerMonitorStart (
     zsock_t *pipe,
     void *info
 ) {
-    RouterMonitor self = {{0}};
-    routerMonitorInit (&self, info);
+    RouterMonitor self;
+    routerMonitorInit(&self, info);
 
     zactor_t *servermon = NULL;
     zsock_t *requests = NULL;
@@ -386,7 +388,7 @@ routerMonitorStart (
     }
 
     // Set up the Server Monitor Actor
-    if (!(servermon = zactor_new (zmonitor, self.info.frontend))) {
+    if (!(servermon = zactor_new(zmonitor, self.info.frontend))) {
         error("Cannot allocate a new server monitor actor.");
         goto cleanup;
     }
