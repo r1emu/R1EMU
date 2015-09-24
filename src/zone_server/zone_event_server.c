@@ -83,7 +83,7 @@ bool zoneEventServerOnDisconnect (
     return true;
 }
 
-bool zoneEventServerUpdateClientPosition (
+bool zoneEventServerUpdateClientPosition(
     EventServer *self,
     GameEvent *event,
     GameEventUpdatePosition *updatePosEvent,
@@ -104,7 +104,7 @@ bool zoneEventServerUpdateClientPosition (
     CommanderInfo *cInfo = &updatePosEvent->info;
 
     // Get the clients around
-    if (!(redisClientsAround = eventServerRedisGetClientsWithinRange (
+    if (!(redisClientsAround = eventServerRedisGetClientsWithinRange(
         self, mapId, emitterSk, &PositionXYZToXZ (&updatePosEvent->newPosition),
         COMMANDER_VIEW_RANGE
     ))) {
@@ -118,23 +118,23 @@ bool zoneEventServerUpdateClientPosition (
     GraphNode *nodeCurrentClient = eventServerGetClientNode (self, emitterSk);
 
     // Mark the neighbours nodes as unvisited
-    for (GraphArc *neighbourArc = zlist_first (nodeCurrentClient->arcs);
+    for (GraphArc *neighbourArc = zlist_first(nodeCurrentClient->arcs);
         neighbourArc != NULL;
-        neighbourArc = zlist_next (nodeCurrentClient->arcs)
+        neighbourArc = zlist_next(nodeCurrentClient->arcs)
     ) {
         GraphNode *neighbourNode = neighbourArc->to;
         GraphNodeClient *neighbourClient = neighbourNode->user_data;
         neighbourClient->around = false;
     }
 
-    if (zlist_size (redisClientsAround) > 0)
+    if (zlist_size(redisClientsAround) > 0)
     {
         pcEnterList = zlist_new();
 
         // Compare the list from Redis to the list of neighbors from the proximity graph
-        for (uint8_t *redisSocketIdClientAround = zlist_first (redisClientsAround);
+        for (uint8_t *redisSocketIdClientAround = zlist_first(redisClientsAround);
              redisSocketIdClientAround != NULL;
-             redisSocketIdClientAround = zlist_next (redisClientsAround)
+             redisSocketIdClientAround = zlist_next(redisClientsAround)
         ) {
             GraphNode *graphClientAroundNode;
             if (!(graphClientAroundNode = eventServerGetClientNode (self, redisSocketIdClientAround))) {
@@ -156,10 +156,10 @@ bool zoneEventServerUpdateClientPosition (
         }
 
         // Send the ZC_PC_ENTER to clients who now sees the current client
-        if (zlist_size (pcEnterList) > 0) {
-            pcEnterMsg = zmsg_new ();
-            zoneBuilderEnterPc (cInfo, pcEnterMsg);
-            if (!(eventServerSendToClients (self, redisClientsAround, pcEnterMsg))) {
+        if (zlist_size(pcEnterList) > 0) {
+            pcEnterMsg = zmsg_new();
+            zoneBuilderEnterPc(cInfo, pcEnterMsg);
+            if (!(eventServerSendToClients(self, redisClientsAround, pcEnterMsg))) {
                 error("Failed to send the packet to the clients.");
                 status = false;
                 goto cleanup;
@@ -167,9 +167,9 @@ bool zoneEventServerUpdateClientPosition (
         }
 
         // Also, send to the current player the list of entered players
-        for (uint8_t *enterPcSocketId = zlist_first (pcEnterList);
+        for (uint8_t *enterPcSocketId = zlist_first(pcEnterList);
              enterPcSocketId != NULL;
-             enterPcSocketId = zlist_next (pcEnterList)
+             enterPcSocketId = zlist_next(pcEnterList)
         ) {
             if (strcmp (enterPcSocketId, emitterSk) == 0) {
                 // Doesn't send again the packet - the client sees himself
@@ -177,8 +177,8 @@ bool zoneEventServerUpdateClientPosition (
             }
 
             GameSession gameSession;
-            curPcEnterMsg = zmsg_new ();
-            if (!(eventServerGetGameSessionBySocketId (
+            curPcEnterMsg = zmsg_new();
+            if (!(eventServerGetGameSessionBySocketId(
                 self, eventServerGetRouterId(self), enterPcSocketId, &gameSession)))
             {
                 error("Cannot get game session from %s.", enterPcSocketId);
@@ -186,8 +186,8 @@ bool zoneEventServerUpdateClientPosition (
                 goto cleanup;
             }
 
-            zoneBuilderEnterPc (&gameSession.commanderSession.currentCommander.info, curPcEnterMsg);
-            zframe_t *pcEnterFrame = zmsg_first (curPcEnterMsg);
+            zoneBuilderEnterPc(&gameSession.commanderSession.currentCommander.info, curPcEnterMsg);
+            zframe_t *pcEnterFrame = zmsg_first(curPcEnterMsg);
             if (!(eventServerSendToClient (self, emitterSk, zframe_data(pcEnterFrame), zframe_size(pcEnterFrame)))) {
                 error("Failed to send the packet to the clients.");
                 status = false;
@@ -200,9 +200,9 @@ bool zoneEventServerUpdateClientPosition (
 
     // Check for ZC_LEAVE and build a list of clients involved
     pcLeaveList = zlist_new();
-    for (GraphArc *neighbourArc = zlist_first (nodeCurrentClient->arcs);
+    for (GraphArc *neighbourArc = zlist_first(nodeCurrentClient->arcs);
         neighbourArc != NULL;
-        neighbourArc = zlist_next (nodeCurrentClient->arcs)
+        neighbourArc = zlist_next(nodeCurrentClient->arcs)
     ) {
         GraphNode *neighbourNode = neighbourArc->to;
         GraphNodeClient *neighbourClient = neighbourNode->user_data;
@@ -214,26 +214,26 @@ bool zoneEventServerUpdateClientPosition (
     }
 
     // Send the ZC_LEAVE to the players in the list
-    if (zlist_size (pcLeaveList) > 0)
+    if (zlist_size(pcLeaveList) > 0)
     {
-        pcLeaveMsg = zmsg_new ();
-        zoneBuilderLeave (cInfo->pcId, pcLeaveMsg);
+        pcLeaveMsg = zmsg_new();
+        zoneBuilderLeave(cInfo->pcId, pcLeaveMsg);
 
         // Also, send to the current player the list of left players
-        if (!(eventServerSendToClients (self, pcLeaveList, pcLeaveMsg))) {
+        if (!(eventServerSendToClients(self, pcLeaveList, pcLeaveMsg))) {
             error("Failed to send the packet to the clients.");
             status = false;
             goto cleanup;
         }
 
         // Also, send to the current player the list of left players
-        for (uint8_t *leftPcSocketId = zlist_first (pcLeaveList);
+        for (uint8_t *leftPcSocketId = zlist_first(pcLeaveList);
              leftPcSocketId != NULL;
-             leftPcSocketId = zlist_next (pcLeaveList)
+             leftPcSocketId = zlist_next(pcLeaveList)
         ) {
             GameSession gameSession;
-            curPcLeaveMsg = zmsg_new ();
-            if (!(eventServerGetGameSessionBySocketId (
+            curPcLeaveMsg = zmsg_new();
+            if (!(eventServerGetGameSessionBySocketId(
                 self, eventServerGetRouterId(self), leftPcSocketId, &gameSession)))
             {
                 error("Cannot get game session from %s.", leftPcSocketId);
@@ -241,8 +241,8 @@ bool zoneEventServerUpdateClientPosition (
                 goto cleanup;
             }
 
-            zoneBuilderLeave (gameSession.commanderSession.currentCommander.info.pcId, curPcLeaveMsg);
-            zframe_t *pcLeaveFrame = zmsg_first (curPcLeaveMsg);
+            zoneBuilderLeave(gameSession.commanderSession.currentCommander.info.pcId, curPcLeaveMsg);
+            zframe_t *pcLeaveFrame = zmsg_first(curPcLeaveMsg);
             if (!(eventServerSendToClient (self, emitterSk, zframe_data(pcLeaveFrame), zframe_size(pcLeaveFrame)))) {
                 error("Failed to send the packet to the clients.");
                 status = false;

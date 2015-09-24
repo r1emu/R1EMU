@@ -280,7 +280,7 @@ cleanup:
     return result;
 }
 
-bool redisGetGameSessionBySocketId (Redis *self, uint16_t routerId, uint8_t *sessionKey, GameSession *gameSession) {
+bool redisGetGameSessionBySocketId(Redis *self, uint16_t routerId, uint8_t *sessionKey, GameSession *gameSession) {
 
     SocketSession socketSession;
     RedisSocketSessionKey socketKey = {
@@ -470,7 +470,7 @@ cleanup:
     return result;
 }
 
-bool redisMoveGameSession (Redis *self, RedisGameSessionKey *from, RedisGameSessionKey *to) {
+bool redisMoveGameSession(Redis *self, RedisGameSessionKey *from, RedisGameSessionKey *to) {
     bool result = true;
     redisReply *reply = NULL;
 
@@ -515,7 +515,7 @@ cleanup:
     return result;
 }
 
-zlist_t *redisGetClientsWithinDistance (
+zlist_t *redisGetClientsWithinDistance(
     Redis *self,
     uint16_t routerId, uint16_t mapId,
     PositionXZ *center,

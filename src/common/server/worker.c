@@ -285,7 +285,7 @@ static bool workerProcessClientPacket(Worker *self, zmsg_t *msg) {
     zframe_t *headerAnswer = NULL;
 
     // Read the message
-    zframe_t *sessionKeyFrame = zmsg_first (msg);
+    zframe_t *sessionKeyFrame = zmsg_first(msg);
     zframe_t *packetFrame = zmsg_next(msg);
     // We don't need the client packet in the reply
     zmsg_remove (msg, packetFrame);

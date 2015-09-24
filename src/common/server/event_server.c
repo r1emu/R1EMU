@@ -174,7 +174,7 @@ EventServer_handleEvent (
     zframe_t *eventTypeFrame;
 
     // Get the event type frame
-    if (!(eventTypeFrame = zmsg_first (msg))) {
+    if (!(eventTypeFrame = zmsg_first(msg))) {
         error("Event type cannot be retrieved.");
         return false;
     }
@@ -253,18 +253,18 @@ eventServerSubscribe (
 }
 
 bool
-eventServerSendToClients (
+eventServerSendToClients(
     EventServer *self,
     zlist_t *clients,
     zmsg_t *broadcastMsg
 ) {
     bool result = true;
     zmsg_t *msg = NULL;
-    zframe_t *frame = zmsg_first (broadcastMsg);
+    zframe_t *frame = zmsg_first(broadcastMsg);
     uint8_t *packet = zframe_data(frame);
     size_t packetLen = zframe_size(frame);
 
-    if ((!(msg = zmsg_new ()))
+    if ((!(msg = zmsg_new()))
     ||  zmsg_addmem(msg, PACKET_HEADER (ROUTER_WORKER_MULTICAST), sizeof(ROUTER_WORKER_MULTICAST)) != 0
     ||  zmsg_addmem(msg, packet, packetLen) != 0
     ) {
@@ -275,7 +275,7 @@ eventServerSendToClients (
 
     // [1 frame data] + [1 frame identity] + [1 frame identity] + ...
     char *identityKey;
-    for (identityKey = zlist_first (clients); identityKey != NULL; identityKey = zlist_next (clients)) {
+    for (identityKey = zlist_first(clients); identityKey != NULL; identityKey = zlist_next(clients)) {
         // Add all the clients to the packet
         uint8_t identityBytes[5];
         socketSessionGenId (identityKey, identityBytes);
@@ -315,7 +315,7 @@ bool eventServerDispatchEvent(
     memcpy (&gameEvent.data, event, eventSize);
     size_t gameEventSize = sizeof(GameEvent) - sizeof (EventDataCategories) + eventSize;
 
-    if ((!(msg = zmsg_new ()))
+    if ((!(msg = zmsg_new()))
     ||  zmsg_addmem(msg, PACKET_HEADER (EVENT_SERVER_EVENT), sizeof(EVENT_SERVER_EVENT)) != 0
     ||  zmsg_addmem(msg, PACKET_HEADER (eventType), sizeof(eventType)) != 0
     ||  zmsg_addmem(msg, &gameEvent, gameEventSize) != 0
@@ -346,7 +346,7 @@ eventServerSendToClient (
     bool result = true;
     zmsg_t *msg = NULL;
 
-    if ((!(msg = zmsg_new ()))
+    if ((!(msg = zmsg_new()))
     ||  zmsg_addmem(msg, PACKET_HEADER (ROUTER_WORKER_MULTICAST), sizeof(ROUTER_WORKER_MULTICAST)) != 0
     ||  zmsg_addmem(msg, packet, packetLen) != 0
     ) {
@@ -383,14 +383,14 @@ eventServerGetRouterId (
 }
 
 zlist_t *
-eventServerRedisGetClientsWithinRange (
+eventServerRedisGetClientsWithinRange(
     EventServer *self,
     uint16_t mapId,
     uint8_t *ignoredSessionKey,
     PositionXZ *position,
     float range
 ) {
-    return redisGetClientsWithinDistance (self->redis, self->info.routerId, mapId, position, range, ignoredSessionKey);
+    return redisGetClientsWithinDistance(self->redis, self->info.routerId, mapId, position, range, ignoredSessionKey);
 }
 
 bool eventServerRemoveClient(EventServer *self, uint8_t *sessionKey)
@@ -435,7 +435,7 @@ eventServerGetClientsAround (
     }
 
     // Add the neighbors keys to the clients list
-    for (GraphArc *arc = zlist_first (node->arcs); arc != NULL; arc = zlist_next (node->arcs)) {
+    for (GraphArc *arc = zlist_first(node->arcs); arc != NULL; arc = zlist_next(node->arcs)) {
         GraphNode *nodeAround = arc->to;
         zlist_append(clients, nodeAround->key);
     }

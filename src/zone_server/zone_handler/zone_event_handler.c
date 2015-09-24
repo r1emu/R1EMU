@@ -124,7 +124,7 @@ bool zoneEventHandlerMoveStop(EventServer *self, GameEvent *event) {
 
     if (zlist_size(clientsAround) > 0) {
         // build the packet for the clients around
-        msg = zmsg_new ();
+        msg = zmsg_new();
 
         zoneBuilderPcMoveStop(
             moveStopEvent->updatePosEvent.info.pcId,

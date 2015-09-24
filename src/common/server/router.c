@@ -278,7 +278,7 @@ static int routerSubscribe(zloop_t *loop, zsock_t *publisher, void *_self) {
             size_t identityCount = zmsg_size(msg);
             for (size_t count = 0; count < identityCount; count++) {
                 // TODO : Don't allocate a new zmsg_t for every submessage ?
-                zmsg_t *subMsg = zmsg_new ();
+                zmsg_t *subMsg = zmsg_new();
                 zmsg_add(subMsg, zmsg_pop (msg));
                 zmsg_add(subMsg, zframe_dup (dataFrame));
                 zmsg_send(&subMsg, self->frontend);
@@ -382,7 +382,7 @@ static int routerBackend(zloop_t *loop, zsock_t *backend, void *_self) {
                 zframe_t *identity = zmsg_pop (msg);
                 size_t msgCount = zmsg_size(msg);
                 for (int i = 0; i < msgCount; i++) {
-                    zmsg_t *subMsg = zmsg_new ();
+                    zmsg_t *subMsg = zmsg_new();
                     zmsg_add(subMsg, zframe_dup (identity));
                     zmsg_add(subMsg, zmsg_pop (msg));
                     zmsg_send(&subMsg, self->frontend);
@@ -429,7 +429,7 @@ static bool routerInformMonitor(Router *self, zframe_t *identityClient, uint64_t
 
     // Build the message to the Router Monitor
     zmsg_t *msg;
-    if ((msg = zmsg_new ()) == NULL
+    if ((msg = zmsg_new()) == NULL
     ||  zmsg_addmem(msg, PACKET_HEADER (ROUTER_MONITOR_ADD_FD), sizeof(ROUTER_MONITOR_ADD_FD)) != 0
     ||  zmsg_addmem(msg, PACKET_HEADER (fdClient), sizeof(fdClient)) != 0
     ||  zmsg_append (msg, &identityClient) != 0
@@ -454,7 +454,7 @@ static int routerFrontend(zloop_t *loop, zsock_t *frontend, void *_self) {
         return 0;
     }
 
-    zframe_t *identityClient = zmsg_first (msg);
+    zframe_t *identityClient = zmsg_first(msg);
     zframe_t *data = zmsg_next(msg);
 
     // Retrieve the FD of the client
@@ -563,7 +563,7 @@ static bool routerInitMonitor(Router *self) {
     // Wait for the READY signal from the monitor actor
     zmsg_t *msg = NULL;
     if ((!(msg = zmsg_recv(monitorActor)))
-    || (memcmp (zframe_data(zmsg_first (msg)), PACKET_HEADER (ROUTER_MONITOR_READY), sizeof(ROUTER_MONITOR_READY)) != 0)
+    || (memcmp (zframe_data(zmsg_first(msg)), PACKET_HEADER (ROUTER_MONITOR_READY), sizeof(ROUTER_MONITOR_READY)) != 0)
     ) {
         error("Cannot received correctly an answer from the monitor actor.");
         return false;
