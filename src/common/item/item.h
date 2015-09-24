@@ -25,6 +25,7 @@
 // ---------- Defines -------------
 
 // ------ Structure declaration -------
+
 #define ITEM_KEY_SIZE 17
 typedef uint8_t ItemKey[ITEM_KEY_SIZE];
 
@@ -44,6 +45,9 @@ typedef struct Item {
 
     /** Index of the item in the inventory */
     uint32_t inventoryIndex;
+
+    /** Item Category (should be in ItemData, but for now we put it here)*/
+    int itemCategory;
 
     /** Attributes of the item */
     ItemAttributes attributes;

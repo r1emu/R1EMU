@@ -51,6 +51,7 @@ typedef enum {
     INVENTORY_CAT_QUEST = 12,
     INVENTORY_CAT_PETWEAPON = 13,
     INVENTORY_CAT_PETARMOR = 14,
+    INVENTORY_CAT_Count,
 }   InventoryCategory;
 
 typedef enum {
@@ -112,6 +113,7 @@ typedef struct Inventory Inventory;
 struct Inventory
 {
     zhash_t *items;
+    zlist_t *bags[INVENTORY_CAT_Count];
     Item *equippedItems[EQSLOT_Count];
 };
 
@@ -147,6 +149,7 @@ void inventoryDestroy(Inventory **self);
  * @param item an Item.
  */
 bool inventoryAddItem(Inventory *self, Item *itemToAdd);
+bool inventoryRemoveItem(Inventory *self, Item *itemToRemove);
 
 /**
  * Get count (size) of items in inventory
@@ -155,10 +158,13 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd);
  */
 size_t inventoryGetItemsCount(Inventory *self);
 
-Item *inventoryGetFirstItem(Inventory *self);
-Item *inventoryGetNextItem(Inventory *self);
+Item *inventoryGetFirstItem(Inventory *self, InventoryCategory category);
+Item *inventoryGetNextItem(Inventory *self, InventoryCategory category);
 
 bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot);
 void inventoryPrintEquipment(Inventory *self);
 bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value);
+void inventoryPrintBag(Inventory *self, InventoryCategory category);
+bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item);
+bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2);
 

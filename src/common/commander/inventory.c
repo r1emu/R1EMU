@@ -48,6 +48,13 @@ bool inventoryInit(Inventory *self) {
         return false;
     }
 
+    for (int i = 0; i < INVENTORY_CAT_Count; i++) {
+        if (!(self->bags[i] = zlist_new())) {
+            error("Cannot allocate list for bag [%d]", i);
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -68,6 +75,16 @@ void inventoryDestroy(Inventory **_self) {
 
 bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
+    if (!itemToAdd->itemCategory) {
+        error("Item has no category");
+        return false;
+    }
+
+    if (itemToAdd->itemCategory > INVENTORY_CAT_Count) {
+        error("Item has invalid category");
+        return false;
+    }
+
     dbg("itemIdKey: %d", itemToAdd->itemId);
 
     ItemKey itemKey;
@@ -80,6 +97,12 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
         return false;
     }
 
+    int result = zlist_append(self->bags[itemToAdd->itemCategory], itemToAdd);
+    if (result == -1) {
+        error("Cannot push item into the category bag in inventory");
+        return false;
+    }
+
     return true;
 }
 
@@ -87,6 +110,15 @@ bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
 
     ItemKey itemKey;
     itemGenKey(itemToRemove->itemId, itemKey);
+
+    //if (zlist_exists(self->bags[itemToRemove->itemCategory], itemToRemove)) {
+        zlist_remove(self->bags[itemToRemove->itemCategory], itemToRemove);
+    //} else {
+    //    error("Item was not found in bag [%d] of inventory", itemToRemove->itemCategory);
+    //    return false;
+    //}
+
+
 
     zhash_delete(self->items, itemKey);
 
@@ -116,12 +148,12 @@ size_t inventoryGetItemsCount(Inventory *self) {
     return zhash_size(self->items);
 }
 
-Item *inventoryGetFirstItem(Inventory *self) {
-    return zhash_first(self->items);
+Item *inventoryGetFirstItem(Inventory *self, InventoryCategory category) {
+    return (Item*) zlist_first(self->bags[category]);
 }
 
-Item *inventoryGetNextItem(Inventory *self) {
-    return zhash_next(self->items);
+Item *inventoryGetNextItem(Inventory *self, InventoryCategory category) {
+    return (Item*) zlist_next(self->bags[category]);
 }
 
 bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
@@ -225,6 +257,25 @@ bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value) {
     return true;
 }
 
+bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2) {
+    // Check bag
+    Item *item1 = *_item1;
+    Item *item2 = *_item2;
+    if (item1->itemCategory != item2->itemCategory) {
+        error("Items to swap are from different bags");
+        return false;
+    }
+
+    Item *itemTemp;
+
+    itemTemp = item1;
+    item1 = item2;
+    item2 = itemTemp;
+
+    return true;
+
+}
+
 
 void inventoryPrintEquipment(Inventory *self) {
     dbg("head_top = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[0]);
@@ -247,4 +298,23 @@ void inventoryPrintEquipment(Inventory *self) {
     dbg("ring_left = %d (%x)", self->equippedItems[17] ? self->equippedItems[17]->itemType : 0, self->equippedItems[17]);
     dbg("ring_right = %d (%x)", self->equippedItems[18] ? self->equippedItems[18]->itemType : 0, self->equippedItems[18]);
     dbg("necklace = %d (%x)", self->equippedItems[19] ? self->equippedItems[19]->itemType : 0, self->equippedItems[19]);
+}
+
+void inventoryPrintBag(Inventory *self, InventoryCategory category) {
+    Item *item;
+    item = zlist_first(self->bags[category]);
+
+    dbg("Printing Inventory bag[%d]", category);
+
+    if (!item) {
+        dbg("-- Bag [%d] is empty --", category);
+    }
+
+    int index = 0;
+    while (item) {
+        dbg("[%d] item: [%d]", index, item->itemType);
+
+        item = zlist_next(self->bags[category]);
+        index++;
+    }
 }
