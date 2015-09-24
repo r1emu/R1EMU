@@ -2066,3 +2066,28 @@ void zoneBuilderChangeCamera(uint8_t mode, PositionXYZ *pos, float fspd, float i
         replyPacket.ispd = ispd;
     }
 }
+
+void zoneBuilderItemRemove(Item *item, uint8_t removalType, uint8_t inventoryType, zmsg_t *replyMsg) {
+
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint64_t itemId;
+        uint32_t amount;
+        uint8_t removalType;
+        uint8_t inventoryType;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_ITEM_REMOVE;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+        replyPacket.itemId = item->itemType;
+        replyPacket.amount = item->amount;
+        replyPacket.removalType = removalType;
+        replyPacket.inventoryType = inventoryType;
+    }
+}

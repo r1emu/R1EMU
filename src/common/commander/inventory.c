@@ -256,6 +256,25 @@ bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value) {
     return true;
 }
 
+bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2) {
+    // Check bag
+    Item *item1 = *_item1;
+    Item *item2 = *_item2;
+    if (item1->itemCategory != item2->itemCategory) {
+        error("Items to swap are from different bags");
+        return false;
+    }
+
+    Item *itemTemp;
+
+    itemTemp = item1;
+    item1 = item2;
+    item2 = itemTemp;
+
+    return true;
+
+}
+
 
 void inventoryPrintEquipment(Inventory *self) {
     dbg("head_top = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[0]);

@@ -147,4 +147,6 @@ bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot);
 void inventoryPrintEquipment(Inventory *self);
 bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value);
 void inventoryPrintBag(Inventory *self, InventoryCategory category);
+bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item);
+bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2);
 
