@@ -19,6 +19,7 @@
 #include "common/redis/fields/redis_game_session.h"
 #include "common/redis/fields/redis_socket_session.h"
 #include "common/server/event_handler.h"
+#include "common/commander/inventory.h"
 
 /** Connect to the zone server */
 static PacketHandlerState zoneHandlerConnect        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
@@ -64,6 +65,10 @@ static PacketHandlerState zoneHandlerRotate         (Worker *self, Session *sess
 static PacketHandlerState zoneHandlerPose           (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On commander dash run */
 static PacketHandlerState zoneHandlerDashRun        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+/** On delete an item from inventory/warehouse */
+static PacketHandlerState zoneHandlerItemDelete        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+/** On commander delete item */
+static PacketHandlerState zoneHandlerSwapEtcInvChangeIndex        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 
 /**
  * @brief zoneHandlers is a global table containing all the zone handlers.
@@ -94,6 +99,8 @@ const PacketHandler zoneHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CZ_ROTATE, zoneHandlerRotate),
     REGISTER_PACKET_HANDLER(CZ_POSE, zoneHandlerPose),
     REGISTER_PACKET_HANDLER(CZ_DASHRUN, zoneHandlerDashRun),
+    REGISTER_PACKET_HANDLER(CZ_ITEM_DELETE, zoneHandlerItemDelete),
+    REGISTER_PACKET_HANDLER(CZ_SWAP_ETC_INV_CHANGE_INDEX, zoneHandlerSwapEtcInvChangeIndex),
 
     #undef REGISTER_PACKET_HANDLER
 };
@@ -426,40 +433,49 @@ static PacketHandlerState zoneHandlerGameReady(
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_GAME_READY);
     CommanderInfo *cInfo = &session->game.commanderSession.currentCommander.info;
 
-    /* /// TESTING PURPOSES
+    /// TESTING PURPOSES
     Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
     Item items[20];
     items[0].itemId = 1111;
-    items[0].itemType = 640092;
-    items[0].amount = 5;
+    items[0].itemType = 645001;
+    items[0].amount = 5003;
     items[0].itemCategory = INVENTORY_CAT_CONSUMABLE;
-    items[0].attributes = itemAttributesNew(0, 45, NULL, NULL, NULL, 0, 0);
+    items[0].inventoryIndex = 1;
+    //items[0].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[0]);
 
-
     items[1].itemId = 2222;
-    items[1].itemType = 640102;
-    items[1].amount = 1;
-    items[0].itemCategory = INVENTORY_CAT_CONSUMABLE;
-    items[1].attributes = itemAttributesNew(0, 30, NULL, NULL, NULL, 0, 0);
+    items[1].itemType = 640026;
+    items[1].amount = 5;
+    items[1].itemCategory = INVENTORY_CAT_CONSUMABLE;
+    items[1].inventoryIndex = 2;
+    //items[1].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[1]);
+
 
     items[2].itemId = 3333;
     items[2].itemType = 531102;
     items[2].amount = 1;
-    items[0].itemCategory = INVENTORY_CAT_ARMOR;
-    items[2].equipSlot = EQSLOT_BODY_ARMOR;
-    items[2].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    items[2].itemCategory = INVENTORY_CAT_ARMOR;
+    //items[2].equipSlot = EQSLOT_BODY_ARMOR;
+    //items[2].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[2]);
 
     items[3].itemId = 4444;
     items[3].itemType = 531101;
     items[3].amount = 1;
-    items[0].itemCategory = INVENTORY_CAT_ARMOR;
-    items[3].equipSlot = EQSLOT_BODY_ARMOR;
-    items[3].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    items[3].itemCategory = INVENTORY_CAT_ARMOR;
+    //items[3].equipSlot = EQSLOT_BODY_ARMOR;
+    //items[3].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[3]);
-    */
+
+
+    inventoryPrintBag(inventory, INVENTORY_CAT_CONSUMABLE);
+    inventoryPrintBag(inventory, INVENTORY_CAT_ARMOR);
+
+    inventoryRemoveItem(inventory, &items[1]);
+
+    inventoryPrintBag(inventory, INVENTORY_CAT_CONSUMABLE);
 
     zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander.inventory, replyMsg);
     zoneBuilderSessionObjects(replyMsg);
@@ -945,3 +961,88 @@ static PacketHandlerState zoneHandlerDashRun(
 
     return PACKET_HANDLER_OK;
 }
+
+static PacketHandlerState zoneHandlerItemDelete(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *replyMsg)
+{
+    #pragma pack(push, 1)
+    struct {
+        uint16_t unk1;
+        uint32_t unk2;
+        uint64_t itemId;
+        uint64_t unk3;
+    } *clientPacket = (void *) packet;
+    #pragma pack(pop)
+
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_ITEM_DELETE);
+
+    // Delete item from inventory
+    Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+
+    Item *item;
+    if (inventoryGetItemByItemId(inventory, clientPacket->itemId, &item)) {
+        inventoryRemoveItem(&session->game.commanderSession.currentCommander.inventory, item);
+    } else {
+        error("Item not found in inventory");
+        return PACKET_HANDLER_ERROR;
+    }
+
+    ///TODO
+    uint8_t removalType = 3; // Destroyed
+    uint8_t inventoryType = 0; // 0 (Inventory) , 1 (warehouse)
+
+    zoneBuilderItemRemove(item, removalType, inventoryType,replyMsg);
+
+    return PACKET_HANDLER_OK;
+}
+
+static PacketHandlerState zoneHandlerSwapEtcInvChangeIndex(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *replyMsg)
+{
+    #pragma pack(push, 1)
+    struct {
+        uint8_t inventoryType;
+        uint64_t itemId1;
+        uint32_t inventoryIndex1;
+        uint64_t itemId2;
+        uint32_t inventoryIndex2;
+    } *clientPacket = (void *) packet;
+    #pragma pack(pop)
+
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_SWAP_ETC_INV_CHANGE_INDEX);
+
+    // Delete item from inventory
+    Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+
+    Item *item1;
+    Item *item2;
+
+    if (!inventoryGetItemByItemId(inventory, clientPacket->itemId1, &item1)) {
+        error("Item1 not found in inventory");
+        return PACKET_HANDLER_ERROR;
+    }
+
+    if (!inventoryGetItemByItemId(inventory, clientPacket->itemId2, &item2)) {
+        error("Item2 not found in inventory");
+        return PACKET_HANDLER_ERROR;
+    }
+
+    if (!inventorySwapItems(inventory, &item1, &item2)) {
+        error("Error when swapping items in inventory");
+        return PACKET_HANDLER_ERROR;
+    }
+
+    // No packet in return?
+
+    return PACKET_HANDLER_OK;
+}
+
+

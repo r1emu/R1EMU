@@ -133,6 +133,7 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
     uint32_t itemPosition = inventoryGetItemsCount(inventory) + 1;
 
     Item newItem;
+
     itemInit(&newItem,
         r1emuGenerateRandom64(&self->seed),
         itemType,
