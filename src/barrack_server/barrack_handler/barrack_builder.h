@@ -128,8 +128,7 @@ barrackBuilderCommanderDestroy(uint8_t commanderDestroyMask, zmsg_t *replyMsg);
 /**
  * @brief Create a new commander
  */
-void
-barrackBuilderCommanderCreate(AccountSession *accountSession, zmsg_t *replyMsg);
+void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount, zmsg_t *replyMsg);
 
 /**
  * @brief Send information about the pets of the account

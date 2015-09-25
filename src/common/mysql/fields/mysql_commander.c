@@ -212,11 +212,7 @@ bool mySqlCommanderInsert(MySQL *self, uint64_t accountId, Commander *commanderT
 
     uint64_t commanderId = mysql_insert_id(self->handle);
 
-    dbg("commanderId %d", commanderId);
-
     commanderToCreate->info.commanderId = commanderId;
-    commanderToCreate->info.pcId = commanderId;
-    commanderToCreate->info.socialInfoId = commanderId;
 
     // TODO : check last insert id
 

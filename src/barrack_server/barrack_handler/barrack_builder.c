@@ -606,7 +606,7 @@ void barrackBuilderCommanderDestroy(uint8_t commanderDestroyMask, zmsg_t *replyM
     }
 }
 
-void barrackBuilderCommanderCreate(AccountSession *accountSession, zmsg_t *replyMsg) {
+void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
@@ -614,16 +614,8 @@ void barrackBuilderCommanderCreate(AccountSession *accountSession, zmsg_t *reply
     } replyPacket;
     #pragma pack(pop)
 
-    dbg("barrackBuilderCommanderCreate");
-
     // Build the reply packet
     PositionXZ commanderDir = PositionXZ_decl(-0.707107f, 0.707107f);
-    Commander *commander = accountSession->commanders[accountSession->commandersCount-1];
-
-
-
-    // ICBT : those values are zeroes for some reason
-
 
     PacketType packetType = BC_COMMANDER_CREATE;
     CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
@@ -634,7 +626,7 @@ void barrackBuilderCommanderCreate(AccountSession *accountSession, zmsg_t *reply
         replyPacket.commanderCreate.appearance = commander->info.appearance,
         replyPacket.commanderCreate.mapId = commander->mapId,
         replyPacket.commanderCreate.socialInfoId = commander->info.socialInfoId,
-        replyPacket.commanderCreate.commanderPosition = accountSession->commandersCount,
+        replyPacket.commanderCreate.commanderPosition = commandersCount,
         replyPacket.commanderCreate.unk4 = SWAP_UINT32(0x02000000), // ICBT
         replyPacket.commanderCreate.unk5 = 0,
         replyPacket.commanderCreate.maxXP = 0xC, // ICBT ; TODO : Implement EXP table

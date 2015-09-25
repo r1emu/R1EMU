@@ -446,6 +446,9 @@ workerProcessOneRequest(
         }
     }
 
+    Session sessionCopy;
+    memcpy(&sessionCopy, session, sizeof(sessionCopy));
+
     // Answer
     switch (workerHandlePacket(
         self,
@@ -457,6 +460,10 @@ workerProcessOneRequest(
     {
         case PACKET_HANDLER_ERROR:
             zframe_reset(headerAnswer, PACKET_HEADER(ROUTER_WORKER_ERROR), sizeof(ROUTER_WORKER_ERROR));
+            if (memcmp(&sessionCopy, session, sizeof(sessionCopy)) != 0) {
+                error("The session was modified but the worker returned an error status. "
+                      "Please change the source code so the session isn't modified before returning an error status.");
+            }
             goto cleanup;
         break;
 

@@ -13,7 +13,7 @@
 
 #include "commander.h"
 
-void commanderEquipmentInit(CommanderEquipment *equipment) {
+bool commanderEquipmentInit(CommanderEquipment *equipment) {
     equipment->head_top = 2;
     equipment->head_middle = 2;
     equipment->itemUnk1 = 4;
@@ -34,9 +34,11 @@ void commanderEquipmentInit(CommanderEquipment *equipment) {
     equipment->ring_left = 9;
     equipment->ring_right = 9;
     equipment->necklace = 0xa;
+
+    return true;
 }
 
-void commanderApparenceInit(CommanderAppearance *commander) {
+bool commanderApparenceInit(CommanderAppearance *commander) {
     memset(commander, 0, sizeof(*commander));
 
     commander->accountId = -1;
@@ -49,12 +51,17 @@ void commanderApparenceInit(CommanderAppearance *commander) {
     commanderEquipmentInit(&commander->equipment);
     commander->hairId = 0x10;
     commander->pose = SWAP_UINT16(0x0000); // Idle (ICBT)
+
+    return true;
 }
 
-void commanderInfoInit(CommanderInfo *commander) {
+bool commanderInfoInit(CommanderInfo *commander) {
     memset(commander, 0, sizeof(*commander));
 
-    commanderApparenceInit(&commander->appearance);
+    if (!(commanderApparenceInit(&commander->appearance))) {
+        error("Cannot initialize commander appearance.");
+        return false;
+    }
 
     commander->pos = PositionXYZ_decl(27.0, 30.0, 29.0);
     commander->currentXP = 0;
@@ -70,13 +77,54 @@ void commanderInfoInit(CommanderInfo *commander) {
     commander->maxStamina = 25000;
     commander->unk6 = SWAP_UINT16(0x0020);
     commander->unk7 = SWAP_UINT16(0x5910); // ICBT
+
+    return true;
 }
 
-void commanderInit(Commander *commander) {
+Commander *commanderNew(void) {
+    Commander *self;
+
+    if ((self = calloc(1, sizeof(Commander))) == NULL) {
+        error("Cannot allocate a new commander.");
+        return NULL;
+    }
+
+    if (!commanderInit (self)) {
+        commanderDestroy (&self);
+        error("Router failed to initialize.");
+        return NULL;
+    }
+
+    return self;
+}
+
+Commander *commanderDup(Commander *src) {
+    Commander *dest = NULL;
+
+    if (!(dest = commanderNew())) {
+        error("Cannot allocate a new commander.");
+        return NULL;
+    }
+
+    memcpy(dest, src, sizeof(*src));
+
+    return dest;
+}
+
+bool commanderInit(Commander *commander) {
     memset(commander, 0, sizeof(*commander));
 
-    commanderInfoInit(&commander->info);
-    inventoryInit(&commander->inventory);
+    if (!(commanderInfoInit(&commander->info))) {
+        error("Cannot initialize commander info.");
+        return false;
+    }
+
+    if (!(inventoryInit(&commander->inventory))) {
+        error("Cannot initialize inventory.");
+        return false;
+    }
+
+    return true;
 }
 
 void commanderEquipmentPrint(CommanderEquipment *equipment) {
@@ -136,3 +184,18 @@ void commanderInfoPrint(CommanderInfo *commander) {
     dbg("unk6 = %d (%x)", commander->unk6, commander->unk6);
     dbg("unk7 = %d (%x)", commander->unk7, commander->unk7);
 }
+
+void commanderFree(Commander *self) {
+
+}
+
+void commanderDestroy(Commander **_self) {
+    Commander *self = *_self;
+
+    if (_self && self) {
+        commanderFree(self);
+        free(self);
+        *_self = NULL;
+    }
+}
+

@@ -216,12 +216,20 @@ typedef enum CommanderHair
 /**
  * @brief Initialize a commander with basic information
  */
-void commanderInfoInit(CommanderInfo *commander);
-void commanderApparenceInit(CommanderAppearance *appearance);
-void commanderInit(Commander *commander);
+bool commanderInfoInit(CommanderInfo *commander);
+bool commanderApparenceInit(CommanderAppearance *appearance);
+bool commanderInit(Commander *commander);
 
 /**
  * @brief Dump a CommanderInfo in the console
  */
 void commanderInfoPrint(CommanderInfo *commander);
 void commanderAppearancePrint(CommanderAppearance *appearance);
+
+void commanderFree(Commander *self);
+void commanderDestroy(Commander **_self);
+
+/**
+ * @brief Duplicate a commander in memory
+ */
+Commander *commanderDup(Commander *src);

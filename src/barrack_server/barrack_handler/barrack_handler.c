@@ -539,6 +539,9 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     size_t packetSize,
     zmsg_t *reply)
 {
+    PacketHandlerState status = PACKET_HANDLER_ERROR;
+    BcMessageType msgType = BC_MESSAGE_NO_MSG;
+
     #pragma pack(push, 1)
     struct {
         uint8_t charPosition;
@@ -552,8 +555,6 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     }  *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    dbg("ReceivedCharacterPosition: %x", clientPacket->charPosition);
-
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_CREATE);
 
     Commander newCommander;
@@ -561,125 +562,125 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     newCommander.mapId = 1002;
 
     CommanderInfo *commanderInfo = &newCommander.info;
-    CommanderAppearance *commander = &commanderInfo->appearance;
+    CommanderAppearance *commanderAppearance = &commanderInfo->appearance;
 
     // Validate all parameters
 
-    // Name
+    // Check name
     size_t commanderNameLen = strlen(clientPacket->commanderName);
 
     if (commanderNameLen == 0) {
-
         error("Empty commander name");
-
-        barrackBuilderMessage(BC_MESSAGE_COMMANDER_NAME_TOO_SHORT, "", reply);
-        return PACKET_HANDLER_OK;
+        msgType = BC_MESSAGE_COMMANDER_NAME_TOO_SHORT;
+        goto cleanup;
     }
 
     for (size_t i = 0; i < commanderNameLen; i++) {
          if (!isprint(clientPacket->commanderName[i])) {
-
-            dbg("Wrong commander name character in Commander");
-
-            barrackBuilderMessage(BC_MESSAGE_NAME_ALREADY_EXIST, "", reply);
-            return PACKET_HANDLER_OK;
+            error("Wrong commander name character in Commander");
+            msgType = BC_MESSAGE_NAME_ALREADY_EXIST;
+            goto cleanup;
          }
     }
 
     // Check valid hairId
     /// TODO
 
-    // JobID
-    switch(clientPacket->jobId) {
+    // Check JobID
+    switch (clientPacket->jobId) {
+
         default:
             error("Invalid commander Job ID(%x)", clientPacket->jobId);
-            barrackBuilderMessage(BC_MESSAGE_CREATE_COMMANDER_FAIL, "", reply);
-            return PACKET_HANDLER_OK;
+            msgType = BC_MESSAGE_CREATE_COMMANDER_FAIL;
+            goto cleanup;
             break;
+
         case COMMANDER_JOB_WARRIOR:
-            commander->classId = COMMANDER_CLASS_WARRIOR;
+            commanderAppearance->classId = COMMANDER_CLASS_WARRIOR;
             break;
+
         case COMMANDER_JOB_ARCHER:
-            commander->classId = COMMANDER_CLASS_ARCHER;
+            commanderAppearance->classId = COMMANDER_CLASS_ARCHER;
             break;
+
         case COMMANDER_JOB_WIZARD:
-            commander->classId = COMMANDER_CLASS_WIZARD;
+            commanderAppearance->classId = COMMANDER_CLASS_WIZARD;
             break;
+
         case COMMANDER_JOB_CLERIC:
-            commander->classId = COMMANDER_CLASS_CLERIC;
+            commanderAppearance->classId = COMMANDER_CLASS_CLERIC;
             break;
     }
 
-    commander->jobId = clientPacket->jobId;
+    commanderAppearance->jobId = clientPacket->jobId;
 
     // Gender
-    switch(clientPacket->gender) {
+    switch (clientPacket->gender) {
         case COMMANDER_GENDER_MALE:
         case COMMANDER_GENDER_FEMALE:
-            commander->gender = clientPacket->gender;
+            commanderAppearance->gender = clientPacket->gender;
             break;
 
         case COMMANDER_GENDER_BOTH:
         default:
             error("Invalid gender(%d)", clientPacket->gender);
-            barrackBuilderMessage(BC_MESSAGE_CREATE_COMMANDER_FAIL, "", reply);
-            return PACKET_HANDLER_OK;
+            msgType = BC_MESSAGE_CREATE_COMMANDER_FAIL;
+            goto cleanup;
             break;
     }
-
-
 
     // Character position
     if (clientPacket->charPosition != session->game.accountSession.commandersCount + 1) {
         error("Client sent a malformed charPosition.");
-        barrackBuilderMessage(BC_MESSAGE_CREATE_COMMANDER_FAIL, "", reply);
-        return PACKET_HANDLER_OK;
+        msgType = BC_MESSAGE_CREATE_COMMANDER_FAIL;
+        goto cleanup;
     }
 
     // CharName
-    strncpy(commander->commanderName, clientPacket->commanderName, sizeof(commander->commanderName));
+    strncpy(commanderAppearance->commanderName, clientPacket->commanderName, sizeof(commanderAppearance->commanderName));
 
     // AccountID
-    commander->accountId = session->socket.accountId;
+    commanderAppearance->accountId = session->socket.accountId;
 
     // Hair type
-    commander->hairId = clientPacket->hairId;
+    commanderAppearance->hairId = clientPacket->hairId;
 
     // PCID
-    //session->game.commanderSession.currentCommander.info.pcId = r1emuGenerateRandom(&self->seed);
-    //info("PCID generated : %x", session->game.commanderSession.currentCommander.info.pcId);
-
-    // CommanderID
-    //commanderInfo->commanderId = r1emuGenerateRandom64(&self->seed);
-    //info("CommanderID generated : %llx", commanderInfo->commanderId);
+    // TODO : check for unicity of the generated pcId
+    commanderInfo->pcId = r1emuGenerateRandom(&self->seed);
 
     // SocialInfoID
-    //commanderInfo->socialInfoId = r1emuGenerateRandom64(&self->seed);
-    //info("SocialInfoID generated : %llx", commanderInfo->socialInfoId);
+    // TODO : MySQL should generate this ID
+    commanderInfo->socialInfoId = r1emuGenerateRandom64(&self->seed);
 
     // Position : Center of the barrack
     commanderInfo->pos = PositionXYZ_decl(19.0, 28.0, 29.0);
 
-    if (mySqlCommanderInsert(self->sqlConn, session->socket.accountId, &newCommander)) {
-
-        dbg("New Commander Created!");
-
-        dbg("accountId %d", commander->accountId);
-        dbg("socialInfoId %d", commanderInfo->socialInfoId);
-
-        // Add to session
-        session->game.accountSession.commanders[session->game.accountSession.commandersCount] = &newCommander;
-        session->game.accountSession.commandersCount++;
-
-        barrackBuilderCommanderCreate(&session->game.accountSession, reply);
-    } else {
-        // Error creating commander
-        return PACKET_HANDLER_ERROR;
+    if (mySqlCommanderInsert(self->sqlConn, session->socket.accountId, &newCommander) != 0) {
+        error("Cannot create the commander in the SQL.");
+        goto cleanup;
     }
 
+    info("New Commander Created!");
+    info("PCID generated : %x", commanderInfo->pcId);
+    info("SocialInfoID generated : %llx", commanderInfo->socialInfoId);
+    info("accountId %llx", commanderAppearance->accountId);
 
+    // Update the session
+    Commander *dupCommander = commanderDup(&newCommander);
+    session->game.accountSession.commanders[session->game.accountSession.commandersCount] = dupCommander;
+    session->game.accountSession.commandersCount++;
 
-    return PACKET_HANDLER_UPDATE_SESSION;
+    barrackBuilderCommanderCreate(dupCommander, session->game.accountSession.commandersCount, reply);
+
+cleanup:
+    if (msgType != BC_MESSAGE_NO_MSG) {
+        // The error is handled correctly, reply back to the client but don't update the session.
+        barrackBuilderMessage(msgType, "", reply);
+        status = PACKET_HANDLER_OK;
+    }
+
+    return status;
 }
 
 static PacketHandlerState barrackHandlerLogout(
