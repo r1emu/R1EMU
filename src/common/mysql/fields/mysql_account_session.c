@@ -14,8 +14,13 @@
 #include "mysql_account_session.h"
 #include "barrack_server/barrack_handler/barrack_builder.h"
 
-bool mySqlGetAccountData(MySQL *self, char *accountName, unsigned char *password, AccountSession * accountSession) {
-
+bool mySqlGetAccountData(
+    MySQL *self,
+    char *accountName,
+    unsigned char *password,
+    AccountSession *accountSession,
+    bool *goodCredentials)
+{
     bool status = false;
     MYSQL_ROW row;
 
@@ -43,21 +48,22 @@ bool mySqlGetAccountData(MySQL *self, char *accountName, unsigned char *password
     }
 
     if (mysql_num_rows(self->result) == 0) {
-        dbg("MySQL: Account/Password is incorrect.");
-        goto cleanup;
+        // Wrong account / password
+        warning("MySQL: Account/Password is incorrect.");
+        *goodCredentials = false;
+    } else {
+        // update the commander
+        row = mysql_fetch_row(self->result);
+        strncpy(accountSession->login, accountName, sizeof(accountSession->login));
+        accountSession->accountId = strtoll(row[0], NULL, 10);
+        accountSession->isBanned = row[1][0] == 'y';
+        accountSession->timeBanned = strtol(row[2], NULL, 10); // FIXME : not sure if 32 or 64 bits
+        accountSession->credits = strtof(row[3], NULL);
+        accountSession->privilege = strtol(row[4], NULL, 10);
+        strncpy(accountSession->familyName, row[5], sizeof(accountSession->familyName));
+        accountSession->barrackType = strtol(row[6], NULL, 10);
+        *goodCredentials = true;
     }
-
-    row = mysql_fetch_row(self->result);
-
-    // update the commander
-    strncpy(accountSession->login, accountName, sizeof(accountSession->login));
-    accountSession->accountId = strtoll(row[0], NULL, 10);
-    accountSession->isBanned = row[1][0] == 'y';
-    accountSession->timeBanned = strtol(row[2], NULL, 10); // FIXME : not sure if 32 or 64 bits
-    accountSession->credits = strtof(row[3], NULL);
-    accountSession->privilege = strtol(row[4], NULL, 10);
-    strncpy(accountSession->familyName, row[5], sizeof(accountSession->familyName));
-    accountSession->barrackType = strtol(row[6], NULL, 10);
 
     status = true;
 

@@ -76,6 +76,8 @@ static PacketHandlerState barrackHandlerLogin(
     size_t packetSize,
     zmsg_t *reply)
 {
+    PacketHandlerState status = PACKET_HANDLER_ERROR;
+
     #pragma pack(push, 1)
     struct {
         uint8_t login[ACCOUNT_SESSION_LOGIN_MAXSIZE];
@@ -86,54 +88,54 @@ static PacketHandlerState barrackHandlerLogin(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_LOGIN);
 
-    // Check if client/version servers are the same
-    /*
-    if (clientPacket.clientVersion != _SERVER_VERSION) {
-        barrackBuilderMessage(BC_MESSAGE_VERSION_MISSMATCH, nullptr, reply);
-        return PACKET_HANDLER_OK;
-    }
-    */
-
     // Get accountData from database
-    AccountSession *accountSession = &session->game.accountSession;
+    AccountSession accountSession;
+    bool goodCredentials = false;
 
     // Initialize Account Session
-    accountSessionInit(&session->game.accountSession,
-        clientPacket->login, session->socket.sessionKey,
-        session->game.accountSession.privilege);
-
-    mySqlGetAccountData(self->sqlConn, clientPacket->login, clientPacket->md5Password, accountSession);
-
-    // Check if user/pass incorrect
-    if (accountSession->accountId == 0) {
-        barrackBuilderMessage(BC_MESSAGE_USER_PASS_INCORRECT_1, "", reply);
-        return PACKET_HANDLER_OK;
-    } else {
-        // Check if user is banned
-        if (accountSession->isBanned) {
-            barrackBuilderMessage(BC_MESSAGE_ACCOUNT_BLOCKED_2, "", reply);
-            return PACKET_HANDLER_OK;
-        }
-        // Check if user is already logged-in
-        /*
-        RedisAccountSessionKey accountKey = {
-            .accountId = accountSession->accountId
-        };
-
-        AccountSession otherAccountSession;
-
-        if (redisGetAccountSession(self->redis, &accountKey, &otherAccountSession)) {
-            barrackBuilderMessage(BC_MESSAGE_ALREADY_LOGGEDIN, "", reply);
-            return PACKET_HANDLER_OK;
-        }
-        */
+    if (!(accountSessionInit(
+        &accountSession,
+        clientPacket->login,
+        session->socket.sessionKey,
+        session->game.accountSession.privilege)))
+    {
+        error("Cannot initialize the account session.");
+        goto cleanup;
     }
 
-    // authentication OK!
-    session->socket.authenticated = true;
+    if (!(mySqlGetAccountData(
+        self->sqlConn,
+        clientPacket->login,
+        clientPacket->md5Password,
+        &accountSession,
+        &goodCredentials)))
+    {
+        error("Cannot get SQL account data.");
+        goto cleanup;
+    }
+
+    // Check if user/pass incorrect
+    if (!goodCredentials) {
+        barrackBuilderMessage(BC_MESSAGE_USER_PASS_INCORRECT_1, "", reply);
+        status = PACKET_HANDLER_OK;
+        goto cleanup;
+    }
+
+    // Check if user is banned
+    if (accountSession.isBanned) {
+        barrackBuilderMessage(BC_MESSAGE_ACCOUNT_BLOCKED_2, "", reply);
+        status = PACKET_HANDLER_OK;
+        goto cleanup;
+    }
+
+    // Check if user is already logged-in
+    // TODO
 
     // update the session
-    session->socket.accountId = accountSession->accountId;
+    // authentication OK!
+    session->socket.authenticated = true;
+    session->socket.accountId = accountSession.accountId;
+    session->game.accountSession = accountSession;
 
     info("AccountID %llx generated !", session->socket.accountId);
 
@@ -145,7 +147,10 @@ static PacketHandlerState barrackHandlerLogin(
         reply
     );
 
-    return PACKET_HANDLER_UPDATE_SESSION;
+    status = PACKET_HANDLER_UPDATE_SESSION;
+
+cleanup:
+    return status;
 }
 
 static PacketHandlerState barrackHandlerLoginByPassport(
@@ -153,7 +158,10 @@ static PacketHandlerState barrackHandlerLoginByPassport(
     Session *session,
     uint8_t *packet,
     size_t packetSize,
-    zmsg_t *reply) {
+    zmsg_t *reply)
+{
+    PacketHandlerState status = PACKET_HANDLER_ERROR;
+
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
@@ -170,13 +178,6 @@ static PacketHandlerState barrackHandlerLoginByPassport(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_LOGIN_BY_PASSPORT);
 
-    // Function disabled
-    if (true) {
-        char messageToSend[] = "Function disabled.";
-        barrackBuilderMessage(BC_MESSAGE_CUSTOM_MSG, messageToSend, reply);
-        return PACKET_HANDLER_UPDATE_SESSION;
-    }
-
     // authenticate here
     // TODO
 
@@ -184,12 +185,23 @@ static PacketHandlerState barrackHandlerLoginByPassport(
     session->socket.authenticated = true;
 
     // update the session
-    // gives a random account
+    // ==== gives a random account ====
     session->socket.accountId = r1emuGenerateRandom64(&self->seed);
-    accountSessionInit(&session->game.accountSession, session->game.accountSession.login, session->socket.sessionKey, ACCOUNT_SESSION_PRIVILEGES_ADMIN);
-    snprintf(session->game.accountSession.login, sizeof(session->game.accountSession.login), "%llX", session->socket.accountId);
-    // ==================================
+
+    if (!(accountSessionInit(
+        &session->game.accountSession,
+        session->game.accountSession.login,
+        session->socket.sessionKey,
+        ACCOUNT_SESSION_PRIVILEGES_ADMIN)))
+    {
+        error("Cannot initialize the account session.");
+        goto cleanup;
+    }
+
+    snprintf(session->game.accountSession.login,
+      sizeof(session->game.accountSession.login), "%llX", session->socket.accountId);
     info("Account %s generated !", session->game.accountSession.login);
+    // ==================================
 
     barrackBuilderLoginOk(
         session->socket.accountId,
@@ -199,7 +211,10 @@ static PacketHandlerState barrackHandlerLoginByPassport(
         reply
     );
 
-    return PACKET_HANDLER_UPDATE_SESSION;
+    status = PACKET_HANDLER_UPDATE_SESSION;
+
+cleanup:
+    return status;
 }
 
 static PacketHandlerState barrackHandlerStartGame(
@@ -209,6 +224,8 @@ static PacketHandlerState barrackHandlerStartGame(
     size_t packetSize,
     zmsg_t *reply)
 {
+    PacketHandlerState status = PACKET_HANDLER_ERROR;
+
     #pragma pack(push, 1)
     struct {
         uint16_t routerId;
@@ -218,13 +235,10 @@ static PacketHandlerState barrackHandlerStartGame(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_START_GAME);
 
-    dbg("clientPacket->commanderIndex %d", clientPacket->commanderIndex);
-    dbg("session->game.accountSession.commandersCount %d", session->game.accountSession.commandersCount);
-
     // Check if commanderIndex exists
     if (clientPacket->commanderIndex > session->game.accountSession.commandersCount) {
-        error("Selected commander index doesnt exist in account");
-        return PACKET_HANDLER_ERROR;
+        error("Selected commander index doesn't exist in account");
+        goto cleanup;
     }
 
     // Retrieve zone servers IPs from Redis
@@ -238,7 +252,7 @@ static PacketHandlerState barrackHandlerStartGame(
     int maxServerCount = sizeof_array(zoneServerIps);
     if (clientPacket->routerId >= maxServerCount) {
         error("Invalid RouterId.");
-        return PACKET_HANDLER_ERROR;
+        goto cleanup;
     }
 
     // Retrieve zone servers ports from Redis
@@ -259,7 +273,7 @@ static PacketHandlerState barrackHandlerStartGame(
     // Force update session in redis
     if (!(redisUpdateSession(self->redis, session))) {
         error("Cannot update the Redis session.");
-        return PACKET_HANDLER_ERROR;
+        goto cleanup;
     }
 
     dbg("routerId %d", session->socket.routerId);
@@ -282,11 +296,14 @@ static PacketHandlerState barrackHandlerStartGame(
     };
     if (!(redisMoveGameSession(self->redis, &fromKey, &toKey))) {
         error("Cannot move the Game session %s.", session->socket.sessionKey);
-        return PACKET_HANDLER_ERROR;
+        goto cleanup;
     }
 
-    // Build the answer packet
+    // Update the session
+    session->game.commanderSession.currentCommander = *session->game.accountSession.commanders[clientPacket->commanderIndex];
+    session->game.commanderSession.mapId = session->game.commanderSession.currentCommander.mapId;
 
+    // Build the answer packet
     barrackBuilderStartGameOk(
         self->info.routerId,
         zoneServerIp,
@@ -298,11 +315,10 @@ static PacketHandlerState barrackHandlerStartGame(
         reply
     );
 
-    // Update the session
-    session->game.commanderSession.currentCommander = *session->game.accountSession.commanders[clientPacket->commanderIndex];
-    session->game.commanderSession.mapId = session->game.commanderSession.currentCommander.mapId;
+    status = PACKET_HANDLER_UPDATE_SESSION;
 
-    return PACKET_HANDLER_UPDATE_SESSION;
+cleanup:
+    return status;
 }
 
 static PacketHandlerState
