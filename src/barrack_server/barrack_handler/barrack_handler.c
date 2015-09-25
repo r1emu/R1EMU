@@ -265,10 +265,13 @@ static PacketHandlerState barrackHandlerStartGame(
     int zoneServerPort = zoneServerPorts[clientPacket->routerId];
 
     // Prepare "current commander"
-    commanderPrint(session->game.accountSession.commanders[clientPacket->commanderIndex]);
+    CommanderSession *commanderSession = &session->game.commanderSession;
+    AccountSession *accountSession = &session->game.accountSession;
+    size_t commanderIndex = clientPacket->commanderIndex - 1;
 
-    session->game.commanderSession.currentCommander = *session->game.accountSession.commanders[clientPacket->commanderIndex-1];
-    session->game.commanderSession.mapId = session->game.commanderSession.currentCommander.mapId;
+    commanderPrint(accountSession->commanders[commanderIndex]);
+    commanderSession->currentCommander = accountSession->commanders[commanderIndex];
+    // commanderSession->mapId = commanderSession->currentCommander->mapId;
 
     // Force update session in redis
     if (!(redisUpdateSession(self->redis, session))) {
@@ -276,12 +279,12 @@ static PacketHandlerState barrackHandlerStartGame(
         goto cleanup;
     }
 
-    dbg("routerId %d", session->socket.routerId);
-    dbg("mapId %d", session->socket.mapId);
-    dbg("accountId %d", session->socket.accountId);
-    dbg("S PcId %d", session->game.commanderSession.currentCommander.pcId);
-    dbg("S socialInfoId %d", session->game.commanderSession.currentCommander.socialInfoId);
-    dbg("S commanderId %d", session->game.commanderSession.currentCommander.commanderId);
+    dbg("routerId %x", session->socket.routerId);
+    dbg("mapId %x", session->socket.mapId);
+    dbg("accountId %llx", session->socket.accountId);
+    dbg("S PcId %x", session->game.commanderSession.currentCommander->pcId);
+    dbg("S socialInfoId %llx", session->game.commanderSession.currentCommander->socialInfoId);
+    dbg("S commanderId %llx", session->game.commanderSession.currentCommander->commanderId);
 
     // Move the GameSession to the target Zone
     RedisGameSessionKey fromKey = {
@@ -300,17 +303,17 @@ static PacketHandlerState barrackHandlerStartGame(
     }
 
     // Update the session
-    session->game.commanderSession.currentCommander = *session->game.accountSession.commanders[clientPacket->commanderIndex];
-    session->game.commanderSession.mapId = session->game.commanderSession.currentCommander.mapId;
+    session->game.commanderSession.currentCommander = accountSession->commanders[commanderIndex];
+    // session->game.commanderSession.currentCommander->mapId = commanderSession->currentCommander->mapId;
 
     // Build the answer packet
     barrackBuilderStartGameOk(
         self->info.routerId,
         zoneServerIp,
         zoneServerPort,
-        session->game.commanderSession.mapId,
+        session->game.commanderSession.currentCommander->mapId,
         clientPacket->commanderIndex,
-        session->game.commanderSession.currentCommander.socialInfoId,
+        session->game.commanderSession.currentCommander->socialInfoId,
         false,
         reply
     );
@@ -339,7 +342,7 @@ barrackHandlerCommanderMove(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_MOVE);
 
-    Commander *commander = &session->game.commanderSession.currentCommander;
+    Commander *commander = session->game.commanderSession.currentCommander;
 
     // TODO : Check position of the client
 
@@ -463,7 +466,7 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_BARRACKNAME_CHANGE);
 
-    CommanderAppearance *commanderAppearance = &session->game.commanderSession.currentCommander.appearance;
+    CommanderAppearance *commanderAppearance = &session->game.commanderSession.currentCommander->appearance;
 
     // Check if the barrack name is not empty and contains only ASCII characters
     size_t barrackNameLen = strlen(clientPacket->barrackName);

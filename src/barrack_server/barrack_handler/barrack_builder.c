@@ -609,7 +609,7 @@ void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        CommanderCreateInfo commanderCreate;
+        CommanderCreatePacket commanderCreate;
     } replyPacket;
     #pragma pack(pop)
 

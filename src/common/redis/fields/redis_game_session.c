@@ -192,7 +192,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
 
             /// Write the reply to the session
             CommanderSession *commanderSession = &gameSession->commanderSession;
-            Commander *commander = &commanderSession->currentCommander;
+            Commander *commander = commanderSession->currentCommander;
             CommanderAppearance *appearance = &commander->appearance;
             CommanderEquipment *equipment = &appearance->equipment;
 
@@ -205,7 +205,6 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             gameSession->accountSession.commandersCount = GET_REDIS_32(barrack_charactersCreatedCount);
 
             // Commander
-            commanderSession->mapId = GET_REDIS_32(commander_mapId);
             COPY_REDIS_STR(appearance->commanderName, commander_commanderName);
             COPY_REDIS_STR(appearance->familyName, commander_familyName);
             appearance->accountId = GET_REDIS_64 (commander_accountId);
@@ -217,6 +216,21 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             appearance->level     = GET_REDIS_32(commander_level);
             appearance->hairId    = GET_REDIS_32(commander_hairId);
             appearance->pose      = GET_REDIS_32(commander_pose);
+            commander->mapId = GET_REDIS_32(commander_mapId);
+            commander->pos.x = GET_REDIS_FLOAT (info_posX);
+            commander->pos.y = GET_REDIS_FLOAT (info_posY);
+            commander->pos.z = GET_REDIS_FLOAT (info_posZ);
+            commander->currentXP = GET_REDIS_32(info_currentXP);
+            commander->maxXP = GET_REDIS_32(info_maxXP);
+            commander->pcId = GET_REDIS_32(info_pcId);
+            commander->socialInfoId = GET_REDIS_64 (info_socialInfoId);
+            commander->commanderId = GET_REDIS_64 (info_commanderId);
+            commander->currentHP = GET_REDIS_32(info_currentHP);
+            commander->maxHP = GET_REDIS_32(info_maxHP);
+            commander->currentSP = GET_REDIS_32(info_currentSP);
+            commander->maxSP = GET_REDIS_32(info_maxSP);
+            commander->currentStamina = GET_REDIS_32(info_currentStamina);
+            commander->maxStamina = GET_REDIS_32(info_maxStamina);
 
             // Equipment
             equipment->head_top    = GET_REDIS_32(equipment_head_top);
@@ -239,24 +253,6 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             equipment->ring_left   = GET_REDIS_32(equipment_ring_left);
             equipment->ring_right  = GET_REDIS_32(equipment_ring_right);
             equipment->necklace    = GET_REDIS_32(equipment_necklace);
-
-            // CommanderInfo info
-            commander->pos.x = GET_REDIS_FLOAT (info_posX);
-            commander->pos.y = GET_REDIS_FLOAT (info_posY);
-            commander->pos.z = GET_REDIS_FLOAT (info_posZ);
-            commander->currentXP = GET_REDIS_32(info_currentXP);
-            commander->maxXP = GET_REDIS_32(info_maxXP);
-            commander->pcId = GET_REDIS_32(info_pcId);
-            commander->socialInfoId = GET_REDIS_64 (info_socialInfoId);
-            commander->commanderId = GET_REDIS_64 (info_commanderId);
-            commander->currentHP = GET_REDIS_32(info_currentHP);
-            commander->maxHP = GET_REDIS_32(info_maxHP);
-            commander->currentSP = GET_REDIS_32(info_currentSP);
-            commander->maxSP = GET_REDIS_32(info_maxSP);
-            commander->currentStamina = GET_REDIS_32(info_currentStamina);
-            commander->maxStamina = GET_REDIS_32(info_maxStamina);
-            commander->unk6 = GET_REDIS_32(info_unk6);
-            commander->unk7 = GET_REDIS_32(info_unk7);
 
             #undef COPY_REDIS_STR
             #undef GET_REDIS_32
@@ -311,7 +307,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
     bool result = true;
     redisReply *reply = NULL;
 
-    Commander *commander = &gameSession->commanderSession.currentCommander;
+    Commander *commander = gameSession->commanderSession.currentCommander;
     CommanderAppearance *appearance = &commander->appearance;
     CommanderEquipment *equipment = &appearance->equipment;
 
@@ -336,6 +332,20 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         " " REDIS_GAME_SESSION_commander_level_str " %x"
         " " REDIS_GAME_SESSION_commander_hairId_str " %x"
         " " REDIS_GAME_SESSION_commander_pose_str " %x"
+        " " REDIS_GAME_SESSION_info_posX_str " %f"
+        " " REDIS_GAME_SESSION_info_posY_str " %f"
+        " " REDIS_GAME_SESSION_info_posZ_str " %f"
+        " " REDIS_GAME_SESSION_info_currentXP_str " %x"
+        " " REDIS_GAME_SESSION_info_maxXP_str " %x"
+        " " REDIS_GAME_SESSION_info_pcId_str " %x"
+        " " REDIS_GAME_SESSION_info_socialInfoId_str " %llx"
+        " " REDIS_GAME_SESSION_info_commanderId_str " %llx"
+        " " REDIS_GAME_SESSION_info_currentHP_str " %x"
+        " " REDIS_GAME_SESSION_info_maxHP_str " %x"
+        " " REDIS_GAME_SESSION_info_currentSP_str " %x"
+        " " REDIS_GAME_SESSION_info_maxSP_str " %x"
+        " " REDIS_GAME_SESSION_info_currentStamina_str " %x"
+        " " REDIS_GAME_SESSION_info_maxStamina_str " %x"
         // Equipment
         " " REDIS_GAME_SESSION_equipment_head_top_str " %x"
         " " REDIS_GAME_SESSION_equipment_head_middle_str " %x"
@@ -357,33 +367,18 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         " " REDIS_GAME_SESSION_equipment_ring_left_str " %x"
         " " REDIS_GAME_SESSION_equipment_ring_right_str " %x"
         " " REDIS_GAME_SESSION_equipment_necklace_str " %x"
-        // CommanderInfo Info
-        " " REDIS_GAME_SESSION_info_posX_str " %f"
-        " " REDIS_GAME_SESSION_info_posY_str " %f"
-        " " REDIS_GAME_SESSION_info_posZ_str " %f"
-        " " REDIS_GAME_SESSION_info_currentXP_str " %x"
-        " " REDIS_GAME_SESSION_info_maxXP_str " %x"
-        " " REDIS_GAME_SESSION_info_pcId_str " %x"
-        " " REDIS_GAME_SESSION_info_socialInfoId_str " %llx"
-        " " REDIS_GAME_SESSION_info_commanderId_str " %llx"
-        " " REDIS_GAME_SESSION_info_currentHP_str " %x"
-        " " REDIS_GAME_SESSION_info_maxHP_str " %x"
-        " " REDIS_GAME_SESSION_info_currentSP_str " %x"
-        " " REDIS_GAME_SESSION_info_maxSP_str " %x"
-        " " REDIS_GAME_SESSION_info_currentStamina_str " %x"
-        " " REDIS_GAME_SESSION_info_maxStamina_str " %x"
-        " " REDIS_GAME_SESSION_info_unk6_str " %x"
-        " " REDIS_GAME_SESSION_info_unk7_str " %x"
         , key->routerId, key->mapId, key->accountId,
 
         // Account
         socketId,
         gameSession->accountSession.login,
         gameSession->accountSession.privilege,
+
         // Barrack
         gameSession->accountSession.commandersCount,
+
         // Commander
-        gameSession->commanderSession.mapId,
+        commander->mapId,
         CHECK_REDIS_EMPTY_STRING(appearance->commanderName),
         CHECK_REDIS_EMPTY_STRING(appearance->familyName),
         key->accountId,
@@ -395,6 +390,20 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         appearance->level,
         appearance->hairId,
         appearance->pose,
+        commander->pos.x,
+        commander->pos.y,
+        commander->pos.z,
+        commander->currentXP,
+        commander->maxXP,
+        commander->pcId,
+        commander->socialInfoId,
+        commander->commanderId,
+        commander->currentHP,
+        commander->maxHP,
+        commander->currentSP,
+        commander->maxSP,
+        commander->currentStamina,
+        commander->maxStamina,
 
         // Equipment
         equipment->head_top,
@@ -416,25 +425,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         equipment->itemUnk7,
         equipment->ring_left,
         equipment->ring_right,
-        equipment->necklace,
-
-        // CommanderInfo info
-        commander->pos.x,
-        commander->pos.y,
-        commander->pos.z,
-        commander->currentXP,
-        commander->maxXP,
-        commander->pcId,
-        commander->socialInfoId,
-        commander->commanderId,
-        commander->currentHP,
-        commander->maxHP,
-        commander->currentSP,
-        commander->maxSP,
-        commander->currentStamina,
-        commander->maxStamina,
-        commander->unk6,
-        commander->unk7
+        equipment->necklace
     );
 
     if (!reply) {

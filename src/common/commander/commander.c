@@ -105,8 +105,6 @@ bool commanderInit(Commander *commander) {
     commander->maxSP = 105;
     commander->currentStamina = 25000;
     commander->maxStamina = 25000;
-    commander->unk6 = SWAP_UINT16(0x0020);
-    commander->unk7 = SWAP_UINT16(0x5910); // ICBT
 
     if (!(inventoryInit(&commander->inventory))) {
         error("Cannot initialize inventory.");
@@ -170,8 +168,6 @@ void commanderPrint(Commander *commander) {
     dbg("maxSP = %d (%x)", commander->maxSP, commander->maxSP);
     dbg("currentStamina = %d (%x)", commander->currentStamina, commander->currentStamina);
     dbg("maxStamina = %d (%x)", commander->maxStamina, commander->maxStamina);
-    dbg("unk6 = %d (%x)", commander->unk6, commander->unk6);
-    dbg("unk7 = %d (%x)", commander->unk7, commander->unk7);
 }
 
 void commanderFree(Commander *self) {

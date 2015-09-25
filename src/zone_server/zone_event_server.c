@@ -56,7 +56,7 @@ bool zoneEventServerOnDisconnect (
 
     // Send a EVENT_TYPE_LEAVE packet to the event server
     GameEventLeave event = {
-        .pcId = gameSession.commanderSession.currentCommander.pcId
+        .pcId = gameSession.commanderSession.currentCommander->pcId
     };
     eventServerDispatchEvent(eventServer, sessionKeyStr, EVENT_TYPE_LEAVE, &event, sizeof(event));
 
@@ -186,7 +186,7 @@ bool zoneEventServerUpdateClientPosition(
                 goto cleanup;
             }
 
-            zoneBuilderEnterPc(&gameSession.commanderSession.currentCommander, curPcEnterMsg);
+            zoneBuilderEnterPc(gameSession.commanderSession.currentCommander, curPcEnterMsg);
             zframe_t *pcEnterFrame = zmsg_first(curPcEnterMsg);
             if (!(eventServerSendToClient (self, emitterSk, zframe_data(pcEnterFrame), zframe_size(pcEnterFrame)))) {
                 error("Failed to send the packet to the clients.");
@@ -241,7 +241,7 @@ bool zoneEventServerUpdateClientPosition(
                 goto cleanup;
             }
 
-            zoneBuilderLeave(gameSession.commanderSession.currentCommander.pcId, curPcLeaveMsg);
+            zoneBuilderLeave(gameSession.commanderSession.currentCommander->pcId, curPcLeaveMsg);
             zframe_t *pcLeaveFrame = zmsg_first(curPcLeaveMsg);
             if (!(eventServerSendToClient (self, emitterSk, zframe_data(pcLeaveFrame), zframe_size(pcLeaveFrame)))) {
                 error("Failed to send the packet to the clients.");
