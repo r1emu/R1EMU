@@ -26,13 +26,11 @@ bool mySqlGetCommanders(MySQL *self, Commander *commanders) {
         commanderInit(curCommander);
 
         curCommander->mapId = strtol(row[MYSQL_COMMANDER_FIELD_map_id], NULL, 10);
+        curCommander->pcId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
+        curCommander->commanderId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
+        curCommander->socialInfoId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
 
-        CommanderInfo *cInfo = &curCommander->info;
-        cInfo->pcId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
-        cInfo->commanderId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
-        cInfo->socialInfoId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
-
-        CommanderAppearance *appearance = &cInfo->appearance;
+        CommanderAppearance *appearance = &curCommander->appearance;
         strncpy(appearance->commanderName, row[MYSQL_COMMANDER_FIELD_commanderName], sizeof(appearance->commanderName));
         appearance->jobId = strtol(row[MYSQL_COMMANDER_FIELD_job_id], NULL, 10);
         appearance->classId = strtol(row[MYSQL_COMMANDER_FIELD_class_id], NULL, 10);
@@ -132,7 +130,7 @@ cleanup:
 bool mySqlCommanderInsert(MySQL *self, uint64_t accountId, Commander *commanderToCreate) {
 
     bool status = false;
-    CommanderAppearance *commander = &commanderToCreate->info.appearance;
+    CommanderAppearance *commander = &commanderToCreate->appearance;
 
     // Insert a new commander
     if (mySqlQuery(self, "INSERT INTO commanders "
@@ -174,15 +172,15 @@ bool mySqlCommanderInsert(MySQL *self, uint64_t accountId, Commander *commanderT
        accountId,
        commander->commanderName,
        commander->level,
-       commanderToCreate->info.maxXP,
+       commanderToCreate->maxXP,
        commander->gender,
        commander->jobId,
        commander->classId,
        commander->hairId,
        commanderToCreate->mapId,
-       commanderToCreate->info.pos.x, /// FIXME : Using world pos, and should be barrack pos
-       commanderToCreate->info.pos.y, /// FIXME : Using world pos, and should be barrack pos
-       commanderToCreate->info.pos.z, /// FIXME : Using world pos, and should be barrack pos
+       commanderToCreate->pos.x, /// FIXME : Using world pos, and should be barrack pos
+       commanderToCreate->pos.y, /// FIXME : Using world pos, and should be barrack pos
+       commanderToCreate->pos.z, /// FIXME : Using world pos, and should be barrack pos
        10,
        10,
        commander->equipment.head_top,
@@ -212,7 +210,7 @@ bool mySqlCommanderInsert(MySQL *self, uint64_t accountId, Commander *commanderT
 
     uint64_t commanderId = mysql_insert_id(self->handle);
 
-    commanderToCreate->info.commanderId = commanderId;
+    commanderToCreate->commanderId = commanderId;
 
     // TODO : check last insert id
 
