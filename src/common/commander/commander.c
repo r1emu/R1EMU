@@ -55,32 +55,6 @@ bool commanderApparenceInit(CommanderAppearance *commander) {
     return true;
 }
 
-bool commanderInfoInit(CommanderInfo *commander) {
-    memset(commander, 0, sizeof(*commander));
-
-    if (!(commanderApparenceInit(&commander->appearance))) {
-        error("Cannot initialize commander appearance.");
-        return false;
-    }
-
-    commander->pos = PositionXYZ_decl(27.0, 30.0, 29.0);
-    commander->currentXP = 0;
-    commander->maxXP = 0xC; // ICBT
-    commander->pcId = -1;
-    commander->socialInfoId = -1;
-    commander->commanderId = -1;
-    commander->currentHP = 238;
-    commander->maxHP = 238;
-    commander->currentSP = 105;
-    commander->maxSP = 105;
-    commander->currentStamina = 25000;
-    commander->maxStamina = 25000;
-    commander->unk6 = SWAP_UINT16(0x0020);
-    commander->unk7 = SWAP_UINT16(0x5910); // ICBT
-
-    return true;
-}
-
 Commander *commanderNew(void) {
     Commander *self;
 
@@ -114,10 +88,25 @@ Commander *commanderDup(Commander *src) {
 bool commanderInit(Commander *commander) {
     memset(commander, 0, sizeof(*commander));
 
-    if (!(commanderInfoInit(&commander->info))) {
-        error("Cannot initialize commander info.");
+    if (!(commanderApparenceInit(&commander->appearance))) {
+        error("Cannot initialize commander appearance.");
         return false;
     }
+
+    commander->pos = PositionXYZ_decl(27.0, 30.0, 29.0);
+    commander->currentXP = 0;
+    commander->maxXP = 0xC; // ICBT
+    commander->pcId = -1;
+    commander->socialInfoId = -1;
+    commander->commanderId = -1;
+    commander->currentHP = 238;
+    commander->maxHP = 238;
+    commander->currentSP = 105;
+    commander->maxSP = 105;
+    commander->currentStamina = 25000;
+    commander->maxStamina = 25000;
+    commander->unk6 = SWAP_UINT16(0x0020);
+    commander->unk7 = SWAP_UINT16(0x5910); // ICBT
 
     if (!(inventoryInit(&commander->inventory))) {
         error("Cannot initialize inventory.");
@@ -165,7 +154,7 @@ void commanderAppearancePrint(CommanderAppearance *appearance) {
     dbg("pose = %d (%x)", appearance->pose, appearance->pose);
 }
 
-void commanderInfoPrint(CommanderInfo *commander) {
+void commanderPrint(Commander *commander) {
     commanderAppearancePrint(&commander->appearance);
     dbg("posX = %f %f %f (%x %x %x)",
          commander->pos.x, commander->pos.y, commander->pos.z,

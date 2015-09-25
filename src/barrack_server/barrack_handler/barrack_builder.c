@@ -379,7 +379,6 @@ void barrackBuilderCommanderList(
 
             // iterate through all commander
             Commander *curCommander = &commanders[commanderIndex];
-            CommanderInfo *cInfo = &curCommander->info;
             Inventory *inventory = &curCommander->inventory;
 
             // Define CommanderBarrackInfoPacket current structure
@@ -405,14 +404,14 @@ void barrackBuilderCommanderList(
             #pragma pack(pop)
 
             // fill it
-            curCommandersBarrackInfoPacket->appearance = cInfo->appearance;
+            curCommandersBarrackInfoPacket->appearance = curCommander->appearance;
 
-            curCommandersBarrackInfoPacket->socialInfoId = cInfo->socialInfoId; // CharUniqueId?
+            curCommandersBarrackInfoPacket->socialInfoId = curCommander->socialInfoId; // CharUniqueId?
             curCommandersBarrackInfoPacket->commanderPosition = commanderIndex + 1;
             curCommandersBarrackInfoPacket->mapId = 1002; /// FIXME : No MapId in the current structure!
             curCommandersBarrackInfoPacket->unk4 = SWAP_UINT32(0x02000000);
             curCommandersBarrackInfoPacket->unk5 = 0;
-            curCommandersBarrackInfoPacket->maxXP = cInfo->maxXP;
+            curCommandersBarrackInfoPacket->maxXP = curCommander->maxXP;
             curCommandersBarrackInfoPacket->unk6 = SWAP_UINT32(0xC01C761C);
             curCommandersBarrackInfoPacket->pos = PositionXYZ_decl(
                 SWAP_UINT32(0x25e852c1), SWAP_UINT32(0x6519e541), SWAP_UINT32(0x39f4ef42)
@@ -623,17 +622,17 @@ void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
-        replyPacket.commanderCreate.appearance = commander->info.appearance,
+        replyPacket.commanderCreate.appearance = commander->appearance,
         replyPacket.commanderCreate.mapId = commander->mapId,
-        replyPacket.commanderCreate.socialInfoId = commander->info.socialInfoId,
+        replyPacket.commanderCreate.socialInfoId = commander->socialInfoId,
         replyPacket.commanderCreate.commanderPosition = commandersCount,
         replyPacket.commanderCreate.unk4 = SWAP_UINT32(0x02000000), // ICBT
         replyPacket.commanderCreate.unk5 = 0,
         replyPacket.commanderCreate.maxXP = 0xC, // ICBT ; TODO : Implement EXP table
         replyPacket.commanderCreate.unk6 = SWAP_UINT32(0xC01C761C), // ICBT
-        replyPacket.commanderCreate.pos = commander->info.pos,
+        replyPacket.commanderCreate.pos = commander->pos,
         replyPacket.commanderCreate.dir = commanderDir,
-        replyPacket.commanderCreate.pos2 = commander->info.pos,
+        replyPacket.commanderCreate.pos2 = commander->pos,
         replyPacket.commanderCreate.dir2 = commanderDir,
         memset(replyPacket.commanderCreate.appearance.familyName, 0, sizeof(replyPacket.commanderCreate.appearance.familyName));
         replyPacket.commanderCreate.appearance.accountId = 0;

@@ -96,12 +96,14 @@ typedef struct CommanderCreateInfo {
 #pragma pack(pop)
 
 /**
- * Contains information about a commander exchanged between the client and server
+ * Contains all information about a commander
  */
 #pragma pack(push, 1)
 typedef struct
 {
     CommanderAppearance appearance;
+    Inventory inventory;
+
     PositionXYZ pos;
     uint32_t currentXP;
     uint32_t maxXP;
@@ -116,17 +118,6 @@ typedef struct
     uint32_t maxStamina;
     uint16_t unk6;
     uint16_t unk7;
-} CommanderInfo;
-#pragma pack(pop)
-
-/**
- * Contains all information about a commander
- */
-#pragma pack(push, 1)
-typedef struct
-{
-    CommanderInfo info;
-    Inventory inventory;
 
     uint16_t mapId; // Is it the right place?
 
@@ -216,15 +207,11 @@ typedef enum CommanderHair
 /**
  * @brief Initialize a commander with basic information
  */
-bool commanderInfoInit(CommanderInfo *commander);
 bool commanderApparenceInit(CommanderAppearance *appearance);
 bool commanderInit(Commander *commander);
 
-/**
- * @brief Dump a CommanderInfo in the console
- */
-void commanderInfoPrint(CommanderInfo *commander);
 void commanderAppearancePrint(CommanderAppearance *appearance);
+void commanderPrint(Commander *commander);
 
 void commanderFree(Commander *self);
 void commanderDestroy(Commander **_self);

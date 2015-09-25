@@ -69,15 +69,14 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
     Commander fakePc;
     commanderInit(&fakePc);
 
-    fakePc.info.pos = session->game.commanderSession.currentCommander.info.pos;
-    fakePc.info.appearance.accountId = r1emuGenerateRandom64(&self->seed);
-    fakePc.info.socialInfoId = r1emuGenerateRandom64(&self->seed);
-    fakePc.info.pcId = r1emuGenerateRandom(&self->seed);
-    fakePc.info.commanderId = r1emuGenerateRandom64(&self->seed);
-    snprintf(fakePc.info.appearance.familyName, sizeof(fakePc.info.appearance.familyName),
-        "PcID_%x", fakePc.info.pcId);
-    snprintf(fakePc.info.appearance.commanderName, sizeof(fakePc.info.appearance.commanderName),
-        "AccountID_%llx", fakePc.info.appearance.accountId);
+    fakePc.pos = session->game.commanderSession.currentCommander.pos;
+    fakePc.appearance.accountId = r1emuGenerateRandom64(&self->seed);
+    fakePc.socialInfoId = r1emuGenerateRandom64(&self->seed);
+    fakePc.pcId = r1emuGenerateRandom(&self->seed);
+    fakePc.commanderId = r1emuGenerateRandom64(&self->seed);
+    snprintf(fakePc.appearance.familyName, sizeof(fakePc.appearance.familyName), "PcID_%x", fakePc.pcId);
+    snprintf(fakePc.appearance.commanderName, sizeof(fakePc.appearance.commanderName),
+        "AccountID_%llx", fakePc.appearance.accountId);
 
     // register the fake socket session
     SocketSession fakeSocketSession;
@@ -86,7 +85,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
     socketSessionGenSessionKey((uint8_t *)&sessionKey, sessionKeyStr);
     sprintf(sessionKeyStr, "%.08x", sessionKey);
-    socketSessionInit(&fakeSocketSession, fakePc.info.appearance.accountId, self->info.routerId, session->socket.mapId,
+    socketSessionInit(&fakeSocketSession, fakePc.appearance.accountId, self->info.routerId, session->socket.mapId,
         sessionKeyStr, true);
 
     RedisSocketSessionKey socketKey = {
@@ -109,12 +108,12 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
     redisUpdateGameSession(self->redis, &gameKey, sessionKeyStr, &fakeGameSession);
     info("Fake PC spawned.(SocketID=%s, SocialID=%I64x, AccID=%I64x, PcID=%x, CommID=%I64x)",
-         sessionKeyStr, fakePc.info.socialInfoId, fakePc.info.appearance.accountId, fakePc.info.pcId, fakePc.info.commanderId);
+         sessionKeyStr, fakePc.socialInfoId, fakePc.appearance.accountId, fakePc.pcId, fakePc.commanderId);
 
     GameEventEnterPc event = {
         .updatePosEvent = {
             .mapId = fakeSocketSession.mapId,
-            .info = fakePc.info
+            .commander = fakePc
         }
     };
 
@@ -173,8 +172,8 @@ void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) 
             info("y = %.6f", position.y);
             position.z = atof(arg[2]);
             info("z = %.6f", position.z);
-            session->game.commanderSession.currentCommander.info.pos = position;
-            zoneBuilderSetPos(session->game.commanderSession.currentCommander.info.pcId, &position, replyMsg);
+            session->game.commanderSession.currentCommander.pos = position;
+            zoneBuilderSetPos(session->game.commanderSession.currentCommander.pcId, &position, replyMsg);
         }
         free(arg);
     }
@@ -198,12 +197,12 @@ void adminCmdWhere(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
     const uint16_t MAX_LEN = 128;
     char message[MAX_LEN];
     PositionXYZ position;
-    position = session->game.commanderSession.currentCommander.info.pos;
+    position = session->game.commanderSession.currentCommander.pos;
     snprintf(message, sizeof(message), "[%hu] x = %.0f, y = %.0f, z = %.0f",
         session->game.commanderSession.mapId,
         position.x, position.y, position.z);
 
-    zoneBuilderChat(&session->game.commanderSession.currentCommander.info, message, replyMsg);
+    zoneBuilderChat(&session->game.commanderSession.currentCommander, message, replyMsg);
 }
 
 void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
@@ -229,11 +228,11 @@ void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *re
         while (arg[++argc] != NULL);
         if (argc >= 3) {
             pos.x = (strlen(arg[0]) == 1 && arg[0][0] == 'c') ?
-                session->game.commanderSession.currentCommander.info.pos.x : atof(arg[0]);
+                session->game.commanderSession.currentCommander.pos.x : atof(arg[0]);
             pos.y = (strlen(arg[1]) == 1 && arg[1][0] == 'c') ?
-                session->game.commanderSession.currentCommander.info.pos.y : atof(arg[1]);
+                session->game.commanderSession.currentCommander.pos.y : atof(arg[1]);
             pos.z = (strlen(arg[2]) == 1 && arg[2][0] == 'c') ?
-                session->game.commanderSession.currentCommander.info.pos.z : atof(arg[2]);
+                session->game.commanderSession.currentCommander.pos.z : atof(arg[2]);
         }
         if (argc == 3)
             zoneBuilderChangeCamera(1, &pos, 10.0f, 0.7f, replyMsg);
@@ -244,7 +243,7 @@ void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *re
         }
         else {
             snprintf(message, sizeof(message), "Bad usage /changeCamera <x> <y> <z> {<fspd> <ispd>}");
-            zoneBuilderChat(&session->game.commanderSession.currentCommander.info, message, replyMsg);
+            zoneBuilderChat(&session->game.commanderSession.currentCommander, message, replyMsg);
         }
         free(arg);
     }
@@ -268,7 +267,7 @@ void adminCmdSetStamina(Worker *self, Session *session, char *args, zmsg_t *repl
         else {
             uint32_t stamina = atoi(arg[0]) * 1000;
             info("Setting stamina to %d.", stamina);
-            session->game.commanderSession.currentCommander.info.currentStamina = stamina;
+            session->game.commanderSession.currentCommander.currentStamina = stamina;
             zoneBuilderStamina(stamina, replyMsg);
         }
         free(arg);
@@ -293,8 +292,8 @@ void adminCmdSetSP(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
         else {
             uint32_t sp = atoi(arg[0]);
             info("Setting SP to %d.", sp);
-            session->game.commanderSession.currentCommander.info.currentSP = sp;
-            zoneBuilderUpdateSP(session->game.commanderSession.currentCommander.info.pcId, sp, replyMsg);
+            session->game.commanderSession.currentCommander.currentSP = sp;
+            zoneBuilderUpdateSP(session->game.commanderSession.currentCommander.pcId, sp, replyMsg);
         }
         free(arg);
     }
@@ -318,8 +317,8 @@ void adminCmdSetLevel(Worker *self, Session *session, char *args, zmsg_t *replyM
         else {
             uint32_t level = atoi(arg[0]);
             info("Setting level to %d.", level);
-            session->game.commanderSession.currentCommander.info.appearance.level = level;
-            zoneBuilderPCLevelUp(session->game.commanderSession.currentCommander.info.pcId, level, replyMsg);
+            session->game.commanderSession.currentCommander.appearance.level = level;
+            zoneBuilderPCLevelUp(session->game.commanderSession.currentCommander.pcId, level, replyMsg);
         }
         free(arg);
     }

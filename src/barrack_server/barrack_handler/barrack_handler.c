@@ -250,9 +250,8 @@ static PacketHandlerState barrackHandlerStartGame(
     uint32_t zoneServerIp = zoneServerIps[clientPacket->routerId];
     int zoneServerPort = zoneServerPorts[clientPacket->routerId];
 
-    // Prepare "current commander"
     session->game.commanderSession.currentCommander = *session->game.accountSession.commanders[clientPacket->commanderIndex-1];
-    memcpy(session->game.commanderSession.currentCommander.info.appearance.familyName, session->game.accountSession.familyName, sizeof(session->game.accountSession.familyName));
+    memcpy(session->game.commanderSession.currentCommander.appearance.familyName, session->game.accountSession.familyName, sizeof(session->game.accountSession.familyName));
     session->game.commanderSession.mapId = session->game.commanderSession.currentCommander.mapId;
 
     // Force update session in redis
@@ -264,9 +263,9 @@ static PacketHandlerState barrackHandlerStartGame(
     dbg("routerId %d", session->socket.routerId);
     dbg("mapId %d", session->socket.mapId);
     dbg("accountId %d", session->socket.accountId);
-    dbg("S PcId %d", session->game.commanderSession.currentCommander.info.pcId);
-    dbg("S socialInfoId %d", session->game.commanderSession.currentCommander.info.socialInfoId);
-    dbg("S commanderId %d", session->game.commanderSession.currentCommander.info.commanderId);
+    dbg("S PcId %d", session->game.commanderSession.currentCommander.pcId);
+    dbg("S socialInfoId %d", session->game.commanderSession.currentCommander.socialInfoId);
+    dbg("S commanderId %d", session->game.commanderSession.currentCommander.commanderId);
 
     // Move the GameSession to the target Zone
     RedisGameSessionKey fromKey = {
@@ -292,11 +291,14 @@ static PacketHandlerState barrackHandlerStartGame(
         zoneServerPort,
         session->game.commanderSession.mapId,
         clientPacket->commanderIndex,
-        session->game.commanderSession.currentCommander.info.socialInfoId,
+        session->game.commanderSession.currentCommander.socialInfoId,
         false,
         reply
     );
 
+    // Update the session
+    session->game.commanderSession.currentCommander = *session->game.accountSession.commanders[clientPacket->commanderIndex];
+    session->game.commanderSession.mapId = session->game.commanderSession.currentCommander.mapId;
 
     return PACKET_HANDLER_UPDATE_SESSION;
 }
@@ -319,7 +321,7 @@ barrackHandlerCommanderMove(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_MOVE);
 
-    CommanderInfo *commander = &session->game.commanderSession.currentCommander.info;
+    Commander *commander = &session->game.commanderSession.currentCommander;
 
     // TODO : Check position of the client
 
@@ -384,6 +386,7 @@ barrackHandlerStartBarrack(
         for (int i = 0; i < commandersCount; i++) {
             session->game.accountSession.commanders[i] = malloc(sizeof(Commander));
             memcpy(session->game.accountSession.commanders[i], &commanders[i], sizeof(Commander));
+            memcpy(session->game.accountSession.commanders[i]->appearance.familyName, session->game.accountSession.familyName, sizeof(session->game.accountSession.familyName));
         }
 
         // Send the commander list
@@ -397,8 +400,6 @@ barrackHandlerStartBarrack(
     }
 
     status = PACKET_HANDLER_UPDATE_SESSION;
-
-    dbg("status: %d", status);
 
 cleanup:
     return status;
@@ -431,7 +432,6 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
     size_t packetSize,
     zmsg_t *reply)
 {
-
     BarrackNameResultType ResultType = BC_BARRACKNAME_CHANGE_OK;
 
     #pragma pack(push, 1)
@@ -442,8 +442,7 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_BARRACKNAME_CHANGE);
 
-    CommanderInfo *commanderInfo = &session->game.commanderSession.currentCommander.info;
-    CommanderAppearance *commander = &commanderInfo->appearance;
+    CommanderAppearance *commanderAppearance = &session->game.commanderSession.currentCommander.appearance;
 
     // Check if the barrack name is not empty and contains only ASCII characters
     size_t barrackNameLen = strlen(clientPacket->barrackName);
@@ -467,13 +466,13 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
 
     if (ResultType == BC_BARRACKNAME_CHANGE_OK) {
         // Update the session
-        strncpy(commander->familyName, clientPacket->barrackName, sizeof(commander->familyName));
-        strncpy(session->game.accountSession.familyName, clientPacket->barrackName, sizeof(session->game.accountSession.familyName));
-
+        strncpy(commanderAppearance->familyName, clientPacket->barrackName, sizeof(commanderAppearance->familyName));
+        strncpy(session->game.accountSession.familyName,
+            clientPacket->barrackName, sizeof(session->game.accountSession.familyName));
     }
 
     // Build the reply packet
-    barrackBuilderBarrackNameChange(ResultType, commander->familyName, reply);
+    barrackBuilderBarrackNameChange(ResultType, commanderAppearance->familyName, reply);
 
     // Update session only if barrack name changed.
     if (ResultType == BC_BARRACKNAME_CHANGE_OK) {
@@ -508,12 +507,12 @@ static PacketHandlerState barrackHandlerCommanderDestroy(
     // Update session
     commanderToDelete = session->game.accountSession.commanders[clientPacket->commanderIndex - 1];
 
-    dbg("commanderToDelete->info.commanderId %d", commanderToDelete->info.commanderId);
+    dbg("commanderToDelete->commanderId %d", commanderToDelete->commanderId);
 
     if (commanderToDelete) {
 
         // Remove commander from MySQL (or mark to remove?)
-        if (MySqlCommanderDelete(self->sqlConn, commanderToDelete->info.commanderId)) {
+        if (MySqlCommanderDelete(self->sqlConn, commanderToDelete->commanderId)) {
             // Update the commanders count
             if (session->game.accountSession.commandersCount > 0) {
                 session->game.accountSession.commandersCount -= 1;
@@ -568,8 +567,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     commanderInit(&newCommander);
     newCommander.mapId = 1002;
 
-    CommanderInfo *commanderInfo = &newCommander.info;
-    CommanderAppearance *commanderAppearance = &commanderInfo->appearance;
+    CommanderAppearance *commanderAppearance = &newCommander.appearance;
 
     // Validate all parameters
 
@@ -673,14 +671,14 @@ static PacketHandlerState barrackHandlerCommanderCreate(
 
     // PCID
     // TODO : check for unicity of the generated pcId
-    commanderInfo->pcId = r1emuGenerateRandom(&self->seed);
+    newCommander.pcId = r1emuGenerateRandom(&self->seed);
 
     // SocialInfoID
     // TODO : MySQL should generate this ID
-    commanderInfo->socialInfoId = r1emuGenerateRandom64(&self->seed);
+    newCommander.socialInfoId = r1emuGenerateRandom64(&self->seed);
 
     // Position : Center of the barrack
-    commanderInfo->pos = PositionXYZ_decl(19.0, 28.0, 29.0);
+    newCommander.pos = PositionXYZ_decl(19.0, 28.0, 29.0);
 
     if (!mySqlCommanderInsert(self->sqlConn, session->socket.accountId, &newCommander)) {
         error("Cannot create the commander in the SQL.");
@@ -688,8 +686,8 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     }
 
     info("New Commander Created!");
-    info("PCID generated : %x", commanderInfo->pcId);
-    info("SocialInfoID generated : %llx", commanderInfo->socialInfoId);
+    info("PCID generated : %x", newCommander.pcId);
+    info("SocialInfoID generated : %llx", newCommander.socialInfoId);
     info("accountId %llx", commanderAppearance->accountId);
 
     // Update the session
