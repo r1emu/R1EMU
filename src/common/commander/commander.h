@@ -207,19 +207,38 @@ typedef enum CommanderHair
     COMMANDER_HAIR_COUNT
 } CommanderHair;
 
+
+/**
+ * Allocate a new Commander structure.
+ * @return A pointer to an allocated Commander, or NULL if an error occured.
+ */
+Commander *commanderNew(void);
+
+/**
+ * Initialize an allocated Commander structure.
+ * @param self An allocated Commander to initialize.
+ * @return true on success, false otherwise.
+ */
+bool commanderInit(Commander *commander);
+
 /**
  * @brief Initialize a commander with basic information
  */
 bool commanderApparenceInit(CommanderAppearance *appearance);
-bool commanderInit(Commander *commander);
 
+/**
+ * @brief Print commander basic information
+ */
 void commanderAppearancePrint(CommanderAppearance *appearance);
 void commanderPrint(Commander *commander);
-
-void commanderFree(Commander *self);
-void commanderDestroy(Commander **_self);
 
 /**
  * @brief Duplicate a commander in memory
  */
 Commander *commanderDup(Commander *src);
+
+/**
+ * @brief Free a commander in memory
+ */
+void commanderFree(Commander *self);
+void commanderDestroy(Commander **_self);

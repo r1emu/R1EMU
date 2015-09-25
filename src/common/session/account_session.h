@@ -21,7 +21,6 @@
 #include "common/commander/commander.h"
 
 #define ACCOUNT_SESSION_LOGIN_MAXSIZE 33
-#define MAX_COMMANDERS_PER_ACCOUNT 10
 
 /**
  * @brief AccountSessionPrivileges enumerates the different levels of privileges
@@ -52,11 +51,14 @@ struct AccountSession {
     time_t timeBanned;
     float credits;
     time_t timeLastLogin;
-    uint8_t familyName [64]; ///TODO SIZE
+    uint8_t familyName[64]; ///TODO SIZE
     uint32_t barrackType;
-    uint8_t commandersCount; // Makes any sense to have a variable to store this information? Copied for deprecated "BarrackSession"
-    Commander *commanders[MAX_COMMANDERS_PER_ACCOUNT];
 
+    // Makes any sense to have a variable to store this information? Copied for deprecated "BarrackSession"
+    uint8_t commandersCount;
+
+    Commander **commanders;
+    size_t commandersCountMax;
 };
 
 typedef struct AccountSession AccountSession;
@@ -82,8 +84,20 @@ bool accountSessionInit(
     AccountSessionPrivileges accountPrivilege);
 
 /**
+ * @brief Get the number of commanders in the current account session
+ * @return A pointer to an initialized AccountSession.
+ */
+size_t accountSessionGetCommandersCount(AccountSession *self);
+
+/**
+ * @brief Get a commander by its array index
+ * @return An allocated Commander on success, NULL if it doesn't exist
+ */
+Commander *accountSessionGetCommanderByIndex(AccountSession *self, int index);
+
+/**
  * @brief Prints a AccountSession structure.
- * @param self An allocated AccountSession
+ * @param self An initialized AccountSession
  */
 void accountSessionPrint(AccountSession *self);
 

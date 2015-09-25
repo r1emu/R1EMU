@@ -36,6 +36,22 @@ AccountSession *accountSessionNew(uint8_t *accountLogin, uint8_t *socketId, Acco
     return self;
 }
 
+Commander *accountSessionGetCommanderByIndex(AccountSession *self, int index) {
+    return self->commanders[index];
+}
+
+size_t accountSessionGetCommandersCount(AccountSession *self) {
+    size_t count = 0;
+
+    for (size_t i = 0; i < self->commandersCountMax; i++) {
+        if (self->commanders[i] != NULL) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
 bool accountSessionInit(AccountSession *self, uint8_t *login, uint8_t *socketId, AccountSessionPrivileges privilege) {
 
     memset(self, 0, sizeof(AccountSession));
