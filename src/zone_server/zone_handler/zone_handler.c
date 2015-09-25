@@ -434,7 +434,9 @@ static PacketHandlerState zoneHandlerGameReady(
     CommanderInfo *cInfo = &session->game.commanderSession.currentCommander.info;
 
     /// TESTING PURPOSES
+    /*
     Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+
     Item items[20];
     items[0].itemId = 1111;
     items[0].itemType = 645001;
@@ -476,7 +478,7 @@ static PacketHandlerState zoneHandlerGameReady(
     inventoryRemoveItem(inventory, &items[1]);
 
     inventoryPrintBag(inventory, INVENTORY_CAT_CONSUMABLE);
-
+    */
     zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander.inventory, replyMsg);
     zoneBuilderSessionObjects(replyMsg);
     zoneBuilderOptionList(replyMsg);
@@ -745,6 +747,15 @@ static PacketHandlerState zoneHandlerConnect(
         uint8_t channelListId;
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
+
+    dbg("zoneHandlerConnect");
+    dbg("unk1 %d", clientPacket->unk1);
+    dbg("accountId %d", clientPacket->accountId);
+    dbg("zoneServerId %d", clientPacket->zoneServerId);
+    dbg("zoneServerIndex %d", clientPacket->zoneServerIndex);
+    dbg("unk3 %d", clientPacket->unk3);
+    dbg("channelListId %d", clientPacket->channelListId);
+    dbg("login %s", clientPacket->login);
 
     // TODO : Reverse CZ_CONNECT correctly
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CONNECT);

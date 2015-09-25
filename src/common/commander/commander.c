@@ -126,6 +126,7 @@ void commanderInfoPrint(CommanderInfo *commander) {
     dbg("maxXP = %d (%x)", commander->maxXP, commander->maxXP);
     dbg("socialInfoId = %llu (%llx)", commander->socialInfoId, commander->socialInfoId);
     dbg("commanderId = %llu (%llx)", commander->commanderId, commander->commanderId);
+    dbg("pcId = %llu (%llx)", commander->pcId, commander->pcId);
     dbg("currentHP = %d (%x)", commander->currentHP, commander->currentHP);
     dbg("maxHP = %d (%x)", commander->maxHP, commander->maxHP);
     dbg("currentSP = %d (%x)", commander->currentSP, commander->currentSP);
