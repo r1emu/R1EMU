@@ -71,9 +71,9 @@ cleanup:
     return status;
 }
 
-BarrackNameResultType mySqlSetFamilyName(MySQL *self, AccountSession *accountSession, char *familyName) {
+BarrackNameChangeStatus mySqlSetFamilyName(MySQL *self, AccountSession *accountSession, char *familyName) {
 
-    BarrackNameResultType status = BC_BARRACKNAME_CHANGE_ERROR;
+    BarrackNameChangeStatus status = BC_BARRACKNAME_CHANGE_ERROR;
     MYSQL_ROW row;
 
     // Perform query to change name

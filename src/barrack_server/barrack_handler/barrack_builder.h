@@ -39,13 +39,13 @@ typedef enum PacketTypeBarrackNormal {
 /**
  * BC_BARRACKNAME_CHANGE result types
  */
-typedef enum BarrackNameResultType {
+typedef enum BarrackNameChangeStatus {
 
     BC_BARRACKNAME_CHANGE_ALREADYEXIST = -1,
     BC_BARRACKNAME_CHANGE_OK = 0,
     BC_BARRACKNAME_CHANGE_ERROR = 1,
 
-} BarrackNameResultType;
+} BarrackNameChangeStatus;
 
 /**
  * @brief Send message to client
@@ -117,7 +117,7 @@ void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg);
  * @brief Change the name of the barrack
  */
 void
-barrackBuilderBarrackNameChange(BarrackNameResultType resultType, uint8_t *barrackName, zmsg_t *replyMsg);
+barrackBuilderBarrackNameChange(BarrackNameChangeStatus resultType, uint8_t *barrackName, zmsg_t *replyMsg);
 
 /**
  * @brief Destroy commanders

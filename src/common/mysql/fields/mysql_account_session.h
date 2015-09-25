@@ -44,5 +44,5 @@ bool mySqlGetAccountData(
 /**
  * @brief Set Family name into MySQL for a given AccountSession
  */
-BarrackNameResultType mySqlSetFamilyName(MySQL *self, AccountSession *accountSession, char *familyName);
+BarrackNameChangeStatus mySqlSetFamilyName(MySQL *self, AccountSession *accountSession, char *familyName);
 
