@@ -431,7 +431,8 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
     size_t packetSize,
     zmsg_t *reply)
 {
-    BarrackNameResultType ResultType = BC_BARRACKNAME_CHANGE_OK;
+    PacketHandlerState status = PACKET_HANDLER_ERROR;
+    BarrackNameChangeStatus changeStatus = BC_BARRACKNAME_CHANGE_ERROR;
 
     #pragma pack(push, 1)
     struct{
@@ -448,37 +449,44 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
 
     if (barrackNameLen == 0) {
         error("Empty barrack name");
-        ResultType = BC_BARRACKNAME_CHANGE_ERROR;
+        goto cleanup;
     }
 
     for (size_t i = 0; i < barrackNameLen; i++) {
          if (!isprint(clientPacket->barrackName[i])) {
-            dbg("Wrong barrack name character in BC_BARRACKNAME_CHANGE");
-            ResultType = BC_BARRACKNAME_CHANGE_ERROR;
+            error("Wrong barrack name character in BC_BARRACKNAME_CHANGE");
+            goto cleanup;
          }
     }
 
-    dbg("AccountId: %llx", session->game.accountSession.accountId);
-
     // Try to perform the change
-    ResultType = mySqlSetFamilyName(self->sqlConn, &session->game.accountSession, clientPacket->barrackName);
-
-    if (ResultType == BC_BARRACKNAME_CHANGE_OK) {
-        // Update the session
-        strncpy(commanderAppearance->familyName, clientPacket->barrackName, sizeof(commanderAppearance->familyName));
-        strncpy(session->game.accountSession.familyName,
-            clientPacket->barrackName, sizeof(session->game.accountSession.familyName));
+    if ((changeStatus = mySqlSetFamilyName(
+            self->sqlConn,
+            &session->game.accountSession,
+            clientPacket->barrackName) != BC_BARRACKNAME_CHANGE_OK))
+    {
+        error("Cannot change the family name '%s' to '%s'.",
+            session->game.accountSession.familyName, clientPacket->barrackName);
+        goto cleanup;
     }
 
+    // Update the session
+    strncpy(commanderAppearance->familyName, clientPacket->barrackName, sizeof(commanderAppearance->familyName));
+    strncpy(session->game.accountSession.familyName,
+        clientPacket->barrackName, sizeof(session->game.accountSession.familyName));
+
+    status = PACKET_HANDLER_UPDATE_SESSION;
+
+cleanup:
     // Build the reply packet
-    barrackBuilderBarrackNameChange(ResultType, commanderAppearance->familyName, reply);
+    barrackBuilderBarrackNameChange(changeStatus, commanderAppearance->familyName, reply);
 
-    // Update session only if barrack name changed.
-    if (ResultType == BC_BARRACKNAME_CHANGE_OK) {
-        return PACKET_HANDLER_UPDATE_SESSION;
-    } else {
-        return PACKET_HANDLER_OK;
+    if (changeStatus != BC_BARRACKNAME_CHANGE_OK) {
+        // The error is displayed to the client, don't update the session though
+        status = PACKET_HANDLER_OK;
     }
+
+    return status;
 }
 
 static PacketHandlerState barrackHandlerCommanderDestroy(

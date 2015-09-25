@@ -565,12 +565,12 @@ void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg) {
     zmsg_add(replyMsg, zframe_new(&compressedPacket, outPacketSize));
 }
 
-void barrackBuilderBarrackNameChange(BarrackNameResultType resultType, uint8_t *barrackName, zmsg_t *replyMsg) {
+void barrackBuilderBarrackNameChange(BarrackNameChangeStatus status, uint8_t *barrackName, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
         uint8_t changed;
-        uint32_t resultType;
+        uint32_t status;
         uint8_t barrackName[64];
     } replyPacket;
     #pragma pack(pop)
@@ -581,8 +581,8 @@ void barrackBuilderBarrackNameChange(BarrackNameResultType resultType, uint8_t *
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
-        replyPacket.changed = (resultType == BC_BARRACKNAME_CHANGE_OK);
-        replyPacket.resultType = resultType;
+        replyPacket.changed = (status == BC_BARRACKNAME_CHANGE_OK);
+        replyPacket.status = status;
         strncpy(replyPacket.barrackName, barrackName, sizeof(replyPacket.barrackName));
     }
 }
