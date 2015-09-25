@@ -222,7 +222,7 @@ static PacketHandlerState barrackHandlerStartGame(
     dbg("session->game.accountSession.commandersCount %d", session->game.accountSession.commandersCount);
 
     // Check if commanderIndex exists
-    if (clientPacket->commanderIndex > session->game.accountSession.commandersCount) {
+    if (!session->game.accountSession.commanders[clientPacket->commanderIndex-1]) {
         error("Selected commander index doesnt exist in account");
         return PACKET_HANDLER_ERROR;
     }
@@ -252,6 +252,7 @@ static PacketHandlerState barrackHandlerStartGame(
 
     // Prepare "current commander"
     session->game.commanderSession.currentCommander = *session->game.accountSession.commanders[clientPacket->commanderIndex-1];
+    memcpy(session->game.commanderSession.currentCommander.info.appearance.familyName, session->game.accountSession.familyName, sizeof(session->game.accountSession.familyName));
     session->game.commanderSession.mapId = session->game.commanderSession.currentCommander.mapId;
 
     // Force update session in redis
@@ -383,7 +384,6 @@ barrackHandlerStartBarrack(
         for (int i = 0; i < commandersCount; i++) {
             session->game.accountSession.commanders[i] = malloc(sizeof(Commander));
             memcpy(session->game.accountSession.commanders[i], &commanders[i], sizeof(Commander));
-            memcpy(session->game.accountSession.commanders[i]->info.appearance.familyName, session->game.accountSession.familyName, sizeof(session->game.accountSession.familyName));
         }
 
         // Send the commander list
@@ -492,30 +492,36 @@ static PacketHandlerState barrackHandlerCommanderDestroy(
 {
     #pragma pack(push, 1)
     struct {
-        uint8_t charPosition;
+        uint8_t commanderIndex;
     }  *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    // For future reference, clientPacket->charPosition 0xFF removes all characters.
+    dbg("clientPacket->commanderIndex %d", clientPacket->commanderIndex);
+    dbg("session->game.accountSession.commandersCount %d", session->game.accountSession.commandersCount);
+
+    // For future reference, clientPacket->commanderIndex 0xFF removes all characters.
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_DESTROY);
 
     Commander *commanderToDelete;
 
     // Update session
-    commanderToDelete = session->game.accountSession.commanders[clientPacket->charPosition - 1];
+    commanderToDelete = session->game.accountSession.commanders[clientPacket->commanderIndex - 1];
+
+    dbg("commanderToDelete->info.commanderId %d", commanderToDelete->info.commanderId);
+
     if (commanderToDelete) {
-        /// TODO
+
         // Remove commander from MySQL (or mark to remove?)
-        if (true) {
-            // Reorder array of commanders
-            for (int i = 0; i < session->game.accountSession.commandersCount - 1; i++) {
-                session->game.accountSession.commanders[i] = session->game.accountSession.commanders[i + 1];
-            }
+        if (MySqlCommanderDelete(self->sqlConn, commanderToDelete->info.commanderId)) {
             // Update the commanders count
             if (session->game.accountSession.commandersCount > 0) {
                 session->game.accountSession.commandersCount -= 1;
             }
+
+            commanderDestroy(&commanderToDelete);
+            session->game.accountSession.commanders[clientPacket->commanderIndex - 1] = NULL;
+
         } else {
             dbg("Problem removing commander from MySQL");
             barrackBuilderMessage(BC_MESSAGE_CUSTOM_MSG, "There was a problem while deleting your Character. Please try again.", reply);
@@ -525,7 +531,7 @@ static PacketHandlerState barrackHandlerCommanderDestroy(
 
 
     // Build the reply packet
-    barrackBuilderCommanderDestroy(clientPacket->charPosition, reply);
+    barrackBuilderCommanderDestroy(clientPacket->commanderIndex, reply);
 
     return PACKET_HANDLER_UPDATE_SESSION;
 }
@@ -542,7 +548,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
 
     #pragma pack(push, 1)
     struct {
-        uint8_t charPosition;
+        uint8_t commanderIndex;
         uint8_t commanderName[COMMANDER_NAME_SIZE+1];
         uint16_t jobId;
         uint8_t gender;
@@ -552,6 +558,9 @@ static PacketHandlerState barrackHandlerCommanderCreate(
         uint8_t hairId;
     }  *clientPacket = (void *) packet;
     #pragma pack(pop)
+
+    dbg("clientPacket->commanderIndex %d", clientPacket->commanderIndex);
+    dbg("session->game.accountSession.commandersCount %d", session->game.accountSession.commandersCount);
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_CREATE);
 
@@ -627,12 +636,31 @@ static PacketHandlerState barrackHandlerCommanderCreate(
             break;
     }
 
+    int commandersCount = 0;
+
+    /// FIXME : Should check for "max commanders for this current barrack" MAX_COMMANDERS_PER_ACCOUNT is the maximum possible (no matter the barrack player has)
+    for (int i = 0; i < MAX_COMMANDERS_PER_ACCOUNT; i++) {
+        if (session->game.accountSession.commanders[i] != NULL) {
+            commandersCount++;
+            if (clientPacket->commanderIndex-1 == i) {
+                error("Client sent a malformed commanderIndex. Slot is not empty");
+                msgType = BC_MESSAGE_CREATE_COMMANDER_FAIL;
+                goto cleanup;
+            }
+        }
+    }
+
+    // At this point, we know that commanderIndex is "at least" a free slot.
+    // Check if commanderIndex is in valid boundaries for account and barrack type
+
     // Character position
-    if (clientPacket->charPosition != session->game.accountSession.commandersCount + 1) {
-        error("Client sent a malformed charPosition.");
+    /*
+    if (clientPacket->commanderIndex <= accountSession.maxCountCommandersInThisBarrack) { /// TODO :
+        error("Client sent a malformed commanderIndex.");
         msgType = BC_MESSAGE_CREATE_COMMANDER_FAIL;
         goto cleanup;
     }
+    */
 
     // CharName
     strncpy(commanderAppearance->commanderName, clientPacket->commanderName, sizeof(commanderAppearance->commanderName));
@@ -666,10 +694,10 @@ static PacketHandlerState barrackHandlerCommanderCreate(
 
     // Update the session
     Commander *dupCommander = commanderDup(&newCommander);
-    session->game.accountSession.commanders[session->game.accountSession.commandersCount] = dupCommander;
+    session->game.accountSession.commanders[clientPacket->commanderIndex-1] = dupCommander;
     session->game.accountSession.commandersCount++;
 
-    barrackBuilderCommanderCreate(dupCommander, session->game.accountSession.commandersCount, reply);
+    barrackBuilderCommanderCreate(dupCommander, clientPacket->commanderIndex, reply);
 
     status = PACKET_HANDLER_UPDATE_SESSION;
 

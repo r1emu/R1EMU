@@ -222,3 +222,22 @@ bool mySqlCommanderInsert(MySQL *self, uint64_t accountId, Commander *commanderT
 cleanup:
     return status;
 }
+
+bool MySqlCommanderDelete(MySQL *self, uint64_t commanderId) {
+
+    bool status = false;
+
+// Insert a new commander
+    if (mySqlQuery(self, "DELETE FROM commanders "
+       "WHERE commander_id = '%llu'",
+       commanderId))
+    {
+        error("SQL Error : %s" , mysql_error(self->handle));
+        goto cleanup;
+    }
+
+    status = true;
+
+cleanup:
+    return status;
+}

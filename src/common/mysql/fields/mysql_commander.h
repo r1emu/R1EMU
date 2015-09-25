@@ -105,3 +105,5 @@ bool mySqlRequestCommandersByAccountId(MySQL *self, uint64_t accountId, size_t *
 bool mySqlGetCommanders(MySQL *self, Commander *commanders);
 
 bool mySqlCommanderInsert(MySQL *self, uint64_t accountId, Commander *commander);
+
+bool MySqlCommanderDelete(MySQL *self, uint64_t commanderId);

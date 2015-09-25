@@ -186,7 +186,7 @@ void commanderInfoPrint(CommanderInfo *commander) {
 }
 
 void commanderFree(Commander *self) {
-
+    // TODO : free inventory?
 }
 
 void commanderDestroy(Commander **_self) {
