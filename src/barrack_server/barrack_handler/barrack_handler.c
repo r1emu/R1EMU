@@ -218,6 +218,9 @@ static PacketHandlerState barrackHandlerStartGame(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_START_GAME);
 
+    dbg("clientPacket->commanderIndex %d", clientPacket->commanderIndex);
+    dbg("session->game.accountSession.commandersCount %d", session->game.accountSession.commandersCount);
+
     // Check if commanderIndex exists
     if (clientPacket->commanderIndex > session->game.accountSession.commandersCount) {
         error("Selected commander index doesnt exist in account");
@@ -249,6 +252,9 @@ static PacketHandlerState barrackHandlerStartGame(
 
     // Prepare "current commander"
     commanderPrint(session->game.accountSession.commanders[clientPacket->commanderIndex]);
+
+    session->game.commanderSession.currentCommander = *session->game.accountSession.commanders[clientPacket->commanderIndex-1];
+    session->game.commanderSession.mapId = session->game.commanderSession.currentCommander.mapId;
 
     // Force update session in redis
     if (!(redisUpdateSession(self->redis, session))) {
@@ -668,7 +674,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
 
     barrackBuilderCommanderCreate(dupCommander, session->game.accountSession.commandersCount, reply);
 
-    status = PACKET_HANDLER_OK;
+    status = PACKET_HANDLER_UPDATE_SESSION;
 
 cleanup:
     if (msgType != BC_MESSAGE_NO_MSG) {
