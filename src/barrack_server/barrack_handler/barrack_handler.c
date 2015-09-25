@@ -656,7 +656,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     // Position : Center of the barrack
     commanderInfo->pos = PositionXYZ_decl(19.0, 28.0, 29.0);
 
-    if (mySqlCommanderInsert(self->sqlConn, session->socket.accountId, &newCommander) != 0) {
+    if (!mySqlCommanderInsert(self->sqlConn, session->socket.accountId, &newCommander)) {
         error("Cannot create the commander in the SQL.");
         goto cleanup;
     }
