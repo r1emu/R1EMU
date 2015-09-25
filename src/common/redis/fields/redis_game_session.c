@@ -202,7 +202,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             gameSession->accountSession.privilege = GET_REDIS_32(account_privilege);
 
             // Barrack
-            gameSession->accountSession.charactersCreatedCount = GET_REDIS_32(barrack_charactersCreatedCount);
+            gameSession->accountSession.commandersCount = GET_REDIS_32(barrack_charactersCreatedCount);
 
             // Commander
             commanderSession->mapId = GET_REDIS_32(commander_mapId);
@@ -381,7 +381,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         gameSession->accountSession.login,
         gameSession->accountSession.privilege,
         // Barrack
-        gameSession->accountSession.charactersCreatedCount,
+        gameSession->accountSession.commandersCount,
         // Commander
         gameSession->commanderSession.mapId,
         CHECK_REDIS_EMPTY_STRING(appearance->commanderName),

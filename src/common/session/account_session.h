@@ -18,8 +18,10 @@
 
 #include "R1EMU.h"
 #include "common/session/socket_session.h"
+#include "common/commander/commander.h"
 
 #define ACCOUNT_SESSION_LOGIN_MAXSIZE 33
+#define MAX_COMMANDERS_PER_ACCOUNT 10
 
 /**
  * @brief AccountSessionPrivileges enumerates the different levels of privileges
@@ -52,7 +54,8 @@ struct AccountSession {
     time_t timeLastLogin;
     uint8_t familyName [64]; ///TODO SIZE
     uint32_t barrackType;
-    uint8_t charactersCreatedCount; // Makes any sense to have a variable to store this information? Copied for deprecated "BarrackSession"
+    uint8_t commandersCount; // Makes any sense to have a variable to store this information? Copied for deprecated "BarrackSession"
+    Commander *commanders[MAX_COMMANDERS_PER_ACCOUNT];
 
 };
 

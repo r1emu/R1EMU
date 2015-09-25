@@ -132,6 +132,8 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
     uint32_t itemPosition = inventoryGetItemsCount(inventory) + 1;
 
+    dbg("item position: %d", itemPosition);
+
     Item newItem;
 
     itemInit(&newItem,
