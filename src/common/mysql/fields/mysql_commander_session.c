@@ -75,7 +75,7 @@ bool mySqlCommanderSessionFlush(MySQL *self, CommanderSession *commanderSession)
     bool status = false;
     MYSQL_ROW count;
 
-    Commander *commander = &commanderSession->currentCommander;
+    Commander *commander = commanderSession->currentCommander;
 
     // flush the commander
     if (mySqlQuery(self, "SELECT count(*) FROM commander WHERE commander_id = %u", commander->commanderId)) {

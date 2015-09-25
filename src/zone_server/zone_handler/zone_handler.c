@@ -172,7 +172,7 @@ static PacketHandlerState zoneHandlerRestSit(
 
     // notify the players around
     GameEventRestSit event = {
-        .pcId = session->game.commanderSession.currentCommander.pcId,
+        .pcId = session->game.commanderSession.currentCommander->pcId,
     };
     workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_REST_SIT, &event, sizeof(event));
 
@@ -215,7 +215,7 @@ static PacketHandlerState zoneHandlerSkillGround(
     zoneBuilderPlayAni(replyMsg);
 
     zoneBuilderNormalUnk8(
-        session->game.commanderSession.currentCommander.pcId,
+        session->game.commanderSession.currentCommander->pcId,
         replyMsg
     );
 
@@ -285,7 +285,7 @@ static PacketHandlerState zoneHandlerLogout(
 
     // notify leave to clients
     GameEventLeave event = {
-        .pcId = session->game.commanderSession.currentCommander.pcId,
+        .pcId = session->game.commanderSession.currentCommander->pcId,
     };
     workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_LEAVE, &event, sizeof(event));
 
@@ -338,7 +338,7 @@ static PacketHandlerState zoneHandlerMoveStop(
     GameEventMoveStop event = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .commander = session->game.commanderSession.currentCommander,
+            .commander = *session->game.commanderSession.currentCommander,
         },
         .position = clientPacket->position,
         .direction = clientPacket->direction,
@@ -381,13 +381,13 @@ static PacketHandlerState zoneHandlerKeyboardMove(
     // TODO : Check coordinates
 
     // update session
-    session->game.commanderSession.currentCommander.pos = clientPacket->position;
+    session->game.commanderSession.currentCommander->pos = clientPacket->position;
 
     // notify the players around
     GameEventCommanderMove event = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .commander = session->game.commanderSession.currentCommander
+            .commander = *session->game.commanderSession.currentCommander
         },
         .position = clientPacket->position,
         .direction = clientPacket->direction,
@@ -431,11 +431,11 @@ static PacketHandlerState zoneHandlerGameReady(
     zmsg_t *replyMsg)
 {
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_GAME_READY);
-    Commander *commander = &session->game.commanderSession.currentCommander;
+    Commander *commander = session->game.commanderSession.currentCommander;
 
     /// TESTING PURPOSES
     /*
-    Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
 
     Item items[20];
     items[0].itemId = 1111;
@@ -479,7 +479,7 @@ static PacketHandlerState zoneHandlerGameReady(
 
     inventoryPrintBag(inventory, INVENTORY_CAT_CONSUMABLE);
     */
-    zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander.inventory, replyMsg);
+    zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
     zoneBuilderSessionObjects(replyMsg);
     zoneBuilderOptionList(replyMsg);
     zoneBuilderSkillmapList(replyMsg);
@@ -495,7 +495,7 @@ static PacketHandlerState zoneHandlerGameReady(
 
     /// FOR TESTIG PURPOSES
     /*
-    Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
     Item items[20];
 
     items[0].itemId = 1111;
@@ -665,7 +665,7 @@ static PacketHandlerState zoneHandlerGameReady(
 
 
 
-    zoneBuilderItemEquipList(&session->game.commanderSession.currentCommander.inventory, replyMsg);
+    zoneBuilderItemEquipList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
     // ZoneBuilder_skillList(commander->pcId, replyMsg);
     zoneBuilderAbilityList(commander->pcId, replyMsg);
     zoneBuilderCooldownList(commander->socialInfoId, replyMsg);
@@ -712,18 +712,18 @@ static PacketHandlerState zoneHandlerGameReady(
 
     ZoneBuilder_normalUnk7(
         session->socket.accountId,
-        session->game.commanderSession.currentCommander.appearance.pcId,
-        session->game.commanderSession.currentCommander.appearance.familyName,
-        session->game.commanderSession.currentCommander.appearance.commanderName,
+        session->game.commanderSession.currentCommander->appearance.pcId,
+        session->game.commanderSession.currentCommander->appearance.familyName,
+        session->game.commanderSession.currentCommander->appearance.commanderName,
         replyMsg
     );
 
     ZoneBuilder_jobPts(replyMsg);
-    ZoneBuilder_normalUnk9(session->game.commanderSession.currentCommander.appearance.pcId, replyMsg);
+    ZoneBuilder_normalUnk9(session->game.commanderSession.currentCommander->appearance.pcId, replyMsg);
     ZoneBuilder_addonMsg(replyMsg);
     */
 
-    zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander.pcId, 31.0f, replyMsg);
+    zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander->pcId, 31.0f, replyMsg);
 
     return PACKET_HANDLER_UPDATE_SESSION;
 }
@@ -786,7 +786,7 @@ static PacketHandlerState zoneHandlerConnect(
     socketSessionInit(&session->socket,
         clientPacket->accountId,
         self->info.routerId,
-        session->game.commanderSession.mapId,
+        session->game.commanderSession.currentCommander->mapId,
         session->socket.sessionKey,
         true
     );
@@ -808,13 +808,13 @@ static PacketHandlerState zoneHandlerConnect(
         return PACKET_HANDLER_ERROR;
     }
 
-    session->game.commanderSession.currentCommander.pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
+    session->game.commanderSession.currentCommander->pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
 
     zoneBuilderConnectOk(
-        session->game.commanderSession.currentCommander.pcId,
+        session->game.commanderSession.currentCommander->pcId,
         0, // GameMode
         0, // accountPrivileges
-        &session->game.commanderSession.currentCommander, // Current commander
+        session->game.commanderSession.currentCommander, // Current commander
         replyMsg
     );
 
@@ -840,7 +840,7 @@ static PacketHandlerState zoneHandlerJump(
     GameEventJump event = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .commander = session->game.commanderSession.currentCommander
+            .commander = *session->game.commanderSession.currentCommander
         },
         .height = COMMANDER_HEIGHT_JUMP
     };
@@ -887,7 +887,7 @@ static PacketHandlerState zoneHandlerHeadRotate(
 
     // notify the players around
     GameEventHeadRotate event = {
-        .pcId = session->game.commanderSession.currentCommander.pcId,
+        .pcId = session->game.commanderSession.currentCommander->pcId,
         .direction = clientPacket->direction
     };
 
@@ -913,7 +913,7 @@ static PacketHandlerState zoneHandlerRotate(
 
     // notify the players around
     GameEventRotate event = {
-        .pcId = session->game.commanderSession.currentCommander.pcId,
+        .pcId = session->game.commanderSession.currentCommander->pcId,
         .direction = clientPacket->direction
     };
 
@@ -941,9 +941,9 @@ static PacketHandlerState zoneHandlerPose(
 
     // notify the players around
     GameEventPose event = {
-        .pcId = session->game.commanderSession.currentCommander.pcId,
+        .pcId = session->game.commanderSession.currentCommander->pcId,
         .poseId = clientPacket->poseId,
-        .position = session->game.commanderSession.currentCommander.pos,
+        .position = session->game.commanderSession.currentCommander->pos,
         .direction = clientPacket->direction
     };
 
@@ -966,7 +966,7 @@ static PacketHandlerState zoneHandlerDashRun(
     #pragma pack(pop)
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_DASHRUN);
-    zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander.pcId, 38.0f, replyMsg);*/
+    zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander->pcId, 38.0f, replyMsg);*/
 
     warning("CZ_DASHRUN not implemented yet.");
 
@@ -992,11 +992,11 @@ static PacketHandlerState zoneHandlerItemDelete(
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_ITEM_DELETE);
 
     // Delete item from inventory
-    Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
 
     Item *item;
     if (inventoryGetItemByItemId(inventory, clientPacket->itemId, &item)) {
-        inventoryRemoveItem(&session->game.commanderSession.currentCommander.inventory, item);
+        inventoryRemoveItem(&session->game.commanderSession.currentCommander->inventory, item);
     } else {
         error("Item not found in inventory");
         return PACKET_HANDLER_ERROR;
@@ -1031,7 +1031,7 @@ static PacketHandlerState zoneHandlerSwapEtcInvChangeIndex(
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_SWAP_ETC_INV_CHANGE_INDEX);
 
     // Delete item from inventory
-    Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
 
     Item *item1;
     Item *item2;

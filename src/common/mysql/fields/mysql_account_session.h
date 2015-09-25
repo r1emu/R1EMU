@@ -34,7 +34,12 @@
 /**
  * @brief Get Account Data from MySQL
  */
-bool mySqlGetAccountData(MySQL *self, char *accountName, unsigned char *password, AccountSession * accountSession);
+bool mySqlGetAccountData(
+    MySQL *self,
+    char *accountName,
+    unsigned char *password,
+    AccountSession *accountSession,
+    bool *goodCredentials);
 
 /**
  * @brief Set Family name into MySQL for a given AccountSession

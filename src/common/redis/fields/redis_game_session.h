@@ -39,7 +39,7 @@
 #define REDIS_GAME_SESSION_commander_gender_str          "commander_gender"
 #define REDIS_GAME_SESSION_commander_unk5_str            "commander_unk5"
 #define REDIS_GAME_SESSION_commander_level_str           "commander_level"
-#define REDIS_GAME_SESSION_commander_hairId_str        "commander_hairId"
+#define REDIS_GAME_SESSION_commander_hairId_str          "commander_hairId"
 #define REDIS_GAME_SESSION_commander_pose_str            "commander_pose"
 
 // CommanderEquipment
