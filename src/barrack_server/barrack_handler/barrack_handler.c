@@ -673,6 +673,8 @@ static PacketHandlerState barrackHandlerCommanderCreate(
 
     barrackBuilderCommanderCreate(dupCommander, session->game.accountSession.commandersCount, reply);
 
+    status = PACKET_HANDLER_OK;
+
 cleanup:
     if (msgType != BC_MESSAGE_NO_MSG) {
         // The error is handled correctly, reply back to the client but don't update the session.
