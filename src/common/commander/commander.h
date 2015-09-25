@@ -211,6 +211,7 @@ bool commanderApparenceInit(CommanderAppearance *appearance);
 bool commanderInit(Commander *commander);
 
 void commanderAppearancePrint(CommanderAppearance *appearance);
+void commanderPrint(Commander *commander);
 
 void commanderFree(Commander *self);
 void commanderDestroy(Commander **_self);

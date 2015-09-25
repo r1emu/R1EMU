@@ -56,7 +56,7 @@ bool zoneEventServerOnDisconnect (
 
     // Send a EVENT_TYPE_LEAVE packet to the event server
     GameEventLeave event = {
-        .pcId = gameSession.commanderSession.currentCommander.info.pcId
+        .pcId = gameSession.commanderSession.currentCommander.pcId
     };
     eventServerDispatchEvent(eventServer, sessionKeyStr, EVENT_TYPE_LEAVE, &event, sizeof(event));
 
@@ -101,7 +101,7 @@ bool zoneEventServerUpdateClientPosition(
 
     uint8_t *emitterSk = event->emitterSk;
     uint16_t mapId = updatePosEvent->mapId;
-    CommanderInfo *cInfo = &updatePosEvent->info;
+    Commander *commander = &updatePosEvent->commander;
 
     // Get the clients around
     if (!(redisClientsAround = eventServerRedisGetClientsWithinRange(
@@ -158,7 +158,7 @@ bool zoneEventServerUpdateClientPosition(
         // Send the ZC_PC_ENTER to clients who now sees the current client
         if (zlist_size(pcEnterList) > 0) {
             pcEnterMsg = zmsg_new();
-            zoneBuilderEnterPc(cInfo, pcEnterMsg);
+            zoneBuilderEnterPc(commander, pcEnterMsg);
             if (!(eventServerSendToClients(self, redisClientsAround, pcEnterMsg))) {
                 error("Failed to send the packet to the clients.");
                 status = false;
@@ -186,7 +186,7 @@ bool zoneEventServerUpdateClientPosition(
                 goto cleanup;
             }
 
-            zoneBuilderEnterPc(&gameSession.commanderSession.currentCommander.info, curPcEnterMsg);
+            zoneBuilderEnterPc(&gameSession.commanderSession.currentCommander, curPcEnterMsg);
             zframe_t *pcEnterFrame = zmsg_first(curPcEnterMsg);
             if (!(eventServerSendToClient (self, emitterSk, zframe_data(pcEnterFrame), zframe_size(pcEnterFrame)))) {
                 error("Failed to send the packet to the clients.");
@@ -217,7 +217,7 @@ bool zoneEventServerUpdateClientPosition(
     if (zlist_size(pcLeaveList) > 0)
     {
         pcLeaveMsg = zmsg_new();
-        zoneBuilderLeave(cInfo->pcId, pcLeaveMsg);
+        zoneBuilderLeave(commander->pcId, pcLeaveMsg);
 
         // Also, send to the current player the list of left players
         if (!(eventServerSendToClients(self, pcLeaveList, pcLeaveMsg))) {
@@ -241,7 +241,7 @@ bool zoneEventServerUpdateClientPosition(
                 goto cleanup;
             }
 
-            zoneBuilderLeave(gameSession.commanderSession.currentCommander.info.pcId, curPcLeaveMsg);
+            zoneBuilderLeave(gameSession.commanderSession.currentCommander.pcId, curPcLeaveMsg);
             zframe_t *pcLeaveFrame = zmsg_first(curPcLeaveMsg);
             if (!(eventServerSendToClient (self, emitterSk, zframe_data(pcLeaveFrame), zframe_size(pcLeaveFrame)))) {
                 error("Failed to send the packet to the clients.");

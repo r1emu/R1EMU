@@ -748,7 +748,7 @@ void zoneBuilderLeave(uint32_t targetPcId, zmsg_t *replyMsg) {
 
 void zoneBuilderCampInfo(uint64_t accountId, zmsg_t *replyMsg) {}
 
-void zoneBuilderEnterPc(CommanderInfo *commander, zmsg_t *replyMsg) {
+void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
@@ -1519,7 +1519,7 @@ void zoneBuilderMoveSpeed(uint32_t targetPcId, float movementSpeed, zmsg_t *repl
     }
 }
 
-void zoneBuilderChat(CommanderInfo *commander, uint8_t *chatText, zmsg_t *replyMsg) {
+void zoneBuilderChat(Commander *commander, uint8_t *chatText, zmsg_t *replyMsg) {
 
     size_t chatTextLen = strlen(chatText) + 1;
 

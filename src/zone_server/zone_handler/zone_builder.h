@@ -134,7 +134,7 @@ void zoneBuilderBuffList(uint32_t targetPcId, zmsg_t *replyMsg);
 /**
  * @brief Makes a playable character appear in the screen.
  */
-void zoneBuilderEnterPc(CommanderInfo *commander, zmsg_t *replyMsg);
+void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg);
 
 /**
  * @brief Makes a playable character disappear in the screen.
@@ -325,7 +325,7 @@ void zoneBuilderJump(uint32_t targetPcId, float height, zmsg_t *replyMsg);
 /**
  * Makes a normal chat message
  */
-void zoneBuilderChat(CommanderInfo *commander, uint8_t *chatText, zmsg_t *replyMsg);
+void zoneBuilderChat(Commander *commander, uint8_t *chatText, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown Contains information about quest position?
