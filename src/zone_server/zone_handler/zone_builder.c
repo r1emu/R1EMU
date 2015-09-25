@@ -1590,7 +1590,7 @@ void zoneBuilderConnectOk(
     uint32_t pcId,
     uint8_t gameMode,
     uint8_t accountPrivileges,
-    CommanderInfo *commander,
+    Commander *commander,
     zmsg_t *replyMsg)
 {
     #pragma pack(push, 1)
@@ -1605,7 +1605,22 @@ void zoneBuilderConnectOk(
         uint8_t passport[41];
         uint32_t pcId;
         uint32_t unk5;
-        CommanderInfo commander;
+
+        CommanderAppearance appearance;
+        PositionXYZ pos;
+        uint32_t currentXP;
+        uint32_t maxXP;
+        uint32_t _pcId;
+        uint64_t socialInfoId;
+        uint64_t commanderId;
+        uint32_t currentHP;
+        uint32_t maxHP;
+        uint16_t currentSP;
+        uint16_t maxSP;
+        uint32_t currentStamina;
+        uint32_t maxStamina;
+        uint16_t unk6;
+        uint16_t unk7;
     } replyPacket;
     #pragma pack(pop)
 
@@ -1625,8 +1640,8 @@ void zoneBuilderConnectOk(
         memcpy(replyPacket.passport, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", sizeof(replyPacket.passport));
         replyPacket.pcId = pcId;
         replyPacket.unk5 = 0; // ICBT
-        // Copy the current commander information
-        memcpy(&replyPacket.commander, commander, sizeof(replyPacket.commander));
+
+        replyPacket.appearance = commander->appearance;
     }
 }
 

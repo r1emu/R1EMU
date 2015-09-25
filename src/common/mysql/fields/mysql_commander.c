@@ -26,13 +26,11 @@ bool mySqlGetCommanders(MySQL *self, Commander *commanders) {
         commanderInit(curCommander);
 
         curCommander->mapId = strtol(row[MYSQL_COMMANDER_FIELD_map_id], NULL, 10);
+        curCommander->pcId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
+        curCommander->commanderId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
+        curCommander->socialInfoId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
 
-        CommanderInfo *cInfo = &curCommander->info;
-        cInfo->pcId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
-        cInfo->commanderId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
-        cInfo->socialInfoId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
-
-        CommanderAppearance *appearance = &cInfo->appearance;
+        CommanderAppearance *appearance = &curCommander->appearance;
         strncpy(appearance->commanderName, row[MYSQL_COMMANDER_FIELD_commanderName], sizeof(appearance->commanderName));
         appearance->jobId = strtol(row[MYSQL_COMMANDER_FIELD_job_id], NULL, 10);
         appearance->classId = strtol(row[MYSQL_COMMANDER_FIELD_class_id], NULL, 10);

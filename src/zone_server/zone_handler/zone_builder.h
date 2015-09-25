@@ -314,7 +314,7 @@ void zoneBuilderConnectOk(
     uint32_t pcId,
     uint8_t gameMode,
     uint8_t accountPrivileges,
-    CommanderInfo *commander,
+    Commander *commander,
     zmsg_t *replyMsg);
 
 /**
