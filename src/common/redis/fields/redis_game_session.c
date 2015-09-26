@@ -67,22 +67,22 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_equipment_ring_right] = REDIS_GAME_SESSION_equipment_ring_right_str,
     [REDIS_GAME_SESSION_equipment_necklace] = REDIS_GAME_SESSION_equipment_necklace_str,
     // CommanderInfo Info session
-    [REDIS_GAME_SESSION_info_posX] = REDIS_GAME_SESSION_info_posX_str,
-    [REDIS_GAME_SESSION_info_posY] = REDIS_GAME_SESSION_info_posY_str,
-    [REDIS_GAME_SESSION_info_posZ] = REDIS_GAME_SESSION_info_posZ_str,
-    [REDIS_GAME_SESSION_info_currentXP] = REDIS_GAME_SESSION_info_currentXP_str,
-    [REDIS_GAME_SESSION_info_maxXP] = REDIS_GAME_SESSION_info_maxXP_str,
-    [REDIS_GAME_SESSION_info_pcId] = REDIS_GAME_SESSION_info_pcId_str,
-    [REDIS_GAME_SESSION_info_socialInfoId] = REDIS_GAME_SESSION_info_socialInfoId_str,
-    [REDIS_GAME_SESSION_info_commanderId] = REDIS_GAME_SESSION_info_commanderId_str,
-    [REDIS_GAME_SESSION_info_currentHP] = REDIS_GAME_SESSION_info_currentHP_str,
-    [REDIS_GAME_SESSION_info_maxHP] = REDIS_GAME_SESSION_info_maxHP_str,
-    [REDIS_GAME_SESSION_info_currentSP] = REDIS_GAME_SESSION_info_currentSP_str,
-    [REDIS_GAME_SESSION_info_maxSP] = REDIS_GAME_SESSION_info_maxSP_str,
-    [REDIS_GAME_SESSION_info_currentStamina] = REDIS_GAME_SESSION_info_currentStamina_str,
-    [REDIS_GAME_SESSION_info_maxStamina] = REDIS_GAME_SESSION_info_maxStamina_str,
-    [REDIS_GAME_SESSION_info_unk6] = REDIS_GAME_SESSION_info_unk6_str,
-    [REDIS_GAME_SESSION_info_unk7] = REDIS_GAME_SESSION_info_unk7_str,
+    [REDIS_GAME_SESSION_commander_posX] = REDIS_GAME_SESSION_commander_posX_str,
+    [REDIS_GAME_SESSION_commander_posY] = REDIS_GAME_SESSION_commander_posY_str,
+    [REDIS_GAME_SESSION_commander_posZ] = REDIS_GAME_SESSION_commander_posZ_str,
+    [REDIS_GAME_SESSION_commander_currentXP] = REDIS_GAME_SESSION_commander_currentXP_str,
+    [REDIS_GAME_SESSION_commander_maxXP] = REDIS_GAME_SESSION_commander_maxXP_str,
+    [REDIS_GAME_SESSION_commander_pcId] = REDIS_GAME_SESSION_commander_pcId_str,
+    [REDIS_GAME_SESSION_commander_socialInfoId] = REDIS_GAME_SESSION_commander_socialInfoId_str,
+    [REDIS_GAME_SESSION_commander_commanderId] = REDIS_GAME_SESSION_commander_commanderId_str,
+    [REDIS_GAME_SESSION_commander_currentHP] = REDIS_GAME_SESSION_commander_currentHP_str,
+    [REDIS_GAME_SESSION_commander_maxHP] = REDIS_GAME_SESSION_commander_maxHP_str,
+    [REDIS_GAME_SESSION_commander_currentSP] = REDIS_GAME_SESSION_commander_currentSP_str,
+    [REDIS_GAME_SESSION_commander_maxSP] = REDIS_GAME_SESSION_commander_maxSP_str,
+    [REDIS_GAME_SESSION_commander_currentStamina] = REDIS_GAME_SESSION_commander_currentStamina_str,
+    [REDIS_GAME_SESSION_commander_maxStamina] = REDIS_GAME_SESSION_commander_maxStamina_str,
+    [REDIS_GAME_SESSION_commander_unk6] = REDIS_GAME_SESSION_commander_unk6_str,
+    [REDIS_GAME_SESSION_commander_unk7] = REDIS_GAME_SESSION_commander_unk7_str,
 };
 
 
@@ -136,22 +136,22 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         " " REDIS_GAME_SESSION_equipment_ring_right_str
         " " REDIS_GAME_SESSION_equipment_necklace_str
         // CommanderInfo Info
-        " " REDIS_GAME_SESSION_info_posX_str
-        " " REDIS_GAME_SESSION_info_posY_str
-        " " REDIS_GAME_SESSION_info_posZ_str
-        " " REDIS_GAME_SESSION_info_currentXP_str
-        " " REDIS_GAME_SESSION_info_maxXP_str
-        " " REDIS_GAME_SESSION_info_pcId_str
-        " " REDIS_GAME_SESSION_info_socialInfoId_str
-        " " REDIS_GAME_SESSION_info_commanderId_str
-        " " REDIS_GAME_SESSION_info_currentHP_str
-        " " REDIS_GAME_SESSION_info_maxHP_str
-        " " REDIS_GAME_SESSION_info_currentSP_str
-        " " REDIS_GAME_SESSION_info_maxSP_str
-        " " REDIS_GAME_SESSION_info_currentStamina_str
-        " " REDIS_GAME_SESSION_info_maxStamina_str
-        " " REDIS_GAME_SESSION_info_unk6_str
-        " " REDIS_GAME_SESSION_info_unk7_str
+        " " REDIS_GAME_SESSION_commander_posX_str
+        " " REDIS_GAME_SESSION_commander_posY_str
+        " " REDIS_GAME_SESSION_commander_posZ_str
+        " " REDIS_GAME_SESSION_commander_currentXP_str
+        " " REDIS_GAME_SESSION_commander_maxXP_str
+        " " REDIS_GAME_SESSION_commander_pcId_str
+        " " REDIS_GAME_SESSION_commander_socialInfoId_str
+        " " REDIS_GAME_SESSION_commander_commanderId_str
+        " " REDIS_GAME_SESSION_commander_currentHP_str
+        " " REDIS_GAME_SESSION_commander_maxHP_str
+        " " REDIS_GAME_SESSION_commander_currentSP_str
+        " " REDIS_GAME_SESSION_commander_maxSP_str
+        " " REDIS_GAME_SESSION_commander_currentStamina_str
+        " " REDIS_GAME_SESSION_commander_maxStamina_str
+        " " REDIS_GAME_SESSION_commander_unk6_str
+        " " REDIS_GAME_SESSION_commander_unk7_str
 
         , key->routerId, key->mapId, key->accountId
     );
@@ -207,7 +207,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             // Commander
             COPY_REDIS_STR(appearance->commanderName, commander_commanderName);
             COPY_REDIS_STR(appearance->familyName, commander_familyName);
-            appearance->accountId = GET_REDIS_64 (commander_accountId);
+            appearance->accountId = GET_REDIS_64(commander_accountId);
             appearance->classId   = GET_REDIS_32(commander_classId);
             appearance->unk4      = GET_REDIS_32(commander_unk4);
             appearance->jobId     = GET_REDIS_32(commander_jobId);
@@ -217,20 +217,20 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             appearance->hairId    = GET_REDIS_32(commander_hairId);
             appearance->pose      = GET_REDIS_32(commander_pose);
             commander->mapId = GET_REDIS_32(commander_mapId);
-            commander->pos.x = GET_REDIS_FLOAT (info_posX);
-            commander->pos.y = GET_REDIS_FLOAT (info_posY);
-            commander->pos.z = GET_REDIS_FLOAT (info_posZ);
-            commander->currentXP = GET_REDIS_32(info_currentXP);
-            commander->maxXP = GET_REDIS_32(info_maxXP);
-            commander->pcId = GET_REDIS_32(info_pcId);
-            commander->socialInfoId = GET_REDIS_64 (info_socialInfoId);
-            commander->commanderId = GET_REDIS_64 (info_commanderId);
-            commander->currentHP = GET_REDIS_32(info_currentHP);
-            commander->maxHP = GET_REDIS_32(info_maxHP);
-            commander->currentSP = GET_REDIS_32(info_currentSP);
-            commander->maxSP = GET_REDIS_32(info_maxSP);
-            commander->currentStamina = GET_REDIS_32(info_currentStamina);
-            commander->maxStamina = GET_REDIS_32(info_maxStamina);
+            commander->pos.x = GET_REDIS_FLOAT(commander_posX);
+            commander->pos.y = GET_REDIS_FLOAT(commander_posY);
+            commander->pos.z = GET_REDIS_FLOAT(commander_posZ);
+            commander->currentXP = GET_REDIS_32(commander_currentXP);
+            commander->maxXP = GET_REDIS_32(commander_maxXP);
+            commander->pcId = GET_REDIS_32(commander_pcId);
+            commander->socialInfoId = GET_REDIS_64(commander_socialInfoId);
+            commander->commanderId = GET_REDIS_64(commander_commanderId);
+            commander->currentHP = GET_REDIS_32(commander_currentHP);
+            commander->maxHP = GET_REDIS_32(commander_maxHP);
+            commander->currentSP = GET_REDIS_32(commander_currentSP);
+            commander->maxSP = GET_REDIS_32(commander_maxSP);
+            commander->currentStamina = GET_REDIS_32(commander_currentStamina);
+            commander->maxStamina = GET_REDIS_32(commander_maxStamina);
 
             // Equipment
             equipment->head_top    = GET_REDIS_32(equipment_head_top);
@@ -305,159 +305,185 @@ bool redisGetGameSessionBySocketId(Redis *self, uint16_t routerId, uint8_t *sess
 bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *socketId, GameSession *gameSession) {
 
     bool result = true;
-    redisReply *reply = NULL;
+    size_t repliesCount = 4;
+    redisReply *replies[repliesCount];
+    memset(replies, 0, sizeof(replies));
 
-    Commander *commander = gameSession->commanderSession.currentCommander;
-    CommanderAppearance *appearance = &commander->appearance;
-    CommanderEquipment *equipment = &appearance->equipment;
+    Commander *commander = NULL;
+    CommanderAppearance *appearance = NULL;
+    CommanderEquipment *equipment = NULL;
 
-    reply = redisCommandDbg(self,
-        "HMSET zone%x:map%x:acc%llx"
-        // Account
-        " " REDIS_GAME_SESSION_account_sessionKey_str " %s"
-        " " REDIS_GAME_SESSION_account_login_str " %s"
-        " " REDIS_GAME_SESSION_account_privilege_str " %x"
-        // Barrack
-        " " REDIS_GAME_SESSION_barrack_charactersCreatedCount_str " %x"
-        // Commander
-        " " REDIS_GAME_SESSION_commander_mapId_str " %x"
-        " " REDIS_GAME_SESSION_commander_commanderName_str " %s"
-        " " REDIS_GAME_SESSION_commander_familyName_str " %s"
-        " " REDIS_GAME_SESSION_commander_accountId_str " %llx"
-        " " REDIS_GAME_SESSION_commander_classId_str " %x"
-        " " REDIS_GAME_SESSION_commander_unk4_str " %x"
-        " " REDIS_GAME_SESSION_commander_jobId_str " %x"
-        " " REDIS_GAME_SESSION_commander_gender_str " %x"
-        " " REDIS_GAME_SESSION_commander_unk5_str " %x"
-        " " REDIS_GAME_SESSION_commander_level_str " %x"
-        " " REDIS_GAME_SESSION_commander_hairId_str " %x"
-        " " REDIS_GAME_SESSION_commander_pose_str " %x"
-        " " REDIS_GAME_SESSION_info_posX_str " %f"
-        " " REDIS_GAME_SESSION_info_posY_str " %f"
-        " " REDIS_GAME_SESSION_info_posZ_str " %f"
-        " " REDIS_GAME_SESSION_info_currentXP_str " %x"
-        " " REDIS_GAME_SESSION_info_maxXP_str " %x"
-        " " REDIS_GAME_SESSION_info_pcId_str " %x"
-        " " REDIS_GAME_SESSION_info_socialInfoId_str " %llx"
-        " " REDIS_GAME_SESSION_info_commanderId_str " %llx"
-        " " REDIS_GAME_SESSION_info_currentHP_str " %x"
-        " " REDIS_GAME_SESSION_info_maxHP_str " %x"
-        " " REDIS_GAME_SESSION_info_currentSP_str " %x"
-        " " REDIS_GAME_SESSION_info_maxSP_str " %x"
-        " " REDIS_GAME_SESSION_info_currentStamina_str " %x"
-        " " REDIS_GAME_SESSION_info_maxStamina_str " %x"
-        // Equipment
-        " " REDIS_GAME_SESSION_equipment_head_top_str " %x"
-        " " REDIS_GAME_SESSION_equipment_head_middle_str " %x"
-        " " REDIS_GAME_SESSION_equipment_itemUnk1_str " %x"
-        " " REDIS_GAME_SESSION_equipment_body_armor_str " %x"
-        " " REDIS_GAME_SESSION_equipment_gloves_str " %x"
-        " " REDIS_GAME_SESSION_equipment_boots_str " %x"
-        " " REDIS_GAME_SESSION_equipment_helmet_str " %x"
-        " " REDIS_GAME_SESSION_equipment_bracelet_str " %x"
-        " " REDIS_GAME_SESSION_equipment_weapon_str " %x"
-        " " REDIS_GAME_SESSION_equipment_shield_str " %x"
-        " " REDIS_GAME_SESSION_equipment_costume_str " %x"
-        " " REDIS_GAME_SESSION_equipment_itemUnk3_str " %x"
-        " " REDIS_GAME_SESSION_equipment_itemUnk4_str " %x"
-        " " REDIS_GAME_SESSION_equipment_itemUnk5_str " %x"
-        " " REDIS_GAME_SESSION_equipment_leg_armor_str " %x"
-        " " REDIS_GAME_SESSION_equipment_itemUnk6_str " %x"
-        " " REDIS_GAME_SESSION_equipment_itemUnk7_str " %x"
-        " " REDIS_GAME_SESSION_equipment_ring_left_str " %x"
-        " " REDIS_GAME_SESSION_equipment_ring_right_str " %x"
-        " " REDIS_GAME_SESSION_equipment_necklace_str " %x"
-        , key->routerId, key->mapId, key->accountId,
-
-        // Account
-        socketId,
-        gameSession->accountSession.login,
-        gameSession->accountSession.privilege,
-
-        // Barrack
-        gameSession->accountSession.commandersCount,
-
-        // Commander
-        commander->mapId,
-        CHECK_REDIS_EMPTY_STRING(appearance->commanderName),
-        CHECK_REDIS_EMPTY_STRING(appearance->familyName),
-        key->accountId,
-        appearance->classId,
-        appearance->unk4,
-        appearance->jobId,
-        appearance->gender,
-        appearance->unk5,
-        appearance->level,
-        appearance->hairId,
-        appearance->pose,
-        commander->pos.x,
-        commander->pos.y,
-        commander->pos.z,
-        commander->currentXP,
-        commander->maxXP,
-        commander->pcId,
-        commander->socialInfoId,
-        commander->commanderId,
-        commander->currentHP,
-        commander->maxHP,
-        commander->currentSP,
-        commander->maxSP,
-        commander->currentStamina,
-        commander->maxStamina,
-
-        // Equipment
-        equipment->head_top,
-        equipment->head_middle,
-        equipment->itemUnk1,
-        equipment->body_armor,
-        equipment->gloves,
-        equipment->boots,
-        equipment->helmet,
-        equipment->bracelet,
-        equipment->weapon,
-        equipment->shield,
-        equipment->costume,
-        equipment->itemUnk3,
-        equipment->itemUnk4,
-        equipment->itemUnk5,
-        equipment->leg_armor,
-        equipment->itemUnk6,
-        equipment->itemUnk7,
-        equipment->ring_left,
-        equipment->ring_right,
-        equipment->necklace
-    );
-
-    if (!reply) {
-        error("Redis error encountered : The request is invalid.");
-        result = false;
-        goto cleanup;
+    if ((commander = gameSession->commanderSession.currentCommander) != NULL) {
+        appearance = &commander->appearance;
+        equipment = &appearance->equipment;
     }
 
-    switch (reply->type)
-    {
-        case REDIS_REPLY_ERROR:
-            error("Redis error encountered : %s", reply->str);
-            result = false;
-            goto cleanup;
-            break;
+    // Account
+    replies[0] = redisCommandDbg(self,
+        "HMSET zone%x:map%x:acc%llx"
+        " " REDIS_GAME_SESSION_account_sessionKey_str " %s"
+        " " REDIS_GAME_SESSION_account_login_str " %s"
+        " " REDIS_GAME_SESSION_account_privilege_str " %x",
+        key->routerId, key->mapId, key->accountId,
 
-        case REDIS_REPLY_STATUS:
-            // info("Redis status : %s", reply->str);
-            break;
+        socketId,
+        gameSession->accountSession.login,
+        gameSession->accountSession.privilege
+    );
 
-        default :
-            error("Unexpected Redis status. (%d)", reply->type);
-            result = false;
-            goto cleanup;
-            break;
+    // Barrack
+    replies[1] = redisCommandDbg(self,
+        "HMSET zone%x:map%x:acc%llx"
+        " " REDIS_GAME_SESSION_barrack_charactersCreatedCount_str " %x"
+        , key->routerId, key->mapId, key->accountId,
+
+        gameSession->accountSession.commandersCount
+    );
+
+    // Commander
+    if (commander) {
+    replies[2] = redisCommandDbg(self,
+            "HMSET zone%x:map%x:acc%llx"
+            " " REDIS_GAME_SESSION_commander_mapId_str " %x"
+            " " REDIS_GAME_SESSION_commander_commanderName_str " %s"
+            " " REDIS_GAME_SESSION_commander_familyName_str " %s"
+            " " REDIS_GAME_SESSION_commander_accountId_str " %llx"
+            " " REDIS_GAME_SESSION_commander_classId_str " %x"
+            " " REDIS_GAME_SESSION_commander_unk4_str " %x"
+            " " REDIS_GAME_SESSION_commander_jobId_str " %x"
+            " " REDIS_GAME_SESSION_commander_gender_str " %x"
+            " " REDIS_GAME_SESSION_commander_unk5_str " %x"
+            " " REDIS_GAME_SESSION_commander_level_str " %x"
+            " " REDIS_GAME_SESSION_commander_hairId_str " %x"
+            " " REDIS_GAME_SESSION_commander_pose_str " %x"
+            " " REDIS_GAME_SESSION_commander_posX_str " %f"
+            " " REDIS_GAME_SESSION_commander_posY_str " %f"
+            " " REDIS_GAME_SESSION_commander_posZ_str " %f"
+            " " REDIS_GAME_SESSION_commander_currentXP_str " %x"
+            " " REDIS_GAME_SESSION_commander_maxXP_str " %x"
+            " " REDIS_GAME_SESSION_commander_pcId_str " %x"
+            " " REDIS_GAME_SESSION_commander_socialInfoId_str " %llx"
+            " " REDIS_GAME_SESSION_commander_commanderId_str " %llx"
+            " " REDIS_GAME_SESSION_commander_currentHP_str " %x"
+            " " REDIS_GAME_SESSION_commander_maxHP_str " %x"
+            " " REDIS_GAME_SESSION_commander_currentSP_str " %x"
+            " " REDIS_GAME_SESSION_commander_maxSP_str " %x"
+            " " REDIS_GAME_SESSION_commander_currentStamina_str " %x"
+            " " REDIS_GAME_SESSION_commander_maxStamina_str " %x",
+            key->routerId, key->mapId, key->accountId,
+
+            commander->mapId,
+            CHECK_REDIS_EMPTY_STRING(appearance->commanderName),
+            CHECK_REDIS_EMPTY_STRING(appearance->familyName),
+            key->accountId,
+            appearance->classId,
+            appearance->unk4,
+            appearance->jobId,
+            appearance->gender,
+            appearance->unk5,
+            appearance->level,
+            appearance->hairId,
+            appearance->pose,
+            commander->pos.x,
+            commander->pos.y,
+            commander->pos.z,
+            commander->currentXP,
+            commander->maxXP,
+            commander->pcId,
+            commander->socialInfoId,
+            commander->commanderId,
+            commander->currentHP,
+            commander->maxHP,
+            commander->currentSP,
+            commander->maxSP,
+            commander->currentStamina,
+            commander->maxStamina
+        );
+    }
+
+    // Equipment
+    if (equipment) {
+        replies[3] = redisCommandDbg(self,
+            "HMSET zone%x:map%x:acc%llx"
+            " " REDIS_GAME_SESSION_equipment_head_top_str " %x"
+            " " REDIS_GAME_SESSION_equipment_head_middle_str " %x"
+            " " REDIS_GAME_SESSION_equipment_itemUnk1_str " %x"
+            " " REDIS_GAME_SESSION_equipment_body_armor_str " %x"
+            " " REDIS_GAME_SESSION_equipment_gloves_str " %x"
+            " " REDIS_GAME_SESSION_equipment_boots_str " %x"
+            " " REDIS_GAME_SESSION_equipment_helmet_str " %x"
+            " " REDIS_GAME_SESSION_equipment_bracelet_str " %x"
+            " " REDIS_GAME_SESSION_equipment_weapon_str " %x"
+            " " REDIS_GAME_SESSION_equipment_shield_str " %x"
+            " " REDIS_GAME_SESSION_equipment_costume_str " %x"
+            " " REDIS_GAME_SESSION_equipment_itemUnk3_str " %x"
+            " " REDIS_GAME_SESSION_equipment_itemUnk4_str " %x"
+            " " REDIS_GAME_SESSION_equipment_itemUnk5_str " %x"
+            " " REDIS_GAME_SESSION_equipment_leg_armor_str " %x"
+            " " REDIS_GAME_SESSION_equipment_itemUnk6_str " %x"
+            " " REDIS_GAME_SESSION_equipment_itemUnk7_str " %x"
+            " " REDIS_GAME_SESSION_equipment_ring_left_str " %x"
+            " " REDIS_GAME_SESSION_equipment_ring_right_str " %x"
+            " " REDIS_GAME_SESSION_equipment_necklace_str " %x"
+            , key->routerId, key->mapId, key->accountId,
+
+            // Equipment
+            equipment->head_top,
+            equipment->head_middle,
+            equipment->itemUnk1,
+            equipment->body_armor,
+            equipment->gloves,
+            equipment->boots,
+            equipment->helmet,
+            equipment->bracelet,
+            equipment->weapon,
+            equipment->shield,
+            equipment->costume,
+            equipment->itemUnk3,
+            equipment->itemUnk4,
+            equipment->itemUnk5,
+            equipment->leg_armor,
+            equipment->itemUnk6,
+            equipment->itemUnk7,
+            equipment->ring_left,
+            equipment->ring_right,
+            equipment->necklace
+        );
+    }
+
+    for (int i = 0; i < repliesCount; i++) {
+        redisReply *reply = replies[i];
+
+        if (reply) {
+            switch (reply->type)
+            {
+                case REDIS_REPLY_ERROR:
+                    error("Redis error encountered : %s", reply->str);
+                    result = false;
+                    goto cleanup;
+                    break;
+
+                case REDIS_REPLY_STATUS:
+                    // Ok
+                    break;
+
+                default :
+                    error("Unexpected Redis status. (%d)", reply->type);
+                    result = false;
+                    goto cleanup;
+                    break;
+            }
+        }
     }
 
 cleanup:
-    if (reply) {
-        redisReplyDestroy(&reply);
-    }
+    for (int i = 0; i < repliesCount; i++) {
+        redisReply *reply = replies[i];
 
+        if (reply) {
+            redisReplyDestroy(&reply);
+        }
+    }
     return result;
 }
 
@@ -562,8 +588,8 @@ zlist_t *redisGetClientsWithinDistance(
                 for (int i = 0; i < reply->element[1]->elements; i++) {
                     // Get the position of all accounts in the map
                     posReply = redisCommandDbg(self,
-                        "HMGET %s " REDIS_GAME_SESSION_info_posX_str
-                                " " REDIS_GAME_SESSION_info_posZ_str // Get position
+                        "HMGET %s " REDIS_GAME_SESSION_commander_posX_str
+                                " " REDIS_GAME_SESSION_commander_posZ_str // Get position
                                 " " REDIS_GAME_SESSION_account_sessionKey_str, // SocketKey
                         reply->element[1]->element[i]->str // account key
                     );

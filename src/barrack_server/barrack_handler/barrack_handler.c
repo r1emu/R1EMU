@@ -371,6 +371,14 @@ barrackHandlerStartBarrack(
     // TODO : Define CB_START_BARRACK structure
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_START_BARRACK);
 
+    // FIXME : Temp values
+    AccountSession *accountSession = &session->game.accountSession;
+    accountSession->commandersCountMax = 4;
+    if (!(accountSession->commanders = calloc(accountSession->commandersCountMax, sizeof(Commander *)))) {
+        error("Cannot allocate the commanders array.");
+        goto cleanup;
+    }
+
     // Get list of Commanders for this AccountId
     size_t commandersCount;
 
@@ -434,6 +442,10 @@ static PacketHandlerState barrackHandlerCurrentBarrack(
     //   =================================================
     //    4E00 03000000 F7030000 D1A8014400000000 03000068 42F0968F 41000070 4111E334 3FCF2635 BF
     //    size pktType  checksum     accountId               float    float    float    float
+
+    // Select the current commander selected
+    // FIXME
+    session->game.commanderSession.currentCommander = session->game.accountSession.commanders[0];
 
     barrackBuilderPetInformation(reply);
     barrackBuilderZoneTraffics(1002, reply);
@@ -664,6 +676,8 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     }
 
     AccountSession *accountSession = &session->game.accountSession;
+
+    // FIXME : Temp value
 
     // Check commanderIndex boundaries
     if (commanderIndex < 0 || commanderIndex >= accountSession->commandersCountMax) {
