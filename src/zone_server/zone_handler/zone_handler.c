@@ -768,6 +768,7 @@ static PacketHandlerState zoneHandlerConnect(
     AccountSession *tmpAccountSession = &tmpGameSession.accountSession;
     CommanderSession *tmpCommanderSession = &tmpGameSession.commanderSession;
 
+    // TODO : Get the account session from Db.
     RedisAccountSessionKey accountKey = {
         .routerId = self->info.routerId,
         .mapId = SOCKET_SESSION_UNDEFINED_MAP,
@@ -798,11 +799,13 @@ static PacketHandlerState zoneHandlerConnect(
         goto cleanup;
     }
 
+    // Allocate commanders array
     if (!(accountSessionCommandersInit(tmpAccountSession, commandersCount))) {
         error("Cannot initialize commanders in session.");
         goto cleanup;
     }
 
+    // Fill commanders array
     if (!(mySqlGetCommanders(self->sqlConn, tmpAccountSession->commanders))) {
         error("Cannot get commanders.");
         goto cleanup;
@@ -812,6 +815,7 @@ static PacketHandlerState zoneHandlerConnect(
     tmpCommanderSession->currentCommander = commanderDup(tmpAccountSession->commanders[0]);
 
     // Get the Game Session that the Barrack Server moved
+    // TODO : Should be replaced by Db
     RedisGameSessionKey gameKey = accountKey;
     if (!(redisGetGameSession(self->redis, &gameKey, &tmpGameSession))) {
         error("Cannot retrieve the game session.");
@@ -838,7 +842,7 @@ static PacketHandlerState zoneHandlerConnect(
         .mapId = session->socket.mapId,
         .accountId = session->socket.accountId
     };
-
+    // TODO : Should be replaced by Db
     if (!(redisMoveGameSession(self->redis, &fromKey, &toKey))) {
         error("Cannot move the game session to the current mapId.");
         goto cleanup;
