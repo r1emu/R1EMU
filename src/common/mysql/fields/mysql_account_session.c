@@ -26,7 +26,7 @@ bool mySqlLoadAccountCommanders(MySQL *self, AccountSession *accountSession, uin
     }
 
     // Allocate the commanders array depending of the count of commanders
-    accountSession->commandersCountMax = 4; /// FIXME
+    accountSession->commandersCountMax = 5; /// FIXME
     if (!(accountSessionCommandersInit(accountSession, accountSession->commandersCountMax, *commandersCount))) {
         error("Cannot initialize commanders in session.");
         goto cleanup;

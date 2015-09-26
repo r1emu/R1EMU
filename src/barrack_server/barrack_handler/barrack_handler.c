@@ -311,8 +311,7 @@ cleanup:
     return status;
 }
 
-static PacketHandlerState
-barrackHandlerCommanderMove(
+static PacketHandlerState barrackHandlerCommanderMove(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -334,7 +333,7 @@ barrackHandlerCommanderMove(
     size_t commanderIndex = clientPacket->commanderIndex - 1;
 
     Commander *commander = NULL;
-    if (!(commander = accountSessionGetCommanderByIndex(&session->game.accountSession, commanderIndex))) {
+    if (!accountSessionGetCommanderByIndex(&session->game.accountSession, commanderIndex, &commander)) {
         error("Cannot get commander by index.");
         goto cleanup;
     }
@@ -359,8 +358,7 @@ cleanup:
     return status;
 }
 
-static PacketHandlerState
-barrackHandlerStartBarrack(
+static PacketHandlerState barrackHandlerStartBarrack(
     Worker *self,
     Session *session,
     uint8_t *packet,
@@ -561,12 +559,17 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     #pragma pack(pop)
 
     size_t commanderIndex = clientPacket->commanderIndex - 1;
+    AccountSession *accountSession = &session->game.accountSession;
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_CREATE);
 
+    if (!accountSessionIsCommanderSlotEmpty(accountSession, commanderIndex)) {
+        goto cleanup;
+    }
+
     Commander newCommander;
     commanderInit(&newCommander);
-    newCommander.mapId = 1002;
+    newCommander.mapId = 1002; // FIXME : Start map could be loaded from
 
     CommanderAppearance *commanderAppearance = &newCommander.appearance;
 
@@ -632,8 +635,6 @@ static PacketHandlerState barrackHandlerCommanderCreate(
             goto cleanup;
             break;
     }
-
-    AccountSession *accountSession = &session->game.accountSession;
 
     // Name
     strncpy(commanderAppearance->commanderName, clientPacket->commanderName, sizeof(commanderAppearance->commanderName));

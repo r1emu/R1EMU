@@ -89,9 +89,9 @@ size_t accountSessionGetCommandersCount(AccountSession *self);
 
 /**
  * @brief Get a commander by its array index
- * @return An allocated Commander on success, NULL if it doesn't exist
+ * @return true on success, false otherwise
  */
-Commander *accountSessionGetCommanderByIndex(AccountSession *self, int index);
+bool accountSessionGetCommanderByIndex(AccountSession *self, int index, Commander **commander);
 
 /**
  * @brief Initialize commanders in the session
@@ -115,3 +115,10 @@ void accountSessionDestroy(AccountSession **self);
  * @param self A pointer to an allocated AccountSession.
  */
 void accountSessionFree(AccountSession *self);
+
+/**
+ * @brief Check if a given slot index is empty in account commanders
+ * @param self A pointer to an allocated AccountSession.
+ * @param commanderIndex the slot index to look into
+ */
+bool accountSessionIsCommanderSlotEmpty(AccountSession *self, int commanderIndex);
