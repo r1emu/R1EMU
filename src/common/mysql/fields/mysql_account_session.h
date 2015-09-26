@@ -46,3 +46,4 @@ bool mySqlGetAccountData(
  */
 BarrackNameChangeStatus mySqlSetFamilyName(MySQL *self, uint64_t accountId, char *familyName);
 
+bool mySqlLoadAccountCommanders(MySQL *self, AccountSession *accountSession, uint64_t accountId, size_t *commandersCount);

@@ -341,7 +341,7 @@ workerGetOrCreateSessionObject(Worker *self, uint8_t *sessionKey, DbObject **_ob
 
     if (!object) {
         // Session doesn't not exist yet, create it
-        info("Welcome, %s!", sessionKey);
+        info("Welcome, socket session %s!", sessionKey);
         if (!(session = sessionNew(self->info.routerId, sessionKey))) {
             error("Cannot allocate a new session.");
             goto cleanup;

@@ -20,7 +20,7 @@
 #include "account_session.h"
 #include "common/utils/memory.h"
 
-AccountSession *accountSessionNew(uint8_t *accountLogin, uint8_t *socketId, AccountSessionPrivileges accountPrivilege) {
+AccountSession *accountSessionNew(uint8_t *accountName, uint8_t *socketId, AccountSessionPrivileges accountPrivilege) {
 
     AccountSession *self;
 
@@ -28,7 +28,7 @@ AccountSession *accountSessionNew(uint8_t *accountLogin, uint8_t *socketId, Acco
         return NULL;
     }
 
-    if (!accountSessionInit(self, accountLogin, socketId, accountPrivilege)) {
+    if (!accountSessionInit(self, accountName, socketId, accountPrivilege)) {
         accountSessionDestroy (&self);
         error("AccountSession failed to initialize.");
         return NULL;
@@ -37,11 +37,11 @@ AccountSession *accountSessionNew(uint8_t *accountLogin, uint8_t *socketId, Acco
     return self;
 }
 
-bool accountSessionCommandersInit(AccountSession *self, size_t commandersCount) {
+bool accountSessionCommandersInit(AccountSession *self, size_t commandersCountMax, size_t commandersCount) {
 
     bool status = false;
 
-    if (!(self->commanders = calloc(self->commandersCountMax, sizeof(Commander *)))) {
+    if (!(self->commanders = calloc(commandersCountMax, sizeof(Commander *)))) {
         error("Cannot allocate the commanders array.");
         goto cleanup;
     }
@@ -89,12 +89,12 @@ size_t accountSessionGetCommandersCount(AccountSession *self) {
     return count;
 }
 
-bool accountSessionInit(AccountSession *self, uint8_t *login, uint8_t *socketId, AccountSessionPrivileges privilege) {
+bool accountSessionInit(AccountSession *self, uint8_t *accountName, uint8_t *socketId, AccountSessionPrivileges privilege) {
 
     memset(self, 0, sizeof(AccountSession));
 
     self->accountId = 0;
-    memcpy(self->login, login, sizeof(self->login));
+    memcpy(self->accountName, accountName, sizeof(self->accountName));
     memcpy(self->sessionKey, socketId, sizeof(self->sessionKey));
     self->privilege = privilege;
 

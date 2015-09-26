@@ -21,7 +21,7 @@
 #include "common/session/session.h"
 
 // Game session
-#define REDIS_SESSION_account_login_str              "account_login"
+#define REDIS_SESSION_account_accountName_str        "account_accountName"
 #define REDIS_SESSION_account_sessionKey_str         "account_sessionKey"
 #define REDIS_SESSION_account_privilege_str          "account_privilege"
 #define REDIS_SESSION_account_commandersCountMax_str "commandersCountMax"
@@ -78,7 +78,7 @@
 
 enum RedisAccountSessionFields {
     // Account Session
-    REDIS_ACCOUNT_SESSION_login,
+    REDIS_ACCOUNT_SESSION_accountName,
     REDIS_ACCOUNT_SESSION_sessionKey,
     REDIS_ACCOUNT_SESSION_privilege,
     REDIS_ACCOUNT_SESSION_commandersCountMax,
@@ -86,7 +86,7 @@ enum RedisAccountSessionFields {
 
 enum RedisGameSessionFields {
     // Account Session
-    REDIS_GAME_SESSION_account_login,
+    REDIS_GAME_SESSION_account_accountName,
     REDIS_GAME_SESSION_account_sessionKey,
     REDIS_GAME_SESSION_account_privilege,
     REDIS_GAME_SESSION_account_commandersCountMax,

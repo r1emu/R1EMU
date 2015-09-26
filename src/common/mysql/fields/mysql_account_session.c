@@ -13,6 +13,36 @@
 
 #include "mysql_account_session.h"
 #include "barrack_server/barrack_handler/barrack_builder.h"
+#include "mysql_commander.h"
+
+bool mySqlLoadAccountCommanders(MySQL *self, AccountSession *accountSession, uint64_t accountId, size_t *commandersCount) {
+
+    bool status = false;
+
+    // Request to SQL the list of commanders, retrieve the count
+    if (!(mySqlRequestCommandersByAccountId(self, accountId, commandersCount))) {
+        error("Cannot request commanders by accountId = %llx", accountId);
+        goto cleanup;
+    }
+
+    // Allocate the commanders array depending of the count of commanders
+    accountSession->commandersCountMax = 4; /// FIXME
+    if (!(accountSessionCommandersInit(accountSession, accountSession->commandersCountMax, *commandersCount))) {
+        error("Cannot initialize commanders in session.");
+        goto cleanup;
+    }
+
+    // Write commanders array from SQL result
+    if (!(mySqlGetCommanders(self, accountSession->commanders))) {
+        error("Cannot get commanders by accountId = %llx", accountId);
+        goto cleanup;
+    }
+
+    status = true;
+
+cleanup:
+    return status;
+}
 
 bool mySqlGetAccountData(
     MySQL *self,
@@ -54,7 +84,7 @@ bool mySqlGetAccountData(
     } else {
         // update the commander
         row = mysql_fetch_row(self->result);
-        strncpy(accountSession->login, accountName, sizeof(accountSession->login));
+        strncpy(accountSession->accountName, accountName, sizeof(accountSession->accountName));
         accountSession->accountId = strtoll(row[0], NULL, 10);
         accountSession->isBanned = row[1][0] == 'y';
         accountSession->timeBanned = strtol(row[2], NULL, 10); // FIXME : not sure if 32 or 64 bits

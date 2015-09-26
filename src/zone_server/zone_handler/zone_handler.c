@@ -21,6 +21,7 @@
 #include "common/server/event_handler.h"
 #include "common/commander/inventory.h"
 #include "common/mysql/fields/mysql_commander.h"
+#include "common/mysql/fields/mysql_account_session.h"
 
 /** Connect to the zone server */
 static PacketHandlerState zoneHandlerConnect        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
@@ -743,7 +744,7 @@ static PacketHandlerState zoneHandlerConnect(
         uint32_t unk1;
         uint64_t accountId;
         uint64_t zoneServerId;
-        uint8_t login[ACCOUNT_SESSION_LOGIN_MAXSIZE];
+        uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
         uint8_t unk4;
         uint32_t zoneServerIndex;
         uint16_t unk3;
@@ -759,7 +760,7 @@ static PacketHandlerState zoneHandlerConnect(
     dbg("unk3 %x", clientPacket->unk3);
     dbg("unk4 %x", clientPacket->unk4);
     dbg("channelListId %d", clientPacket->channelListId);
-    dbg("login %s", clientPacket->login);
+    dbg("accountName %s", clientPacket->accountName);
 
     // TODO : Reverse CZ_CONNECT correctly
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CONNECT);
@@ -781,12 +782,12 @@ static PacketHandlerState zoneHandlerConnect(
 
     // Check the client packet here (authentication)
     // TODO improve it
-    if (strncmp(tmpAccountSession->login,
-                clientPacket->login,
-                sizeof(tmpAccountSession->login)) != 0)
+    if (strncmp(tmpAccountSession->accountName,
+                clientPacket->accountName,
+                sizeof(tmpAccountSession->accountName)) != 0)
     {
-        error("Wrong account authentication.(clientPacket account = <%s>, Session account = <%s>",
-            clientPacket->login, tmpAccountSession->login);
+        error("Wrong account authentication. (clientPacket account = <%s>, Session account = <%s>",
+            clientPacket->accountName, tmpAccountSession->accountName);
         goto cleanup;
     }
 
@@ -794,20 +795,8 @@ static PacketHandlerState zoneHandlerConnect(
 
     // Get list of Commanders for this AccountId
     size_t commandersCount;
-    if (!(mySqlRequestCommandersByAccountId(self->sqlConn, clientPacket->accountId, &commandersCount))) {
-        error("Cannot request commanders by accountId = %llx", clientPacket->accountId);
-        goto cleanup;
-    }
-
-    // Allocate commanders array
-    if (!(accountSessionCommandersInit(tmpAccountSession, commandersCount))) {
-        error("Cannot initialize commanders in session.");
-        goto cleanup;
-    }
-
-    // Fill commanders array
-    if (!(mySqlGetCommanders(self->sqlConn, tmpAccountSession->commanders))) {
-        error("Cannot get commanders.");
+    if (!(mySqlLoadAccountCommanders(self->sqlConn, tmpAccountSession, clientPacket->accountId, &commandersCount))) {
+        error("Cannot load commanders.");
         goto cleanup;
     }
 

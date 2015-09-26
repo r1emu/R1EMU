@@ -46,7 +46,7 @@ void barrackBuilderMessage(uint8_t msgType, uint8_t *message, zmsg_t *replyMsg) 
 
 void barrackBuilderLoginOk(
     uint64_t accountId,
-    uint8_t *accountLogin,
+    uint8_t *accountName,
     uint8_t *sessionKey,
     AccountSessionPrivileges accountPrivileges,
     zmsg_t *replyMsg)
@@ -56,7 +56,7 @@ void barrackBuilderLoginOk(
         ServerPacketHeader header;
         uint16_t unk1;
         uint64_t accountId;
-        uint8_t accountLogin[ACCOUNT_SESSION_LOGIN_MAXSIZE];
+        uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
         uint32_t accountPrivileges;
         uint8_t sessionKey[GAME_SESSION_KEY_MAXSIZE];
     } replyPacket;
@@ -71,7 +71,7 @@ void barrackBuilderLoginOk(
         replyPacket.unk1 = 0x3E9; // from iCBT1
         replyPacket.accountId = accountId;
         replyPacket.accountPrivileges = accountPrivileges;
-        strncpy(replyPacket.accountLogin, accountLogin, sizeof(replyPacket.accountLogin));
+        strncpy(replyPacket.accountName, accountName, sizeof(replyPacket.accountName));
         strncpy(replyPacket.sessionKey, sessionKey, sizeof(replyPacket.sessionKey));
     }
 }

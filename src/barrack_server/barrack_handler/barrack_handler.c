@@ -45,7 +45,7 @@ static PacketHandlerState barrackHandlerCommanderMove    (Worker *self, Session 
 /** Request for the player to enter in game */
 static PacketHandlerState barrackHandlerStartGame        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Request for the player to logout */
-static PacketHandlerState barrackHandlerLogout        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerLogout           (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 
 /**
  * @brief barrackHandlers is a global table containing all the barrack handlers.
@@ -62,9 +62,9 @@ const PacketHandler barrackHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CB_COMMANDER_CREATE,   barrackHandlerCommanderCreate),
     REGISTER_PACKET_HANDLER(CB_COMMANDER_DESTROY,  barrackHandlerCommanderDestroy),
     REGISTER_PACKET_HANDLER(CB_COMMANDER_MOVE,     barrackHandlerCommanderMove),
-    // REGISTER_PACKET_HANDLER(CB_JUMP,               barrackHandlerJump),
+    // REGISTER_PACKET_HANDLER(CB_JUMP,            barrackHandlerJump),
     REGISTER_PACKET_HANDLER(CB_START_GAME,         barrackHandlerStartGame),
-    REGISTER_PACKET_HANDLER(CB_LOGOUT,         barrackHandlerLogout),
+    REGISTER_PACKET_HANDLER(CB_LOGOUT,             barrackHandlerLogout),
 
     #undef REGISTER_PACKET_HANDLER
 };
@@ -80,7 +80,7 @@ static PacketHandlerState barrackHandlerLogin(
 
     #pragma pack(push, 1)
     struct {
-        uint8_t login[ACCOUNT_SESSION_LOGIN_MAXSIZE];
+        uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
         uint8_t md5Password[17];
         uint8_t unk1[5]; // Game version?
     } *clientPacket = (void *) packet;
@@ -88,24 +88,13 @@ static PacketHandlerState barrackHandlerLogin(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_LOGIN);
 
-    // Get accountData from database
+    // Get accountSession from database
     AccountSession accountSession;
     bool goodCredentials = false;
 
-    // Initialize Account Session
-    if (!(accountSessionInit(
-        &accountSession,
-        clientPacket->login,
-        session->socket.sessionKey,
-        session->game.accountSession.privilege)))
-    {
-        error("Cannot initialize the account session.");
-        goto cleanup;
-    }
-
     if (!(mySqlGetAccountData(
         self->sqlConn,
-        clientPacket->login,
+        clientPacket->accountName,
         clientPacket->md5Password,
         &accountSession,
         &goodCredentials)))
@@ -132,16 +121,16 @@ static PacketHandlerState barrackHandlerLogin(
     // TODO
 
     // update the session
-    // authentication OK!
     session->socket.authenticated = true;
     session->socket.accountId = accountSession.accountId;
     session->game.accountSession = accountSession;
 
-    info("AccountID %llx generated !", session->socket.accountId);
+    info("AccountID %llx (%s) connected !",
+         session->socket.accountId, session->game.accountSession.accountName);
 
     barrackBuilderLoginOk(
         session->socket.accountId,
-        session->game.accountSession.login,
+        session->game.accountSession.accountName,
         "*0FC621B82495C18DEC8D8D956C82297BEAAAA858",
         session->game.accountSession.privilege,
         reply
@@ -189,7 +178,7 @@ static PacketHandlerState barrackHandlerLoginByPassport(
 
     if (!(accountSessionInit(
         &session->game.accountSession,
-        session->game.accountSession.login,
+        session->game.accountSession.accountName,
         session->socket.sessionKey,
         ACCOUNT_SESSION_PRIVILEGES_ADMIN)))
     {
@@ -197,14 +186,14 @@ static PacketHandlerState barrackHandlerLoginByPassport(
         goto cleanup;
     }
 
-    snprintf(session->game.accountSession.login,
-      sizeof(session->game.accountSession.login), "%llX", session->socket.accountId);
-    info("Account %s generated !", session->game.accountSession.login);
+    snprintf(session->game.accountSession.accountName,
+      sizeof(session->game.accountSession.accountName), "%llX", session->socket.accountId);
+    info("Account %s generated !", session->game.accountSession.accountName);
     // ==================================
 
     barrackBuilderLoginOk(
         session->socket.accountId,
-        session->game.accountSession.login,
+        session->game.accountSession.accountName,
         "*0FC621B82495C18DEC8D8D956C82297BEAAAA858",
         session->game.accountSession.privilege,
         reply
@@ -383,32 +372,23 @@ barrackHandlerStartBarrack(
     // TODO : Define CB_START_BARRACK structure
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_START_BARRACK);
 
-    AccountSession *accountSession = &session->game.accountSession;
+    AccountSession tmpAccountSession = session->game.accountSession;
+    size_t commandersCount;
 
     // Get list of Commanders for this AccountId
-    size_t commandersCount;
-    if (!(mySqlRequestCommandersByAccountId(self->sqlConn, session->socket.accountId, &commandersCount))) {
-        error("Cannot request commanders by accountId = %llx", session->socket.accountId);
+    if (!(mySqlLoadAccountCommanders(self->sqlConn, &tmpAccountSession, session->socket.accountId, &commandersCount))) {
+        error("Cannot load commanders.");
         goto cleanup;
     }
 
-    accountSession->commandersCountMax = 4; /// FIXME
-    if (!(accountSessionCommandersInit(accountSession, commandersCount))) {
-        error("Cannot initialize commanders in session.");
-        goto cleanup;
-    }
-
-    // Get commanders from SQL
-    if (!(mySqlGetCommanders(self->sqlConn, accountSession->commanders))) {
-        error("Cannot get commanders by accountId = %llx", session->socket.accountId);
-        goto cleanup;
-    }
+    // Update session
+    session->game.accountSession = tmpAccountSession;
 
     // Send the commander list
     barrackBuilderCommanderList(
         session->socket.accountId,
         &session->game,
-        accountSession->commanders,
+        session->game.accountSession.commanders,
         commandersCount,
         reply
     );

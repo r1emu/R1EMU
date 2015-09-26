@@ -57,7 +57,7 @@ void barrackBuilderMessage(uint8_t msgType, uint8_t *message, zmsg_t *replyMsg);
  */
 void barrackBuilderLoginOk(
     uint64_t accountId,
-    uint8_t *accountLogin,
+    uint8_t *accountName,
     uint8_t *sessionKey,
     AccountSessionPrivileges accountPrivileges,
     zmsg_t *replyMsg

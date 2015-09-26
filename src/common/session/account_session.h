@@ -20,7 +20,7 @@
 #include "common/session/socket_session.h"
 #include "common/commander/commander.h"
 
-#define ACCOUNT_SESSION_LOGIN_MAXSIZE 33
+#define ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE 33
 
 /**
  * @brief AccountSessionPrivileges enumerates the different levels of privileges
@@ -38,7 +38,7 @@ typedef enum AccountSessionPrivileges {
  */
 struct AccountSession {
     // The account login
-    uint8_t login[ACCOUNT_SESSION_LOGIN_MAXSIZE];
+    uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
 
     // Session key
     uint8_t sessionKey[SOCKET_SESSION_ID_SIZE];
@@ -66,7 +66,7 @@ typedef struct AccountSession AccountSession;
  * @return A pointer to an allocated AccountSession.
  */
 AccountSession *accountSessionNew(
-    uint8_t *accountLogin,
+    uint8_t *accountName,
     uint8_t *socketId,
     AccountSessionPrivileges accountPrivilege);
 
@@ -77,7 +77,7 @@ AccountSession *accountSessionNew(
  */
 bool accountSessionInit(
     AccountSession *self,
-    uint8_t *accountLogin,
+    uint8_t *accountName,
     uint8_t *socketId,
     AccountSessionPrivileges accountPrivilege);
 
@@ -97,7 +97,7 @@ Commander *accountSessionGetCommanderByIndex(AccountSession *self, int index);
  * @brief Initialize commanders in the session
  * @return true on success, false otherwise
  */
-bool accountSessionCommandersInit(AccountSession *self, size_t commandersCount);
+bool accountSessionCommandersInit(AccountSession *self, size_t commandersCountMax, size_t commandersCount);
 
 /**
  * @brief Prints a AccountSession structure.

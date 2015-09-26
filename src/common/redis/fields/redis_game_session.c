@@ -27,7 +27,7 @@
 // ------ Extern variables implementation -------
 const char *redisAccountSessionsStr [] = {
     // Account session
-    [REDIS_ACCOUNT_SESSION_login] = REDIS_SESSION_account_login_str,
+    [REDIS_ACCOUNT_SESSION_accountName] = REDIS_SESSION_account_accountName_str,
     [REDIS_ACCOUNT_SESSION_sessionKey] = REDIS_SESSION_account_sessionKey_str,
     [REDIS_ACCOUNT_SESSION_privilege] = REDIS_SESSION_account_privilege_str,
     [REDIS_ACCOUNT_SESSION_commandersCountMax] = REDIS_SESSION_account_commandersCountMax_str,
@@ -35,7 +35,7 @@ const char *redisAccountSessionsStr [] = {
 
 const char *redisGameSessionsStr [] = {
     // Account session
-    [REDIS_GAME_SESSION_account_login] = REDIS_SESSION_account_login_str,
+    [REDIS_GAME_SESSION_account_accountName] = REDIS_SESSION_account_accountName_str,
     [REDIS_GAME_SESSION_account_sessionKey] = REDIS_SESSION_account_sessionKey_str,
     [REDIS_GAME_SESSION_account_privilege] = REDIS_SESSION_account_privilege_str,
     [REDIS_GAME_SESSION_account_commandersCountMax] = REDIS_SESSION_account_commandersCountMax_str,
@@ -98,7 +98,7 @@ bool redisGetAccountSession(Redis *self, RedisAccountSessionKey *key, AccountSes
 
     reply = redisCommandDbg(self,
         "HMGET zone%x:map%x:acc%llx"
-        " " REDIS_SESSION_account_login_str
+        " " REDIS_SESSION_account_accountName_str
         " " REDIS_SESSION_account_sessionKey_str
         " " REDIS_SESSION_account_privilege_str
         " " REDIS_SESSION_account_commandersCountMax_str
@@ -126,7 +126,7 @@ bool redisGetAccountSession(Redis *self, RedisAccountSessionKey *key, AccountSes
             }
 
             /// Write the reply to the session
-            COPY_REDIS_ACCOUNT_STR(accountSession->login, login);
+            COPY_REDIS_ACCOUNT_STR(accountSession->accountName, accountName);
             COPY_REDIS_ACCOUNT_STR(accountSession->sessionKey, sessionKey);
             accountSession->privilege = GET_REDIS_ACCOUNT_32(privilege);
             accountSession->commandersCountMax = GET_REDIS_ACCOUNT_32(commandersCountMax);
@@ -158,7 +158,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         "HMGET zone%x:map%x:acc%llx"
         /** Keep these fields in the same order than the RedisGameSessionFields fields one */
         // Account
-        " " REDIS_SESSION_account_login_str
+        " " REDIS_SESSION_account_accountName_str
         " " REDIS_SESSION_account_sessionKey_str
         " " REDIS_SESSION_account_privilege_str
         " " REDIS_SESSION_account_commandersCountMax_str
@@ -250,7 +250,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             CommanderEquipment *equipment = &appearance->equipment;
 
             // Account
-            COPY_REDIS_GAME_STR(gameSession->accountSession.login, account_login);
+            COPY_REDIS_GAME_STR(gameSession->accountSession.accountName, account_accountName);
             COPY_REDIS_GAME_STR(gameSession->accountSession.sessionKey, account_sessionKey);
             gameSession->accountSession.privilege = GET_REDIS_GAME_32(account_privilege);
             gameSession->accountSession.commandersCountMax = GET_REDIS_GAME_32(account_commandersCountMax);
@@ -372,13 +372,13 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
     replies[0] = redisCommandDbg(self,
         "HMSET zone%x:map%x:acc%llx"
         " " REDIS_SESSION_account_sessionKey_str " %s"
-        " " REDIS_SESSION_account_login_str " %s"
+        " " REDIS_SESSION_account_accountName_str " %s"
         " " REDIS_SESSION_account_privilege_str " %x"
         " " REDIS_SESSION_account_commandersCountMax_str " %x",
         key->routerId, key->mapId, key->accountId,
 
         socketId,
-        gameSession->accountSession.login,
+        gameSession->accountSession.accountName,
         gameSession->accountSession.privilege,
         gameSession->accountSession.commandersCountMax
     );
