@@ -38,10 +38,8 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_commander_familyName] = REDIS_GAME_SESSION_commander_familyName_str,
     [REDIS_GAME_SESSION_commander_accountId] = REDIS_GAME_SESSION_commander_accountId_str,
     [REDIS_GAME_SESSION_commander_classId] = REDIS_GAME_SESSION_commander_classId_str,
-    [REDIS_GAME_SESSION_commander_unk4] = REDIS_GAME_SESSION_commander_unk4_str,
     [REDIS_GAME_SESSION_commander_jobId] = REDIS_GAME_SESSION_commander_jobId_str,
     [REDIS_GAME_SESSION_commander_gender] = REDIS_GAME_SESSION_commander_gender_str,
-    [REDIS_GAME_SESSION_commander_unk5] = REDIS_GAME_SESSION_commander_unk5_str,
     [REDIS_GAME_SESSION_commander_level] = REDIS_GAME_SESSION_commander_level_str,
     [REDIS_GAME_SESSION_commander_hairId] = REDIS_GAME_SESSION_commander_hairId_str,
     [REDIS_GAME_SESSION_commander_pose] = REDIS_GAME_SESSION_commander_pose_str,
@@ -81,8 +79,6 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_commander_maxSP] = REDIS_GAME_SESSION_commander_maxSP_str,
     [REDIS_GAME_SESSION_commander_currentStamina] = REDIS_GAME_SESSION_commander_currentStamina_str,
     [REDIS_GAME_SESSION_commander_maxStamina] = REDIS_GAME_SESSION_commander_maxStamina_str,
-    [REDIS_GAME_SESSION_commander_unk6] = REDIS_GAME_SESSION_commander_unk6_str,
-    [REDIS_GAME_SESSION_commander_unk7] = REDIS_GAME_SESSION_commander_unk7_str,
 };
 
 
@@ -107,10 +103,8 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         " " REDIS_GAME_SESSION_commander_familyName_str
         " " REDIS_GAME_SESSION_commander_accountId_str
         " " REDIS_GAME_SESSION_commander_classId_str
-        " " REDIS_GAME_SESSION_commander_unk4_str
         " " REDIS_GAME_SESSION_commander_jobId_str
         " " REDIS_GAME_SESSION_commander_gender_str
-        " " REDIS_GAME_SESSION_commander_unk5_str
         " " REDIS_GAME_SESSION_commander_level_str
         " " REDIS_GAME_SESSION_commander_hairId_str
         " " REDIS_GAME_SESSION_commander_pose_str
@@ -150,8 +144,6 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         " " REDIS_GAME_SESSION_commander_maxSP_str
         " " REDIS_GAME_SESSION_commander_currentStamina_str
         " " REDIS_GAME_SESSION_commander_maxStamina_str
-        " " REDIS_GAME_SESSION_commander_unk6_str
-        " " REDIS_GAME_SESSION_commander_unk7_str
 
         , key->routerId, key->mapId, key->accountId
     );
@@ -209,10 +201,8 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             COPY_REDIS_STR(appearance->familyName, commander_familyName);
             appearance->accountId = GET_REDIS_64(commander_accountId);
             appearance->classId   = GET_REDIS_32(commander_classId);
-            appearance->unk4      = GET_REDIS_32(commander_unk4);
             appearance->jobId     = GET_REDIS_32(commander_jobId);
             appearance->gender    = GET_REDIS_32(commander_gender);
-            appearance->unk5      = GET_REDIS_32(commander_unk5);
             appearance->level     = GET_REDIS_32(commander_level);
             appearance->hairId    = GET_REDIS_32(commander_hairId);
             appearance->pose      = GET_REDIS_32(commander_pose);
@@ -307,11 +297,16 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
     bool result = true;
     size_t repliesCount = 4;
     redisReply *replies[repliesCount];
-    memset(replies, 0, sizeof(replies));
 
     Commander *commander = NULL;
     CommanderAppearance *appearance = NULL;
     CommanderEquipment *equipment = NULL;
+
+    // Initialize replies
+    void *noReply = (void *) -1;
+    for (int i = 0; i < repliesCount; i++) {
+        replies[i] = noReply;
+    }
 
     if ((commander = gameSession->commanderSession.currentCommander) != NULL) {
         appearance = &commander->appearance;
@@ -342,17 +337,15 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
 
     // Commander
     if (commander) {
-    replies[2] = redisCommandDbg(self,
+        replies[2] = redisCommandDbg(self,
             "HMSET zone%x:map%x:acc%llx"
             " " REDIS_GAME_SESSION_commander_mapId_str " %x"
             " " REDIS_GAME_SESSION_commander_commanderName_str " %s"
             " " REDIS_GAME_SESSION_commander_familyName_str " %s"
             " " REDIS_GAME_SESSION_commander_accountId_str " %llx"
             " " REDIS_GAME_SESSION_commander_classId_str " %x"
-            " " REDIS_GAME_SESSION_commander_unk4_str " %x"
             " " REDIS_GAME_SESSION_commander_jobId_str " %x"
             " " REDIS_GAME_SESSION_commander_gender_str " %x"
-            " " REDIS_GAME_SESSION_commander_unk5_str " %x"
             " " REDIS_GAME_SESSION_commander_level_str " %x"
             " " REDIS_GAME_SESSION_commander_hairId_str " %x"
             " " REDIS_GAME_SESSION_commander_pose_str " %x"
@@ -377,10 +370,8 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
             CHECK_REDIS_EMPTY_STRING(appearance->familyName),
             key->accountId,
             appearance->classId,
-            appearance->unk4,
             appearance->jobId,
             appearance->gender,
-            appearance->unk5,
             appearance->level,
             appearance->hairId,
             appearance->pose,
@@ -454,7 +445,12 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
     for (int i = 0; i < repliesCount; i++) {
         redisReply *reply = replies[i];
 
-        if (reply) {
+        if (reply != noReply) {
+            if (!reply) {
+                error("Redis error encountered : The request is invalid.");
+                result = false;
+                goto cleanup;
+            }
             switch (reply->type)
             {
                 case REDIS_REPLY_ERROR:
@@ -480,7 +476,7 @@ cleanup:
     for (int i = 0; i < repliesCount; i++) {
         redisReply *reply = replies[i];
 
-        if (reply) {
+        if (reply && reply != noReply) {
             redisReplyDestroy(&reply);
         }
     }

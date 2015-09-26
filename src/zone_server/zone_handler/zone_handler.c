@@ -20,6 +20,7 @@
 #include "common/redis/fields/redis_socket_session.h"
 #include "common/server/event_handler.h"
 #include "common/commander/inventory.h"
+#include "common/mysql/fields/mysql_commander.h"
 
 /** Connect to the zone server */
 static PacketHandlerState zoneHandlerConnect        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
@@ -735,6 +736,8 @@ static PacketHandlerState zoneHandlerConnect(
     size_t packetSize,
     zmsg_t *replyMsg)
 {
+    PacketHandlerState status = PACKET_HANDLER_ERROR;
+
     #pragma pack(push, 1)
     struct {
         uint32_t unk1;
@@ -748,14 +751,59 @@ static PacketHandlerState zoneHandlerConnect(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
+    AccountSession *accountSession = &session->game.accountSession;
+
     dbg("zoneHandlerConnect");
-    dbg("unk1 %d", clientPacket->unk1);
+    dbg("unk1 %x", clientPacket->unk1);
     dbg("accountId %d", clientPacket->accountId);
     dbg("zoneServerId %d", clientPacket->zoneServerId);
     dbg("zoneServerIndex %d", clientPacket->zoneServerIndex);
-    dbg("unk3 %d", clientPacket->unk3);
+    dbg("unk3 %x", clientPacket->unk3);
+    dbg("unk4 %x", clientPacket->unk4);
     dbg("channelListId %d", clientPacket->channelListId);
     dbg("login %s", clientPacket->login);
+
+    // Load data from SQL
+    if (!(accountSessionCommandersInit(accountSession))) {
+        error("Cannot initialize commanders in session.");
+        goto cleanup;
+    }
+    // Get list of Commanders for this AccountId
+    size_t commandersCount;
+    if (!(mySqlRequestCommandersByAccountId(self->sqlConn, clientPacket->accountId, &commandersCount))) {
+        error("Cannot request commanders by accountId = %llx", clientPacket->accountId);
+        goto cleanup;
+    }
+
+    {
+        Commander commanders[commandersCount];
+
+        // Get commanders from SQL
+        if (!(mySqlGetCommanders(self->sqlConn, commanders))) {
+            error("Cannot get commanders by accountId = %llx", clientPacket->accountId);
+            goto cleanup;
+        }
+
+        // Add commanders to session.
+        for (int i = 0; i < commandersCount; i++) {
+            if (!(session->game.accountSession.commanders[i] = commanderNew())) {
+                error("Cannot allocate a new commander.");
+                goto cleanup;
+            }
+        }
+
+        // Update the session
+        for (int i = 0; i < commandersCount; i++) {
+            memcpy(session->game.accountSession.commanders[i], &commanders[i], sizeof(Commander));
+            /* memcpy(session->game.accountSession.commanders[i]->appearance.familyName,
+                session->game.accountSession.familyName, sizeof(session->game.accountSession.familyName)); */
+        }
+
+        session->game.accountSession.commandersCount = commandersCount;
+        // FIXME : Determine how to get the correct commander in the commander array
+        session->game.commanderSession.currentCommander = session->game.accountSession.commanders[0];
+    }
+
 
     // TODO : Reverse CZ_CONNECT correctly
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CONNECT);
@@ -768,17 +816,18 @@ static PacketHandlerState zoneHandlerConnect(
     };
     if (!(redisGetGameSession(self->redis, &gameKey, &session->game))) {
         error("Cannot retrieve the game session.");
-        return PACKET_HANDLER_ERROR;
+        goto cleanup;
     }
 
     // Check the client packet here(authentication)
+    // TODO improve it
     if (strncmp(session->game.accountSession.login,
                 clientPacket->login,
                 sizeof(session->game.accountSession.login)) != 0)
     {
         error("Wrong account authentication.(clientPacket account = <%s>, Session account = <%s>",
             clientPacket->login, session->game.accountSession.login);
-        return PACKET_HANDLER_ERROR;
+        goto cleanup;
     }
 
     // Authentication OK !
@@ -805,20 +854,23 @@ static PacketHandlerState zoneHandlerConnect(
 
     if (!(redisMoveGameSession(self->redis, &fromKey, &toKey))) {
         error("Cannot move the game session to the current mapId.");
-        return PACKET_HANDLER_ERROR;
+        goto cleanup;
     }
 
+    // update the session
     session->game.commanderSession.currentCommander->pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
 
     zoneBuilderConnectOk(
-        session->game.commanderSession.currentCommander->pcId,
         0, // GameMode
         0, // accountPrivileges
-        session->game.commanderSession.currentCommander, // Current commander
+        session->game.commanderSession.currentCommander,
         replyMsg
     );
 
-    return PACKET_HANDLER_UPDATE_SESSION;
+    status = PACKET_HANDLER_UPDATE_SESSION;
+
+cleanup:
+    return status;
 }
 
 static PacketHandlerState zoneHandlerJump(

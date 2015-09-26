@@ -330,9 +330,11 @@ barrackHandlerCommanderMove(
     size_t packetSize,
     zmsg_t *reply)
 {
+    PacketHandlerState status = PACKET_HANDLER_ERROR;
+
     #pragma pack(push, 1)
     struct {
-        uint8_t commanderListId;
+        uint8_t commanderIndex;
         PositionXYZ position;
         float angleDestX, angleDestY;
     } *clientPacket = (void *) packet;
@@ -340,22 +342,32 @@ barrackHandlerCommanderMove(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_MOVE);
 
-    Commander *commander = session->game.commanderSession.currentCommander;
+    size_t commanderIndex = clientPacket->commanderIndex - 1;
+
+    Commander *commander = NULL;
+    if (!(commander = accountSessionGetCommanderByIndex(&session->game.accountSession, commanderIndex))) {
+        error("Cannot get commander by index.");
+        goto cleanup;
+    }
 
     // TODO : Check position of the client
 
     // Update session
+    session->game.commanderSession.currentCommander = commander;
     memcpy(&commander->pos, &clientPacket->position, sizeof(PositionXZ));
 
     // Build packet
     barrackBuilderCommanderMoveOk(
         session->socket.accountId,
-        clientPacket->commanderListId,
+        clientPacket->commanderIndex,
         &commander->pos,
         reply
     );
 
-    return PACKET_HANDLER_UPDATE_SESSION;
+    status = PACKET_HANDLER_UPDATE_SESSION;
+
+cleanup:
+    return status;
 }
 
 static PacketHandlerState
@@ -371,17 +383,17 @@ barrackHandlerStartBarrack(
     // TODO : Define CB_START_BARRACK structure
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_START_BARRACK);
 
-    // FIXME : Temp values
     AccountSession *accountSession = &session->game.accountSession;
-    accountSession->commandersCountMax = 4;
-    if (!(accountSession->commanders = calloc(accountSession->commandersCountMax, sizeof(Commander *)))) {
-        error("Cannot allocate the commanders array.");
+
+    // FIXME : Temp values
+    accountSession->commandersCountMax = 4; // max number of commanders in the barrack
+    if (!(accountSessionCommandersInit(accountSession))) {
+        error("Cannot initialize commanders in session.");
         goto cleanup;
     }
 
     // Get list of Commanders for this AccountId
     size_t commandersCount;
-
     if (!(mySqlRequestCommandersByAccountId(self->sqlConn, session->socket.accountId, &commandersCount))) {
         error("Cannot request commanders by accountId = %llx", session->socket.accountId);
         goto cleanup;
@@ -442,10 +454,6 @@ static PacketHandlerState barrackHandlerCurrentBarrack(
     //   =================================================
     //    4E00 03000000 F7030000 D1A8014400000000 03000068 42F0968F 41000070 4111E334 3FCF2635 BF
     //    size pktType  checksum     accountId               float    float    float    float
-
-    // Select the current commander selected
-    // FIXME
-    session->game.commanderSession.currentCommander = session->game.accountSession.commanders[0];
 
     barrackBuilderPetInformation(reply);
     barrackBuilderZoneTraffics(1002, reply);
@@ -678,13 +686,6 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     AccountSession *accountSession = &session->game.accountSession;
 
     // FIXME : Temp value
-
-    // Check commanderIndex boundaries
-    if (commanderIndex < 0 || commanderIndex >= accountSession->commandersCountMax) {
-        error("The slot '%d' is out of bound.");
-        msgType = BC_MESSAGE_CREATE_COMMANDER_FAIL;
-        goto cleanup;
-    }
 
     // Check empty slot
     if (accountSessionGetCommanderByIndex(accountSession, commanderIndex) != NULL) {

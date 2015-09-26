@@ -34,10 +34,8 @@
 #define REDIS_GAME_SESSION_commander_familyName_str      "commander_familyName"
 #define REDIS_GAME_SESSION_commander_accountId_str       "commander_accountId"
 #define REDIS_GAME_SESSION_commander_classId_str         "commander_classId"
-#define REDIS_GAME_SESSION_commander_unk4_str            "commander_unk4"
 #define REDIS_GAME_SESSION_commander_jobId_str           "commander_jobId"
 #define REDIS_GAME_SESSION_commander_gender_str          "commander_gender"
-#define REDIS_GAME_SESSION_commander_unk5_str            "commander_unk5"
 #define REDIS_GAME_SESSION_commander_level_str           "commander_level"
 #define REDIS_GAME_SESSION_commander_hairId_str          "commander_hairId"
 #define REDIS_GAME_SESSION_commander_pose_str            "commander_pose"
@@ -79,8 +77,6 @@
 #define REDIS_GAME_SESSION_commander_maxSP_str           "info_maxSP"
 #define REDIS_GAME_SESSION_commander_currentStamina_str  "info_currentStamina"
 #define REDIS_GAME_SESSION_commander_maxStamina_str      "info_maxStamina"
-#define REDIS_GAME_SESSION_commander_unk6_str            "info_unk6"
-#define REDIS_GAME_SESSION_commander_unk7_str            "info_unk7"
 
 enum RedisGameSessionFields {
     // Account Session
@@ -97,10 +93,8 @@ enum RedisGameSessionFields {
     REDIS_GAME_SESSION_commander_familyName,
     REDIS_GAME_SESSION_commander_accountId,
     REDIS_GAME_SESSION_commander_classId,
-    REDIS_GAME_SESSION_commander_unk4,
     REDIS_GAME_SESSION_commander_jobId,
     REDIS_GAME_SESSION_commander_gender,
-    REDIS_GAME_SESSION_commander_unk5,
     REDIS_GAME_SESSION_commander_level,
     REDIS_GAME_SESSION_commander_hairId,
     REDIS_GAME_SESSION_commander_pose,
@@ -142,8 +136,6 @@ enum RedisGameSessionFields {
     REDIS_GAME_SESSION_commander_maxSP,
     REDIS_GAME_SESSION_commander_currentStamina,
     REDIS_GAME_SESSION_commander_maxStamina,
-    REDIS_GAME_SESSION_commander_unk6,
-    REDIS_GAME_SESSION_commander_unk7,
 
 	REDIS_GAME_SESSION_COUNT
 };

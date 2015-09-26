@@ -1587,7 +1587,6 @@ void zoneBuilderJump(uint32_t targetPcId, float height, zmsg_t *replyMsg) {
 }
 
 void zoneBuilderConnectOk(
-    uint32_t pcId,
     uint8_t gameMode,
     uint8_t accountPrivileges,
     Commander *commander,
@@ -1638,10 +1637,22 @@ void zoneBuilderConnectOk(
         replyPacket.unk3 = 0; // ICBT
         memcpy(replyPacket.markers, "*\x00*", sizeof(replyPacket.markers));
         memcpy(replyPacket.passport, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", sizeof(replyPacket.passport));
-        replyPacket.pcId = pcId;
+        replyPacket.pcId = commander->pcId;
         replyPacket.unk5 = 0; // ICBT
 
         replyPacket.appearance = commander->appearance;
+        replyPacket.pos = commander->pos;
+        replyPacket.currentXP = commander->currentXP;
+        replyPacket.maxXP = commander->maxXP;
+        replyPacket._pcId = commander->pcId;
+        replyPacket.socialInfoId = commander->socialInfoId;
+        replyPacket.commanderId = commander->commanderId;
+        replyPacket.currentHP = commander->currentHP;
+        replyPacket.maxHP = commander->maxHP;
+        replyPacket.currentSP = commander->currentSP;
+        replyPacket.maxSP = commander->maxSP;
+        replyPacket.currentStamina = commander->currentStamina;
+        replyPacket.maxStamina = commander->maxStamina;
     }
 }
 

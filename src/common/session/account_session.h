@@ -96,8 +96,13 @@ size_t accountSessionGetCommandersCount(AccountSession *self);
 Commander *accountSessionGetCommanderByIndex(AccountSession *self, int index);
 
 /**
+ * @brief Initialize commanders in the session
+ * @return true on success, false otherwise
+ */
+bool accountSessionCommandersInit(AccountSession *self);
+
+/**
  * @brief Prints a AccountSession structure.
- * @param self An initialized AccountSession
  */
 void accountSessionPrint(AccountSession *self);
 

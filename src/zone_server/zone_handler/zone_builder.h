@@ -311,7 +311,6 @@ void zoneBuilderMoveSpeed(uint32_t targetPcId, float movementSpeed,zmsg_t *reply
  * @brief Connect to the zone server
  */
 void zoneBuilderConnectOk(
-    uint32_t pcId,
     uint8_t gameMode,
     uint8_t accountPrivileges,
     Commander *commander,

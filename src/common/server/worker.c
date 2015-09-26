@@ -773,7 +773,7 @@ static int workerHandlePublicRequest(zloop_t *loop, zsock_t *worker, void *_self
 
     if (!(workerProcessClientPacket(self, msg))) {
         workerError(self, "Cannot handle correctly the client packet.");
-        result = -1;
+        result = 0;
         // Don't return, we want to send back an answer so the Worker doesn't quit
     }
 

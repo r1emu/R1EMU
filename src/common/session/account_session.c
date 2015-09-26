@@ -36,8 +36,30 @@ AccountSession *accountSessionNew(uint8_t *accountLogin, uint8_t *socketId, Acco
     return self;
 }
 
-Commander *accountSessionGetCommanderByIndex(AccountSession *self, int index) {
-    return self->commanders[index];
+bool accountSessionCommandersInit(AccountSession *self) {
+
+    bool status = false;
+
+    if (!(self->commanders = calloc(self->commandersCountMax, sizeof(Commander *)))) {
+        error("Cannot allocate the commanders array.");
+        goto cleanup;
+    }
+
+    status = true;
+
+cleanup:
+    return status;
+}
+
+Commander *accountSessionGetCommanderByIndex(AccountSession *self, int commanderIndex) {
+
+    // Check commanderIndex boundaries
+    if (commanderIndex < 0 || commanderIndex >= self->commandersCountMax) {
+        error("The slot '%d' is out of bound.");
+        return NULL;
+    }
+
+    return self->commanders[commanderIndex];
 }
 
 size_t accountSessionGetCommandersCount(AccountSession *self) {
