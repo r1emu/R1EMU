@@ -435,8 +435,6 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_BARRACKNAME_CHANGE);
 
-    CommanderAppearance *commanderAppearance = &session->game.commanderSession.currentCommander->appearance;
-
     // Check if the barrack name is not empty and contains only ASCII characters
     size_t barrackNameLen = strlen(clientPacket->barrackName);
 
@@ -452,6 +450,13 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
          }
     }
 
+    // Check if we are changing for the same name
+    if (memcmp(&clientPacket->barrackName,
+               &session->game.accountSession.familyName,
+               sizeof(clientPacket->barrackName)) == 0) {
+        goto cleanup;
+    }
+
     // Try to perform the change
     if ((changeStatus = mySqlSetFamilyName(
         self->sqlConn,
@@ -464,7 +469,6 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
     }
 
     // Update the session
-    strncpy(commanderAppearance->familyName, clientPacket->barrackName, sizeof(commanderAppearance->familyName));
     strncpy(session->game.accountSession.familyName,
         clientPacket->barrackName, sizeof(session->game.accountSession.familyName));
 
@@ -472,7 +476,7 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
 
 cleanup:
     // Build the reply packet
-    barrackBuilderBarrackNameChange(changeStatus, commanderAppearance->familyName, reply);
+    barrackBuilderBarrackNameChange(changeStatus, session->game.accountSession.familyName, reply);
 
     if (changeStatus != BC_BARRACKNAME_CHANGE_OK) {
         // The error is displayed to the client, don't update the session though
