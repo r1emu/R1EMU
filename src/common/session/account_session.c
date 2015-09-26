@@ -18,6 +18,7 @@
 
 // ---------- Includes ------------
 #include "account_session.h"
+#include "common/utils/memory.h"
 
 AccountSession *accountSessionNew(uint8_t *accountLogin, uint8_t *socketId, AccountSessionPrivileges accountPrivilege) {
 
@@ -36,7 +37,7 @@ AccountSession *accountSessionNew(uint8_t *accountLogin, uint8_t *socketId, Acco
     return self;
 }
 
-bool accountSessionCommandersInit(AccountSession *self) {
+bool accountSessionCommandersInit(AccountSession *self, size_t commandersCount) {
 
     bool status = false;
 
@@ -45,9 +46,23 @@ bool accountSessionCommandersInit(AccountSession *self) {
         goto cleanup;
     }
 
+    for (int i = 0; i < commandersCount; i++) {
+        if (!(self->commanders[i] = commanderNew())) {
+            error("Cannot allocate a new commander.");
+            goto cleanup;
+        }
+    }
+
     status = true;
 
 cleanup:
+    if (!status) {
+        for (int i = 0; i < commandersCount; i++) {
+            commanderDestroy(&self->commanders[i]);
+        }
+        destroy(&self->commanders);
+    }
+
     return status;
 }
 

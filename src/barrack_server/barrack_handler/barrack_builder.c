@@ -238,7 +238,7 @@ void barrackBuilderServerEntry(
 void barrackBuilderCommanderList(
     uint64_t accountId,
     GameSession *gameSession,
-    Commander *commanders,
+    Commander **commanders,
     int commandersCount,
     zmsg_t *replyMsg)
 {
@@ -247,28 +247,11 @@ void barrackBuilderCommanderList(
     size_t attributesSizeAllCommanders[commandersCount];
     size_t attributeSizeAllCommanders[commandersCount][EQSLOT_Count];
 
-    dbg("Getting attributes from commander items");
-
     for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
 
         // iterate through all commander
-        Commander *curCommander = &commanders[commanderIndex];
+        Commander *curCommander = commanders[commanderIndex];
         Inventory *inventory = &curCommander->inventory;
-
-        dbg("Commander %d:", commanderIndex);
-        dbg("inventory items count %d:", inventoryGetItemsCount(inventory));
-
-        // TESTIG PURPOSES, DELETE LATER
-        /*
-        Item newItem;
-        newItem.itemId = 1234;
-        newItem.itemType = 531101;
-        newItem.amount = 1;
-        newItem.equipSlot = EQSLOT_BODY_ARMOR;
-        newItem.attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
-        inventoryAddItem(inventory, &newItem);
-        inventoryEquipItem(inventory, newItem.itemId, EQSLOT_BODY_ARMOR);
-        */
 
         // get attributes size
         size_t attributesSize = 0;
@@ -317,8 +300,6 @@ void barrackBuilderCommanderList(
         commanderBarrackInfoPacketSize += sizeof(CommanderBarrackInfoPacket);
     }
 
-    dbg("commanderBarrackInfoPacketSize %d", commanderBarrackInfoPacketSize);
-
     // We got the final packet size, allocate replyPacket
     #pragma pack(push, 1)
     struct BarrackBuilderCommanderListPacket {
@@ -326,8 +307,9 @@ void barrackBuilderCommanderList(
         uint64_t accountId;
         uint8_t unk1;
         uint8_t commandersCount;
-        uint8_t familyName [COMMANDER_FAMILY_NAME_SIZE];
+        uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
 
+        // TODO : Fix it
         uint16_t accountInfoLength; // sizeof(accountInfo)
         //AccountInfo accountInfo[accountInfoCount];
 
@@ -342,8 +324,6 @@ void barrackBuilderCommanderList(
         uint8_t commandersBarrackInfoPacket[commanderBarrackInfoPacketSize];
     } replyPacket;
     #pragma pack(pop)
-
-    dbg("replyPacket size %d", sizeof(replyPacket));
 
     PacketStream packetStream;
     packetStreamInit(&packetStream, &replyPacket);
@@ -378,7 +358,7 @@ void barrackBuilderCommanderList(
         for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
 
             // iterate through all commander
-            Commander *curCommander = &commanders[commanderIndex];
+            Commander *curCommander = commanders[commanderIndex];
             Inventory *inventory = &curCommander->inventory;
 
             // Define CommanderBarrackInfoPacket current structure
@@ -622,20 +602,18 @@ void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
-        replyPacket.commanderCreate.appearance = commander->appearance,
-        replyPacket.commanderCreate.mapId = commander->mapId,
-        replyPacket.commanderCreate.socialInfoId = commander->socialInfoId,
-        replyPacket.commanderCreate.commanderPosition = commandersCount,
-        replyPacket.commanderCreate.unk4 = SWAP_UINT32(0x02000000), // ICBT
-        replyPacket.commanderCreate.unk5 = 0,
-        replyPacket.commanderCreate.maxXP = 0xC, // ICBT ; TODO : Implement EXP table
-        replyPacket.commanderCreate.unk6 = SWAP_UINT32(0xC01C761C), // ICBT
-        replyPacket.commanderCreate.pos = commander->pos,
-        replyPacket.commanderCreate.dir = commanderDir,
-        replyPacket.commanderCreate.pos2 = commander->pos,
-        replyPacket.commanderCreate.dir2 = commanderDir,
-        memset(replyPacket.commanderCreate.appearance.familyName, 0, sizeof(replyPacket.commanderCreate.appearance.familyName));
-        replyPacket.commanderCreate.appearance.accountId = 0;
+        replyPacket.commanderCreate.appearance = commander->appearance;
+        replyPacket.commanderCreate.mapId = commander->mapId;
+        replyPacket.commanderCreate.socialInfoId = commander->socialInfoId;
+        replyPacket.commanderCreate.commanderPosition = commandersCount;
+        replyPacket.commanderCreate.unk4 = SWAP_UINT32(0x02000000); // ICBT
+        replyPacket.commanderCreate.unk5 = 0;
+        replyPacket.commanderCreate.maxXP = 0xC; // ICBT ; TODO : Implement EXP table
+        replyPacket.commanderCreate.unk6 = SWAP_UINT32(0xC01C761C); // ICBT
+        replyPacket.commanderCreate.pos = commander->pos;
+        replyPacket.commanderCreate.dir = commanderDir;
+        replyPacket.commanderCreate.pos2 = commander->pos;
+        replyPacket.commanderCreate.dir2 = commanderDir;
     }
 
     buffer_print(&replyPacket, sizeof(replyPacket), NULL);

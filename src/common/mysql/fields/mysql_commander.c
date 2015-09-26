@@ -14,7 +14,7 @@
 #include "mysql_commander.h"
 #include "common/commander/commander.h"
 
-bool mySqlGetCommanders(MySQL *self, Commander *commanders) {
+bool mySqlGetCommanders(MySQL *self, Commander **commanders) {
 
     MYSQL_ROW row;
 
@@ -22,7 +22,7 @@ bool mySqlGetCommanders(MySQL *self, Commander *commanders) {
 
     for (int i = 0; (row = mysql_fetch_row(self->result)); i++) {
 
-        Commander *curCommander = &commanders[i];
+        Commander *curCommander = commanders[i];
         commanderInit(curCommander);
 
         curCommander->mapId = strtol(row[MYSQL_COMMANDER_FIELD_map_id], NULL, 10);

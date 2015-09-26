@@ -385,13 +385,6 @@ barrackHandlerStartBarrack(
 
     AccountSession *accountSession = &session->game.accountSession;
 
-    // FIXME : Temp values
-    accountSession->commandersCountMax = 4; // max number of commanders in the barrack
-    if (!(accountSessionCommandersInit(accountSession))) {
-        error("Cannot initialize commanders in session.");
-        goto cleanup;
-    }
-
     // Get list of Commanders for this AccountId
     size_t commandersCount;
     if (!(mySqlRequestCommandersByAccountId(self->sqlConn, session->socket.accountId, &commandersCount))) {
@@ -399,41 +392,26 @@ barrackHandlerStartBarrack(
         goto cleanup;
     }
 
-    {
-        Commander commanders[commandersCount];
-
-        // Get commanders from SQL
-        if (!(mySqlGetCommanders(self->sqlConn, commanders))) {
-            error("Cannot get commanders by accountId = %llx", session->socket.accountId);
-            goto cleanup;
-        }
-
-        // Add commanders to session.
-        for (int i = 0; i < commandersCount; i++) {
-            if (!(session->game.accountSession.commanders[i] = commanderNew())) {
-                error("Cannot allocate a new commander.");
-                goto cleanup;
-            }
-        }
-
-        // Update the session
-        for (int i = 0; i < commandersCount; i++) {
-            memcpy(session->game.accountSession.commanders[i], &commanders[i], sizeof(Commander));
-            /* memcpy(session->game.accountSession.commanders[i]->appearance.familyName,
-                session->game.accountSession.familyName, sizeof(session->game.accountSession.familyName)); */
-        }
-
-        session->game.accountSession.commandersCount = commandersCount;
-
-        // Send the commander list
-        barrackBuilderCommanderList(
-            session->socket.accountId,
-            &session->game,
-            commanders,
-            commandersCount,
-            reply
-        );
+    accountSession->commandersCountMax = 4; /// FIXME
+    if (!(accountSessionCommandersInit(accountSession, commandersCount))) {
+        error("Cannot initialize commanders in session.");
+        goto cleanup;
     }
+
+    // Get commanders from SQL
+    if (!(mySqlGetCommanders(self->sqlConn, accountSession->commanders))) {
+        error("Cannot get commanders by accountId = %llx", session->socket.accountId);
+        goto cleanup;
+    }
+
+    // Send the commander list
+    barrackBuilderCommanderList(
+        session->socket.accountId,
+        &session->game,
+        accountSession->commanders,
+        commandersCount,
+        reply
+    );
 
     status = PACKET_HANDLER_UPDATE_SESSION;
 
@@ -542,36 +520,31 @@ static PacketHandlerState barrackHandlerCommanderDestroy(
     #pragma pack(pop)
 
     dbg("clientPacket->commanderIndex %d", clientPacket->commanderIndex);
-    dbg("session->game.accountSession.commandersCount %d", session->game.accountSession.commandersCount);
 
     // For future reference, clientPacket->commanderIndex 0xFF removes all characters.
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_DESTROY);
 
-    Commander *commanderToDelete;
+    Commander *commanderToDelete = NULL;
 
     // Update session
     size_t commanderIndex = clientPacket->commanderIndex - 1;
-    commanderToDelete = session->game.accountSession.commanders[commanderIndex];
 
-    if (!commanderToDelete) {
+    if (!(commanderToDelete = session->game.accountSession.commanders[commanderIndex])) {
         error("Cannot delete the commander [%d] because it doesn't exist.", commanderIndex);
         goto cleanup;
     }
 
-    // Remove commander from MySQL (or mark to remove?)
-    if (MySqlCommanderDelete(self->sqlConn, commanderToDelete->commanderId)) {
+    // Remove commander from MySQL
+    // TODO : mark to delete instead of really deleting it
+    if (!(MySqlCommanderDelete(self->sqlConn, commanderToDelete->commanderId))) {
         error("Cannot remove commander '%llx' from MySQL", commanderToDelete->commanderId);
         barrackBuilderMessage(BC_MESSAGE_CUSTOM_MSG, "There was a problem while deleting your Character. Please try again.", reply);
         status = PACKET_HANDLER_OK;
         goto cleanup;
     }
 
-    // Update the commanders count
-    if (session->game.accountSession.commandersCount > 0) {
-        session->game.accountSession.commandersCount -= 1;
-    }
-
+    // Update the session
     session->game.accountSession.commanders[commanderIndex] = NULL;
     commanderDestroy(&commanderToDelete);
 
@@ -608,9 +581,6 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     #pragma pack(pop)
 
     size_t commanderIndex = clientPacket->commanderIndex - 1;
-
-    dbg("clientPacket->commanderIndex %d", clientPacket->commanderIndex);
-    dbg("session->game.accountSession.commandersCount %d", session->game.accountSession.commandersCount);
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_CREATE);
 
@@ -685,17 +655,9 @@ static PacketHandlerState barrackHandlerCommanderCreate(
 
     AccountSession *accountSession = &session->game.accountSession;
 
-    // FIXME : Temp value
-
-    // Check empty slot
-    if (accountSessionGetCommanderByIndex(accountSession, commanderIndex) != NULL) {
-        error("The slot '%d' is not empty.");
-        msgType = BC_MESSAGE_CREATE_COMMANDER_FAIL;
-        goto cleanup;
-    }
-
-    // CharName
+    // Name
     strncpy(commanderAppearance->commanderName, clientPacket->commanderName, sizeof(commanderAppearance->commanderName));
+    strncpy(commanderAppearance->familyName, accountSession->familyName, sizeof(commanderAppearance->familyName));
 
     // AccountID
     commanderAppearance->accountId = session->socket.accountId;
@@ -724,11 +686,16 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     info("SocialInfoID generated : %llx", newCommander.socialInfoId);
     info("accountId %llx", commanderAppearance->accountId);
 
-    // Update the session
-    Commander *dupCommander = commanderDup(&newCommander);
-    session->game.accountSession.commanders[commanderIndex] = dupCommander;
-    session->game.accountSession.commandersCount = accountSessionGetCommandersCount(accountSession);
+    Commander *dupCommander = NULL;
+    if (!(dupCommander = commanderDup(&newCommander))) {
+        error("Cannot duplicate the commander.");
+        goto cleanup;
+    }
 
+    // Update the session
+    accountSession->commanders[commanderIndex] = dupCommander;
+
+    // Build the reply packet
     barrackBuilderCommanderCreate(dupCommander, commanderIndex + 1, reply);
 
     status = PACKET_HANDLER_UPDATE_SESSION;

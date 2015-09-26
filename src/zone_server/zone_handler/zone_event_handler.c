@@ -188,7 +188,7 @@ bool zoneEventHandlerChat(EventServer *self, GameEvent *event) {
     bool status = true;
     zmsg_t *msg = NULL;
     zlist_t *clientsAround = NULL;
-    GameEventChat *chatEvent = &event->data.zone.chat;
+    _GameEventChat *chatEvent = &event->data.zone.chat;
 
     // get the clients around
     if (!eventServerGetClientsAround(self, event->emitterSk, &clientsAround)) {

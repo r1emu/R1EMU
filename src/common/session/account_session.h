@@ -51,12 +51,10 @@ struct AccountSession {
     time_t timeBanned;
     float credits;
     time_t timeLastLogin;
-    uint8_t familyName[64]; ///TODO SIZE
+    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
     uint32_t barrackType;
 
-    // Makes any sense to have a variable to store this information? Copied for deprecated "BarrackSession"
-    uint8_t commandersCount;
-
+    // Array of commanders in the barrack
     Commander **commanders;
     size_t commandersCountMax;
 };
@@ -99,7 +97,7 @@ Commander *accountSessionGetCommanderByIndex(AccountSession *self, int index);
  * @brief Initialize commanders in the session
  * @return true on success, false otherwise
  */
-bool accountSessionCommandersInit(AccountSession *self);
+bool accountSessionCommandersInit(AccountSession *self, size_t commandersCount);
 
 /**
  * @brief Prints a AccountSession structure.

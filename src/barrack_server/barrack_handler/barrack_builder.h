@@ -104,7 +104,7 @@ void barrackBuilderServerEntry(
 void barrackBuilderCommanderList(
     uint64_t accountId,
     GameSession *gameSession,
-    Commander *commanders,
+    Commander **commanders,
     int commandersCount,
     zmsg_t *replyMsg);
 

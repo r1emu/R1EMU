@@ -65,10 +65,16 @@ typedef struct {
 } GameEventEnterPc;
 
 /** Event data needed for a commander to chat */
+#define DECLARE_GameEventChat(chatTextSize) \
+typedef struct { \
+    Commander commander; \
+    uint8_t chatText[chatTextSize]; \
+} GameEventChat;
+#define CHAT_TEXT_SIZE_MAX 500
 typedef struct {
     Commander commander;
-    uint8_t chatText[0]; // variable length array
-} GameEventChat;
+    uint8_t chatText[CHAT_TEXT_SIZE_MAX];
+} _GameEventChat;
 
 /** Event data needed for a commander to rotate head */
 typedef struct {
@@ -102,7 +108,7 @@ typedef union {
     GameEventRestSit restSit;
     GameEventJump jump;
     GameEventEnterPc enterPc;
-    GameEventChat chat;
+    _GameEventChat chat;
     GameEventHeadRotate headRotate;
     GameEventRotate rotate;
     GameEventLeave leave;

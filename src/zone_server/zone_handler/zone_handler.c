@@ -125,19 +125,19 @@ static PacketHandlerState zoneHandlerChat(
     zmsg_t *replyMsg)
 {
     // the first 2 bytes of ZC_CHAT are the packet size
-    size_t chatTextSize = *((uint16_t *) packet) - sizeof(ClientPacketHeader) - sizeof(uint16_t);
+    size_t msgSize = *((uint16_t *) packet) - sizeof(ClientPacketHeader) - sizeof(uint16_t);
 
     #pragma pack(push, 1)
     struct {
         uint16_t msgSize;
-        uint8_t msgText[chatTextSize];
+        uint8_t msgText[msgSize];
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CHAT);
 
     // The chat message sent by the client should always finish by a null byte
-    clientPacket->msgText[chatTextSize-1] = '\0';
+    clientPacket->msgText[msgSize - 1] = '\0';
 
     // Check for custom admin commands
     if (session->game.accountSession.privilege <= ACCOUNT_SESSION_PRIVILEGES_ADMIN
@@ -146,11 +146,11 @@ static PacketHandlerState zoneHandlerChat(
     }
     else {
         // normal message : Dispatch a GameEventChat
-        size_t gameEventSize = sizeof(GameEventChat) + chatTextSize;
-        GameEventChat *event = alloca(gameEventSize);
-        memcpy(&event->commander, &session->game.commanderSession.currentCommander, sizeof(event->commander));
-        memcpy(event->chatText, clientPacket->msgText, chatTextSize);
-        workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_CHAT, event, gameEventSize);
+        DECLARE_GameEventChat(msgSize);
+        GameEventChat event;
+        memcpy(&event.commander, session->game.commanderSession.currentCommander, sizeof(event.commander));
+        memcpy(event.chatText, clientPacket->msgText, msgSize);
+        workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_CHAT, &event, sizeof(event));
     }
 
     return PACKET_HANDLER_UPDATE_SESSION;
@@ -751,8 +751,6 @@ static PacketHandlerState zoneHandlerConnect(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
-    AccountSession *accountSession = &session->game.accountSession;
-
     dbg("zoneHandlerConnect");
     dbg("unk1 %x", clientPacket->unk1);
     dbg("accountId %d", clientPacket->accountId);
@@ -763,11 +761,36 @@ static PacketHandlerState zoneHandlerConnect(
     dbg("channelListId %d", clientPacket->channelListId);
     dbg("login %s", clientPacket->login);
 
-    // Load data from SQL
-    if (!(accountSessionCommandersInit(accountSession))) {
-        error("Cannot initialize commanders in session.");
+    // TODO : Reverse CZ_CONNECT correctly
+    // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CONNECT);
+
+    GameSession tmpGameSession;
+    AccountSession *tmpAccountSession = &tmpGameSession.accountSession;
+    CommanderSession *tmpCommanderSession = &tmpGameSession.commanderSession;
+
+    RedisAccountSessionKey accountKey = {
+        .routerId = self->info.routerId,
+        .mapId = SOCKET_SESSION_UNDEFINED_MAP,
+        .accountId = clientPacket->accountId
+    };
+    if (!(redisGetAccountSession(self->redis, &accountKey, tmpAccountSession))) {
+        error("Cannot retrieve the account session.");
         goto cleanup;
     }
+
+    // Check the client packet here (authentication)
+    // TODO improve it
+    if (strncmp(tmpAccountSession->login,
+                clientPacket->login,
+                sizeof(tmpAccountSession->login)) != 0)
+    {
+        error("Wrong account authentication.(clientPacket account = <%s>, Session account = <%s>",
+            clientPacket->login, tmpAccountSession->login);
+        goto cleanup;
+    }
+
+    // === Authentication OK ! ===
+
     // Get list of Commanders for this AccountId
     size_t commandersCount;
     if (!(mySqlRequestCommandersByAccountId(self->sqlConn, clientPacket->accountId, &commandersCount))) {
@@ -775,67 +798,31 @@ static PacketHandlerState zoneHandlerConnect(
         goto cleanup;
     }
 
-    {
-        Commander commanders[commandersCount];
-
-        // Get commanders from SQL
-        if (!(mySqlGetCommanders(self->sqlConn, commanders))) {
-            error("Cannot get commanders by accountId = %llx", clientPacket->accountId);
-            goto cleanup;
-        }
-
-        // Add commanders to session.
-        for (int i = 0; i < commandersCount; i++) {
-            if (!(session->game.accountSession.commanders[i] = commanderNew())) {
-                error("Cannot allocate a new commander.");
-                goto cleanup;
-            }
-        }
-
-        // Update the session
-        for (int i = 0; i < commandersCount; i++) {
-            memcpy(session->game.accountSession.commanders[i], &commanders[i], sizeof(Commander));
-            /* memcpy(session->game.accountSession.commanders[i]->appearance.familyName,
-                session->game.accountSession.familyName, sizeof(session->game.accountSession.familyName)); */
-        }
-
-        session->game.accountSession.commandersCount = commandersCount;
-        // FIXME : Determine how to get the correct commander in the commander array
-        session->game.commanderSession.currentCommander = session->game.accountSession.commanders[0];
+    if (!(accountSessionCommandersInit(tmpAccountSession, commandersCount))) {
+        error("Cannot initialize commanders in session.");
+        goto cleanup;
     }
 
+    if (!(mySqlGetCommanders(self->sqlConn, tmpAccountSession->commanders))) {
+        error("Cannot get commanders.");
+        goto cleanup;
+    }
 
-    // TODO : Reverse CZ_CONNECT correctly
-    // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CONNECT);
+    // FIXME : Determine how to get the correct commander in the commander array
+    tmpCommanderSession->currentCommander = commanderDup(tmpAccountSession->commanders[0]);
 
     // Get the Game Session that the Barrack Server moved
-    RedisGameSessionKey gameKey = {
-        .routerId = self->info.routerId,
-        .mapId = -1,
-        .accountId = clientPacket->accountId
-    };
-    if (!(redisGetGameSession(self->redis, &gameKey, &session->game))) {
+    RedisGameSessionKey gameKey = accountKey;
+    if (!(redisGetGameSession(self->redis, &gameKey, &tmpGameSession))) {
         error("Cannot retrieve the game session.");
         goto cleanup;
     }
 
-    // Check the client packet here(authentication)
-    // TODO improve it
-    if (strncmp(session->game.accountSession.login,
-                clientPacket->login,
-                sizeof(session->game.accountSession.login)) != 0)
-    {
-        error("Wrong account authentication.(clientPacket account = <%s>, Session account = <%s>",
-            clientPacket->login, session->game.accountSession.login);
-        goto cleanup;
-    }
-
-    // Authentication OK !
     // Update the Socket Session
     socketSessionInit(&session->socket,
         clientPacket->accountId,
         self->info.routerId,
-        session->game.commanderSession.currentCommander->mapId,
+        tmpCommanderSession->currentCommander->mapId,
         session->socket.sessionKey,
         true
     );
@@ -857,9 +844,14 @@ static PacketHandlerState zoneHandlerConnect(
         goto cleanup;
     }
 
-    // update the session
-    session->game.commanderSession.currentCommander->pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
+    // FIXME
+    // Set a default position
+    tmpCommanderSession->currentCommander->pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
 
+    // Update the session
+    session->game = tmpGameSession;
+
+    // Build a reply packet
     zoneBuilderConnectOk(
         0, // GameMode
         0, // accountPrivileges
