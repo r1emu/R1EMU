@@ -66,15 +66,26 @@ cleanup:
     return status;
 }
 
-Commander *accountSessionGetCommanderByIndex(AccountSession *self, int commanderIndex) {
+bool accountSessionGetCommanderByIndex(AccountSession *self, int commanderIndex, Commander **commander) {
+
+    bool status = false;
 
     // Check commanderIndex boundaries
     if (commanderIndex < 0 || commanderIndex >= self->commandersCountMax) {
-        error("The slot '%d' is out of bound.");
-        return NULL;
+        error("The slot '%d' is out of bound.", commanderIndex);
+        goto cleanup;
     }
 
-    return self->commanders[commanderIndex];
+    *commander = self->commanders[commanderIndex];
+    if (!commander) {
+        goto cleanup;
+    }
+
+    status = true;
+
+cleanup:
+    return status;
+
 }
 
 size_t accountSessionGetCommandersCount(AccountSession *self) {
@@ -99,6 +110,28 @@ bool accountSessionInit(AccountSession *self, uint8_t *accountName, uint8_t *soc
     self->privilege = privilege;
 
     return true;
+}
+
+bool accountSessionIsCommanderSlotEmpty(AccountSession *self, int commanderIndex) {
+
+    bool status = false;
+
+    // Check commanderIndex boundaries
+    if (commanderIndex < 0 || commanderIndex >= self->commandersCountMax) {
+        error("The slot '%d' is out of bound.", commanderIndex);
+        goto cleanup;
+    }
+
+    // Check if slot is occupied
+    if (self->commanders[commanderIndex]) {
+        goto cleanup;
+    }
+
+    status = true;
+
+cleanup:
+    return status;
+
 }
 
 void accountSessionPrint(AccountSession *self) {
