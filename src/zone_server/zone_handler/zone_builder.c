@@ -605,7 +605,7 @@ void zoneBuilderAddStamina(uint32_t stamina, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg) {
+void zoneBuilderUpdateSP(uint32_t targetPcId, uint32_t sp, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
@@ -621,13 +621,13 @@ void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg) {
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         replyPacket.header.type = ZC_UPDATE_SP;
-        replyPacket.pcId = targetPcID;
+        replyPacket.pcId = targetPcId;
         replyPacket.sp = sp;
         replyPacket.unk1 = 0;
     }
 }
 
-void zoneBuilderUpdateAllStatus(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, uint16_t sp,
+void zoneBuilderUpdateAllStatus(uint32_t targetPcId, uint32_t hp, uint32_t maxHp, uint16_t sp,
                                 uint16_t maxSp, zmsg_t *replyMsg)
 {
     #pragma pack(push, 1)
@@ -648,7 +648,7 @@ void zoneBuilderUpdateAllStatus(uint32_t targetPcID, uint32_t hp, uint32_t maxHp
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         replyPacket.header.type = ZC_UPDATE_ALL_STATUS;
-        replyPacket.pcId = targetPcID;
+        replyPacket.pcId = targetPcId;
         replyPacket.hp = hp;
         replyPacket.maxHp = maxHp;
         replyPacket.sp = sp;
@@ -657,7 +657,7 @@ void zoneBuilderUpdateAllStatus(uint32_t targetPcID, uint32_t hp, uint32_t maxHp
     }
 }
 
-void zoneBuilderPCLevelUp(uint32_t targetPcID, uint32_t level, zmsg_t *replyMsg) {
+void zoneBuilderPCLevelUp(uint32_t targetPcId, uint32_t level, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
@@ -672,12 +672,12 @@ void zoneBuilderPCLevelUp(uint32_t targetPcID, uint32_t level, zmsg_t *replyMsg)
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         replyPacket.header.type = ZC_PC_LEVELUP;
-        replyPacket.pcId = targetPcID;
+        replyPacket.pcId = targetPcId;
         replyPacket.level = level;
     }
 }
 
-void zoneBuilderAddHp(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, zmsg_t *replyMsg) {
+void zoneBuilderAddHp(uint32_t targetPcId, uint32_t hp, uint32_t maxHp, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
@@ -694,7 +694,7 @@ void zoneBuilderAddHp(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, zmsg_t *
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         replyPacket.header.type = ZC_ADD_HP;
-        replyPacket.pcId = targetPcID;
+        replyPacket.pcId = targetPcId;
         replyPacket.hp = hp;
         replyPacket.maxHp = maxHp;
         replyPacket.unk1 = 1;

@@ -89,7 +89,7 @@ bool dbClientInfoInit(DbClientInfo *self, char *name, uint16_t routerId) {
     return true;
 }
 
-bool dbClientStart(DbClient *self) {
+bool dbClientConnect(DbClient *self) {
 
     char *endpointStr = zsys_sprintf(DB_ENDPOINT, self->info.name, self->info.routerId);
 
@@ -196,6 +196,58 @@ bool dbClientRemoveObject(DbClient *self, char *key) {
     }
 
     return true;
+}
+
+bool dbClientGetObjectsSync(DbClient *self, char **keys, size_t keysCount, zhash_t **out) {
+
+    bool status = false;
+
+    if (!(dbClientRequestObjects(self, keys, keysCount))) {
+        dbClientError(self, "Cannot request objects.");
+        goto cleanup;
+    }
+
+    if (!(dbClientGetObjects(self, out))) {
+        dbClientError(self, "Cannot get objects.");
+        goto cleanup;
+    }
+
+    status = true;
+
+cleanup:
+
+    return status;
+}
+
+bool dbClientGetObjectSync(DbClient *self, char *key, DbObject **out) {
+
+    bool status = false;
+    zhash_t *objects = NULL;
+
+    if (!(dbClientGetObjectsSync(self, (char *[]) {key}, 1, &objects))) {
+        dbClientError(self, "Cannot get object synchronously.");
+        goto cleanup;
+    }
+    status = true;
+
+    if (zhash_size(objects) != 1 && zhash_size(objects) != 0) {
+        dbClientError(self, "Objects count retrieved must be egal to 0 or 1.");
+        goto cleanup;
+    }
+
+    *out = zhash_first(objects);
+
+cleanup:
+    if (!status) {
+        if (objects) {
+                for (DbObject *o = zhash_first(objects); o != NULL; o = zhash_next(objects)) {
+                dbObjectDestroy(&o);
+            }
+        }
+    }
+
+    zhash_destroy(&objects);
+    return status;
 }
 
 bool dbClientRequestObjects(DbClient *self, char **keys, size_t keysCount) {
@@ -351,16 +403,22 @@ bool dbClientGetObject(DbClient *self, DbObject **out) {
 
     if (zhash_size(objects) != 1 && zhash_size(objects) != 0) {
         dbClientError(self, "Objects count retrieved must be egal to 0 or 1.");
-        // TODO : Cleanup memory inside hashtable
         goto cleanup;
     }
 
-    DbObject *object = zhash_first(objects);
-    *out = object;
+    *out = zhash_first(objects);
 
     status = true;
 
 cleanup:
+    if (!status) {
+        if (objects) {
+                for (DbObject *o = zhash_first(objects); o != NULL; o = zhash_next(objects)) {
+                dbObjectDestroy(&o);
+            }
+        }
+    }
+
     zhash_destroy(&objects);
 
     return status;

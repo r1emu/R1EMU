@@ -26,7 +26,6 @@ bool mySqlGetCommanders(MySQL *self, Commander **commanders) {
         commanderInit(curCommander);
 
         curCommander->mapId = strtol(row[MYSQL_COMMANDER_FIELD_map_id], NULL, 10);
-        curCommander->pcId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
         curCommander->commanderId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
         curCommander->socialInfoId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
 

@@ -18,6 +18,7 @@
 #include "common/packet/packet.h"
 #include "common/redis/fields/redis_game_session.h"
 #include "common/redis/fields/redis_session.h"
+#include "common/db/db_client.h"
 #include "barrack_server/barrack_event_server.h"
 #include "zone_server/zone_event_server.h"
 
@@ -41,6 +42,8 @@ struct EventServer
     // EventServer information
     EventServerInfo info;
 
+    DbClient *dbSession;
+
     // EventServer process routine
     bool (*eventServerProcess)(EventServer *self, EventType type, void *eventData);
 };
@@ -63,8 +66,8 @@ EventServer *eventServerNew(EventServerInfo *info, ServerType serverType) {
     return self;
 }
 
-bool eventServerInit(EventServer *self, EventServerInfo *info, ServerType serverType) {
-    memcpy(&self->info, info, sizeof(self->info));
+bool eventServerInit(EventServer *self, EventServerInfo *serverInfo, ServerType serverType) {
+    memcpy(&self->info, serverInfo, sizeof(self->info));
 
     // create a unique publisher for the EventServer
     if (!(self->eventsInput = zsock_new(ZMQ_SUB))) {
@@ -79,7 +82,7 @@ bool eventServerInit(EventServer *self, EventServerInfo *info, ServerType server
     }
 
     // initialize Redis connection
-    if (!(self->redis = redisNew(&info->redisInfo))) {
+    if (!(self->redis = redisNew(&serverInfo->redisInfo))) {
         error("Cannot initialize a new Redis connection.");
         return false;
     }
@@ -87,6 +90,17 @@ bool eventServerInit(EventServer *self, EventServerInfo *info, ServerType server
     // initialize hashtable of clients around
     if (!(self->clientsGraph = graphNew())) {
         error("Cannot allocate a new clients Graph.");
+        return false;
+    }
+
+    DbClientInfo clientInfo;
+    if (!(dbClientInfoInit(&clientInfo, "dbSession", serverInfo->routerId))) {
+        error("Cannot initialize dbClient info.");
+        return false;
+    }
+
+    if (!(self->dbSession = dbClientNew(&clientInfo))) {
+        error("Cannot allocate a new dbClient");
         return false;
     }
 
@@ -129,12 +143,12 @@ bool eventServerFlushSession(EventServer *self, uint8_t *sessionKey) {
 
     // Flush the redis session here
     RedisSessionKey redisSessionKey = {
-        .socketKey = {
+        .socketSessionKey = {
             .routerId = self->info.routerId,
             .sessionKey = sessionKey
         }
     };
-    if (!(redisFlushSession (self->redis, &redisSessionKey))) {
+    if (!(redisDeleteSession(self->redis, &redisSessionKey))) {
         error ("Cannot flush the redis session '%s'", sessionKey);
         return false;
     }
@@ -203,10 +217,32 @@ bool
 eventServerGetGameSessionBySocketId (
     EventServer *self,
     uint16_t routerId,
-    uint8_t *socketId,
-    GameSession *gameSession
-) {
-    return redisGetGameSessionBySocketId (self->redis, routerId, socketId, gameSession);
+    uint8_t *sessionKey,
+    GameSession *gameSession)
+{
+    bool status = false;
+
+    Session *session = NULL;
+    if (!(dbClientRequestObject(self->dbSession, sessionKey))) {
+        error("Cannot request session '%s'", sessionKey);
+        goto cleanup;
+    }
+
+    DbObject *dbSessionObject = NULL;
+    if (!(dbClientGetObject(self->dbSession, &dbSessionObject))) {
+        error("Cannot get db session object.");
+        goto cleanup;
+    }
+
+    session = dbSessionObject->data;
+    memcpy(gameSession, &session->game, sizeof(*gameSession));
+
+    status = true;
+
+cleanup:
+    sessionDestroy(&session);
+    dbObjectDestroy(&dbSessionObject);
+    return status;
 }
 
 static int
@@ -451,6 +487,12 @@ eventServerStart (
     // Start Redis
     if (!(redisConnection (self->redis))) {
         error("Cannot connect to the Redis Server.");
+        return false;
+    }
+
+    // Connect to dbSession
+    if (!(dbClientConnect(self->dbSession))) {
+        error("Cannot start dbClient.");
         return false;
     }
 

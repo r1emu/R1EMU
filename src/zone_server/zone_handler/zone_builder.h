@@ -168,24 +168,24 @@ void zoneBuilderAddStamina(uint32_t stamina, zmsg_t *replyMsg);
 /**
  * @brief Updates sp of character to value of sp.
  */
-void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg);
+void zoneBuilderUpdateSP(uint32_t targetPcId, uint32_t sp, zmsg_t *replyMsg);
 
 /**
  * @brief Updates sp of character to value of sp.
  */
-void zoneBuilderPCLevelUp(uint32_t targetPcID, uint32_t level, zmsg_t *replyMsg);
+void zoneBuilderPCLevelUp(uint32_t targetPcId, uint32_t level, zmsg_t *replyMsg);
 
 /**
  * @brief Updates hp/maxhp/sp/maxsp of character.
  */
-void zoneBuilderUpdateAllStatus(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, uint16_t sp,
+void zoneBuilderUpdateAllStatus(uint32_t targetPcId, uint32_t hp, uint32_t maxHp, uint16_t sp,
                                 uint16_t maxSp, zmsg_t *replyMsg);
 
 /**
  * @brief Updates hp of character. Does not seem to show in client. This packet seems to be
  *        sent during HP regen and when the client starts the game.
  */
-void zoneBuilderAddHp(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, zmsg_t *replyMsg);
+void zoneBuilderAddHp(uint32_t targetPcId, uint32_t hp, uint32_t maxHp, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown

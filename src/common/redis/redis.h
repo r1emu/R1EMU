@@ -24,19 +24,6 @@
 #define REDIS_EMPTY_STRING (uint8_t *) "__EMPTY_STRING__"
 #define CHECK_REDIS_EMPTY_STRING(_x) ((_x)[0] != '\0') ? (_x) : REDIS_EMPTY_STRING
 
-// accessors helpers
-// Game
-#define COPY_REDIS_GAME_STR(_str, _x) strncpy(_str, reply->element[REDIS_GAME_SESSION_##_x]->str, sizeof(_str));
-#define GET_REDIS_GAME_32(_x) strtoul(reply->element[REDIS_GAME_SESSION_##_x]->str, NULL, 16)
-#define GET_REDIS_GAME_64(_x) strtoull(reply->element[REDIS_GAME_SESSION_##_x]->str, NULL, 16)
-#define GET_REDIS_GAME_FLOAT(_x) strtof (reply->element[REDIS_GAME_SESSION_##_x]->str, NULL)
-
-// Account
-#define COPY_REDIS_ACCOUNT_STR(_str, _x) strncpy(_str, reply->element[REDIS_ACCOUNT_SESSION_##_x]->str, sizeof(_str));
-#define GET_REDIS_ACCOUNT_32(_x) strtoul(reply->element[REDIS_ACCOUNT_SESSION_##_x]->str, NULL, 16)
-#define GET_REDIS_ACCOUNT_64(_x) strtoull(reply->element[REDIS_ACCOUNT_SESSION_##_x]->str, NULL, 16)
-#define GET_REDIS_ACCOUNT_FLOAT(_x) strtof (reply->element[REDIS_ACCOUNT_SESSION_##_x]->str, NULL)
-
 typedef struct Redis Redis;
 
 typedef struct RedisInfo {

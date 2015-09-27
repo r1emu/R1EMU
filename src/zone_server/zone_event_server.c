@@ -42,26 +42,30 @@ bool zoneEventServerProcess(EventServer *self, EventType type, void *eventData) 
 
 bool zoneEventServerOnDisconnect (
     zsock_t *eventServer,
+    DbClient *dbSession,
     Redis *redis,
     MySQL *mysql,
     uint16_t routerId,
     uint8_t *sessionKeyStr
 ) {
     // Get the current game session
-    GameSession gameSession;
-    if (!(redisGetGameSessionBySocketId(redis, routerId, sessionKeyStr, &gameSession))) {
-        error("Cannot get game session of '%s'", sessionKeyStr);
+    DbObject *dbSessionObject = NULL;
+    if (!(dbClientGetObjectSync(dbSession, sessionKeyStr, &dbSessionObject))) {
+        error("Cannot get the session '%s'.", sessionKeyStr);
         return false;
     }
 
+    Session *session = dbSessionObject->data;
+    GameSession *gameSession = &session->game;
+
     // Send a EVENT_TYPE_LEAVE packet to the event server
     GameEventLeave event = {
-        .pcId = gameSession.commanderSession.currentCommander->pcId
+        .pcId = gameSession->commanderSession.currentCommander->pcId
     };
     eventServerDispatchEvent(eventServer, sessionKeyStr, EVENT_TYPE_LEAVE, &event, sizeof(event));
 
     // Transfer the Redis session to SQL
-    if (!(mySqlCommanderSessionFlush(mysql, &gameSession.commanderSession))) {
+    if (!(mySqlCommanderSessionFlush(mysql, &gameSession->commanderSession))) {
         error ("Cannot flush the redis session '%s' to the SQL.", sessionKeyStr);
         // return false;
         // TODO : Should we flush the Redis data in that case ?
@@ -69,13 +73,13 @@ bool zoneEventServerOnDisconnect (
 
     // Flush the Redis session of the client
     RedisSessionKey sessionKey = {
-        .socketKey = {
+        .socketSessionKey = {
             .routerId = routerId,
             .sessionKey = sessionKeyStr
         }
     };
 
-    if (!(redisFlushSession (redis, &sessionKey))) {
+    if (!(redisDeleteSession(redis, &sessionKey))) {
         error ("Cannot flush the redis session '%s'", sessionKeyStr);
         return false;
     }
@@ -167,11 +171,11 @@ bool zoneEventServerUpdateClientPosition(
         }
 
         // Also, send to the current player the list of entered players
-        for (uint8_t *enterPcSocketId = zlist_first(pcEnterList);
-             enterPcSocketId != NULL;
-             enterPcSocketId = zlist_next(pcEnterList)
+        for (uint8_t *enterPcSessionKey = zlist_first(pcEnterList);
+             enterPcSessionKey != NULL;
+             enterPcSessionKey = zlist_next(pcEnterList)
         ) {
-            if (strcmp (enterPcSocketId, emitterSk) == 0) {
+            if (strcmp (enterPcSessionKey, emitterSk) == 0) {
                 // Doesn't send again the packet - the client sees himself
                 continue;
             }
@@ -179,9 +183,9 @@ bool zoneEventServerUpdateClientPosition(
             GameSession gameSession;
             curPcEnterMsg = zmsg_new();
             if (!(eventServerGetGameSessionBySocketId(
-                self, eventServerGetRouterId(self), enterPcSocketId, &gameSession)))
+                self, eventServerGetRouterId(self), enterPcSessionKey, &gameSession)))
             {
-                error("Cannot get game session from %s.", enterPcSocketId);
+                error("Cannot get game session from %s.", enterPcSessionKey);
                 status = false;
                 goto cleanup;
             }

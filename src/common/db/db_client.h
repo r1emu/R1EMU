@@ -105,11 +105,22 @@ bool dbClientUpdateObjects(DbClient *self, zhash_t *objects);
 bool dbClientUpdateObject(DbClient *self, char *key, DbObject *object);
 
 /**
+ * Get objects from the db synchronously
+ * @param self A connected dbClient
+ * @param keys Array of keys
+ * @param keysCount number of keys
+ * @param objects A hashtable <char *key, DbObject *object>
+ * @return true on success, false otherwise.
+ */
+bool dbClientGetObjectsSync(DbClient *self, char **keys, size_t keysCount, zhash_t **out);
+bool dbClientGetObjectSync(DbClient *self, char *key, DbObject **out);
+
+/**
  * Start DbClient actor
  * @param self A pointer to an allocated DbClient.
  * @return true on success, false otherwise.
  */
-bool dbClientStart(DbClient *self);
+bool dbClientConnect(DbClient *self);
 
 /**
  * Free an allocated DbClient structure.

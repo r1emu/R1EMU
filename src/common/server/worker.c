@@ -490,12 +490,12 @@ workerProcessOneRequest(
 
         case PACKET_HANDLER_DELETE_SESSION: {
             RedisSessionKey sessionKey = {
-                .socketKey = {
+                .socketSessionKey = {
                     .routerId = session->socket.routerId,
                     .sessionKey = session->socket.sessionKey
                 }
             };
-            if (!(redisFlushSession(self->redis, &sessionKey))) {
+            if (!(redisDeleteSession(self->redis, &sessionKey))) {
                 error("Cannot delete the Session.");
                 goto cleanup;
             }
@@ -610,7 +610,7 @@ bool workerStart(Worker *self) {
         goto cleanup;
     }
 
-    if (!(dbClientStart(self->dbSession))) {
+    if (!(dbClientConnect(self->dbSession))) {
         workerError(self, "Cannot connect to session manager.");
         goto cleanup;
     }

@@ -16,7 +16,7 @@
 #include "zone_event_handler.h"
 #include "admin_cmd.h"
 #include "common/packet/packet.h"
-#include "common/redis/fields/redis_game_session.h"
+#include "common/redis/fields/redis_account_session.h"
 #include "common/redis/fields/redis_socket_session.h"
 #include "common/server/event_handler.h"
 #include "common/commander/inventory.h"
@@ -754,12 +754,12 @@ static PacketHandlerState zoneHandlerConnect(
 
     dbg("zoneHandlerConnect");
     dbg("unk1 %x", clientPacket->unk1);
-    dbg("accountId %d", clientPacket->accountId);
-    dbg("zoneServerId %d", clientPacket->zoneServerId);
-    dbg("zoneServerIndex %d", clientPacket->zoneServerIndex);
+    dbg("accountId %x", clientPacket->accountId);
+    dbg("zoneServerId %x", clientPacket->zoneServerId);
+    dbg("zoneServerIndex %x", clientPacket->zoneServerIndex);
     dbg("unk3 %x", clientPacket->unk3);
     dbg("unk4 %x", clientPacket->unk4);
-    dbg("channelListId %d", clientPacket->channelListId);
+    dbg("channelListId %x", clientPacket->channelListId);
     dbg("accountName %s", clientPacket->accountName);
 
     // TODO : Reverse CZ_CONNECT correctly
@@ -804,7 +804,6 @@ static PacketHandlerState zoneHandlerConnect(
     tmpCommanderSession->currentCommander = commanderDup(tmpAccountSession->commanders[0]);
 
     // Get the Game Session that the Barrack Server moved
-    // TODO : Should be replaced by Db
     RedisGameSessionKey gameKey = accountKey;
     if (!(redisGetGameSession(self->redis, &gameKey, &tmpGameSession))) {
         error("Cannot retrieve the game session.");
@@ -831,15 +830,17 @@ static PacketHandlerState zoneHandlerConnect(
         .mapId = session->socket.mapId,
         .accountId = session->socket.accountId
     };
-    // TODO : Should be replaced by Db
     if (!(redisMoveGameSession(self->redis, &fromKey, &toKey))) {
         error("Cannot move the game session to the current mapId.");
         goto cleanup;
     }
 
-    // FIXME
-    // Set a default position
+    // FIXME : Shouldn't be fixed but saved into the database
     tmpCommanderSession->currentCommander->pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
+
+    // FIXME
+    // Set a unique PcID
+    tmpCommanderSession->currentCommander->pcId = r1emuGenerateRandom(&self->seed);
 
     // Update the session
     session->game = tmpGameSession;

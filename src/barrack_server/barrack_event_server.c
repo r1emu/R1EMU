@@ -40,6 +40,7 @@ bool barrackEventServerProcess(EventServer *self, EventType type, void *eventDat
 
 bool barrackEventServerOnDisconnect (
     zsock_t *eventServer,
+    DbClient *dbSession,
     Redis *redis,
     MySQL *mysql,
     uint16_t routerId,
@@ -47,12 +48,12 @@ bool barrackEventServerOnDisconnect (
 ) {
     // Flush the Redis session of the client
     RedisSessionKey sessionKey = {
-        .socketKey = {
+        .socketSessionKey = {
             .routerId = routerId,
             .sessionKey = sessionKeyStr
         }
     };
-    if (!(redisFlushSession (redis, &sessionKey))) {
+    if (!(redisDeleteSession(redis, &sessionKey))) {
         error ("Cannot flush the redis session '%s'", sessionKey);
         return false;
     }

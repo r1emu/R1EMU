@@ -22,34 +22,10 @@
 #include "common/redis/fields/redis_socket_session.h"
 
 typedef struct {
-    RedisSocketSessionKey socketKey;
+    RedisSocketSessionKey socketSessionKey;
 } RedisSessionKey;
 
-/**
- * @brief Save an entire Session to the Redis server.
- * @param self An allocated Redis instance
- * @param key The GameSession key
- * @param session The Session to save
- * @return true on success, false otherwise
- */
-bool redisUpdateSession(Redis *redis,Session *session);
 
-/**
- * @brief Flush an entire Session
- * @param self An allocated Redis instance
- * @param key The key of the Session
- * @return true on success, false otherwise
- */
-bool redisFlushSession(Redis *self,RedisSessionKey *key);
-
-
-/**
- * @brief Request the session from a SessionKey
- * @param self An allocated Redis
- * @param key The GameSession key
- * @param[out] session The resulting Session
- * @return
- */
-// DEPRECATED
-// Redis shouldn't be used to read data
-// bool redisGetSession(Redis *self, RedisSessionKey *key, Session *session);
+bool redisUpdateSession(Redis *self, Session *session);
+bool redisDeleteSession(Redis *self, RedisSessionKey *key);
+bool redisGetSession (Redis *self, RedisSessionKey *key, Session *session);

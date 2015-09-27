@@ -40,6 +40,7 @@ struct RouterMonitor {
     /** Database connection */
     Redis *redis;
     MySQL *sql;
+    DbClient *dbSession;
 };
 
 // ------ Static declaration -------
@@ -85,18 +86,11 @@ RouterMonitor *routerMonitorNew(RouterMonitorInfo *info) {
     return self;
 }
 
-bool routerMonitorInit (RouterMonitor *self, RouterMonitorInfo *info) {
+bool routerMonitorInit (RouterMonitor *self, RouterMonitorInfo *monitorInfo) {
 
     memset(self, 0, sizeof(*self));
 
-    routerMonitorInfoInit (&self->info,
-        info->frontend,
-        info->routerId,
-        &info->redisInfo,
-        &info->sqlInfo,
-        info->disconnectHandler
-    );
-    routerMonitorInfoDestroy (&info);
+    memcpy(&self->info, monitorInfo, sizeof(self->info));
 
     // Allocate the connected clients hashtable
     if (!(self->connected = zhash_new())) {
@@ -111,6 +105,17 @@ bool routerMonitorInit (RouterMonitor *self, RouterMonitorInfo *info) {
 
     if (!(self->sql = mySqlNew (&self->info.sqlInfo))) {
         error("Cannot initialize the MySQL connection.");
+        return false;
+    }
+
+    DbClientInfo clientInfo;
+    if (!(dbClientInfoInit(&clientInfo, "dbSession", monitorInfo->routerId))) {
+        error("Cannot initialize dbClient info.");
+        return false;
+    }
+
+    if (!(self->dbSession = dbClientNew(&clientInfo))) {
+        error("Cannot allocate a new dbClient");
         return false;
     }
 
@@ -256,6 +261,7 @@ routerMonitorProcess (
             } else {
                 if (!(self->info.disconnectHandler(
                         self->eventServer,
+                        self->dbSession,
                         self->redis,
                         self->sql,
                         self->info.routerId,
@@ -366,10 +372,10 @@ cleanup:
 void
 routerMonitorStart (
     zsock_t *pipe,
-    void *info
+    void *monitorInfo
 ) {
     RouterMonitor self;
-    routerMonitorInit(&self, info);
+    routerMonitorInit(&self, monitorInfo);
 
     zactor_t *servermon = NULL;
     zsock_t *requests = NULL;
@@ -384,6 +390,12 @@ routerMonitorStart (
     // Connect to the MySQL database
     if (!(mySqlConnect (self.sql))) {
         error("Cannot connect to MySQL.");
+        goto cleanup;
+    }
+
+    // Connect to the db Session
+    if (!(dbClientConnect(self.dbSession))) {
+        error("Cannot connect to the dbSession.");
         goto cleanup;
     }
 

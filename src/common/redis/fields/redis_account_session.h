@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file barrack_event_server.h
+ * @file redis_account_session.h
  * @brief
  *
  *
@@ -20,29 +20,21 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
-#include "barrack_handler/barrack_event_handler.h"
-#include "common/server/event_server.h"
-#include "common/server/game_event.h"
-#include "common/db/db_client.h"
+#include "redis_game_session.h"
+#include "common/redis/redis.h"
+#include "common/session/session.h"
 
 // ---------- Defines -------------
 
 // ------ Structure declaration -------
+typedef RedisGameSessionKey RedisAccountSessionKey;
 
 // ----------- Functions ------------
-/**
- * @brief Process the barrack events received from the workers
- */
-bool barrackEventServerProcess(EventServer *self, EventType type, void *eventData);
 
 /**
- * @brief Event handler when a client disconnects
+ * Get, update, move or delete an account session inside Redis
  */
-bool barrackEventServerOnDisconnect (
-    zsock_t *eventServer,
-    DbClient *dbSession,
-    Redis *redis,
-    MySQL *mysql,
-    uint16_t routerId,
-    uint8_t *sessionKeyStr
-);
+bool redisGetAccountSession(Redis *self, RedisAccountSessionKey *key, AccountSession *accountSession);
+bool redisUpdateAccountSession(Redis *self, RedisAccountSessionKey *key, uint8_t *sessionKey, AccountSession *accountSession);
+bool redisMoveAccountSession(Redis *self, RedisAccountSessionKey *from, RedisAccountSessionKey *to);
+bool redisDeleteAccountSession(Redis *self, RedisAccountSessionKey *key);

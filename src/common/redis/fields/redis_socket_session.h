@@ -63,4 +63,4 @@ bool redisUpdateSocketSession(Redis *self, RedisSocketSessionKey *key, SocketSes
  * @param key The SocketSession key
  * @return true on success, false otherwise
  */
-bool redisFlushSocketSession(Redis *self, RedisSocketSessionKey *key);
+bool redisDeleteSocketSession(Redis *self, RedisSocketSessionKey *key);

@@ -41,6 +41,7 @@ bool socialEventServerProcess(EventServer *self, EventType type, void *eventData
 
 bool socialEventServerOnDisconnect (
     zsock_t *eventServer,
+    DbClient *dbSession,
     Redis *redis,
     MySQL *mysql,
     uint16_t routerId,
@@ -48,12 +49,12 @@ bool socialEventServerOnDisconnect (
 ) {
     // Flush the Redis session of the client
     RedisSessionKey sessionKey = {
-        .socketKey = {
+        .socketSessionKey = {
             .routerId = routerId,
             .sessionKey = sessionKeyStr
         }
     };
-    if (!(redisFlushSession (redis, &sessionKey))) {
+    if (!(redisDeleteSession(redis, &sessionKey))) {
         error ("Cannot flush the redis session '%s'", sessionKey);
         return false;
     }

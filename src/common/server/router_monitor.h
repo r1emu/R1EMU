@@ -19,6 +19,7 @@
 #include "R1EMU.h"
 #include "common/redis/redis.h"
 #include "common/mysql/mysql.h"
+#include "common/db/db_client.h"
 
 #define ROUTER_MONITOR_FDKEY_SIZE ((sizeof(uint64_t) * 2) + 1)
 #define ROUTER_MONITOR_SUBSCRIBER_ENDPOINT "inproc://routerMonitorSubscriber-%d"
@@ -26,6 +27,7 @@
 /** Server specific handler when a client disconnects */
 typedef bool (*DisconnectEventHandler) (
     zsock_t *eventServer,
+    DbClient *dbSession,
     Redis *redis,
     MySQL *mysql,
     uint16_t routerId,

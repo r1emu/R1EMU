@@ -37,7 +37,7 @@ bool redisGetSocketSession(Redis *self, RedisSocketSessionKey *key, SocketSessio
 	redisReply *reply = NULL;
 
 	reply = redisCommandDbg(self,
-        "HMGET zone%x:socket%s "
+        "HMGET zone%x:socket:%s "
         REDIS_SOCKET_SESSION_accountId_str " "
         REDIS_SOCKET_SESSION_routerId_str " "
         REDIS_SOCKET_SESSION_mapId_str " "
@@ -113,7 +113,7 @@ bool redisUpdateSocketSession (Redis *self, RedisSocketSessionKey *key, SocketSe
     redisReply *reply = NULL;
 
     reply = redisCommandDbg(self,
-        "HMSET zone%x:socket%s"
+        "HMSET zone%x:socket:%s"
         " accountId %llx"
         " routerId %x"
         " mapId %x"
@@ -153,13 +153,13 @@ bool redisUpdateSocketSession (Redis *self, RedisSocketSessionKey *key, SocketSe
     return true;
 }
 
-bool redisFlushSocketSession (Redis *self, RedisSocketSessionKey *key) {
+bool redisDeleteSocketSession(Redis *self, RedisSocketSessionKey *key) {
 
     redisReply *reply = NULL;
 
     // Delete the key from the Redis
     reply = redisCommandDbg(self,
-        "DEL zone%x:socket%s",
+        "DEL zone%x:socket:%s",
         key->routerId, key->sessionKey
     );
 
