@@ -589,7 +589,19 @@ void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        CommanderCreatePacket commanderCreate;
+        CommanderAppearanceCPacket appearance;
+        uint64_t socialInfoId;
+        uint16_t commanderPosition;
+        uint16_t mapId;
+        uint32_t unk4;
+        uint32_t unk5;
+        uint32_t maxXP;
+        uint32_t unk6;
+        PositionXYZ pos;
+        PositionXZ dir;
+        PositionXYZ pos2;
+        PositionXZ dir2;
+        uint32_t unk8;
     } replyPacket;
     #pragma pack(pop)
 
@@ -602,18 +614,18 @@ void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
-        replyPacket.commanderCreate.appearance = commander->appearance;
-        replyPacket.commanderCreate.mapId = commander->mapId;
-        replyPacket.commanderCreate.socialInfoId = commander->socialInfoId;
-        replyPacket.commanderCreate.commanderPosition = commandersCount;
-        replyPacket.commanderCreate.unk4 = SWAP_UINT32(0x02000000); // ICBT
-        replyPacket.commanderCreate.unk5 = 0;
-        replyPacket.commanderCreate.maxXP = 0xC; // ICBT ; TODO : Implement EXP table
-        replyPacket.commanderCreate.unk6 = SWAP_UINT32(0xC01C761C); // ICBT
-        replyPacket.commanderCreate.pos = commander->pos;
-        replyPacket.commanderCreate.dir = commanderDir;
-        replyPacket.commanderCreate.pos2 = commander->pos;
-        replyPacket.commanderCreate.dir2 = commanderDir;
+        replyPacket.appearance = commander->appearance;
+        replyPacket.mapId = commander->mapId;
+        replyPacket.socialInfoId = commander->socialInfoId;
+        replyPacket.commanderPosition = commandersCount;
+        replyPacket.unk4 = SWAP_UINT32(0x02000000); // ICBT
+        replyPacket.unk5 = 0;
+        replyPacket.maxXP = 0xC; // ICBT ; TODO : Implement EXP table
+        replyPacket.unk6 = SWAP_UINT32(0xC01C761C); // ICBT
+        replyPacket.pos = commander->pos;
+        replyPacket.dir = commanderDir;
+        replyPacket.pos2 = commander->pos;
+        replyPacket.dir2 = commanderDir;
     }
 
     buffer_print(&replyPacket, sizeof(replyPacket), NULL);

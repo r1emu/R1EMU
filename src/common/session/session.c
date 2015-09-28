@@ -68,3 +68,8 @@ void sessionSPacket(Session *self, PacketStream *stream) {
     socketSessionSPacket(&self->socket, stream);
     gameSessionSPacket(&self->game, stream);
 }
+
+void sessionUnpacket(Session *self, PacketStream *stream) {
+    socketSessionUnpacket(&self->socket, stream);
+    gameSessionUnpacket(&self->game, stream);
+}

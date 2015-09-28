@@ -89,6 +89,13 @@ Item *itemNew(uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inve
 bool itemInit(Item *self, uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inventoryIndex);
 
 /**
+ * Initialize an allocated Item structure.
+ * @param self An allocated Item to initialize.
+ * @return true on success, false otherwise.
+ */
+bool itemDup(Item *self, Item **out);
+
+/**
  * Generate a key for an item from ItemId
  */
 void itemGenKey(uint64_t itemIdKey, ItemKey itemKey);
@@ -116,3 +123,4 @@ bool itemRemoveAttribute(Item *self, ItemAttributeId itemAttrId);
 
 size_t itemGetSPacketSize(Item *self);
 void itemSPacket(Item *self, PacketStream *stream);
+void itemUnpacket(Item *self, PacketStream *stream);

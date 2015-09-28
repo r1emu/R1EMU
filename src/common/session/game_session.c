@@ -84,3 +84,6 @@ void gameSessionSPacket(GameSession *self, PacketStream *stream) {
     commanderSessionSPacket(&self->commanderSession, stream);
 }
 
+void gameSessionUnpacket(GameSession *self, PacketStream *stream) {
+    accountSessionUnpacket(&self->accountSession, stream);
+}

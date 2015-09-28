@@ -220,3 +220,31 @@ void commanderSPacket(Commander *self, PacketStream *stream) {
     packetStreamIn(stream, &self->maxStamina);
     inventorySPacket(&self->inventory, stream);
 }
+
+void commanderUnpacket(Commander *self, PacketStream *stream) {
+    packetStreamOut(stream, self->commanderName);
+    packetStreamOut(stream, self->familyName);
+    packetStreamOut(stream, &self->accountId);
+    packetStreamOut(stream, &self->commanderId);
+    packetStreamOut(stream, &self->socialInfoId);
+    packetStreamOut(stream, &self->pcId);
+    packetStreamOut(stream, &self->commanderArrayIndex);
+    packetStreamOut(stream, &self->classId);
+    packetStreamOut(stream, &self->jobId);
+    packetStreamOut(stream, &self->hairId);
+    packetStreamOut(stream, &self->gender);
+    packetStreamOut(stream, &self->pose);
+    packetStreamOut(stream, &self->pos);
+    packetStreamOut(stream, &self->dir);
+    packetStreamOut(stream, &self->mapId);
+    packetStreamOut(stream, &self->level);
+    packetStreamOut(stream, &self->currentXP);
+    packetStreamOut(stream, &self->maxXP);
+    packetStreamOut(stream, &self->currentHP);
+    packetStreamOut(stream, &self->maxHP);
+    packetStreamOut(stream, &self->currentSP);
+    packetStreamOut(stream, &self->maxSP);
+    packetStreamOut(stream, &self->currentStamina);
+    packetStreamOut(stream, &self->maxStamina);
+    inventoryUnpacket(&self->inventory, stream);
+}

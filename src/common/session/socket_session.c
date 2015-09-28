@@ -125,3 +125,11 @@ void socketSessionSPacket(SocketSession *self, PacketStream *stream) {
     packetStreamIn(stream, self->sessionKey);
     packetStreamIn(stream, &self->authenticated);
 }
+
+void socketSessionUnpacket(SocketSession *self, PacketStream *stream) {
+    packetStreamOut(stream, &self->accountId);
+    packetStreamOut(stream, &self->routerId);
+    packetStreamOut(stream, &self->mapId);
+    packetStreamOut(stream, self->sessionKey);
+    packetStreamOut(stream, &self->authenticated);
+}

@@ -52,27 +52,8 @@ typedef struct CommanderEquipmentCPacket {
 } CommanderEquipmentCPacket;
 #pragma pack(pop)
 
-#pragma pack(push, 1)
-typedef struct CommanderEquipmentPacket {
-    uint32_t head_top;
-    uint32_t head_middle;
-    uint32_t body_armor;
-    uint32_t gloves;
-    uint32_t boots;
-    uint32_t helmet;
-    uint32_t bracelet;
-    uint32_t weapon;
-    uint32_t shield;
-    uint32_t costume;
-    uint32_t leg_armor;
-    uint32_t ring_left;
-    uint32_t ring_right;
-    uint32_t necklace;
-} CommanderEquipmentPacket;
-#pragma pack(pop)
-
 /**
- * @brief CommanderAppearanceCPacket is the struct of a commander sent to the client
+ * @brief CommanderAppearanceCPacket is the view of a commander sent to the client
  */
 #pragma pack(push, 1)
 typedef struct CommanderAppearanceCPacket {
@@ -91,45 +72,6 @@ typedef struct CommanderAppearanceCPacket {
     uint8_t unk6;
     uint16_t pose;
 }   CommanderAppearanceCPacket;
-#pragma pack(pop)
-
-typedef struct CommanderAppearancePacket {
-
-    uint8_t commanderName[COMMANDER_NAME_SIZE+1];
-    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
-
-    uint64_t accountId;
-    uint16_t classId;
-    uint16_t jobId;
-    uint8_t hairId;
-
-    uint32_t level;
-    uint8_t gender;
-    uint16_t pose;
-
-    CommanderEquipmentPacket equipment[0]; // always 1
-
-}   CommanderAppearancePacket;
-
-/**
- * Structure of variables needed for BC_COMMANDER_CREATE
- */
-#pragma pack(push, 1)
-typedef struct CommanderCreatePacket {
-    CommanderAppearanceCPacket appearance;
-    uint64_t socialInfoId;
-    uint16_t commanderPosition;
-    uint16_t mapId;
-    uint32_t unk4;
-    uint32_t unk5;
-    uint32_t maxXP;
-    uint32_t unk6;
-    PositionXYZ pos;
-    PositionXZ dir;
-    PositionXYZ pos2;
-    PositionXZ dir2;
-    uint32_t unk8;
-} CommanderCreatePacket;
 #pragma pack(pop)
 
 /**
@@ -330,3 +272,4 @@ void commanderDestroy(Commander **_self);
 
 size_t commanderGetSPacketSize(Commander *self);
 void commanderSPacket(Commander *self, PacketStream *stream);
+void commanderUnpacket(Commander *self, PacketStream *stream);

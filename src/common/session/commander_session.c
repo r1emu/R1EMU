@@ -76,13 +76,11 @@ commanderSessionFree (
 
 size_t commanderSessionGetPacketSize(CommanderSession *self) {
     size_t packetSize = 0;
-
     packetSize += sizeof(CommanderSessionPacket);
-
     return packetSize;
 }
 
 void commanderSessionSPacket(CommanderSession *self, PacketStream *stream) {
-
+    int commanderIndex = (self->currentCommander) ? self->currentCommander->commanderArrayIndex : -1;
+    packetStreamIn(stream, &commanderIndex);
 }
-

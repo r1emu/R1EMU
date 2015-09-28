@@ -74,6 +74,9 @@ static void itemAttributeCPacket(ItemAttribute *self, PacketStream *packetStream
 static size_t itemAttributeGetCPacketSize(ItemAttribute *self);
 static void itemAttributeFree(ItemAttribute *self);
 static void itemAttributeDestroy(ItemAttribute **_self);
+static void itemAttributeSPacket(ItemAttribute *self, PacketStream *stream);
+static void itemAttributeFloatSPacket(ItemAttribute *self, PacketStream *stream);
+static void itemAttributeStringSPacket(ItemAttribute *self, PacketStream *stream);
 
 static size_t itemAttributeGetSPacketSize(ItemAttribute *self);
 
@@ -447,13 +450,7 @@ static size_t itemAttributeGetSPacketSize(ItemAttribute *self) {
     return packetSize;
 }
 
-void itemAttributeFloatSPacket(ItemAttribute *self, PacketStream *stream) {
-
-    ItemAttributeFloat *attributePacket = self->value;
-    packetStreamIn(stream, &attributePacket->value);
-}
-
-void itemAttributeStringSPacket(ItemAttribute *self, PacketStream *stream) {
+static void itemAttributeStringSPacket(ItemAttribute *self, PacketStream *stream) {
 
     uint16_t valueSize = *(uint16_t *) self->value; // StringPacket begins with size
 
@@ -467,7 +464,32 @@ void itemAttributeStringSPacket(ItemAttribute *self, PacketStream *stream) {
     packetStreamIn(stream, attributePacket->value);
 }
 
-void itemAttributeSPacket(ItemAttribute *self, PacketStream *stream) {
+size_t itemAttributesGetSPacketSize(ItemAttributes *self) {
+
+    size_t packetSize = 0;
+
+    packetSize += sizeof(ItemAttributesSPacket);
+
+    // Get size of all attributes
+    for (ItemAttribute *attr = zhash_first(self->hashtable); attr != NULL; attr = zhash_next(self->hashtable)) {
+        packetSize += itemAttributeGetSPacketSize(attr);
+    }
+
+    return packetSize;
+}
+
+void itemAttributesSPacket(ItemAttributes *self, PacketStream *stream) {
+
+    size_t attributesCount = zhash_size(self->hashtable);
+    packetStreamIn(stream, &attributesCount);
+
+    // Write all attributes
+    for (ItemAttribute *attr = zhash_first(self->hashtable); attr != NULL; attr = zhash_next(self->hashtable)) {
+        itemAttributeSPacket(attr, stream);
+    }
+}
+
+static void itemAttributeSPacket(ItemAttribute *self, PacketStream *stream) {
 
     packetStreamIn(stream, &self->format);
     packetStreamIn(stream, &self->attributeId);
@@ -488,27 +510,97 @@ void itemAttributeSPacket(ItemAttribute *self, PacketStream *stream) {
     }
 }
 
-size_t itemAttributesGetSPacketSize(ItemAttributes *self) {
+static void itemAttributeFloatSPacket(ItemAttribute *self, PacketStream *stream) {
 
-    size_t packetSize = 0;
-
-    packetSize += sizeof(ItemAttributesSPacket);
-
-    // Get size of all attributes
-    for (ItemAttribute *attr = zhash_first(self->hashtable); attr != NULL; attr = zhash_next(self->hashtable)) {
-        packetSize += itemAttributeGetSPacketSize(attr);
-    }
-
-    return packetSize;
+    ItemAttributeFloat *attributePacket = self->value;
+    packetStreamIn(stream, &attributePacket->value);
 }
 
-void itemAttributesSPacket(ItemAttributes *self, PacketStream *stream) {
+static bool itemAttributeFloatUnpacket(ItemAttribute *self, PacketStream *stream) {
 
-    uint32_t attributesCount = zhash_size(self->hashtable);
-    packetStreamIn(stream, &attributesCount);
+    ItemAttributeFloat *attributePacket = self->value;
+    packetStreamOut(stream, &attributePacket->value);
+    return true;
+}
 
-    // Write all attributes
-    for (ItemAttribute *attr = zhash_first(self->hashtable); attr != NULL; attr = zhash_next(self->hashtable)) {
-        itemAttributeSPacket(attr, stream);
+static bool itemAttributeStringUnpacket(ItemAttribute *self, PacketStream *stream) {
+
+    bool status = false;
+    uint16_t valueSize;
+    packetStreamOut(stream, &valueSize);
+
+    #pragma pack(push, 1)
+    DECLARE_ItemAttributeString(valueSize);
+    #pragma pack(pop)
+
+    ItemAttributeString *attr = self->value;
+
+    if (valueSize != attr->valueSize) {
+        if (!(attr = realloc(attr, sizeof(ItemAttributeString)))) {
+            error("Cannot realloc an attribute string of size '%d'", sizeof(ItemAttributeString));
+            goto cleanup;
+        }
     }
+
+    attr->valueSize = valueSize;
+    packetStreamOut(stream, attr->value);
+
+    status = true;
+
+cleanup:
+    return status;
+}
+
+static bool itemAttributeUnpacket(ItemAttribute *self, PacketStream *stream) {
+
+    bool status = false;
+    packetStreamOut(stream, &self->format);
+    packetStreamOut(stream, &self->attributeId);
+
+    switch (self->format) {
+
+        case FLOAT_ATTRIBUTE:
+            if (!(itemAttributeFloatUnpacket(self, stream))) {
+                error("Cannot unpack float item attribute");
+                goto cleanup;
+            }
+            break;
+
+        case STRING_ATTRIBUTE:
+            if (!(itemAttributeStringUnpacket(self, stream))) {
+                error("Cannot unpacket string item attribute");
+                goto cleanup;
+            }
+            break;
+
+        default:
+            warning("Unknown attribute format. Please complete this function.");
+            break;
+    }
+
+    status = true;
+
+cleanup:
+    return status;
+}
+
+bool itemAttributesUnpacket(ItemAttributes *self, PacketStream *stream) {
+
+    bool status = false;
+    size_t attributesCount;
+
+    packetStreamOut(stream, &attributesCount);
+
+    for (size_t i = 0; i < attributesCount; i++) {
+        ItemAttribute attr;
+        if (!(itemAttributeUnpacket(&attr, stream))) {
+            error("Cannot unpack item attribute.");
+            goto cleanup;
+        }
+    }
+
+    status = true;
+
+cleanup:
+    return status;
 }

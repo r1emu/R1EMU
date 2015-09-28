@@ -22,6 +22,9 @@
 #define packetStreamIn(self, data) \
     packetStreamAppend(self, (void *) (data), sizeof(*(data)))
 
+#define packetStreamOut(self, data) \
+    packetStreamGet(self, (void *) (data), sizeof(*(data)))
+
 /**
  * @brief PacketStream is a buffer with a pointer to the last data written
  *
@@ -63,13 +66,22 @@ void packetStreamAddOffset(PacketStream *self, unsigned int offset);
 void *packetStreamGetCurrentBuffer(PacketStream *self);
 
 /**
- * @brief
+ * @brief Put data at the end of the stream
  * @param self An allocated PacketStream
  * @param data The data to append to the packet
  * @param dataSize the size of the data
  * @return
  */
 void packetStreamAppend(PacketStream *self, void *data, size_t dataSize);
+
+/**
+ * @brief Get the data from the current stream position and remove it
+ * @param self An allocated PacketStream
+ * @param data The data to append to the packet
+ * @param dataSize the size of the data
+ * @return
+ */
+void packetStreamGet(PacketStream *self, void *data, size_t dataSize);
 
 /**
  * @brief Free an allocated PacketStream structure and nullify the content of the pointer.

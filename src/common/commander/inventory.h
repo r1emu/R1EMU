@@ -117,10 +117,10 @@ typedef struct Inventory
 
 typedef struct InventorySPacket
 {
-    Item equippedItems[0]; // Const Size : EQSLOT_COUNT
+    ItemSPacket equippedItems[0]; // Const Size : EQSLOT_COUNT
 
-    uint32_t itemsCount;
-    Item items[0];
+    size_t itemsCount;
+    ItemSPacket items[0]; // Size : itemsCount
 
 }   InventorySPacket;
 
@@ -178,3 +178,4 @@ bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2);
 
 size_t inventoryGetSPacketSize(Inventory *self);
 void inventorySPacket(Inventory *self, PacketStream *stream);
+void inventoryUnpacket(Inventory *self, PacketStream *stream);

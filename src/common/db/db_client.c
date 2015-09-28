@@ -107,7 +107,7 @@ static bool dbClientAddKeysToMessage(DbClient *self, zmsg_t *request, char **key
 
     bool status = false;
 
-    for (size_t keyIdx; keyIdx < keysCount; keyIdx++) {
+    for (size_t keyIdx = 0; keyIdx < keysCount; keyIdx++) {
         // add all the keys requested to the message
         if (zmsg_addstr(request, keys[keyIdx]) != 0) {
             dbClientError(self, "Cannot add key to message.");

@@ -160,3 +160,4 @@ bool accountSessionIsCommanderSlotEmpty(AccountSession *self, int commanderIndex
 
 size_t accountSessionGetPacketSize(AccountSession *self);
 void accountSessionSPacket(AccountSession *self, PacketStream *stream);
+void accountSessionUnpacket(AccountSession *self, PacketStream *stream);

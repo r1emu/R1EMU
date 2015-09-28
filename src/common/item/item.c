@@ -53,6 +53,25 @@ bool itemInit(Item *self, uint64_t itemId, uint32_t itemType, uint32_t amount, u
     return true;
 }
 
+bool itemDup(Item *self, Item **out) {
+
+    bool status = false;
+    Item *dup = NULL;
+
+    if (!(dup = itemNew(self->itemId, self->itemType, self->amount, self->inventoryIndex))) {
+        error("Cannot duplicate a new item.");
+        goto cleanup;
+    }
+
+    dup->attributes = self->attributes;
+
+    status = true;
+    *out = dup;
+
+cleanup:
+    return status;
+}
+
 bool itemAddAttribute(Item *self, ItemAttributeId itemAttrId, void *value) {
 
     if (!(itemAttributesAdd(&self->attributes, itemAttrId, value))) {
@@ -128,4 +147,14 @@ void itemSPacket(Item *self, PacketStream *stream) {
     packetStreamIn(stream, &self->inventoryIndex);
     packetStreamIn(stream, &self->itemCategory);
     itemAttributesSPacket(&self->attributes, stream);
+}
+
+void itemUnpacket(Item *self, PacketStream *stream) {
+    packetStreamOut(stream, &self->itemId);
+    packetStreamOut(stream, &self->itemType);
+    packetStreamOut(stream, &self->amount);
+    packetStreamOut(stream, &self->inventoryIndex);
+    packetStreamOut(stream, &self->itemCategory);
+    itemAttributesUnpacket(&self->attributes, stream);
+    #warning TODO : return bool
 }

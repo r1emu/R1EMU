@@ -53,8 +53,8 @@ typedef struct ItemAttributes {
 } ItemAttributes;
 
 typedef struct ItemAttributesSPacket {
-    uint32_t attributesCount;
-    ItemAttribute attributes[0];
+    size_t attributesCount;
+    ItemAttributeSPacket attributes[0];
 } ItemAttributesSPacket;
 
 typedef enum ItemAttributeId {
@@ -111,3 +111,4 @@ void itemAttributesDestroy(ItemAttributes **_self);
 
 size_t itemAttributesGetSPacketSize(ItemAttributes *self);
 void itemAttributesSPacket(ItemAttributes *self, PacketStream *stream);
+bool itemAttributesUnpacket(ItemAttributes *self, PacketStream *stream);

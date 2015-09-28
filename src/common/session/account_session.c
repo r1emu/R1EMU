@@ -161,7 +161,6 @@ size_t accountSessionGetPacketSize(AccountSession *self) {
     return packetSize;
 }
 
-
 void accountSessionSPacket(AccountSession *self, PacketStream *stream) {
 
     packetStreamIn(stream, self->accountName);
@@ -179,7 +178,29 @@ void accountSessionSPacket(AccountSession *self, PacketStream *stream) {
     packetStreamIn(stream, &commandersCount);
 
     for (size_t i = 0; i < self->commandersCountMax; i++) {
-        commanderSPacket(self->commanders[i], stream);
+        if (self->commanders[i] != NULL) {
+            commanderSPacket(self->commanders[i], stream);
+        }
     }
 }
 
+void accountSessionUnpacket(AccountSession *self, PacketStream *stream) {
+
+    packetStreamOut(stream, self->accountName);
+    packetStreamOut(stream, self->familyName);
+    packetStreamOut(stream, self->sessionKey);
+    packetStreamOut(stream, &self->privilege);
+    packetStreamOut(stream, &self->isBanned);
+    packetStreamOut(stream, &self->timeBanned);
+    packetStreamOut(stream, &self->credits);
+    packetStreamOut(stream, &self->timeLastLogin);
+    packetStreamOut(stream, &self->barrackType);
+    packetStreamOut(stream, &self->commandersCountMax);
+
+    size_t commandersCount;
+    packetStreamOut(stream, &commandersCount);
+
+    for (size_t i = 0; i < commandersCount; i++) {
+        commanderUnpacket(self->commanders[i], stream);
+    }
+}

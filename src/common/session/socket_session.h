@@ -88,10 +88,6 @@ bool socketSessionInit(
     uint8_t *socketId,
     bool authenticated);
 
-
-size_t socketSessionGetPacketSize(SocketSession *self);
-void socketSessionSPacket(SocketSession *self, PacketStream *stream);
-
 /**
  * @brief Format a session key from the session id
  * @param sessionId The sessionId of the session requested
@@ -119,3 +115,18 @@ void socketSessionPrint(SocketSession *self);
  * @param self A pointer to an allocated SocketSession.
  */
 void socketSessionDestroy(SocketSession **self);
+
+/**
+ * @brief Get the packet size of the packet structure
+ */
+size_t socketSessionGetPacketSize(SocketSession *self);
+
+/**
+ * @brief Get the packet data from the server structure
+ */
+void socketSessionSPacket(SocketSession *self, PacketStream *stream);
+
+/**
+ * @brief Get the server data from the packet structure
+ */
+void socketSessionUnpacket(SocketSession *self, PacketStream *stream);

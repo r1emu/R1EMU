@@ -318,7 +318,6 @@ void inventoryPrintBag(Inventory *self, InventoryCategory category) {
     }
 }
 
-
 size_t inventoryGetSPacketSize(Inventory *self) {
     size_t packetSize = 0;
 
@@ -352,5 +351,19 @@ void inventorySPacket(Inventory *self, PacketStream *stream) {
     // Write inventory items
     for (Item *item = zhash_first(self->items); item != NULL; item = zhash_next(self->items)) {
         itemSPacket(item, stream);
+    }
+}
+
+void inventoryUnpacket(Inventory *self, PacketStream *stream) {
+
+    // Equipped items
+    for (size_t i = 0; i < EQSLOT_COUNT; i++) {
+        itemUnpacket(self->equippedItems[i], stream);
+    }
+
+    size_t itemsCount;
+    packetStreamOut(stream, &itemsCount);
+
+    for (size_t i = 0; i < itemsCount; i++) {
     }
 }

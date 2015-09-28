@@ -87,3 +87,4 @@ void gameSessionFree(GameSession *self);
 
 size_t gameSessionGetPacketSize(GameSession *self);
 void gameSessionSPacket(GameSession *self, PacketStream *stream);
+void gameSessionUnpacket(GameSession *self, PacketStream *stream);
