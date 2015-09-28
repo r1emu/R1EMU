@@ -44,7 +44,7 @@ static zframe_t *workerHandlePingPacket(void);
  * @param msg The message of the client
  * @return true on success, false otherwise
  */
-static bool workerProcessClientPacket(Worker *self, zmsg_t *msg);
+static bool workerProcessCPacket(Worker *self, zmsg_t *msg);
 
 /**
  * @brief Handle a request from the public ports
@@ -280,7 +280,7 @@ static zframe_t *workerHandlePingPacket(void) {
     return zframe_new(PACKET_HEADER (ROUTER_PONG), sizeof(ROUTER_PONG));
 }
 
-static bool workerProcessClientPacket(Worker *self, zmsg_t *msg) {
+static bool workerProcessCPacket(Worker *self, zmsg_t *msg) {
     bool result = false;
     zframe_t *headerAnswer = NULL;
 
@@ -524,7 +524,7 @@ workerHandlePacket(
     PacketHandlerState status = PACKET_HANDLER_ERROR;
 
     // Read the packet
-    ClientPacketHeader header;
+    CPacketHeader header;
     clientPacketUnwrapHeader(&packet, &packetSize, &header, isCrypted);
 
     // Get the corresponding packet handler
@@ -771,7 +771,7 @@ static int workerHandlePublicRequest(zloop_t *loop, zsock_t *worker, void *_self
         goto cleanup;
     }
 
-    if (!(workerProcessClientPacket(self, msg))) {
+    if (!(workerProcessCPacket(self, msg))) {
         workerError(self, "Cannot handle correctly the client packet.");
         result = 0;
         // Don't return, we want to send back an answer so the Worker doesn't quit

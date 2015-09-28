@@ -25,36 +25,33 @@
 #define ITEM_ATTRIBUTE_CUSTOM_NAME "custom_name"
 #define ITEM_ATTRIBUTE_CRAFTER_NAME "crafter_name"
 
-// attribute ID size
-typedef uint16_t AttributeId;
-
-/** Attribute packets structure */
+/** Attribute structure */
 #pragma pack(push, 1)
-typedef struct ItemAttributeFloatPacket {
-    AttributeId attributeId;
+typedef struct ItemAttributeFloat {
     float value;
-} ItemAttributeFloatPacket;
+} ItemAttributeFloat;
 #pragma pack(pop)
 
-#define DECLARE_ItemAttributeStringPacket(x) \
-typedef struct ItemAttributeStringPacket {   \
-    AttributeId attributeId;                 \
-    uint16_t valueSize;                      \
-    uint8_t  value[x];                       \
-} ItemAttributeStringPacket;                 \
+typedef ItemAttributeFloat ItemAttributeFloatCPacket;
+typedef ItemAttributeFloat ItemAttributeFloatSPacket;
 
-/** ItemAttribute formats */
-typedef enum AttributeFormat {
-    FLOAT_ATTRIBUTE,
-    STRING_ATTRIBUTE,
-} AttributeFormat;
+#define DECLARE_ItemAttributeString(x)        \
+typedef struct ItemAttributeString {          \
+    uint16_t valueSize;                       \
+    uint8_t  value[x];                        \
+} ItemAttributeString;
 
-/** ItemAttribute data */
-typedef struct ItemAttribute {
-    AttributeFormat format;
-    AttributeId attributeId;
-    void *value;
-} ItemAttribute;
+#define DECLARE_ItemAttributeStringCPacket(x) \
+typedef struct ItemAttributeStringCPacket {   \
+    uint16_t valueSize;                       \
+    uint8_t  value[x];                        \
+} ItemAttributeStringCPacket;
+
+#define DECLARE_ItemAttributeStringSPacket(x) \
+typedef struct ItemAttributeStringSPacket {   \
+    uint16_t valueSize;                       \
+    uint8_t  value[x];                        \
+} ItemAttributeStringSPacket;
 
 /** key <-> format mapping */
 struct ItemAttributeKeyFormat {
@@ -73,10 +70,12 @@ struct ItemAttributeKeyFormat {
 /** Private ItemAttribute functions */
 static ItemAttribute *itemAttributeNew(AttributeId attributeId, AttributeFormat format, void *value);
 static bool itemAttributeInit(ItemAttribute *self, AttributeId attributeId, AttributeFormat format, void *value);
-static void itemAttributeGetPacket(ItemAttribute *self, PacketStream *packetStream);
-static size_t itemAttributeGetPacketSize(ItemAttribute *self);
+static void itemAttributeCPacket(ItemAttribute *self, PacketStream *packetStream);
+static size_t itemAttributeGetCPacketSize(ItemAttribute *self);
 static void itemAttributeFree(ItemAttribute *self);
 static void itemAttributeDestroy(ItemAttribute **_self);
+
+static size_t itemAttributeGetSPacketSize(ItemAttribute *self);
 
 ItemAttributes *itemAttributesNew(void) {
     ItemAttributes *self;
@@ -120,20 +119,60 @@ ItemAttribute *itemAttributeNew(AttributeId attributeId, AttributeFormat format,
     return self;
 }
 
+ItemAttributeFloat *itemAttributeFloatNew(float value) {
+
+    ItemAttributeFloat *self = NULL;
+
+    if (!(self = malloc(sizeof(ItemAttributeFloat)))) {
+        error("Cannot allocate an item attribute float.");
+        return NULL;
+    }
+
+    self->value = value;
+
+    return self;
+}
+
+void *itemAttributeStringNew(size_t valueSize, char *value) {
+
+    DECLARE_ItemAttributeString(valueSize);
+    ItemAttributeString *self = NULL;
+
+    if (!(self = malloc(sizeof(ItemAttributeString)))) {
+        error("Cannot allocate an item attribute float.");
+        return NULL;
+    }
+
+    self->valueSize = valueSize;
+    strncpy(self->value, value, valueSize);
+
+    return self;
+}
+
 bool itemAttributeInit(ItemAttribute *self, AttributeId attributeId, AttributeFormat format, void *value) {
 
+    memset(self, 0, sizeof(*self));
     bool status = false;
 
     self->format = format;
 
     switch (format) {
-        case FLOAT_ATTRIBUTE:
-            self->value = floatdup(value);
+        case FLOAT_ATTRIBUTE: {
+            if (!(self->value = itemAttributeFloatNew(*(float *) value))) {
+                error("Cannot allocate a float item attribute.");
+                goto cleanup;
+            }
             break;
+        }
 
-        case STRING_ATTRIBUTE:
-            self->value = strdup(value);
+        case STRING_ATTRIBUTE: {
+            size_t valueSize = strlen(value) + 1;
+            if (!(self->value = itemAttributeStringNew(valueSize, value))) {
+                error("Cannot allocate a string item attribute.");
+                goto cleanup;
+            }
             break;
+        }
 
         default:
             error("Unknown attribute format. Please complete this function.");
@@ -146,53 +185,47 @@ cleanup:
     return status;
 }
 
-size_t itemAttributesGetPacketSize(ItemAttributes *self) {
+size_t itemAttributesGetCPacketSize(ItemAttributes *self) {
 
-    size_t size = 0;
+    size_t packetSize = 0;
 
     for (ItemAttribute *attr = zhash_first(self->hashtable); attr != NULL; attr = zhash_next(self->hashtable)) {
-        size += itemAttributeGetPacketSize(attr);
+        packetSize += itemAttributeGetCPacketSize(attr);
     }
 
-    return size;
+    return packetSize;
 }
 
-void itemAttributeFloatGetPacket(ItemAttribute *self, PacketStream *packetStream) {
+void itemAttributeFloatCPacket(ItemAttribute *self, PacketStream *stream) {
 
-    ItemAttributeFloatPacket attributePacket = {
-        .attributeId = self->attributeId,
-        .value = *(float *) self->value
-    };
-
-    packetStreamAppend(packetStream, &attributePacket, sizeof(attributePacket));
+    ItemAttributeFloat *attributePacket = self->value;
+    packetStreamIn(stream, &attributePacket->value);
 }
 
-void itemAttributeStringGetPacket(ItemAttribute *self, PacketStream *packetStream) {
+void itemAttributeStringCPacket(ItemAttribute *self, PacketStream *stream) {
 
-    size_t valueSize = strlen(self->value) + 1;
+    uint16_t valueSize = *(uint16_t *) self->value; // StringPacket begins with size
 
     #pragma pack(push, 1)
-    DECLARE_ItemAttributeStringPacket(valueSize);
+    DECLARE_ItemAttributeString(valueSize);
     #pragma pack(pop)
 
-    ItemAttributeStringPacket attributePacket;
-    attributePacket.attributeId = self->attributeId;
-    attributePacket.valueSize = strlen(self->value);
-    strncpy(attributePacket.value, self->value, valueSize);
+    ItemAttributeString *attributePacket = self->value;
 
-    packetStreamAppend(packetStream, &attributePacket, sizeof(attributePacket));
+    packetStreamIn(stream, &attributePacket->valueSize);
+    packetStreamIn(stream, attributePacket->value);
 }
 
-void itemAttributeGetPacket(ItemAttribute *self, PacketStream *packetStream) {
+void itemAttributeCPacket(ItemAttribute *self, PacketStream *stream) {
 
     switch (self->format) {
 
         case FLOAT_ATTRIBUTE:
-            itemAttributeFloatGetPacket(self, packetStream);
+            itemAttributeFloatCPacket(self, stream);
             break;
 
         case STRING_ATTRIBUTE:
-            itemAttributeStringGetPacket(self, packetStream);
+            itemAttributeStringCPacket(self, stream);
             break;
 
         default:
@@ -201,38 +234,38 @@ void itemAttributeGetPacket(ItemAttribute *self, PacketStream *packetStream) {
     }
 }
 
-void itemAttributesGetPacket(ItemAttributes *self, PacketStream *packetStream) {
+void itemAttributesCPacket(ItemAttributes *self, PacketStream *stream) {
 
     for (ItemAttribute *value = zhash_first(self->hashtable); value != NULL; value = zhash_next(self->hashtable)) {
-        itemAttributeGetPacket(value, packetStream);
+        itemAttributeCPacket(value, stream);
     }
 }
 
-static size_t itemAttributeFloatGetPacketSize(ItemAttribute *self) {
-    return sizeof(ItemAttributeFloatPacket);
+static size_t itemAttributeFloatGetCPacketSize(ItemAttribute *self) {
+    return sizeof(ItemAttributeFloatCPacket);
 }
 
-static size_t itemAttributeStringGetPacketSize(ItemAttribute *self) {
+static size_t itemAttributeStringGetCPacketSize(ItemAttribute *self) {
 
     #pragma pack(push, 1)
-    DECLARE_ItemAttributeStringPacket(strlen(self->value));
+    DECLARE_ItemAttributeStringCPacket(strlen(self->value));
     #pragma pack(pop)
 
-    return sizeof(ItemAttributeStringPacket);
+    return sizeof(ItemAttributeStringCPacket);
 }
 
-static size_t itemAttributeGetPacketSize(ItemAttribute *self) {
+static size_t itemAttributeGetCPacketSize(ItemAttribute *self) {
 
-    size_t size = 0;
+    size_t packetSize = 0;
 
     switch (self->format) {
 
         case FLOAT_ATTRIBUTE:
-            size = itemAttributeFloatGetPacketSize(self);
+            packetSize = itemAttributeFloatGetCPacketSize(self);
             break;
 
         case STRING_ATTRIBUTE:
-            size = itemAttributeStringGetPacketSize(self);
+            packetSize = itemAttributeStringGetCPacketSize(self);
             break;
 
         default:
@@ -240,7 +273,7 @@ static size_t itemAttributeGetPacketSize(ItemAttribute *self) {
             break;
     }
 
-    return size;
+    return packetSize;
 }
 
 bool itemAttributesGet(ItemAttributes *self, ItemAttributeId itemAttrId, void **_output) {
@@ -372,5 +405,110 @@ void itemAttributeDestroy(ItemAttribute **_self) {
     if (_self && self) {
         itemAttributeFree(self);
         *_self = NULL;
+    }
+}
+
+static size_t itemAttributeFloatGetSPacketSize(ItemAttribute *self) {
+    return sizeof(ItemAttributeFloatSPacket);
+}
+
+static size_t itemAttributeStringGetSPacketSize(ItemAttribute *self) {
+
+    size_t valueSize = strlen(self->value) + 1;
+
+    #pragma pack(push, 1)
+    DECLARE_ItemAttributeStringSPacket(valueSize);
+    #pragma pack(pop)
+
+    return sizeof(ItemAttributeStringSPacket);
+}
+
+static size_t itemAttributeGetSPacketSize(ItemAttribute *self) {
+
+    size_t packetSize = 0;
+
+    packetSize += sizeof(ItemAttributeSPacket);
+
+    switch (self->format) {
+
+        case FLOAT_ATTRIBUTE:
+            packetSize += itemAttributeFloatGetSPacketSize(self);
+            break;
+
+        case STRING_ATTRIBUTE:
+            packetSize += itemAttributeStringGetSPacketSize(self);
+            break;
+
+        default:
+            warning("Unknown attribute format. Please complete this function.");
+            break;
+    }
+
+    return packetSize;
+}
+
+void itemAttributeFloatSPacket(ItemAttribute *self, PacketStream *stream) {
+
+    ItemAttributeFloat *attributePacket = self->value;
+    packetStreamIn(stream, &attributePacket->value);
+}
+
+void itemAttributeStringSPacket(ItemAttribute *self, PacketStream *stream) {
+
+    uint16_t valueSize = *(uint16_t *) self->value; // StringPacket begins with size
+
+    #pragma pack(push, 1)
+    DECLARE_ItemAttributeString(valueSize);
+    #pragma pack(pop)
+
+    ItemAttributeString *attributePacket = self->value;
+
+    packetStreamIn(stream, &attributePacket->valueSize);
+    packetStreamIn(stream, attributePacket->value);
+}
+
+void itemAttributeSPacket(ItemAttribute *self, PacketStream *stream) {
+
+    packetStreamIn(stream, &self->format);
+    packetStreamIn(stream, &self->attributeId);
+
+    switch (self->format) {
+
+        case FLOAT_ATTRIBUTE:
+            itemAttributeFloatSPacket(self, stream);
+            break;
+
+        case STRING_ATTRIBUTE:
+            itemAttributeStringSPacket(self, stream);
+            break;
+
+        default:
+            warning("Unknown attribute format. Please complete this function.");
+            break;
+    }
+}
+
+size_t itemAttributesGetSPacketSize(ItemAttributes *self) {
+
+    size_t packetSize = 0;
+
+    packetSize += sizeof(ItemAttributesSPacket);
+
+    // Get size of all attributes
+    for (ItemAttribute *attr = zhash_first(self->hashtable); attr != NULL; attr = zhash_next(self->hashtable)) {
+        packetSize += itemAttributeGetSPacketSize(attr);
+    }
+
+    return packetSize;
+}
+
+void itemAttributesSPacket(ItemAttributes *self, PacketStream *stream) {
+
+    uint32_t attributesCount = zhash_size(self->hashtable);
+    packetStreamIn(stream, &attributesCount);
+
+    // Write all attributes
+    for (ItemAttribute *attr = zhash_first(self->hashtable); attr != NULL; attr = zhash_next(self->hashtable)) {
+        itemAttributeSPacket(attr, stream);
     }
 }

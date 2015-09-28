@@ -126,7 +126,7 @@ static PacketHandlerState zoneHandlerChat(
     zmsg_t *replyMsg)
 {
     // the first 2 bytes of ZC_CHAT are the packet size
-    size_t msgSize = *((uint16_t *) packet) - sizeof(ClientPacketHeader) - sizeof(uint16_t);
+    size_t msgSize = *((uint16_t *) packet) - sizeof(CPacketHeader) - sizeof(uint16_t);
 
     #pragma pack(push, 1)
     struct {

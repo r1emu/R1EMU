@@ -53,15 +53,25 @@ typedef struct Item {
     ItemAttributes attributes;
 } Item;
 
+typedef struct ItemSPacket {
+    uint64_t itemId;
+    uint32_t itemType;
+    uint32_t amount;
+    uint32_t inventoryIndex;
+    int itemCategory;
+
+    ItemAttributes attributes[0]; // Always size 1
+} ItemSPacket;
+
 /**
- * @brief ItemPacket is the packet structure of an item
+ * @brief ItemCPacket is the client packet structure of an item
  */
-typedef struct ItemPacket {
+typedef struct ItemCPacket {
     uint64_t uniqueId;
     uint32_t id;
     uint32_t amount;
     uint32_t inventoryIndex;
-} ItemPacket;
+} ItemCPacket;
 
 // ----------- Functions ------------
 
@@ -102,3 +112,7 @@ bool itemAddAttribute(Item *self, ItemAttributeId itemAttrId, void *value);
 bool itemGetAttribute(Item *self, ItemAttributeId itemAttrId, void **value);
 bool itemUpdateAttribute(Item *self, ItemAttributeId itemAttrId, void *value);
 bool itemRemoveAttribute(Item *self, ItemAttributeId itemAttrId);
+
+
+size_t itemGetSPacketSize(Item *self);
+void itemSPacket(Item *self, PacketStream *stream);

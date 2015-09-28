@@ -146,3 +146,40 @@ void accountSessionDestroy(AccountSession **_self) {
 void accountSessionFree (AccountSession *self) {
     free(self);
 }
+
+size_t accountSessionGetPacketSize(AccountSession *self) {
+    size_t packetSize = 0;
+
+    packetSize += sizeof(AccountSessionPacket);
+
+    for (size_t i = 0; i < self->commandersCountMax; i++) {
+        if (self->commanders[i] != NULL) {
+            packetSize += commanderGetSPacketSize(self->commanders[i]);
+        }
+    }
+
+    return packetSize;
+}
+
+
+void accountSessionSPacket(AccountSession *self, PacketStream *stream) {
+
+    packetStreamIn(stream, self->accountName);
+    packetStreamIn(stream, self->familyName);
+    packetStreamIn(stream, self->sessionKey);
+    packetStreamIn(stream, &self->privilege);
+    packetStreamIn(stream, &self->isBanned);
+    packetStreamIn(stream, &self->timeBanned);
+    packetStreamIn(stream, &self->credits);
+    packetStreamIn(stream, &self->timeLastLogin);
+    packetStreamIn(stream, &self->barrackType);
+    packetStreamIn(stream, &self->commandersCountMax);
+
+    size_t commandersCount = accountSessionGetCommandersCount(self);
+    packetStreamIn(stream, &commandersCount);
+
+    for (size_t i = 0; i < self->commandersCountMax; i++) {
+        commanderSPacket(self->commanders[i], stream);
+    }
+}
+

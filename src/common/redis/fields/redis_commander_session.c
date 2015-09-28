@@ -72,8 +72,8 @@ bool redisUpdateCommanderSession(
     redisReply *reply = NULL;
 
     Commander *commander = commanderSession->currentCommander;
-    CommanderAppearance *appearance = &commander->appearance;
-    CommanderEquipment *equipment = &appearance->equipment;
+    CommanderAppearanceCPacket *appearance = &commander->appearance;
+    CommanderEquipmentCPacket *equipment = &appearance->equipment;
 
     // Commander
     reply = redisCommandDbg(self,
@@ -275,8 +275,8 @@ bool redisGetCommanderSession(Redis *self, RedisCommanderSessionKey *key, Comman
 
             /// Write the reply to the session
             Commander *commander = commanderSession->currentCommander;
-            CommanderAppearance *appearance = &commander->appearance;
-            CommanderEquipment *equipment = &appearance->equipment;
+            CommanderAppearanceCPacket *appearance = &commander->appearance;
+            CommanderEquipmentCPacket *equipment = &appearance->equipment;
 
             COPY_REDIS_COMMANDER_STR(appearance->commanderName, commanderName);
             COPY_REDIS_COMMANDER_STR(appearance->familyName, familyName);

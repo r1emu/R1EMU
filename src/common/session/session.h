@@ -23,12 +23,15 @@
 /**
  * @brief Session is a general structure englobing all the session stuff
  */
-struct Session {
+typedef struct Session {
     SocketSession socket;
     GameSession game;
-};
+}   Session;
 
-typedef struct Session Session;
+typedef struct SessionPacket {
+    SocketSessionPacket socket;
+    GameSessionPacket game;
+}   SessionPacket;
 
 /**
  * @brief Allocate a new Session structure.

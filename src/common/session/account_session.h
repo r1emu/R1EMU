@@ -33,12 +33,12 @@ typedef enum AccountSessionPrivileges {
     ACCOUNT_SESSION_PRIVILEGES_PLAYER  = 3
 }   AccountSessionPrivileges;
 
-/**
- * @brief
- */
-struct AccountSession {
+#pragma pack(push, 1)
+typedef struct AccountSessionPacket {
+
     // The account login
     uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
+    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
 
     // Session key
     uint8_t sessionKey[SOCKET_SESSION_ID_SIZE];
@@ -46,17 +46,51 @@ struct AccountSession {
     // Account privilege level
     AccountSessionPrivileges privilege;
 
+    // Account state
     uint64_t accountId;
     bool isBanned;
     time_t timeBanned;
     float credits;
     time_t timeLastLogin;
-    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
-    uint32_t barrackType;
 
-    // Array of commanders in the barrack
+    // Barrack
+    uint32_t barrackType;
+    size_t commandersCountMax; // Number max of commanders in the current barrack
+
+    // Commanders
+    size_t commanderCount;
+    CommanderSPacket commanders[0]; // Array of size commanderCount
+
+}   AccountSessionPacket;
+#pragma pack(pop)
+
+/**
+ * @brief
+ */
+struct AccountSession {
+    // The account login
+    uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
+    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
+
+    // Session key
+    uint8_t sessionKey[SOCKET_SESSION_ID_SIZE];
+
+    // Account privilege level
+    AccountSessionPrivileges privilege;
+
+    // Account state
+    uint64_t accountId;
+    bool isBanned;
+    time_t timeBanned;
+    float credits;
+    time_t timeLastLogin;
+
+    // Barrack
+    uint32_t barrackType;
+    size_t commandersCountMax; // Number max of commanders in the current barrack
+
+    // Commanders
     Commander **commanders;
-    size_t commandersCountMax;
 };
 
 typedef struct AccountSession AccountSession;
@@ -122,3 +156,7 @@ void accountSessionFree(AccountSession *self);
  * @param commanderIndex the slot index to look into
  */
 bool accountSessionIsCommanderSlotEmpty(AccountSession *self, int commanderIndex);
+
+
+size_t accountSessionGetPacketSize(AccountSession *self);
+void accountSessionSPacket(AccountSession *self, PacketStream *stream);

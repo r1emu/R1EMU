@@ -53,3 +53,18 @@ void sessionDestroy(Session **_self) {
     free(self);
     *_self = NULL;
 }
+
+size_t sessionGetPacketSize(Session *self) {
+    size_t packetSize = 0;
+
+    packetSize += socketSessionGetPacketSize(&self->socket);
+    packetSize += gameSessionGetPacketSize(&self->game);
+
+    return packetSize;
+}
+
+void sessionSPacket(Session *self, PacketStream *stream) {
+
+    socketSessionSPacket(&self->socket, stream);
+    gameSessionSPacket(&self->game, stream);
+}

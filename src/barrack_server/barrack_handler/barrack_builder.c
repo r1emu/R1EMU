@@ -245,7 +245,7 @@ void barrackBuilderCommanderList(
     // Keep sizes in memory
     size_t commanderBarrackInfoPacketSize = 0;
     size_t attributesSizeAllCommanders[commandersCount];
-    size_t attributeSizeAllCommanders[commandersCount][EQSLOT_Count];
+    size_t attributeSizeAllCommanders[commandersCount][EQSLOT_COUNT];
 
     for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
 
@@ -255,12 +255,12 @@ void barrackBuilderCommanderList(
 
         // get attributes size
         size_t attributesSize = 0;
-        for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_Count; eqSlotIndex++) {
+        for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
 
             Item *item = inventory->equippedItems[eqSlotIndex];
 
             // get attribute size
-            size_t attrSize = item ? itemAttributesGetPacketSize(&item->attributes) : 0;
+            size_t attrSize = item ? itemAttributesGetCPacketSize(&item->attributes) : 0;
 
             // get total structure size
             #pragma pack(push, 1)
@@ -279,7 +279,7 @@ void barrackBuilderCommanderList(
         // get CommanderBarrackInfoPacket size
         #pragma pack(push, 1)
         typedef struct {
-            CommanderAppearance commander;
+            CommanderAppearanceCPacket commander;
             uint64_t socialInfoId;
             uint16_t commanderPosition;
             uint16_t mapId;
@@ -365,7 +365,7 @@ void barrackBuilderCommanderList(
             size_t attributesSize = attributesSizeAllCommanders[commanderIndex];
             #pragma pack(push, 1)
             struct CommanderBarrackInfoPacket {
-                CommanderAppearance appearance;
+                CommanderAppearanceCPacket appearance;
                 uint64_t socialInfoId;
                 uint16_t commanderPosition;
                 uint16_t mapId;
@@ -406,7 +406,7 @@ void barrackBuilderCommanderList(
             size_t offset = offsetof(struct CommanderBarrackInfoPacket, attributesPacket);
             packetStreamAddOffset(&packetStream, offset);
 
-            for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_Count; eqSlotIndex++) {
+            for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
 
                 Item *item = inventory->equippedItems[eqSlotIndex];
 
@@ -429,7 +429,7 @@ void barrackBuilderCommanderList(
 
                 // write in the buffer
                 if (item) {
-                    itemAttributesGetPacket(&item->attributes, packetStreamGetCurrentBuffer(&packetStream));
+                    itemAttributesCPacket(&item->attributes, packetStreamGetCurrentBuffer(&packetStream));
                     // relocate the stream position
                     packetStreamAddOffset(&packetStream, attrSize);
                 }

@@ -29,7 +29,7 @@ bool mySqlGetCommanders(MySQL *self, Commander **commanders) {
         curCommander->commanderId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
         curCommander->socialInfoId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
 
-        CommanderAppearance *appearance = &curCommander->appearance;
+        CommanderAppearanceCPacket *appearance = &curCommander->appearance;
         strncpy(appearance->commanderName, row[MYSQL_COMMANDER_FIELD_commanderName], sizeof(appearance->commanderName));
         appearance->jobId = strtol(row[MYSQL_COMMANDER_FIELD_job_id], NULL, 10);
         appearance->classId = strtol(row[MYSQL_COMMANDER_FIELD_class_id], NULL, 10);
@@ -37,7 +37,7 @@ bool mySqlGetCommanders(MySQL *self, Commander **commanders) {
         appearance->gender = strtol(row[MYSQL_COMMANDER_FIELD_gender], NULL, 10);
         appearance->level = strtol(row[MYSQL_COMMANDER_FIELD_level], NULL, 10);
 
-        CommanderEquipment *equipment = &appearance->equipment;
+        CommanderEquipmentCPacket *equipment = &appearance->equipment;
         equipment->head_top = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_head_top], NULL, 10);
         equipment->head_middle = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_head_middle], NULL, 10);
         equipment->itemUnk1 = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_unkown_1], NULL, 10);
@@ -129,7 +129,7 @@ cleanup:
 bool mySqlCommanderInsert(MySQL *self, uint64_t accountId, Commander *commanderToCreate) {
 
     bool status = false;
-    CommanderAppearance *commander = &commanderToCreate->appearance;
+    CommanderAppearanceCPacket *commander = &commanderToCreate->appearance;
 
     // Insert a new commander
     if (mySqlQuery(self, "INSERT INTO commanders "

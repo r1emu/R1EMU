@@ -47,7 +47,6 @@ socketSessionNew (
     return self;
 }
 
-
 bool
 socketSessionInit(
     SocketSession *self,
@@ -112,4 +111,17 @@ socketSessionDestroy (
 
     free(self);
     *_self = NULL;
+}
+
+
+size_t socketSessionGetPacketSize(SocketSession *self) {
+    return sizeof(*self);
+}
+
+void socketSessionSPacket(SocketSession *self, PacketStream *stream) {
+    packetStreamIn(stream, &self->accountId);
+    packetStreamIn(stream, &self->routerId);
+    packetStreamIn(stream, &self->mapId);
+    packetStreamIn(stream, self->sessionKey);
+    packetStreamIn(stream, &self->authenticated);
 }

@@ -25,9 +25,37 @@
 // ---------- Defines -------------
 
 // ------ Structure declaration -------
+
+// attribute ID size
+typedef uint16_t AttributeId;
+
+/** ItemAttribute formats */
+typedef enum AttributeFormat {
+    FLOAT_ATTRIBUTE,
+    STRING_ATTRIBUTE,
+} AttributeFormat;
+
+/** ItemAttribute data */
+typedef struct ItemAttribute {
+    AttributeFormat format;
+    AttributeId attributeId;
+    void *value;
+} ItemAttribute;
+
+typedef struct ItemAttributeSPacket {
+    AttributeFormat format;
+    AttributeId attributeId;
+    uint8_t value[0]; // attribute data
+}   ItemAttributeSPacket;
+
 typedef struct ItemAttributes {
     zhash_t *hashtable;
 } ItemAttributes;
+
+typedef struct ItemAttributesSPacket {
+    uint32_t attributesCount;
+    ItemAttribute attributes[0];
+} ItemAttributesSPacket;
 
 typedef enum ItemAttributeId {
     ITEM_ATTRIBUTE_ID_DURABILITY     = 3770,
@@ -53,12 +81,12 @@ bool itemAttributesInit(ItemAttributes *self);
 /**
  * Get the packet structure of the ItemAttributes
  */
-void itemAttributesGetPacket(ItemAttributes *self, PacketStream *packetStream);
+void itemAttributesCPacket(ItemAttributes *self, PacketStream *packetStream);
 
 /**
  * Get the packet size of the itemAttributes
  */
-size_t itemAttributesGetPacketSize(ItemAttributes *self);
+size_t itemAttributesGetCPacketSize(ItemAttributes *self);
 
 /**
  * Get, add, update or remove an attribute from the item attributes
@@ -79,3 +107,7 @@ void itemAttributesFree(ItemAttributes *self);
  * @param self A pointer to an allocated ItemAttributes.
  */
 void itemAttributesDestroy(ItemAttributes **_self);
+
+
+size_t itemAttributesGetSPacketSize(ItemAttributes *self);
+void itemAttributesSPacket(ItemAttributes *self, PacketStream *stream);

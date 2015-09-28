@@ -63,6 +63,7 @@ commanderSessionDestroy (
     CommanderSession **_self
 ) {
     commanderSessionFree (*_self);
+    free(*_self);
     *_self = NULL;
 }
 
@@ -70,5 +71,18 @@ void
 commanderSessionFree (
     CommanderSession *self
 ) {
-    free(self);
 }
+
+
+size_t commanderSessionGetPacketSize(CommanderSession *self) {
+    size_t packetSize = 0;
+
+    packetSize += sizeof(CommanderSessionPacket);
+
+    return packetSize;
+}
+
+void commanderSessionSPacket(CommanderSession *self, PacketStream *stream) {
+
+}
+

@@ -13,11 +13,11 @@
 
 #include "packet.h"
 
-void clientPacketUnwrapHeader(uint8_t **packet, size_t *packetSize, ClientPacketHeader *header, bool isCrypted) {
-    int headerSize = sizeof(ClientPacketHeader);
+void clientPacketUnwrapHeader(uint8_t **packet, size_t *packetSize, CPacketHeader *header, bool isCrypted) {
+    int headerSize = sizeof(CPacketHeader);
 
     if (!isCrypted) {
-        headerSize -= sizeof_struct_member(ClientPacketHeader, checksum);
+        headerSize -= sizeof_struct_member(CPacketHeader, checksum);
     }
 
     memcpy(header, *packet, headerSize);

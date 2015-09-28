@@ -163,6 +163,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/packet/packet_type.h" />
+		<Unit filename="../../../src/common/redis/fields/redis_account_session.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/redis/fields/redis_account_session.h" />
+		<Unit filename="../../../src/common/redis/fields/redis_commander_session.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/redis/fields/redis_commander_session.h" />
 		<Unit filename="../../../src/common/redis/fields/redis_game_session.c">
 			<Option compilerVar="CC" />
 		</Unit>

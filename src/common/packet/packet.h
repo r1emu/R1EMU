@@ -41,7 +41,7 @@
 #define CHECK_CLIENT_PACKET_SIZE(packet, packetSize, packetType)                                    \
     do {                                                                                            \
         size_t __clientPacketSize = packetTypeInfo.packets[packetType].size                         \
-                                  - sizeof(ClientPacketHeader);                                     \
+                                  - sizeof(CPacketHeader);                                     \
         if (packetTypeInfo.packets[packetType].size != 0                                            \
          && sizeof(packet) != __clientPacketSize) {                                                 \
             error("The packet size sent isn't the equal to the one in packet_type.h");              \
@@ -58,14 +58,14 @@
     } while (0)
 
 /**
- * @brief ClientPacketHeader is the header of each packet sent by the client.
+ * @brief CPacketHeader is the header of each packet sent by the client.
  */
 #pragma pack(push, 1)
-typedef struct ClientPacketHeader {
+typedef struct CPacketHeader {
     uint16_t type;
     uint32_t sequence;
     uint32_t checksum;
-} ClientPacketHeader;
+} CPacketHeader;
 #pragma pack(pop)
 
 #pragma pack(push, 1)
@@ -96,13 +96,13 @@ typedef struct PacketNormalHeader {
 #pragma pack(pop)
 
 /**
- * @brief Unwrap the client packet header and stores it in the ClientPacketHeader argument
+ * @brief Unwrap the client packet header and stores it in the CPacketHeader argument
  * @param[in,out] packet A pointer to the packet to unwrap. Afterward, it points to the data of the packet.
  * @param[in,out] packetSize A pointer to the packetSize. Afterward, it is updated.
  * @param[out] header The header unwrapped from the packet
  * @return
  */
-void clientPacketUnwrapHeader(uint8_t **packet,size_t *packetSize, ClientPacketHeader *header, bool isCrypted);
+void clientPacketUnwrapHeader(uint8_t **packet,size_t *packetSize, CPacketHeader *header, bool isCrypted);
 
 /**
  * @brief Unwrap the crypt packet header and stores it in the header argument

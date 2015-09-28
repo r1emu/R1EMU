@@ -575,7 +575,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     commanderInit(&newCommander);
     newCommander.mapId = 1002; // FIXME : Start map could be loaded from
 
-    CommanderAppearance *commanderAppearance = &newCommander.appearance;
+    CommanderAppearanceCPacket *commanderAppearance = &newCommander.appearance;
 
     // Check name
     size_t commanderNameLen = strlen(clientPacket->commanderName);

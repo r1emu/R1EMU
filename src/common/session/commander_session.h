@@ -27,6 +27,10 @@ struct CommanderSession {
     Commander *currentCommander;
 };
 
+typedef struct CommanderSessionPacket {
+    int currentCommanderIndex; // -1 if not initialized
+}   CommanderSessionPacket;
+
 typedef struct CommanderSession CommanderSession;
 
 /**
@@ -60,3 +64,7 @@ void commanderSessionDestroy(CommanderSession **self);
  * @param self A pointer to an allocated CommanderSession.
  */
 void commanderSessionFree(CommanderSession *self);
+
+
+size_t commanderSessionGetPacketSize(CommanderSession *self);
+void commanderSessionSPacket(CommanderSession *self, PacketStream *stream);

@@ -23,11 +23,12 @@
 #define COMMANDER_FAMILY_NAME_SIZE 64
 #define COMMANDER_HEIGHT_JUMP 350.0f
 
-#pragma pack(push, 1)
 /**
- * @brief CommanderInfo is the struct of a commander.
+ * @brief CommanderEquipmentCPacket is the structure of the client packet send for
+ *        the commander equipment
  */
-typedef struct CommanderEquipment {
+#pragma pack(push, 1)
+typedef struct CommanderEquipmentCPacket {
     uint32_t head_top;
     uint32_t head_middle;
     uint32_t itemUnk1;
@@ -48,15 +49,33 @@ typedef struct CommanderEquipment {
     uint32_t ring_left;
     uint32_t ring_right;
     uint32_t necklace;
-} CommanderEquipment;
+} CommanderEquipmentCPacket;
 #pragma pack(pop)
 
 #pragma pack(push, 1)
+typedef struct CommanderEquipmentPacket {
+    uint32_t head_top;
+    uint32_t head_middle;
+    uint32_t body_armor;
+    uint32_t gloves;
+    uint32_t boots;
+    uint32_t helmet;
+    uint32_t bracelet;
+    uint32_t weapon;
+    uint32_t shield;
+    uint32_t costume;
+    uint32_t leg_armor;
+    uint32_t ring_left;
+    uint32_t ring_right;
+    uint32_t necklace;
+} CommanderEquipmentPacket;
+#pragma pack(pop)
+
 /**
- * @brief CommanderAppearance is the struct of a commander sent to the client
+ * @brief CommanderAppearanceCPacket is the struct of a commander sent to the client
  */
-typedef struct CommanderAppearance
-{
+#pragma pack(push, 1)
+typedef struct CommanderAppearanceCPacket {
     uint8_t commanderName[COMMANDER_NAME_SIZE+1];
     uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
     uint8_t unk2[7];
@@ -67,19 +86,37 @@ typedef struct CommanderAppearance
     uint8_t gender;
     uint8_t unk5;
     uint32_t level;
-    CommanderEquipment equipment;
+    CommanderEquipmentCPacket equipment;
     uint8_t hairId;
     uint8_t unk6;
     uint16_t pose;
-} CommanderAppearance;
+}   CommanderAppearanceCPacket;
 #pragma pack(pop)
 
-#pragma pack(push, 1)
+typedef struct CommanderAppearancePacket {
+
+    uint8_t commanderName[COMMANDER_NAME_SIZE+1];
+    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
+
+    uint64_t accountId;
+    uint16_t classId;
+    uint16_t jobId;
+    uint8_t hairId;
+
+    uint32_t level;
+    uint8_t gender;
+    uint16_t pose;
+
+    CommanderEquipmentPacket equipment[0]; // always 1
+
+}   CommanderAppearancePacket;
+
 /**
  * Structure of variables needed for BC_COMMANDER_CREATE
  */
+#pragma pack(push, 1)
 typedef struct CommanderCreatePacket {
-    CommanderAppearance appearance;
+    CommanderAppearanceCPacket appearance;
     uint64_t socialInfoId;
     uint16_t commanderPosition;
     uint16_t mapId;
@@ -98,34 +135,81 @@ typedef struct CommanderCreatePacket {
 /**
  * Contains all information about a commander
  */
-#pragma pack(push, 1)
-typedef struct
+typedef struct Commander
 {
-    CommanderAppearance appearance;
+    CommanderAppearanceCPacket appearance; /// REMOVEME
+    uint8_t commanderName[COMMANDER_NAME_SIZE+1];
+    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
+    uint64_t accountId;
+    uint16_t classId;
+    uint16_t jobId;
+    uint8_t hairId;
+    uint32_t level;
+    uint8_t gender;
+    uint16_t pose;
+
     Inventory inventory;
 
-    PositionXYZ pos;
-
-    uint32_t currentXP;
-    uint32_t maxXP;
-
+    uint16_t mapId;
     uint32_t pcId;
     uint64_t socialInfoId;
     uint64_t commanderId;
 
+    PositionXYZ pos;
+    PositionXZ dir;
+
+    uint16_t commanderArrayIndex; // index in the commander array
+
+    uint32_t currentXP;
+    uint32_t maxXP;
     uint32_t currentHP;
     uint32_t maxHP;
-
     uint16_t currentSP;
     uint16_t maxSP;
-
     uint32_t currentStamina;
     uint32_t maxStamina;
 
+} Commander;
+
+typedef struct CommanderSPacket
+{
+    uint8_t commanderName[COMMANDER_NAME_SIZE+1];
+    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
+
+    // Identifiers
+    uint64_t accountId;
+    uint64_t commanderId;
+    uint64_t socialInfoId;
+    uint32_t pcId;
+    uint16_t commanderArrayIndex;
+
+    // Class and appearance
+    uint16_t classId;
+    uint16_t jobId;
+    uint8_t hairId;
+    uint8_t gender;
+    uint16_t pose;
+
+    // Positionning
+    PositionXYZ pos;
+    PositionXZ dir;
     uint16_t mapId;
 
-} Commander;
-#pragma pack(pop)
+    // Stats
+    uint32_t level;
+    uint32_t currentXP;
+    uint32_t maxXP;
+    uint32_t currentHP;
+    uint32_t maxHP;
+    uint16_t currentSP;
+    uint16_t maxSP;
+    uint32_t currentStamina;
+    uint32_t maxStamina;
+
+    // Items
+    InventorySPacket inventory[0];
+
+}   CommanderSPacket;
 
 typedef enum CommanderJobId
 {
@@ -224,12 +308,12 @@ bool commanderInit(Commander *commander);
 /**
  * @brief Initialize a commander with basic information
  */
-bool commanderApparenceInit(CommanderAppearance *appearance);
+bool commanderApparenceInit(CommanderAppearanceCPacket *appearance);
 
 /**
  * @brief Print commander basic information
  */
-void commanderAppearancePrint(CommanderAppearance *appearance);
+void commanderAppearancePrint(CommanderAppearanceCPacket *appearance);
 void commanderPrint(Commander *commander);
 
 /**
@@ -242,3 +326,7 @@ Commander *commanderDup(Commander *src);
  */
 void commanderFree(Commander *self);
 void commanderDestroy(Commander **_self);
+
+
+size_t commanderGetSPacketSize(Commander *self);
+void commanderSPacket(Commander *self, PacketStream *stream);

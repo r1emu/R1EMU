@@ -48,7 +48,7 @@ bool inventoryInit(Inventory *self) {
         return false;
     }
 
-    for (int i = 0; i < INVENTORY_CAT_Count; i++) {
+    for (int i = 0; i < INVENTORY_CAT_COUNT; i++) {
         if (!(self->bags[i] = zlist_new())) {
             error("Cannot allocate list for bag [%d]", i);
             return false;
@@ -80,7 +80,7 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
         return false;
     }
 
-    if (itemToAdd->itemCategory > INVENTORY_CAT_Count) {
+    if (itemToAdd->itemCategory > INVENTORY_CAT_COUNT) {
         error("Item has invalid category");
         return false;
     }
@@ -273,7 +273,6 @@ bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2) {
     item2 = itemTemp;
 
     return true;
-
 }
 
 
@@ -316,5 +315,42 @@ void inventoryPrintBag(Inventory *self, InventoryCategory category) {
 
         item = zlist_next(self->bags[category]);
         index++;
+    }
+}
+
+
+size_t inventoryGetSPacketSize(Inventory *self) {
+    size_t packetSize = 0;
+
+    packetSize += sizeof(InventorySPacket);
+
+    // Get size of equipped items
+    for (size_t i = 0; i < EQSLOT_COUNT; i++) {
+        Item *item = self->equippedItems[i];
+        packetSize += itemGetSPacketSize(item);
+    }
+
+    // Get size of inventory items
+    for (Item *item = zhash_first(self->items); item != NULL; item = zhash_next(self->items)) {
+        packetSize += itemGetSPacketSize(item);
+    }
+
+    return packetSize;
+}
+
+void inventorySPacket(Inventory *self, PacketStream *stream) {
+
+    // Write equipped items
+    for (size_t i = 0; i < EQSLOT_COUNT; i++) {
+        Item *item = self->equippedItems[i];
+        itemSPacket(item, stream);
+    }
+
+    size_t itemsCount = zhash_size(self->items);
+    packetStreamIn(stream, &itemsCount);
+
+    // Write inventory items
+    for (Item *item = zhash_first(self->items); item != NULL; item = zhash_next(self->items)) {
+        itemSPacket(item, stream);
     }
 }

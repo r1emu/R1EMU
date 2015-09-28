@@ -17,6 +17,7 @@
 #pragma once
 
 #include "R1EMU.h"
+#include "common/packet/packet_stream.h"
 
 #define SOCKET_SESSION_UNDEFINED_MAP -1
 #define SOCKET_SESSION_UNDEFINED_ACCOUNT -1
@@ -26,7 +27,7 @@
 /**
  * @brief SocketSession identifies a session socket to an account
  */
-struct SocketSession {
+typedef struct SocketSession {
     // the account ID of the account associated with the socket
     uint64_t accountId;
 
@@ -41,9 +42,25 @@ struct SocketSession {
 
     // states
     bool authenticated;
-};
 
-typedef struct SocketSession SocketSession;
+}   SocketSession;
+
+typedef struct SocketSessionPacket {
+    // the account ID of the account associated with the socket
+    uint64_t accountId;
+
+    // the router ID handling the client socket
+    uint16_t routerId;
+
+    // the map Id of the commander currently played
+    uint16_t mapId;
+
+    // session Redis key
+    uint8_t sessionKey[SOCKET_SESSION_ID_SIZE];
+
+    // states
+    bool authenticated;
+}   SocketSessionPacket;
 
 /**
  * @brief Allocate a new SocketSession structure.
@@ -70,6 +87,10 @@ bool socketSessionInit(
     uint16_t mapId,
     uint8_t *socketId,
     bool authenticated);
+
+
+size_t socketSessionGetPacketSize(SocketSession *self);
+void socketSessionSPacket(SocketSession *self, PacketStream *stream);
 
 /**
  * @brief Format a session key from the session id

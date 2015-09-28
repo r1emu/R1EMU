@@ -33,6 +33,14 @@
  * This structure size must be kept as small as possible.
  * /!\ It shouldn't contain any pointer, because it is sent to others worker via TCP
  */
+typedef struct GameSessionPacket {
+    // Account session variables
+    AccountSessionPacket account;
+
+    // CommanderInfo session variables
+    CommanderSessionPacket commander;
+}   GameSessionPacket;
+
 struct GameSession {
     // Account session variables
     AccountSession accountSession;
@@ -75,3 +83,7 @@ void gameSessionDestroy(GameSession **self);
  * @param self A pointer to an allocated GameSession.
  */
 void gameSessionFree(GameSession *self);
+
+
+size_t gameSessionGetPacketSize(GameSession *self);
+void gameSessionSPacket(GameSession *self, PacketStream *stream);

@@ -111,3 +111,21 @@ void itemDestroy(Item **_self) {
         *_self = NULL;
     }
 }
+
+size_t itemGetSPacketSize(Item *self) {
+    size_t packetSize = 0;
+
+    packetSize += sizeof(ItemSPacket);
+    packetSize += itemAttributesGetSPacketSize(&self->attributes);
+
+    return packetSize;
+}
+
+void itemSPacket(Item *self, PacketStream *stream) {
+    packetStreamIn(stream, &self->itemId);
+    packetStreamIn(stream, &self->itemType);
+    packetStreamIn(stream, &self->amount);
+    packetStreamIn(stream, &self->inventoryIndex);
+    packetStreamIn(stream, &self->itemCategory);
+    itemAttributesSPacket(&self->attributes, stream);
+}

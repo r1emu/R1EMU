@@ -51,7 +51,7 @@ typedef enum {
     INVENTORY_CAT_QUEST = 12,
     INVENTORY_CAT_PETWEAPON = 13,
     INVENTORY_CAT_PETARMOR = 14,
-    INVENTORY_CAT_Count,
+    INVENTORY_CAT_COUNT,
 }   InventoryCategory;
 
 typedef enum {
@@ -75,7 +75,7 @@ typedef enum {
     EQSLOT_RIGHT_LEFT,
     EQSLOT_RIGHT_RIGHT,
     EQSLOT_NECKLACE,
-    EQSLOT_Count
+    EQSLOT_COUNT
 } EquipmentSlot;
 
 typedef enum {
@@ -105,17 +105,24 @@ typedef enum {
 
 // ------ Structure declaration -------
 
-typedef struct Inventory Inventory;
-
 /**
  * @brief Inventory contains
  */
-struct Inventory
+typedef struct Inventory
 {
     zhash_t *items;
-    zlist_t *bags[INVENTORY_CAT_Count];
-    Item *equippedItems[EQSLOT_Count];
-};
+    zlist_t *bags[INVENTORY_CAT_COUNT];
+    Item *equippedItems[EQSLOT_COUNT];
+}   Inventory;
+
+typedef struct InventorySPacket
+{
+    Item equippedItems[0]; // Const Size : EQSLOT_COUNT
+
+    uint32_t itemsCount;
+    Item items[0];
+
+}   InventorySPacket;
 
 // ----------- Functions ------------
 /**
@@ -168,3 +175,6 @@ void inventoryPrintBag(Inventory *self, InventoryCategory category);
 bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item);
 bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2);
 
+
+size_t inventoryGetSPacketSize(Inventory *self);
+void inventorySPacket(Inventory *self, PacketStream *stream);

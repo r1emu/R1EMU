@@ -68,3 +68,19 @@ void gameSessionDestroy(GameSession **_self) {
 void gameSessionFree(GameSession *self) {
     free(self);
 }
+
+
+size_t gameSessionGetPacketSize(GameSession *self) {
+    size_t packetSize = 0;
+
+    packetSize += accountSessionGetPacketSize(&self->accountSession);
+    packetSize += commanderSessionGetPacketSize(&self->commanderSession);
+
+    return packetSize;
+}
+
+void gameSessionSPacket(GameSession *self, PacketStream *stream) {
+    accountSessionSPacket(&self->accountSession, stream);
+    commanderSessionSPacket(&self->commanderSession, stream);
+}
+

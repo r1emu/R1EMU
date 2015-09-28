@@ -18,6 +18,10 @@
 
 #include "R1EMU.h"
 
+// Macro helper
+#define packetStreamIn(self, data) \
+    packetStreamAppend(self, (void *) (data), sizeof(*(data)))
+
 /**
  * @brief PacketStream is a buffer with a pointer to the last data written
  *

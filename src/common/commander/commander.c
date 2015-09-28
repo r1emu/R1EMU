@@ -13,7 +13,7 @@
 
 #include "commander.h"
 
-bool commanderEquipmentInit(CommanderEquipment *equipment) {
+bool commanderEquipmentInit(CommanderEquipmentCPacket *equipment) {
     equipment->head_top = 2;
     equipment->head_middle = 2;
     equipment->itemUnk1 = 4;
@@ -38,7 +38,7 @@ bool commanderEquipmentInit(CommanderEquipment *equipment) {
     return true;
 }
 
-bool commanderApparenceInit(CommanderAppearance *commander) {
+bool commanderApparenceInit(CommanderAppearanceCPacket *commander) {
     memset(commander, 0, sizeof(*commander));
 
     commander->accountId = -1;
@@ -114,7 +114,7 @@ bool commanderInit(Commander *commander) {
     return true;
 }
 
-void commanderEquipmentPrint(CommanderEquipment *equipment) {
+void commanderEquipmentPrint(CommanderEquipmentCPacket *equipment) {
     dbg("head_top = %d (%x)", equipment->head_top, equipment->head_top);
     dbg("head_middle = %d (%x)", equipment->head_middle, equipment->head_middle);
     dbg("itemUnk1 = %d (%x)", equipment->itemUnk1, equipment->itemUnk1);
@@ -137,7 +137,7 @@ void commanderEquipmentPrint(CommanderEquipment *equipment) {
     dbg("necklace = %d (%x)", equipment->necklace, equipment->necklace);
 }
 
-void commanderAppearancePrint(CommanderAppearance *appearance) {
+void commanderAppearancePrint(CommanderAppearanceCPacket *appearance) {
     dbg("commanderName = %s", appearance->commanderName);
     dbg("familyName = %s", appearance->familyName);
     dbg("accountId = %llu (%llx)", appearance->accountId, appearance->accountId);
@@ -184,3 +184,39 @@ void commanderDestroy(Commander **_self) {
     }
 }
 
+size_t commanderGetSPacketSize(Commander *self) {
+    size_t packetSize = 0;
+
+    packetSize += sizeof(CommanderSPacket);
+    packetSize += inventoryGetSPacketSize(&self->inventory);
+
+    return packetSize;
+}
+
+void commanderSPacket(Commander *self, PacketStream *stream) {
+    packetStreamIn(stream, self->commanderName);
+    packetStreamIn(stream, self->familyName);
+    packetStreamIn(stream, &self->accountId);
+    packetStreamIn(stream, &self->commanderId);
+    packetStreamIn(stream, &self->socialInfoId);
+    packetStreamIn(stream, &self->pcId);
+    packetStreamIn(stream, &self->commanderArrayIndex);
+    packetStreamIn(stream, &self->classId);
+    packetStreamIn(stream, &self->jobId);
+    packetStreamIn(stream, &self->hairId);
+    packetStreamIn(stream, &self->gender);
+    packetStreamIn(stream, &self->pose);
+    packetStreamIn(stream, &self->pos);
+    packetStreamIn(stream, &self->dir);
+    packetStreamIn(stream, &self->mapId);
+    packetStreamIn(stream, &self->level);
+    packetStreamIn(stream, &self->currentXP);
+    packetStreamIn(stream, &self->maxXP);
+    packetStreamIn(stream, &self->currentHP);
+    packetStreamIn(stream, &self->maxHP);
+    packetStreamIn(stream, &self->currentSP);
+    packetStreamIn(stream, &self->maxSP);
+    packetStreamIn(stream, &self->currentStamina);
+    packetStreamIn(stream, &self->maxStamina);
+    inventorySPacket(&self->inventory, stream);
+}
