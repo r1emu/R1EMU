@@ -184,16 +184,16 @@ void commanderDestroy(Commander **_self) {
     }
 }
 
-size_t commanderGetSPacketSize(Commander *self) {
+size_t commanderGetPacketSize(Commander *self) {
     size_t packetSize = 0;
 
     packetSize += sizeof(CommanderSPacket);
-    packetSize += inventoryGetSPacketSize(&self->inventory);
+    packetSize += inventoryGetPacketSize(&self->inventory);
 
     return packetSize;
 }
 
-void commanderSPacket(Commander *self, PacketStream *stream) {
+void commanderSerialize(Commander *self, PacketStream *stream) {
     packetStreamIn(stream, self->commanderName);
     packetStreamIn(stream, self->familyName);
     packetStreamIn(stream, &self->accountId);
@@ -218,10 +218,10 @@ void commanderSPacket(Commander *self, PacketStream *stream) {
     packetStreamIn(stream, &self->maxSP);
     packetStreamIn(stream, &self->currentStamina);
     packetStreamIn(stream, &self->maxStamina);
-    inventorySPacket(&self->inventory, stream);
+    inventorySerialize(&self->inventory, stream);
 }
 
-void commanderUnpacket(Commander *self, PacketStream *stream) {
+bool commanderUnserialize(Commander *self, PacketStream *stream) {
     packetStreamOut(stream, self->commanderName);
     packetStreamOut(stream, self->familyName);
     packetStreamOut(stream, &self->accountId);
@@ -246,5 +246,11 @@ void commanderUnpacket(Commander *self, PacketStream *stream) {
     packetStreamOut(stream, &self->maxSP);
     packetStreamOut(stream, &self->currentStamina);
     packetStreamOut(stream, &self->maxStamina);
-    inventoryUnpacket(&self->inventory, stream);
+
+    if (!(inventoryUnserialize(&self->inventory, stream))) {
+        error("Cannot unserialize the inventory.");
+        return false;
+    }
+
+    return true;
 }

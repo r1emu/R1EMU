@@ -270,6 +270,6 @@ void commanderFree(Commander *self);
 void commanderDestroy(Commander **_self);
 
 
-size_t commanderGetSPacketSize(Commander *self);
-void commanderSPacket(Commander *self, PacketStream *stream);
-void commanderUnpacket(Commander *self, PacketStream *stream);
+size_t commanderGetPacketSize(Commander *self);
+void commanderSerialize(Commander *self, PacketStream *stream);
+bool commanderUnserialize(Commander *self, PacketStream *stream);

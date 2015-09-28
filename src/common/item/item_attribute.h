@@ -109,6 +109,6 @@ void itemAttributesFree(ItemAttributes *self);
 void itemAttributesDestroy(ItemAttributes **_self);
 
 
-size_t itemAttributesGetSPacketSize(ItemAttributes *self);
-void itemAttributesSPacket(ItemAttributes *self, PacketStream *stream);
-bool itemAttributesUnpacket(ItemAttributes *self, PacketStream *stream);
+size_t itemAttributesGetPacketSize(ItemAttributes *self);
+void itemAttributesSerialize(ItemAttributes *self, PacketStream *stream);
+bool itemAttributesUnserialize(ItemAttributes *self, PacketStream *stream);

@@ -176,6 +176,6 @@ bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item);
 bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2);
 
 
-size_t inventoryGetSPacketSize(Inventory *self);
-void inventorySPacket(Inventory *self, PacketStream *stream);
-void inventoryUnpacket(Inventory *self, PacketStream *stream);
+size_t inventoryGetPacketSize(Inventory *self);
+void inventorySerialize(Inventory *self, PacketStream *stream);
+bool inventoryUnserialize(Inventory *self, PacketStream *stream);

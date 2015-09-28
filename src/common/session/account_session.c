@@ -154,14 +154,14 @@ size_t accountSessionGetPacketSize(AccountSession *self) {
 
     for (size_t i = 0; i < self->commandersCountMax; i++) {
         if (self->commanders[i] != NULL) {
-            packetSize += commanderGetSPacketSize(self->commanders[i]);
+            packetSize += commanderGetPacketSize(self->commanders[i]);
         }
     }
 
     return packetSize;
 }
 
-void accountSessionSPacket(AccountSession *self, PacketStream *stream) {
+void accountSessionSerialize(AccountSession *self, PacketStream *stream) {
 
     packetStreamIn(stream, self->accountName);
     packetStreamIn(stream, self->familyName);
@@ -179,12 +179,12 @@ void accountSessionSPacket(AccountSession *self, PacketStream *stream) {
 
     for (size_t i = 0; i < self->commandersCountMax; i++) {
         if (self->commanders[i] != NULL) {
-            commanderSPacket(self->commanders[i], stream);
+            commanderSerialize(self->commanders[i], stream);
         }
     }
 }
 
-void accountSessionUnpacket(AccountSession *self, PacketStream *stream) {
+bool accountSessionUnserialize(AccountSession *self, PacketStream *stream) {
 
     packetStreamOut(stream, self->accountName);
     packetStreamOut(stream, self->familyName);
@@ -201,6 +201,11 @@ void accountSessionUnpacket(AccountSession *self, PacketStream *stream) {
     packetStreamOut(stream, &commandersCount);
 
     for (size_t i = 0; i < commandersCount; i++) {
-        commanderUnpacket(self->commanders[i], stream);
+        if (!(commanderUnserialize(self->commanders[i], stream))) {
+            error("Cannot unserialize the commander %d.", i);
+            return false;
+        }
     }
+
+    return true;
 }

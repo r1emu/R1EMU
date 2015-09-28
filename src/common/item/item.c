@@ -131,30 +131,35 @@ void itemDestroy(Item **_self) {
     }
 }
 
-size_t itemGetSPacketSize(Item *self) {
+size_t itemGetPacketSize(Item *self) {
     size_t packetSize = 0;
 
     packetSize += sizeof(ItemSPacket);
-    packetSize += itemAttributesGetSPacketSize(&self->attributes);
+    packetSize += itemAttributesGetPacketSize(&self->attributes);
 
     return packetSize;
 }
 
-void itemSPacket(Item *self, PacketStream *stream) {
+void itemSerialize(Item *self, PacketStream *stream) {
     packetStreamIn(stream, &self->itemId);
     packetStreamIn(stream, &self->itemType);
     packetStreamIn(stream, &self->amount);
     packetStreamIn(stream, &self->inventoryIndex);
     packetStreamIn(stream, &self->itemCategory);
-    itemAttributesSPacket(&self->attributes, stream);
+    itemAttributesSerialize(&self->attributes, stream);
 }
 
-void itemUnpacket(Item *self, PacketStream *stream) {
+bool itemUnserialize(Item *self, PacketStream *stream) {
     packetStreamOut(stream, &self->itemId);
     packetStreamOut(stream, &self->itemType);
     packetStreamOut(stream, &self->amount);
     packetStreamOut(stream, &self->inventoryIndex);
     packetStreamOut(stream, &self->itemCategory);
-    itemAttributesUnpacket(&self->attributes, stream);
-    #warning TODO : return bool
+
+    if (!(itemAttributesUnserialize(&self->attributes, stream))) {
+        error("Cannot unserialize the item attribute.");
+        return false;
+    }
+
+    return true;
 }

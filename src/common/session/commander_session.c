@@ -80,7 +80,7 @@ size_t commanderSessionGetPacketSize(CommanderSession *self) {
     return packetSize;
 }
 
-void commanderSessionSPacket(CommanderSession *self, PacketStream *stream) {
+void commanderSessionSerialize(CommanderSession *self, PacketStream *stream) {
     int commanderIndex = (self->currentCommander) ? self->currentCommander->commanderArrayIndex : -1;
     packetStreamIn(stream, &commanderIndex);
 }

@@ -63,13 +63,22 @@ size_t sessionGetPacketSize(Session *self) {
     return packetSize;
 }
 
-void sessionSPacket(Session *self, PacketStream *stream) {
+void sessionSerialize(Session *self, PacketStream *stream) {
 
-    socketSessionSPacket(&self->socket, stream);
-    gameSessionSPacket(&self->game, stream);
+    socketSessionSerialize(&self->socket, stream);
+    gameSessionSerialize(&self->game, stream);
 }
 
-void sessionUnpacket(Session *self, PacketStream *stream) {
-    socketSessionUnpacket(&self->socket, stream);
-    gameSessionUnpacket(&self->game, stream);
+bool sessionUnserialize(Session *self, PacketStream *stream) {
+    if (!(socketSessionUnserialize(&self->socket, stream))) {
+        error("Cannot unserialize the socket session.");
+        return false;
+    }
+
+    if (!(gameSessionUnserialize(&self->game, stream))) {
+        error("Cannot unserialize the game session.");
+        return false;
+    }
+
+    return true;
 }

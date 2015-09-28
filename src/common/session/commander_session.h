@@ -67,4 +67,4 @@ void commanderSessionFree(CommanderSession *self);
 
 
 size_t commanderSessionGetPacketSize(CommanderSession *self);
-void commanderSessionSPacket(CommanderSession *self, PacketStream *stream);
+void commanderSessionSerialize(CommanderSession *self, PacketStream *stream);

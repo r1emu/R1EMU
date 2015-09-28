@@ -121,6 +121,6 @@ bool itemUpdateAttribute(Item *self, ItemAttributeId itemAttrId, void *value);
 bool itemRemoveAttribute(Item *self, ItemAttributeId itemAttrId);
 
 
-size_t itemGetSPacketSize(Item *self);
-void itemSPacket(Item *self, PacketStream *stream);
-void itemUnpacket(Item *self, PacketStream *stream);
+size_t itemGetPacketSize(Item *self);
+void itemSerialize(Item *self, PacketStream *stream);
+bool itemUnserialize(Item *self, PacketStream *stream);

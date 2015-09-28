@@ -74,11 +74,11 @@ static void itemAttributeCPacket(ItemAttribute *self, PacketStream *packetStream
 static size_t itemAttributeGetCPacketSize(ItemAttribute *self);
 static void itemAttributeFree(ItemAttribute *self);
 static void itemAttributeDestroy(ItemAttribute **_self);
-static void itemAttributeSPacket(ItemAttribute *self, PacketStream *stream);
-static void itemAttributeFloatSPacket(ItemAttribute *self, PacketStream *stream);
-static void itemAttributeStringSPacket(ItemAttribute *self, PacketStream *stream);
+static void itemAttributeSerialize(ItemAttribute *self, PacketStream *stream);
+static void itemAttributeFloatSerialize(ItemAttribute *self, PacketStream *stream);
+static void itemAttributeStringSerialize(ItemAttribute *self, PacketStream *stream);
 
-static size_t itemAttributeGetSPacketSize(ItemAttribute *self);
+static size_t itemAttributeGetPacketSize(ItemAttribute *self);
 
 ItemAttributes *itemAttributesNew(void) {
     ItemAttributes *self;
@@ -330,29 +330,42 @@ cleanup:
     return status;
 }
 
-bool itemAttributesAdd(ItemAttributes *self, ItemAttributeId itemAttrId, void *value) {
+static bool itemAttributesAddAttr(ItemAttributes *self, ItemAttributeId itemAttrId, ItemAttribute *itemAttribute) {
 
     bool status = false;
-    char *attributeKey = NULL;
-    ItemAttribute *itemAttribute = NULL;
 
+    char *attributeKey = NULL;
     if (!(attributeKey = itemAttributeKeyFormats[itemAttrId].key)) {
         error("No attribute key for '%d'", itemAttrId);
         goto cleanup;
     }
+
+    if (zhash_insert(self->hashtable, attributeKey, itemAttribute) != 0) {
+        error("Cannot insert the item attribute '%s'", attributeKey);
+        goto cleanup;
+    }
+
+    if (!(zhash_freefn(self->hashtable, attributeKey, (zhash_free_fn *) itemAttributeFree))) {
+        error("Cannot set item attribute destructor.");
+        goto cleanup;
+    }
+
+cleanup:
+    return status;
+}
+
+bool itemAttributesAdd(ItemAttributes *self, ItemAttributeId itemAttrId, void *value) {
+
+    bool status = false;
+    ItemAttribute *itemAttribute = NULL;
 
     if (!(itemAttribute = itemAttributeNew(itemAttrId, itemAttributeKeyFormats[itemAttrId].format, value))) {
         error("Cannot allocate a new item attribute.");
         goto cleanup;
     }
 
-    if (zhash_insert(self->hashtable, attributeKey, itemAttribute) != 0) {
-        error("Cannot insert the item attribute %d", itemAttrId);
-        goto cleanup;
-    }
-
-    if (!(zhash_freefn(self->hashtable, attributeKey, (zhash_free_fn *) itemAttributeFree))) {
-        error("Cannot set item attribute destructor.");
+    if (!(itemAttributesAddAttr(self, itemAttrId, itemAttribute))) {
+        error("Cannot add attribute to attributes.");
         goto cleanup;
     }
 
@@ -411,11 +424,11 @@ void itemAttributeDestroy(ItemAttribute **_self) {
     }
 }
 
-static size_t itemAttributeFloatGetSPacketSize(ItemAttribute *self) {
+static size_t itemAttributeFloatGetPacketSize(ItemAttribute *self) {
     return sizeof(ItemAttributeFloatSPacket);
 }
 
-static size_t itemAttributeStringGetSPacketSize(ItemAttribute *self) {
+static size_t itemAttributeStringGetPacketSize(ItemAttribute *self) {
 
     size_t valueSize = strlen(self->value) + 1;
 
@@ -426,7 +439,7 @@ static size_t itemAttributeStringGetSPacketSize(ItemAttribute *self) {
     return sizeof(ItemAttributeStringSPacket);
 }
 
-static size_t itemAttributeGetSPacketSize(ItemAttribute *self) {
+static size_t itemAttributeGetPacketSize(ItemAttribute *self) {
 
     size_t packetSize = 0;
 
@@ -435,11 +448,11 @@ static size_t itemAttributeGetSPacketSize(ItemAttribute *self) {
     switch (self->format) {
 
         case FLOAT_ATTRIBUTE:
-            packetSize += itemAttributeFloatGetSPacketSize(self);
+            packetSize += itemAttributeFloatGetPacketSize(self);
             break;
 
         case STRING_ATTRIBUTE:
-            packetSize += itemAttributeStringGetSPacketSize(self);
+            packetSize += itemAttributeStringGetPacketSize(self);
             break;
 
         default:
@@ -450,7 +463,7 @@ static size_t itemAttributeGetSPacketSize(ItemAttribute *self) {
     return packetSize;
 }
 
-static void itemAttributeStringSPacket(ItemAttribute *self, PacketStream *stream) {
+static void itemAttributeStringSerialize(ItemAttribute *self, PacketStream *stream) {
 
     uint16_t valueSize = *(uint16_t *) self->value; // StringPacket begins with size
 
@@ -464,7 +477,7 @@ static void itemAttributeStringSPacket(ItemAttribute *self, PacketStream *stream
     packetStreamIn(stream, attributePacket->value);
 }
 
-size_t itemAttributesGetSPacketSize(ItemAttributes *self) {
+size_t itemAttributesGetPacketSize(ItemAttributes *self) {
 
     size_t packetSize = 0;
 
@@ -472,24 +485,24 @@ size_t itemAttributesGetSPacketSize(ItemAttributes *self) {
 
     // Get size of all attributes
     for (ItemAttribute *attr = zhash_first(self->hashtable); attr != NULL; attr = zhash_next(self->hashtable)) {
-        packetSize += itemAttributeGetSPacketSize(attr);
+        packetSize += itemAttributeGetPacketSize(attr);
     }
 
     return packetSize;
 }
 
-void itemAttributesSPacket(ItemAttributes *self, PacketStream *stream) {
+void itemAttributesSerialize(ItemAttributes *self, PacketStream *stream) {
 
     size_t attributesCount = zhash_size(self->hashtable);
     packetStreamIn(stream, &attributesCount);
 
     // Write all attributes
     for (ItemAttribute *attr = zhash_first(self->hashtable); attr != NULL; attr = zhash_next(self->hashtable)) {
-        itemAttributeSPacket(attr, stream);
+        itemAttributeSerialize(attr, stream);
     }
 }
 
-static void itemAttributeSPacket(ItemAttribute *self, PacketStream *stream) {
+static void itemAttributeSerialize(ItemAttribute *self, PacketStream *stream) {
 
     packetStreamIn(stream, &self->format);
     packetStreamIn(stream, &self->attributeId);
@@ -497,11 +510,11 @@ static void itemAttributeSPacket(ItemAttribute *self, PacketStream *stream) {
     switch (self->format) {
 
         case FLOAT_ATTRIBUTE:
-            itemAttributeFloatSPacket(self, stream);
+            itemAttributeFloatSerialize(self, stream);
             break;
 
         case STRING_ATTRIBUTE:
-            itemAttributeStringSPacket(self, stream);
+            itemAttributeStringSerialize(self, stream);
             break;
 
         default:
@@ -510,39 +523,40 @@ static void itemAttributeSPacket(ItemAttribute *self, PacketStream *stream) {
     }
 }
 
-static void itemAttributeFloatSPacket(ItemAttribute *self, PacketStream *stream) {
+static void itemAttributeFloatSerialize(ItemAttribute *self, PacketStream *stream) {
 
     ItemAttributeFloat *attributePacket = self->value;
     packetStreamIn(stream, &attributePacket->value);
 }
 
-static bool itemAttributeFloatUnpacket(ItemAttribute *self, PacketStream *stream) {
+static bool itemAttributeFloatUnserialize(ItemAttribute *self, PacketStream *stream) {
 
     ItemAttributeFloat *attributePacket = self->value;
     packetStreamOut(stream, &attributePacket->value);
     return true;
 }
 
-static bool itemAttributeStringUnpacket(ItemAttribute *self, PacketStream *stream) {
+static bool itemAttributeStringUnserialize(ItemAttribute *self, PacketStream *stream) {
 
     bool status = false;
-    uint16_t valueSize;
-    packetStreamOut(stream, &valueSize);
+    uint16_t newValueSize;
+    packetStreamOut(stream, &newValueSize);
 
     #pragma pack(push, 1)
-    DECLARE_ItemAttributeString(valueSize);
+    DECLARE_ItemAttributeString(newValueSize);
     #pragma pack(pop)
 
     ItemAttributeString *attr = self->value;
 
-    if (valueSize != attr->valueSize) {
+    if (newValueSize > attr->valueSize) {
+        // The current memory size isn't enough
         if (!(attr = realloc(attr, sizeof(ItemAttributeString)))) {
             error("Cannot realloc an attribute string of size '%d'", sizeof(ItemAttributeString));
             goto cleanup;
         }
     }
 
-    attr->valueSize = valueSize;
+    attr->valueSize = newValueSize;
     packetStreamOut(stream, attr->value);
 
     status = true;
@@ -551,7 +565,7 @@ cleanup:
     return status;
 }
 
-static bool itemAttributeUnpacket(ItemAttribute *self, PacketStream *stream) {
+static bool itemAttributeUnserialize(ItemAttribute *self, PacketStream *stream) {
 
     bool status = false;
     packetStreamOut(stream, &self->format);
@@ -560,15 +574,15 @@ static bool itemAttributeUnpacket(ItemAttribute *self, PacketStream *stream) {
     switch (self->format) {
 
         case FLOAT_ATTRIBUTE:
-            if (!(itemAttributeFloatUnpacket(self, stream))) {
-                error("Cannot unpack float item attribute");
+            if (!(itemAttributeFloatUnserialize(self, stream))) {
+                error("Cannot unserialize float item attribute");
                 goto cleanup;
             }
             break;
 
         case STRING_ATTRIBUTE:
-            if (!(itemAttributeStringUnpacket(self, stream))) {
-                error("Cannot unpacket string item attribute");
+            if (!(itemAttributeStringUnserialize(self, stream))) {
+                error("Cannot unserialize string item attribute");
                 goto cleanup;
             }
             break;
@@ -584,17 +598,31 @@ cleanup:
     return status;
 }
 
-bool itemAttributesUnpacket(ItemAttributes *self, PacketStream *stream) {
+bool itemAttributesUnserialize(ItemAttributes *self, PacketStream *stream) {
 
     bool status = false;
     size_t attributesCount;
+    ItemAttribute *itemAttr = NULL;
+
+    zhash_purge(self->hashtable);
 
     packetStreamOut(stream, &attributesCount);
 
     for (size_t i = 0; i < attributesCount; i++) {
-        ItemAttribute attr;
-        if (!(itemAttributeUnpacket(&attr, stream))) {
-            error("Cannot unpack item attribute.");
+        ItemAttributeSPacket *itemAttrPkt = packetStreamGetCurrentBuffer(stream);
+
+        if (!(itemAttr = itemAttributeNew(itemAttrPkt->attributeId, itemAttrPkt->format, itemAttrPkt->value))) {
+            error("Cannot allocate a new item attribute.");
+            goto cleanup;
+        }
+
+        if (!(itemAttributeUnserialize(itemAttr, stream))) {
+            error("Cannot unserialize item attribute.");
+            goto cleanup;
+        }
+
+        if (!(itemAttributesAddAttr(self, itemAttr->attributeId, itemAttr))) {
+            error("Cannot add attribute to attributes.");
             goto cleanup;
         }
     }
@@ -602,5 +630,8 @@ bool itemAttributesUnpacket(ItemAttributes *self, PacketStream *stream) {
     status = true;
 
 cleanup:
+    if (!status) {
+        itemAttributeDestroy(&itemAttr);
+    }
     return status;
 }

@@ -79,11 +79,16 @@ size_t gameSessionGetPacketSize(GameSession *self) {
     return packetSize;
 }
 
-void gameSessionSPacket(GameSession *self, PacketStream *stream) {
-    accountSessionSPacket(&self->accountSession, stream);
-    commanderSessionSPacket(&self->commanderSession, stream);
+void gameSessionSerialize(GameSession *self, PacketStream *stream) {
+    accountSessionSerialize(&self->accountSession, stream);
+    commanderSessionSerialize(&self->commanderSession, stream);
 }
 
-void gameSessionUnpacket(GameSession *self, PacketStream *stream) {
-    accountSessionUnpacket(&self->accountSession, stream);
+bool gameSessionUnserialize(GameSession *self, PacketStream *stream) {
+    if (!(accountSessionUnserialize(&self->accountSession, stream))) {
+        error("Cannot unserialize the account session.");
+        return false;
+    }
+
+    return true;
 }

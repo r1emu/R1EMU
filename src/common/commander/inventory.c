@@ -318,7 +318,7 @@ void inventoryPrintBag(Inventory *self, InventoryCategory category) {
     }
 }
 
-size_t inventoryGetSPacketSize(Inventory *self) {
+size_t inventoryGetPacketSize(Inventory *self) {
     size_t packetSize = 0;
 
     packetSize += sizeof(InventorySPacket);
@@ -326,23 +326,23 @@ size_t inventoryGetSPacketSize(Inventory *self) {
     // Get size of equipped items
     for (size_t i = 0; i < EQSLOT_COUNT; i++) {
         Item *item = self->equippedItems[i];
-        packetSize += itemGetSPacketSize(item);
+        packetSize += itemGetPacketSize(item);
     }
 
     // Get size of inventory items
     for (Item *item = zhash_first(self->items); item != NULL; item = zhash_next(self->items)) {
-        packetSize += itemGetSPacketSize(item);
+        packetSize += itemGetPacketSize(item);
     }
 
     return packetSize;
 }
 
-void inventorySPacket(Inventory *self, PacketStream *stream) {
+void inventorySerialize(Inventory *self, PacketStream *stream) {
 
     // Write equipped items
     for (size_t i = 0; i < EQSLOT_COUNT; i++) {
         Item *item = self->equippedItems[i];
-        itemSPacket(item, stream);
+        itemSerialize(item, stream);
     }
 
     size_t itemsCount = zhash_size(self->items);
@@ -350,20 +350,26 @@ void inventorySPacket(Inventory *self, PacketStream *stream) {
 
     // Write inventory items
     for (Item *item = zhash_first(self->items); item != NULL; item = zhash_next(self->items)) {
-        itemSPacket(item, stream);
+        itemSerialize(item, stream);
     }
 }
 
-void inventoryUnpacket(Inventory *self, PacketStream *stream) {
+bool inventoryUnserialize(Inventory *self, PacketStream *stream) {
 
     // Equipped items
     for (size_t i = 0; i < EQSLOT_COUNT; i++) {
-        itemUnpacket(self->equippedItems[i], stream);
+        if (!(itemUnserialize(self->equippedItems[i], stream))) {
+            error("Cannot unserialize the equipped item %d.", i);
+            return false;
+        }
     }
 
     size_t itemsCount;
     packetStreamOut(stream, &itemsCount);
 
     for (size_t i = 0; i < itemsCount; i++) {
+        #warning TODO
     }
+
+    return true;
 }

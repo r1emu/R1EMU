@@ -118,7 +118,7 @@ size_t socketSessionGetPacketSize(SocketSession *self) {
     return sizeof(*self);
 }
 
-void socketSessionSPacket(SocketSession *self, PacketStream *stream) {
+void socketSessionSerialize(SocketSession *self, PacketStream *stream) {
     packetStreamIn(stream, &self->accountId);
     packetStreamIn(stream, &self->routerId);
     packetStreamIn(stream, &self->mapId);
@@ -126,10 +126,11 @@ void socketSessionSPacket(SocketSession *self, PacketStream *stream) {
     packetStreamIn(stream, &self->authenticated);
 }
 
-void socketSessionUnpacket(SocketSession *self, PacketStream *stream) {
+bool socketSessionUnserialize(SocketSession *self, PacketStream *stream) {
     packetStreamOut(stream, &self->accountId);
     packetStreamOut(stream, &self->routerId);
     packetStreamOut(stream, &self->mapId);
     packetStreamOut(stream, self->sessionKey);
     packetStreamOut(stream, &self->authenticated);
+    return true;
 }

@@ -124,9 +124,9 @@ size_t socketSessionGetPacketSize(SocketSession *self);
 /**
  * @brief Get the packet data from the server structure
  */
-void socketSessionSPacket(SocketSession *self, PacketStream *stream);
+void socketSessionSerialize(SocketSession *self, PacketStream *stream);
 
 /**
  * @brief Get the server data from the packet structure
  */
-void socketSessionUnpacket(SocketSession *self, PacketStream *stream);
+bool socketSessionUnserialize(SocketSession *self, PacketStream *stream);
