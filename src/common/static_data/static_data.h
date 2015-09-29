@@ -39,12 +39,20 @@ bool staticDataInit(StaticData *self, char *name);
 
 /**
  * @brief Add a new object in the static data hashtable.
- * @param self An allocated StaticData to initialize.
+ * @param self An allocated StaticData.
  * @param id The object ID
  * @param item The item associated with the id
  * @return true on success, false otherwise.
  */
 bool staticDataAdd(StaticData *self, StaticDataId id, void *item);
+
+/**
+ * @brief Retrieve an object previously stored in the StaticData
+ * @param self An allocated StaticData.
+ * @param id The object ID
+ * @param out A pointer to the result object
+ */
+bool staticDataGet(StaticData *self, StaticDataId id, void *out);
 
 /**
  * @brief Lock a StaticData so it cannot be written again (read only)

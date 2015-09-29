@@ -86,10 +86,32 @@ bool staticDataAdd(StaticData *self, StaticDataId id, void *object) {
     staticDataGenKey(self, id, key);
 
     if (zhash_insert(self->hashtable, key, object) != 0) {
-        sdError(self, "Cannot insert the object %s", key);
+        sdError(self, "Cannot insert the object '%s'", key);
         return false;
     }
 
+    return true;
+}
+
+bool staticDataGet(StaticData *self, StaticDataId id, void *_out) {
+
+    void **out = _out;
+
+    if (!self->locked) {
+        sdError(self, "StaticData should have been locked before querying it.");
+        return false;
+    }
+
+    StaticDataKey key;
+    staticDataGenKey(self, id, key);
+
+    void *object = NULL;
+    if (!(object = zhash_lookup(self->hashtable, key))) {
+        sdError(self, "Cannot find the static data for object '%s'", key);
+        return false;
+    }
+
+    *out = object;
     return true;
 }
 
