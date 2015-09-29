@@ -85,10 +85,13 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
         return false;
     }
 
-    dbg("itemIdKey: %d", itemToAdd->itemId);
+    uint32_t itemId = itemGetItemId(itemToAdd);
+    uint32_t itemCategory = itemGetCategory(itemToAdd);
+
+    dbg("itemIdKey: %d", itemId);
 
     ItemKey itemKey;
-    itemGenKey(itemToAdd->itemId, itemKey);
+    itemGenKey(itemId, itemKey);
 
     dbg("itemKey: %s", itemKey);
 
@@ -97,7 +100,7 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
         return false;
     }
 
-    int result = zlist_append(self->bags[itemToAdd->itemCategory], itemToAdd);
+    int result = zlist_append(self->bags[itemCategory], itemToAdd);
     if (result == -1) {
         error("Cannot push item into the category bag in inventory");
         return false;
@@ -108,11 +111,14 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
 bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
 
+    uint32_t itemId = itemGetItemId(itemToRemove);
+    uint32_t itemCategory = itemGetCategory(itemToRemove);
+
     ItemKey itemKey;
-    itemGenKey(itemToRemove->itemId, itemKey);
+    itemGenKey(itemId, itemKey);
 
     //if (zlist_exists(self->bags[itemToRemove->itemCategory], itemToRemove)) {
-        zlist_remove(self->bags[itemToRemove->itemCategory], itemToRemove);
+        zlist_remove(self->bags[itemCategory], itemToRemove);
     //} else {
     //    error("Item was not found in bag [%d] of inventory", itemToRemove->itemCategory);
     //    return false;
@@ -158,7 +164,7 @@ Item *inventoryGetNextItem(Inventory *self, InventoryCategory category) {
 
 bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
 
-    Item *itemToUnequip = self->equippedItems[eqSlot];
+    EquipableItem *itemToUnequip = self->equippedItems[eqSlot];
 
     if (itemToUnequip == NULL) {
         // We return false here because the system should have detected earlier that the slot is free
@@ -166,7 +172,7 @@ bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
         return false;
     }
 
-    if (!inventoryAddItem(self, itemToUnequip)) {
+    if (!inventoryAddItem(self, (Item *) itemToUnequip)) {
         error("Cannot add item to the inventory.");
         return false;
     }
@@ -183,7 +189,7 @@ bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
 
 bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot) {
 
-    Item *itemToEquip;
+    EquipableItem *itemToEquip;
 
     // Get item from inventory
     if (!inventoryGetItemByItemId(self, itemId, &itemToEquip)) {
@@ -208,7 +214,7 @@ bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot) 
     self->equippedItems[eqSlot] = itemToEquip;
 
     // Remove from inventory
-    if (!inventoryRemoveItem(self, itemToEquip)) {
+    if (!inventoryRemoveItem(self, (Item *) itemToEquip)) {
         dbg("Can't remove item from inventory. Equip Item failed.");
         // Roll back equipped item
         self->equippedItems[eqSlot] = NULL;
@@ -223,7 +229,7 @@ bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot) 
 }
 
 Item *inventoryGetEquipment(Inventory *self) {
-    return (Item*) self->equippedItems;
+    return (EquipableItem*) self->equippedItems;
 }
 
 bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value) {
@@ -278,26 +284,26 @@ bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2) {
 
 
 void inventoryPrintEquipment(Inventory *self) {
-    dbg("head_top = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[0]);
-    dbg("head_middle = %d (%x)", self->equippedItems[1] ? self->equippedItems[1]->itemType : 0, self->equippedItems[1]);
-    dbg("itemUnk1 = %d (%x)", self->equippedItems[2] ? self->equippedItems[2]->itemType : 0, self->equippedItems[2]);
-    dbg("body_armor = %d (%x)", self->equippedItems[3] ? self->equippedItems[3]->itemType : 0, self->equippedItems[3]);
-    dbg("gloves = %d (%x)", self->equippedItems[4] ? self->equippedItems[4]->itemType : 0, self->equippedItems[4]);
-    dbg("boots = %d (%x)", self->equippedItems[5] ? self->equippedItems[5]->itemType : 0, self->equippedItems[5]);
-    dbg("helmet = %d (%x)", self->equippedItems[6] ? self->equippedItems[6]->itemType : 0, self->equippedItems[6]);
-    dbg("bracelet = %d (%x)", self->equippedItems[7] ? self->equippedItems[7]->itemType : 0, self->equippedItems[7]);
-    dbg("weapon = %d (%x)", self->equippedItems[8] ? self->equippedItems[8]->itemType : 0, self->equippedItems[8]);
-    dbg("shield = %d (%x)", self->equippedItems[9] ? self->equippedItems[9]->itemType : 0, self->equippedItems[9]);
-    dbg("costume = %d (%x)", self->equippedItems[10] ? self->equippedItems[10]->itemType : 0, self->equippedItems[10]);
-    dbg("itemUnk3 = %d (%x)", self->equippedItems[11] ? self->equippedItems[11]->itemType : 0, self->equippedItems[11]);
-    dbg("itemUnk4 = %d (%x)", self->equippedItems[12] ? self->equippedItems[12]->itemType : 0, self->equippedItems[12]);
-    dbg("itemUnk5 = %d (%x)", self->equippedItems[13] ? self->equippedItems[13]->itemType : 0, self->equippedItems[13]);
-    dbg("leg_armor = %d (%x)", self->equippedItems[14] ? self->equippedItems[14]->itemType : 0, self->equippedItems[14]);
-    dbg("itemUnk6 = %d (%x)", self->equippedItems[15] ? self->equippedItems[15]->itemType : 0, self->equippedItems[15]);
-    dbg("itemUnk7 = %d (%x)", self->equippedItems[16] ? self->equippedItems[16]->itemType : 0, self->equippedItems[16]);
-    dbg("ring_left = %d (%x)", self->equippedItems[17] ? self->equippedItems[17]->itemType : 0, self->equippedItems[17]);
-    dbg("ring_right = %d (%x)", self->equippedItems[18] ? self->equippedItems[18]->itemType : 0, self->equippedItems[18]);
-    dbg("necklace = %d (%x)", self->equippedItems[19] ? self->equippedItems[19]->itemType : 0, self->equippedItems[19]);
+    dbg("head_top = %d (%x)", self->equippedItems[0] ? itemGetItemId(self->equippedItems[0]) : 0, self->equippedItems[0]);
+    dbg("head_middle = %d (%x)", self->equippedItems[1] ? itemGetItemId(self->equippedItems[1]) : 0, self->equippedItems[1]);
+    dbg("itemUnk1 = %d (%x)", self->equippedItems[2] ? itemGetItemId(self->equippedItems[2]) : 0, self->equippedItems[2]);
+    dbg("body_armor = %d (%x)", self->equippedItems[3] ? itemGetItemId(self->equippedItems[3]) : 0, self->equippedItems[3]);
+    dbg("gloves = %d (%x)", self->equippedItems[4] ? itemGetItemId(self->equippedItems[4]) : 0, self->equippedItems[4]);
+    dbg("boots = %d (%x)", self->equippedItems[5] ? itemGetItemId(self->equippedItems[5]) : 0, self->equippedItems[5]);
+    dbg("helmet = %d (%x)", self->equippedItems[6] ? itemGetItemId(self->equippedItems[6]) : 0, self->equippedItems[6]);
+    dbg("bracelet = %d (%x)", self->equippedItems[7] ? itemGetItemId(self->equippedItems[7]) : 0, self->equippedItems[7]);
+    dbg("weapon = %d (%x)", self->equippedItems[8] ? itemGetItemId(self->equippedItems[8]) : 0, self->equippedItems[8]);
+    dbg("shield = %d (%x)", self->equippedItems[9] ? itemGetItemId(self->equippedItems[9]) : 0, self->equippedItems[9]);
+    dbg("costume = %d (%x)", self->equippedItems[10] ? itemGetItemId(self->equippedItems[10]) : 0, self->equippedItems[10]);
+    dbg("itemUnk3 = %d (%x)", self->equippedItems[11] ? itemGetItemId(self->equippedItems[11]) : 0, self->equippedItems[11]);
+    dbg("itemUnk4 = %d (%x)", self->equippedItems[12] ? itemGetItemId(self->equippedItems[12]) : 0, self->equippedItems[12]);
+    dbg("itemUnk5 = %d (%x)", self->equippedItems[13] ? itemGetItemId(self->equippedItems[13]) : 0, self->equippedItems[13]);
+    dbg("leg_armor = %d (%x)", self->equippedItems[14] ? itemGetItemId(self->equippedItems[14]) : 0, self->equippedItems[14]);
+    dbg("itemUnk6 = %d (%x)", self->equippedItems[15] ? itemGetItemId(self->equippedItems[15]) : 0, self->equippedItems[15]);
+    dbg("itemUnk7 = %d (%x)", self->equippedItems[16] ? itemGetItemId(self->equippedItems[16]) : 0, self->equippedItems[16]);
+    dbg("ring_left = %d (%x)", self->equippedItems[17] ? itemGetItemId(self->equippedItems[17]) : 0, self->equippedItems[17]);
+    dbg("ring_right = %d (%x)", self->equippedItems[18] ? itemGetItemId(self->equippedItems[18]) : 0, self->equippedItems[18]);
+    dbg("necklace = %d (%x)", self->equippedItems[19] ? itemGetItemId(self->equippedItems[19]) : 0, self->equippedItems[19]);
 }
 
 void inventoryPrintBag(Inventory *self, InventoryCategory category) {

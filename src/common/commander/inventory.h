@@ -20,7 +20,8 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
-#include "common/item/item.h"
+#include "common/actor/a_item.h"
+#include "common/actor/a_equipable_item.h"
 
 // ---------- Defines -------------
 #define INVENTORY_CAT_SIZE 5000
@@ -114,7 +115,7 @@ struct Inventory
 {
     zhash_t *items;
     zlist_t *bags[INVENTORY_CAT_Count];
-    Item *equippedItems[EQSLOT_Count];
+    EquipableItem *equippedItems[EQSLOT_Count];
 };
 
 // ----------- Functions ------------

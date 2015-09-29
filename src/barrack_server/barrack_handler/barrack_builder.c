@@ -242,6 +242,7 @@ void barrackBuilderCommanderList(
     int commandersCount,
     zmsg_t *replyMsg)
 {
+    /*
     // Keep sizes in memory
     size_t commanderBarrackInfoPacketSize = 0;
     size_t attributesSizeAllCommanders[commandersCount];
@@ -440,6 +441,8 @@ void barrackBuilderCommanderList(
     }
 
     buffer_print(&replyPacket, sizeof(replyPacket), NULL);
+
+    */
 }
 
 void barrackBuilderPetInformation(zmsg_t *replyMsg) {
