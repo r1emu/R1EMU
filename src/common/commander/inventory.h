@@ -117,7 +117,8 @@ typedef struct Inventory
 
 typedef struct InventorySPacket
 {
-    ItemSPacket equippedItems[0]; // Const Size : EQSLOT_COUNT
+    size_t equippedItemsCount;
+    ItemSPacket equippedItems[0]; // Size : equippedItemsCount
 
     size_t itemsCount;
     ItemSPacket items[0]; // Size : itemsCount
@@ -165,15 +166,24 @@ bool inventoryRemoveItem(Inventory *self, Item *itemToRemove);
  */
 size_t inventoryGetItemsCount(Inventory *self);
 
+/**
+ * Get count (size) of items in equipment
+ * @param self A pointer to an allocated Inventory.
+ * @return count of items in equipment
+ */
+size_t inventoryGetEquipmentCount(Inventory *self);
+
+
 Item *inventoryGetFirstItem(Inventory *self, InventoryCategory category);
 Item *inventoryGetNextItem(Inventory *self, InventoryCategory category);
 
 bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot);
 void inventoryPrintEquipment(Inventory *self);
-bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value);
+bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, EmptyEquipmentSlot *value);
 void inventoryPrintBag(Inventory *self, InventoryCategory category);
 bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item);
 bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2);
+bool inventoryCheckSlot(EquipmentSlot eqSlot);
 
 
 size_t inventoryGetPacketSize(Inventory *self);

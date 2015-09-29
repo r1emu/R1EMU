@@ -444,7 +444,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[0].itemType = 645001;
     items[0].amount = 5003;
     items[0].itemCategory = INVENTORY_CAT_CONSUMABLE;
-    items[0].inventoryIndex = 1;
+    items[0].index = 1;
     //items[0].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[0]);
 
@@ -452,7 +452,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[1].itemType = 640026;
     items[1].amount = 5;
     items[1].itemCategory = INVENTORY_CAT_CONSUMABLE;
-    items[1].inventoryIndex = 2;
+    items[1].index = 2;
     //items[1].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[1]);
 
@@ -1060,9 +1060,9 @@ static PacketHandlerState zoneHandlerSwapEtcInvChangeIndex(
     struct {
         uint8_t inventoryType;
         uint64_t itemId1;
-        uint32_t inventoryIndex1;
+        uint32_t index1;
         uint64_t itemId2;
-        uint32_t inventoryIndex2;
+        uint32_t index2;
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 

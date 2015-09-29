@@ -21,7 +21,7 @@
 
 // ------ Extern function implementation -------
 
-Item *itemNew(uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inventoryIndex) {
+Item *itemNew(uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t index) {
 
     Item *self;
 
@@ -29,7 +29,7 @@ Item *itemNew(uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inve
         return NULL;
     }
 
-    if (!itemInit(self, itemId, itemType, amount, inventoryIndex)) {
+    if (!itemInit(self, itemId, itemType, amount, index)) {
         itemDestroy(&self);
         error("Item failed to initialize.");
         return NULL;
@@ -38,12 +38,12 @@ Item *itemNew(uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inve
     return self;
 }
 
-bool itemInit(Item *self, uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inventoryIndex) {
+bool itemInit(Item *self, uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t index) {
 
     self->itemId = itemId;
     self->itemType = itemType;
     self->amount = amount;
-    self->inventoryIndex = inventoryIndex;
+    self->index = index;
 
     if (!(itemAttributesInit(&self->attributes))) {
         error("Cannot initialize item attributes.");
@@ -58,7 +58,7 @@ bool itemDup(Item *self, Item **out) {
     bool status = false;
     Item *dup = NULL;
 
-    if (!(dup = itemNew(self->itemId, self->itemType, self->amount, self->inventoryIndex))) {
+    if (!(dup = itemNew(self->itemId, self->itemType, self->amount, self->index))) {
         error("Cannot duplicate a new item.");
         goto cleanup;
     }
@@ -118,6 +118,7 @@ void itemGenKey(uint64_t itemIdKey, ItemKey itemKey) {
 
 void itemFree(Item *self) {
     itemAttributesFree(&self->attributes);
+    free(self);
 }
 
 void itemDestroy(Item **_self) {
@@ -126,7 +127,6 @@ void itemDestroy(Item **_self) {
 
     if (_self && self) {
         itemFree(self);
-        free(self);
         *_self = NULL;
     }
 }
@@ -144,7 +144,7 @@ void itemSerialize(Item *self, PacketStream *stream) {
     packetStreamIn(stream, &self->itemId);
     packetStreamIn(stream, &self->itemType);
     packetStreamIn(stream, &self->amount);
-    packetStreamIn(stream, &self->inventoryIndex);
+    packetStreamIn(stream, &self->index);
     packetStreamIn(stream, &self->itemCategory);
     itemAttributesSerialize(&self->attributes, stream);
 }
@@ -153,7 +153,7 @@ bool itemUnserialize(Item *self, PacketStream *stream) {
     packetStreamOut(stream, &self->itemId);
     packetStreamOut(stream, &self->itemType);
     packetStreamOut(stream, &self->amount);
-    packetStreamOut(stream, &self->inventoryIndex);
+    packetStreamOut(stream, &self->index);
     packetStreamOut(stream, &self->itemCategory);
 
     if (!(itemAttributesUnserialize(&self->attributes, stream))) {

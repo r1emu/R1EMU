@@ -64,7 +64,7 @@ void zoneBuilderItemAdd(Item *item, InventoryAddType addType, zmsg_t *replyMsg) 
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
         replyPacket.item.uniqueId = item->itemId;
         replyPacket.item.amount = item->amount;
-        replyPacket.item.inventoryIndex = item->inventoryIndex;
+        replyPacket.item.index = item->index;
         replyPacket.item.id = item->itemType;
         replyPacket.attributesSize = attrSize;
         replyPacket.addType = addType;
@@ -1693,7 +1693,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
 
         // Iterate through all items in this bag
         Item *item = inventoryGetFirstItem(inventory, category);
-        uint8_t inventoryIndex = 0;
+        uint8_t index = 0;
 
         while (item) {
 
@@ -1708,17 +1708,17 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
                 uint64_t itemId;
                 uint32_t amount;
                 uint32_t price;
-                uint32_t inventoryIndex;
+                uint32_t index;
                 uint32_t unkown2;
                 uint8_t attributes[attrSize];
             } InventoryItemCPacket;
             #pragma pack(pop)
 
-            itemAttributesSize[category][inventoryIndex] = attrSize;
+            itemAttributesSize[category][index] = attrSize;
             totalSize += sizeof(InventoryItemCPacket);
 
             item = inventoryGetNextItem(inventory, category);
-            inventoryIndex++;
+            index++;
         }
     }
 
@@ -1753,12 +1753,12 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
         packetStreamAddOffset(&packetStream, offset);
 
         item = inventoryGetFirstItem(inventory);
-        inventoryIndex = -1;
+        index = -1;
 
         while (item) {
 
-            inventoryIndex++;
-            size_t attrSize = itemAttributesSize[inventoryIndex];
+            index++;
+            size_t attrSize = itemAttributesSize[index];
 
             #pragma pack(push, 1)
             struct InventoryItemCPacket {
@@ -1768,7 +1768,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
                 uint64_t itemId;
                 uint32_t amount;
                 uint32_t price;
-                uint32_t inventoryIndex;
+                uint32_t index;
                 uint32_t unkown2;
                 uint8_t attributes[attrSize];
 
@@ -1781,7 +1781,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
             inventoryItemCPacket->itemId = item ? item->itemId : 0;
             inventoryItemCPacket->amount = item->amount;
             inventoryItemCPacket->price = 0;
-            inventoryItemCPacket->inventoryIndex = INVENTORY_CAT_SIZE * item->itemCategory + item->inventoryIndex;
+            inventoryItemCPacket->index = INVENTORY_CAT_SIZE * item->itemCategory + item->index;
             inventoryItemCPacket->unkown2 = 0;
 
             // fill attribute buffer
@@ -1819,11 +1819,11 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
 
         // Iterate through all items in this bag
         Item *item = inventoryGetFirstItem(inventory, category);
-        uint8_t inventoryIndex = 0;
+        uint8_t index = 0;
 
         while (item) {
 
-            size_t attrSize = itemAttributesSize[category][inventoryIndex];
+            size_t attrSize = itemAttributesSize[category][index];
 
             #pragma pack(push, 1)
             struct InventoryItemCPacket {
@@ -1833,7 +1833,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
                 uint64_t itemId;
                 uint32_t amount;
                 uint32_t price;
-                uint32_t inventoryIndex;
+                uint32_t index;
                 uint32_t unkown2;
                 uint8_t attributes[attrSize];
             };
@@ -1846,7 +1846,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
         }
 
             item = inventoryGetNextItem(inventory, category);
-            inventoryIndex++;
+            index++;
         }
     }
 

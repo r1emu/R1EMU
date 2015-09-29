@@ -44,7 +44,7 @@ typedef struct Item {
     uint32_t amount;
 
     /** Index of the item in the inventory */
-    uint32_t inventoryIndex;
+    uint32_t index;
 
     /** Item Category (should be in ItemData, but for now we put it here)*/
     int itemCategory;
@@ -57,7 +57,7 @@ typedef struct ItemSPacket {
     uint64_t itemId;
     uint32_t itemType;
     uint32_t amount;
-    uint32_t inventoryIndex;
+    uint32_t index;
     int itemCategory;
 
     ItemAttributes attributes[0]; // Always size 1
@@ -70,7 +70,7 @@ typedef struct ItemCPacket {
     uint64_t uniqueId;
     uint32_t id;
     uint32_t amount;
-    uint32_t inventoryIndex;
+    uint32_t index;
 } ItemCPacket;
 
 // ----------- Functions ------------
@@ -79,14 +79,14 @@ typedef struct ItemCPacket {
  * Allocate a new Item structure.
  * @return A pointer to an allocated Item, or NULL if an error occured.
  */
-Item *itemNew(uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inventoryIndex);
+Item *itemNew(uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t index);
 
 /**
  * Initialize an allocated Item structure.
  * @param self An allocated Item to initialize.
  * @return true on success, false otherwise.
  */
-bool itemInit(Item *self, uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t inventoryIndex);
+bool itemInit(Item *self, uint64_t itemId, uint32_t itemType, uint32_t amount, uint32_t index);
 
 /**
  * Initialize an allocated Item structure.

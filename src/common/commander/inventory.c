@@ -85,20 +85,20 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
         return false;
     }
 
-    dbg("itemIdKey: %d", itemToAdd->itemId);
-
     ItemKey itemKey;
     itemGenKey(itemToAdd->itemId, itemKey);
-
-    dbg("itemKey: %s", itemKey);
 
     if (zhash_insert(self->items, itemKey, itemToAdd) != 0) {
         error("Cannot insert the item '%s' in the hashtable.", itemKey);
         return false;
     }
 
-    int result = zlist_append(self->bags[itemToAdd->itemCategory], itemToAdd);
-    if (result == -1) {
+    if (!zhash_freefn(self->items, itemKey, (zhash_free_fn *) itemFree)) {
+        error("Cannot set item '%s' destructor.", itemKey);
+        return false;
+    }
+
+    if (zlist_append(self->bags[itemToAdd->itemCategory], itemToAdd) != 0) {
         error("Cannot push item into the category bag in inventory");
         return false;
     }
@@ -111,15 +111,7 @@ bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
     ItemKey itemKey;
     itemGenKey(itemToRemove->itemId, itemKey);
 
-    //if (zlist_exists(self->bags[itemToRemove->itemCategory], itemToRemove)) {
-        zlist_remove(self->bags[itemToRemove->itemCategory], itemToRemove);
-    //} else {
-    //    error("Item was not found in bag [%d] of inventory", itemToRemove->itemCategory);
-    //    return false;
-    //}
-
-
-
+    zlist_remove(self->bags[itemToRemove->itemCategory], itemToRemove);
     zhash_delete(self->items, itemKey);
 
     return true;
@@ -131,8 +123,6 @@ bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item) {
 
     ItemKey itemKey;
     itemGenKey(itemId, itemKey);
-
-    *_item = NULL;
 
     if (!(item = zhash_lookup(self->items, itemKey))) {
         error("Cannot find the item '%s' in the inventory.", itemKey);
@@ -148,6 +138,18 @@ size_t inventoryGetItemsCount(Inventory *self) {
     return zhash_size(self->items);
 }
 
+size_t inventoryGetEquipmentCount(Inventory *self) {
+    size_t count = 0;
+
+    for (size_t i = 0; i < sizeof_array(self->equippedItems); i++) {
+        if (self->equippedItems[i] != NULL) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
 Item *inventoryGetFirstItem(Inventory *self, InventoryCategory category) {
     return (Item*) zlist_first(self->bags[category]);
 }
@@ -158,9 +160,9 @@ Item *inventoryGetNextItem(Inventory *self, InventoryCategory category) {
 
 bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
 
-    Item *itemToUnequip = self->equippedItems[eqSlot];
+    Item *itemToUnequip = NULL;
 
-    if (itemToUnequip == NULL) {
+    if (!(itemToUnequip = self->equippedItems[eqSlot])) {
         // We return false here because the system should have detected earlier that the slot is free
         error("No item to unequip. Slot is free.");
         return false;
@@ -174,11 +176,11 @@ bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
     // Set slot as free
     self->equippedItems[eqSlot] = NULL;
 
-    // Process unequip events
-    /// TODO
-
-
     return true;
+}
+
+bool inventoryCheckSlot(EquipmentSlot eqSlot) {
+    return (eqSlot >= 0 && eqSlot < EQSLOT_COUNT);
 }
 
 bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot) {
@@ -187,36 +189,35 @@ bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot) 
 
     // Get item from inventory
     if (!inventoryGetItemByItemId(self, itemId, &itemToEquip)) {
-        dbg("Can not find item in inventory. ItemId: %d", itemId);
+        error("Can not find item in inventory. ItemId: %llx", itemId);
         return false;
     }
 
     // Check if eqSlot is right for the item we want to equip.
-    /// TODO
+    if (!(inventoryCheckSlot(eqSlot))) {
+        error("The slot '%d' isn't valid.", eqSlot);
+        return false;
+    }
 
-    // Check if there is the slot already, if so, unequip.
+    // Check if there is something in the slot already, if so, unequip.
     if (self->equippedItems[eqSlot] != NULL) {
-        // Unequip Item
-        /// TODO
         if (!inventoryUnequipItem(self, eqSlot)) {
-            dbg("Not possible to unequip item from slot %d", eqSlot);
+            error("Not possible to unequip item from slot %d", eqSlot);
             return false;
         }
     }
 
     // Now we have the slot free to equip this item, and item is not in inventory.
     self->equippedItems[eqSlot] = itemToEquip;
+    itemToEquip->index = eqSlot;
 
     // Remove from inventory
     if (!inventoryRemoveItem(self, itemToEquip)) {
-        dbg("Can't remove item from inventory. Equip Item failed.");
+        error("Can't remove item from inventory. Equip Item failed.");
         // Roll back equipped item
         self->equippedItems[eqSlot] = NULL;
         return false;
     }
-
-    // Process Equipment events
-    /// TODO
 
     return true;
 
@@ -226,13 +227,13 @@ Item *inventoryGetEquipment(Inventory *self) {
     return (Item*) self->equippedItems;
 }
 
-bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value) {
+bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, EmptyEquipmentSlot *value) {
 
     switch (slot) {
         case EQSLOT_HEAD_TOP: *value = EMPTYEQSLOT_NoHat; break;
         case EQSLOT_HEAD_MIDDLE: *value = EMPTYEQSLOT_NoHat; break;
         case EQSLOT_UNKOWN1: *value = EMPTYEQSLOT_NoOuter; break;
-        case EQSLOT_BODY_ARMOR: *value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_BODY_ARMOR: *value = EMPTYEQSLOT_NoShirt; break;
         case EQSLOT_GLOVES: *value = EMPTYEQSLOT_NoGloves; break;
         case EQSLOT_BOOTS: *value = EMPTYEQSLOT_NoBoots; break;
         case EQSLOT_HELMET: *value = EMPTYEQSLOT_NoHelmet; break;
@@ -250,7 +251,7 @@ bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value) {
         case EQSLOT_RIGHT_RIGHT: *value = EMPTYEQSLOT_NoRing; break;
         case EQSLOT_NECKLACE: *value = EMPTYEQSLOT_NoNeck; break;
         default: {
-            *value = -1;
+            error("Unknown eqSlot '%d'", slot);
             return false;
         }
     }
@@ -274,7 +275,6 @@ bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2) {
 
     return true;
 }
-
 
 void inventoryPrintEquipment(Inventory *self) {
     dbg("head_top = %d (%x)", self->equippedItems[0] ? self->equippedItems[0]->itemType : 0, self->equippedItems[0]);
@@ -300,21 +300,20 @@ void inventoryPrintEquipment(Inventory *self) {
 }
 
 void inventoryPrintBag(Inventory *self, InventoryCategory category) {
+
     Item *item;
-    item = zlist_first(self->bags[category]);
+    zlist_t *bag = self->bags[category];
 
-    dbg("Printing Inventory bag[%d]", category);
+    dbg("Printing Inventory bag [%d]", category);
 
-    if (!item) {
+    if (zlist_size(bag) == 0) {
         dbg("-- Bag [%d] is empty --", category);
+        return;
     }
 
     int index = 0;
-    while (item) {
-        dbg("[%d] item: [%d]", index, item->itemType);
-
-        item = zlist_next(self->bags[category]);
-        index++;
+    for (item = zlist_first(bag); item != NULL; item = zlist_next(bag)) {
+        dbg("[%d] item: [%d]", index++, item->itemType);
     }
 }
 
@@ -339,10 +338,16 @@ size_t inventoryGetPacketSize(Inventory *self) {
 
 void inventorySerialize(Inventory *self, PacketStream *stream) {
 
+    size_t equipmentCount = inventoryGetEquipmentCount(self);
+
+    packetStreamIn(stream, &equipmentCount);
+
     // Write equipped items
     for (size_t i = 0; i < EQSLOT_COUNT; i++) {
         Item *item = self->equippedItems[i];
-        itemSerialize(item, stream);
+        if (item != NULL) {
+            itemSerialize(item, stream);
+        }
     }
 
     size_t itemsCount = zhash_size(self->items);
@@ -356,20 +361,64 @@ void inventorySerialize(Inventory *self, PacketStream *stream) {
 
 bool inventoryUnserialize(Inventory *self, PacketStream *stream) {
 
-    // Equipped items
+    bool status = false;
+     Item *newItem = NULL;
+
+    size_t equipmentCount = inventoryGetEquipmentCount(self);
+    packetStreamOut(stream, &equipmentCount);
+
+    // Free the old equipped items
     for (size_t i = 0; i < EQSLOT_COUNT; i++) {
-        if (!(itemUnserialize(self->equippedItems[i], stream))) {
-            error("Cannot unserialize the equipped item %d.", i);
-            return false;
+        // Free the old item
+        itemDestroy(&self->equippedItems[i]);
+    }
+
+    for (size_t i = 0; i < equipmentCount; i++) {
+        // Read the new item
+        ItemSPacket *itemPkt = packetStreamGetCurrentBuffer(stream);
+
+        if (!(newItem = itemNew(itemPkt->itemId, itemPkt->itemType, itemPkt->amount, itemPkt->index))) {
+            error("Cannot allocate a new copy of the item '%llx'.", itemPkt->itemId);
+            goto cleanup;
         }
+
+        if (!(itemUnserialize(newItem, stream))) {
+            error("Cannot unserialize the equipped item %d.", i);
+            goto cleanup;
+        }
+
+        self->equippedItems[newItem->index] = newItem;
     }
 
     size_t itemsCount;
     packetStreamOut(stream, &itemsCount);
 
-    for (size_t i = 0; i < itemsCount; i++) {
-        #warning TODO
+    // Purge old inventory
+    zhash_purge(self->items);
+    for (size_t i = 0; i < sizeof_array(self->bags); i++) {
+        zlist_purge(self->bags[i]);
     }
 
-    return true;
+    for (size_t i = 0; i < itemsCount; i++) {
+        ItemSPacket *itemPkt = packetStreamGetCurrentBuffer(stream);
+
+        if (!(newItem = itemNew(itemPkt->itemId, itemPkt->itemType, itemPkt->amount, itemPkt->index))) {
+            error("Cannot allocate a new copy of the item '%llx'.", itemPkt->itemId);
+            goto cleanup;
+        }
+
+        if (!(itemUnserialize(newItem, stream))) {
+            error("Cannot unserialize the item '%llx'", newItem->itemId);
+            goto cleanup;
+        }
+
+        if (!(inventoryAddItem(self, newItem))) {
+            error("Cannot add a new item '%llx' in the inventory.", newItem->itemId);
+            goto cleanup;
+        }
+    }
+
+    status = true;
+cleanup:
+    return status;
 }

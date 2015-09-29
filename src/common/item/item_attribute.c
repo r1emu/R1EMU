@@ -141,7 +141,7 @@ void *itemAttributeStringNew(size_t valueSize, char *value) {
     DECLARE_ItemAttributeString(valueSize);
     ItemAttributeString *self = NULL;
 
-    if (!(self = malloc(sizeof(ItemAttributeString)))) {
+    if (!(self = calloc(1, sizeof(ItemAttributeString)))) {
         error("Cannot allocate an item attribute float.");
         return NULL;
     }
@@ -568,6 +568,7 @@ cleanup:
 static bool itemAttributeUnserialize(ItemAttribute *self, PacketStream *stream) {
 
     bool status = false;
+
     packetStreamOut(stream, &self->format);
     packetStreamOut(stream, &self->attributeId);
 
@@ -604,9 +605,11 @@ bool itemAttributesUnserialize(ItemAttributes *self, PacketStream *stream) {
     size_t attributesCount;
     ItemAttribute *itemAttr = NULL;
 
-    zhash_purge(self->hashtable);
-
+    // Get the number of attributes
     packetStreamOut(stream, &attributesCount);
+
+    // Purge the old item attributes
+    zhash_purge(self->hashtable);
 
     for (size_t i = 0; i < attributesCount; i++) {
         ItemAttributeSPacket *itemAttrPkt = packetStreamGetCurrentBuffer(stream);
@@ -631,7 +634,9 @@ bool itemAttributesUnserialize(ItemAttributes *self, PacketStream *stream) {
 
 cleanup:
     if (!status) {
+        zhash_purge(self->hashtable);
         itemAttributeDestroy(&itemAttr);
     }
+
     return status;
 }
