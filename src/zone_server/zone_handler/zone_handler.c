@@ -19,6 +19,9 @@
 #include "common/redis/fields/redis_game_session.h"
 #include "common/redis/fields/redis_socket_session.h"
 #include "common/server/event_handler.h"
+#include "common/commander/inventory.h"
+#include "common/mysql/fields/mysql_commander.h"
+#include "common/mysql/fields/mysql_account_session.h"
 
 /** Connect to the zone server */
 static PacketHandlerState zoneHandlerConnect        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
@@ -64,6 +67,10 @@ static PacketHandlerState zoneHandlerRotate         (Worker *self, Session *sess
 static PacketHandlerState zoneHandlerPose           (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On commander dash run */
 static PacketHandlerState zoneHandlerDashRun        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+/** On delete an item from inventory/warehouse */
+static PacketHandlerState zoneHandlerItemDelete        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+/** On commander delete item */
+static PacketHandlerState zoneHandlerSwapEtcInvChangeIndex        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 
 /**
  * @brief zoneHandlers is a global table containing all the zone handlers.
@@ -94,6 +101,8 @@ const PacketHandler zoneHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CZ_ROTATE, zoneHandlerRotate),
     REGISTER_PACKET_HANDLER(CZ_POSE, zoneHandlerPose),
     REGISTER_PACKET_HANDLER(CZ_DASHRUN, zoneHandlerDashRun),
+    REGISTER_PACKET_HANDLER(CZ_ITEM_DELETE, zoneHandlerItemDelete),
+    REGISTER_PACKET_HANDLER(CZ_SWAP_ETC_INV_CHANGE_INDEX, zoneHandlerSwapEtcInvChangeIndex),
 
     #undef REGISTER_PACKET_HANDLER
 };
@@ -117,19 +126,19 @@ static PacketHandlerState zoneHandlerChat(
     zmsg_t *replyMsg)
 {
     // the first 2 bytes of ZC_CHAT are the packet size
-    size_t chatTextSize = *((uint16_t *) packet) - sizeof(ClientPacketHeader) - sizeof(uint16_t);
+    size_t msgSize = *((uint16_t *) packet) - sizeof(ClientPacketHeader) - sizeof(uint16_t);
 
     #pragma pack(push, 1)
     struct {
         uint16_t msgSize;
-        uint8_t msgText[chatTextSize];
+        uint8_t msgText[msgSize];
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CHAT);
 
     // The chat message sent by the client should always finish by a null byte
-    clientPacket->msgText[chatTextSize-1] = '\0';
+    clientPacket->msgText[msgSize - 1] = '\0';
 
     // Check for custom admin commands
     if (session->game.accountSession.privilege <= ACCOUNT_SESSION_PRIVILEGES_ADMIN
@@ -138,11 +147,11 @@ static PacketHandlerState zoneHandlerChat(
     }
     else {
         // normal message : Dispatch a GameEventChat
-        size_t gameEventSize = sizeof(GameEventChat) + chatTextSize;
-        GameEventChat *event = alloca(gameEventSize);
-        memcpy(&event->info, &session->game.commanderSession.currentCommander, sizeof(event->info));
-        memcpy(event->chatText, clientPacket->msgText, chatTextSize);
-        workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_CHAT, event, gameEventSize);
+        DECLARE_GameEventChat(msgSize);
+        GameEventChat event;
+        memcpy(&event.commander, session->game.commanderSession.currentCommander, sizeof(event.commander));
+        memcpy(event.chatText, clientPacket->msgText, msgSize);
+        workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_CHAT, &event, sizeof(event));
     }
 
     return PACKET_HANDLER_UPDATE_SESSION;
@@ -165,7 +174,7 @@ static PacketHandlerState zoneHandlerRestSit(
 
     // notify the players around
     GameEventRestSit event = {
-        .pcId = session->game.commanderSession.currentCommander.info.pcId,
+        .pcId = session->game.commanderSession.currentCommander->pcId,
     };
     workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_REST_SIT, &event, sizeof(event));
 
@@ -208,7 +217,7 @@ static PacketHandlerState zoneHandlerSkillGround(
     zoneBuilderPlayAni(replyMsg);
 
     zoneBuilderNormalUnk8(
-        session->game.commanderSession.currentCommander.info.pcId,
+        session->game.commanderSession.currentCommander->pcId,
         replyMsg
     );
 
@@ -278,7 +287,7 @@ static PacketHandlerState zoneHandlerLogout(
 
     // notify leave to clients
     GameEventLeave event = {
-        .pcId = session->game.commanderSession.currentCommander.info.pcId,
+        .pcId = session->game.commanderSession.currentCommander->pcId,
     };
     workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_LEAVE, &event, sizeof(event));
 
@@ -331,7 +340,7 @@ static PacketHandlerState zoneHandlerMoveStop(
     GameEventMoveStop event = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .info = session->game.commanderSession.currentCommander.info,
+            .commander = *session->game.commanderSession.currentCommander,
         },
         .position = clientPacket->position,
         .direction = clientPacket->direction,
@@ -374,13 +383,13 @@ static PacketHandlerState zoneHandlerKeyboardMove(
     // TODO : Check coordinates
 
     // update session
-    session->game.commanderSession.currentCommander.info.pos = clientPacket->position;
+    session->game.commanderSession.currentCommander->pos = clientPacket->position;
 
     // notify the players around
     GameEventCommanderMove event = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .info = session->game.commanderSession.currentCommander.info
+            .commander = *session->game.commanderSession.currentCommander
         },
         .position = clientPacket->position,
         .direction = clientPacket->direction,
@@ -424,44 +433,55 @@ static PacketHandlerState zoneHandlerGameReady(
     zmsg_t *replyMsg)
 {
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_GAME_READY);
-    CommanderInfo *cInfo = &session->game.commanderSession.currentCommander.info;
+    Commander *commander = session->game.commanderSession.currentCommander;
 
-    /* /// TESTING PURPOSES
-    Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+    /// TESTING PURPOSES
+    /*
+    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
+
     Item items[20];
     items[0].itemId = 1111;
-    items[0].itemType = 640092;
-    items[0].amount = 5;
+    items[0].itemType = 645001;
+    items[0].amount = 5003;
     items[0].itemCategory = INVENTORY_CAT_CONSUMABLE;
-    items[0].attributes = itemAttributesNew(0, 45, NULL, NULL, NULL, 0, 0);
+    items[0].inventoryIndex = 1;
+    //items[0].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[0]);
 
-
     items[1].itemId = 2222;
-    items[1].itemType = 640102;
-    items[1].amount = 1;
-    items[0].itemCategory = INVENTORY_CAT_CONSUMABLE;
-    items[1].attributes = itemAttributesNew(0, 30, NULL, NULL, NULL, 0, 0);
+    items[1].itemType = 640026;
+    items[1].amount = 5;
+    items[1].itemCategory = INVENTORY_CAT_CONSUMABLE;
+    items[1].inventoryIndex = 2;
+    //items[1].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[1]);
+
 
     items[2].itemId = 3333;
     items[2].itemType = 531102;
     items[2].amount = 1;
-    items[0].itemCategory = INVENTORY_CAT_ARMOR;
-    items[2].equipSlot = EQSLOT_BODY_ARMOR;
-    items[2].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    items[2].itemCategory = INVENTORY_CAT_ARMOR;
+    //items[2].equipSlot = EQSLOT_BODY_ARMOR;
+    //items[2].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[2]);
 
     items[3].itemId = 4444;
     items[3].itemType = 531101;
     items[3].amount = 1;
-    items[0].itemCategory = INVENTORY_CAT_ARMOR;
-    items[3].equipSlot = EQSLOT_BODY_ARMOR;
-    items[3].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    items[3].itemCategory = INVENTORY_CAT_ARMOR;
+    //items[3].equipSlot = EQSLOT_BODY_ARMOR;
+    //items[3].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[3]);
-    */
 
-    zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander.inventory, replyMsg);
+
+    inventoryPrintBag(inventory, INVENTORY_CAT_CONSUMABLE);
+    inventoryPrintBag(inventory, INVENTORY_CAT_ARMOR);
+
+    inventoryRemoveItem(inventory, &items[1]);
+
+    inventoryPrintBag(inventory, INVENTORY_CAT_CONSUMABLE);
+    */
+    zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
     zoneBuilderSessionObjects(replyMsg);
     zoneBuilderOptionList(replyMsg);
     zoneBuilderSkillmapList(replyMsg);
@@ -477,7 +497,7 @@ static PacketHandlerState zoneHandlerGameReady(
 
     /// FOR TESTIG PURPOSES
     /*
-    Inventory *inventory = &session->game.commanderSession.currentCommander.inventory;
+    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
     Item items[20];
 
     items[0].itemId = 1111;
@@ -647,17 +667,17 @@ static PacketHandlerState zoneHandlerGameReady(
 
 
 
-    zoneBuilderItemEquipList(&session->game.commanderSession.currentCommander.inventory, replyMsg);
-    // ZoneBuilder_skillList(cInfo->pcId, replyMsg);
-    zoneBuilderAbilityList(cInfo->pcId, replyMsg);
-    zoneBuilderCooldownList(cInfo->socialInfoId, replyMsg);
+    zoneBuilderItemEquipList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
+    // ZoneBuilder_skillList(commander->pcId, replyMsg);
+    zoneBuilderAbilityList(commander->pcId, replyMsg);
+    zoneBuilderCooldownList(commander->socialInfoId, replyMsg);
 
     zoneBuilderQuickSlotList(replyMsg);
 
     zoneBuilderNormalUnk1(replyMsg);
     zoneBuilderNormalUnk2(replyMsg);
     zoneBuilderNormalUnk3(replyMsg);
-    zoneBuilderNormalUnk4(cInfo->socialInfoId, replyMsg);
+    zoneBuilderNormalUnk4(commander->socialInfoId, replyMsg);
     zoneBuilderNormalUnk5(replyMsg);
 
     zoneBuilderStartGame(1.0, 0.0, 0.0, 0.0, replyMsg);
@@ -667,20 +687,20 @@ static PacketHandlerState zoneHandlerGameReady(
     */
     zoneBuilderLoginTime(replyMsg);
 
-    zoneBuilderMyPCEnter(&cInfo->pos, replyMsg);
+    zoneBuilderMyPCEnter(&commander->pos, replyMsg);
     // ZoneBuilder_skillAdd(replyMsg);
 
     // Notify players around that a new PC has entered
     GameEventEnterPc pcEnterEvent = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .info = *cInfo
+            .commander = *commander
         }
     };
     workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_ENTER_PC, &pcEnterEvent, sizeof(pcEnterEvent));
     // zoneBuilderEnterPc(&pcEnterEvent.updatePosEvent.info, replyMsg);
 
-    // ZoneBuilder_buffList(cInfo->appearance.pcId, replyMsg);
+    // ZoneBuilder_buffList(commander->appearance.pcId, replyMsg);
 
     // add NPC at the start screen
     // ZoneBuilder_enterMonster(replyMsg);
@@ -694,18 +714,18 @@ static PacketHandlerState zoneHandlerGameReady(
 
     ZoneBuilder_normalUnk7(
         session->socket.accountId,
-        session->game.commanderSession.currentCommander.info.appearance.pcId,
-        session->game.commanderSession.currentCommander.info.appearance.familyName,
-        session->game.commanderSession.currentCommander.info.appearance.commanderName,
+        session->game.commanderSession.currentCommander->appearance.pcId,
+        session->game.commanderSession.currentCommander->appearance.familyName,
+        session->game.commanderSession.currentCommander->appearance.commanderName,
         replyMsg
     );
 
     ZoneBuilder_jobPts(replyMsg);
-    ZoneBuilder_normalUnk9(session->game.commanderSession.currentCommander.info.appearance.pcId, replyMsg);
+    ZoneBuilder_normalUnk9(session->game.commanderSession.currentCommander->appearance.pcId, replyMsg);
     ZoneBuilder_addonMsg(replyMsg);
     */
 
-    zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander.info.pcId, 31.0f, replyMsg);
+    zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander->pcId, 31.0f, replyMsg);
 
     return PACKET_HANDLER_UPDATE_SESSION;
 }
@@ -717,12 +737,14 @@ static PacketHandlerState zoneHandlerConnect(
     size_t packetSize,
     zmsg_t *replyMsg)
 {
+    PacketHandlerState status = PACKET_HANDLER_ERROR;
+
     #pragma pack(push, 1)
     struct {
         uint32_t unk1;
         uint64_t accountId;
         uint64_t zoneServerId;
-        uint8_t login[ACCOUNT_SESSION_LOGIN_MAXSIZE];
+        uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
         uint8_t unk4;
         uint32_t zoneServerIndex;
         uint16_t unk3;
@@ -730,36 +752,70 @@ static PacketHandlerState zoneHandlerConnect(
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
+    dbg("zoneHandlerConnect");
+    dbg("unk1 %x", clientPacket->unk1);
+    dbg("accountId %d", clientPacket->accountId);
+    dbg("zoneServerId %d", clientPacket->zoneServerId);
+    dbg("zoneServerIndex %d", clientPacket->zoneServerIndex);
+    dbg("unk3 %x", clientPacket->unk3);
+    dbg("unk4 %x", clientPacket->unk4);
+    dbg("channelListId %d", clientPacket->channelListId);
+    dbg("accountName %s", clientPacket->accountName);
+
     // TODO : Reverse CZ_CONNECT correctly
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CONNECT);
 
-    // Get the Game Session that the Barrack Server moved
-    RedisGameSessionKey gameKey = {
+    GameSession tmpGameSession;
+    AccountSession *tmpAccountSession = &tmpGameSession.accountSession;
+    CommanderSession *tmpCommanderSession = &tmpGameSession.commanderSession;
+
+    // TODO : Get the account session from Db.
+    RedisAccountSessionKey accountKey = {
         .routerId = self->info.routerId,
-        .mapId = -1,
+        .mapId = SOCKET_SESSION_UNDEFINED_MAP,
         .accountId = clientPacket->accountId
     };
-    if (!(redisGetGameSession(self->redis, &gameKey, &session->game))) {
-        error("Cannot retrieve the game session.");
-        return PACKET_HANDLER_ERROR;
+    if (!(redisGetAccountSession(self->redis, &accountKey, tmpAccountSession))) {
+        error("Cannot retrieve the account session.");
+        goto cleanup;
     }
 
-    // Check the client packet here(authentication)
-    if (strncmp(session->game.accountSession.login,
-                clientPacket->login,
-                sizeof(session->game.accountSession.login)) != 0)
+    // Check the client packet here (authentication)
+    // TODO improve it
+    if (strncmp(tmpAccountSession->accountName,
+                clientPacket->accountName,
+                sizeof(tmpAccountSession->accountName)) != 0)
     {
-        error("Wrong account authentication.(clientPacket account = <%s>, Session account = <%s>",
-            clientPacket->login, session->game.accountSession.login);
-        return PACKET_HANDLER_ERROR;
+        error("Wrong account authentication. (clientPacket account = <%s>, Session account = <%s>",
+            clientPacket->accountName, tmpAccountSession->accountName);
+        goto cleanup;
     }
 
-    // Authentication OK !
+    // === Authentication OK ! ===
+
+    // Get list of Commanders for this AccountId
+    size_t commandersCount;
+    if (!(mySqlLoadAccountCommanders(self->sqlConn, tmpAccountSession, clientPacket->accountId, &commandersCount))) {
+        error("Cannot load commanders.");
+        goto cleanup;
+    }
+
+    // FIXME : Determine how to get the correct commander in the commander array
+    tmpCommanderSession->currentCommander = commanderDup(tmpAccountSession->commanders[0]);
+
+    // Get the Game Session that the Barrack Server moved
+    // TODO : Should be replaced by Db
+    RedisGameSessionKey gameKey = accountKey;
+    if (!(redisGetGameSession(self->redis, &gameKey, &tmpGameSession))) {
+        error("Cannot retrieve the game session.");
+        goto cleanup;
+    }
+
     // Update the Socket Session
     socketSessionInit(&session->socket,
         clientPacket->accountId,
         self->info.routerId,
-        session->game.commanderSession.mapId,
+        tmpCommanderSession->currentCommander->mapId,
         session->socket.sessionKey,
         true
     );
@@ -775,23 +831,31 @@ static PacketHandlerState zoneHandlerConnect(
         .mapId = session->socket.mapId,
         .accountId = session->socket.accountId
     };
-
+    // TODO : Should be replaced by Db
     if (!(redisMoveGameSession(self->redis, &fromKey, &toKey))) {
         error("Cannot move the game session to the current mapId.");
-        return PACKET_HANDLER_ERROR;
+        goto cleanup;
     }
 
-    session->game.commanderSession.currentCommander.info.pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
+    // FIXME
+    // Set a default position
+    tmpCommanderSession->currentCommander->pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
 
+    // Update the session
+    session->game = tmpGameSession;
+
+    // Build a reply packet
     zoneBuilderConnectOk(
-        session->game.commanderSession.currentCommander.info.pcId,
         0, // GameMode
         0, // accountPrivileges
-        &session->game.commanderSession.currentCommander.info, // Current commander
+        session->game.commanderSession.currentCommander,
         replyMsg
     );
 
-    return PACKET_HANDLER_UPDATE_SESSION;
+    status = PACKET_HANDLER_UPDATE_SESSION;
+
+cleanup:
+    return status;
 }
 
 static PacketHandlerState zoneHandlerJump(
@@ -813,7 +877,7 @@ static PacketHandlerState zoneHandlerJump(
     GameEventJump event = {
         .updatePosEvent = {
             .mapId = session->socket.mapId,
-            .info = session->game.commanderSession.currentCommander.info
+            .commander = *session->game.commanderSession.currentCommander
         },
         .height = COMMANDER_HEIGHT_JUMP
     };
@@ -860,7 +924,7 @@ static PacketHandlerState zoneHandlerHeadRotate(
 
     // notify the players around
     GameEventHeadRotate event = {
-        .pcId = session->game.commanderSession.currentCommander.info.pcId,
+        .pcId = session->game.commanderSession.currentCommander->pcId,
         .direction = clientPacket->direction
     };
 
@@ -886,7 +950,7 @@ static PacketHandlerState zoneHandlerRotate(
 
     // notify the players around
     GameEventRotate event = {
-        .pcId = session->game.commanderSession.currentCommander.info.pcId,
+        .pcId = session->game.commanderSession.currentCommander->pcId,
         .direction = clientPacket->direction
     };
 
@@ -914,9 +978,9 @@ static PacketHandlerState zoneHandlerPose(
 
     // notify the players around
     GameEventPose event = {
-        .pcId = session->game.commanderSession.currentCommander.info.pcId,
+        .pcId = session->game.commanderSession.currentCommander->pcId,
         .poseId = clientPacket->poseId,
-        .position = session->game.commanderSession.currentCommander.info.pos,
+        .position = session->game.commanderSession.currentCommander->pos,
         .direction = clientPacket->direction
     };
 
@@ -939,9 +1003,94 @@ static PacketHandlerState zoneHandlerDashRun(
     #pragma pack(pop)
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_DASHRUN);
-    zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander.info.pcId, 38.0f, replyMsg);*/
+    zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander->pcId, 38.0f, replyMsg);*/
 
     warning("CZ_DASHRUN not implemented yet.");
 
     return PACKET_HANDLER_OK;
 }
+
+static PacketHandlerState zoneHandlerItemDelete(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *replyMsg)
+{
+    #pragma pack(push, 1)
+    struct {
+        uint16_t unk1;
+        uint32_t unk2;
+        uint64_t itemId;
+        uint64_t unk3;
+    } *clientPacket = (void *) packet;
+    #pragma pack(pop)
+
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_ITEM_DELETE);
+
+    // Delete item from inventory
+    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
+
+    Item *item;
+    if (inventoryGetItemByItemId(inventory, clientPacket->itemId, &item)) {
+        inventoryRemoveItem(&session->game.commanderSession.currentCommander->inventory, item);
+    } else {
+        error("Item not found in inventory");
+        return PACKET_HANDLER_ERROR;
+    }
+
+    ///TODO
+    uint8_t removalType = 3; // Destroyed
+    uint8_t inventoryType = 0; // 0 (Inventory) , 1 (warehouse)
+
+    zoneBuilderItemRemove(item, removalType, inventoryType,replyMsg);
+
+    return PACKET_HANDLER_OK;
+}
+
+static PacketHandlerState zoneHandlerSwapEtcInvChangeIndex(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *replyMsg)
+{
+    #pragma pack(push, 1)
+    struct {
+        uint8_t inventoryType;
+        uint64_t itemId1;
+        uint32_t inventoryIndex1;
+        uint64_t itemId2;
+        uint32_t inventoryIndex2;
+    } *clientPacket = (void *) packet;
+    #pragma pack(pop)
+
+    CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_SWAP_ETC_INV_CHANGE_INDEX);
+
+    // Delete item from inventory
+    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
+
+    Item *item1;
+    Item *item2;
+
+    if (!inventoryGetItemByItemId(inventory, clientPacket->itemId1, &item1)) {
+        error("Item1 not found in inventory");
+        return PACKET_HANDLER_ERROR;
+    }
+
+    if (!inventoryGetItemByItemId(inventory, clientPacket->itemId2, &item2)) {
+        error("Item2 not found in inventory");
+        return PACKET_HANDLER_ERROR;
+    }
+
+    if (!inventorySwapItems(inventory, &item1, &item2)) {
+        error("Error when swapping items in inventory");
+        return PACKET_HANDLER_ERROR;
+    }
+
+    // No packet in return?
+
+    return PACKET_HANDLER_OK;
+}
+
+

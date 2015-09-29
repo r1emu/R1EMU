@@ -134,7 +134,7 @@ void zoneBuilderBuffList(uint32_t targetPcId, zmsg_t *replyMsg);
 /**
  * @brief Makes a playable character appear in the screen.
  */
-void zoneBuilderEnterPc(CommanderInfo *commander, zmsg_t *replyMsg);
+void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg);
 
 /**
  * @brief Makes a playable character disappear in the screen.
@@ -311,10 +311,9 @@ void zoneBuilderMoveSpeed(uint32_t targetPcId, float movementSpeed,zmsg_t *reply
  * @brief Connect to the zone server
  */
 void zoneBuilderConnectOk(
-    uint32_t pcId,
     uint8_t gameMode,
     uint8_t accountPrivileges,
-    CommanderInfo *commander,
+    Commander *commander,
     zmsg_t *replyMsg);
 
 /**
@@ -325,7 +324,7 @@ void zoneBuilderJump(uint32_t targetPcId, float height, zmsg_t *replyMsg);
 /**
  * Makes a normal chat message
  */
-void zoneBuilderChat(CommanderInfo *commander, uint8_t *chatText, zmsg_t *replyMsg);
+void zoneBuilderChat(Commander *commander, uint8_t *chatText, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown Contains information about quest position?
@@ -406,3 +405,8 @@ void zoneBuilderChangeCamera(uint8_t mode, PositionXYZ *pos, float fspd, float i
  * Makes an animation
  */
 void zoneBuilderPose(uint32_t pcId, uint32_t poseId, PositionXYZ *pos, PositionXZ *dir, zmsg_t *replyMsg);
+
+/**
+ *
+ */
+void zoneBuilderItemRemove(Item *item, uint8_t removalType, uint8_t inventoryType, zmsg_t *replyMsg);

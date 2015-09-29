@@ -28,7 +28,9 @@ extern const PacketHandler barrackHandlers[PACKET_TYPE_COUNT];
 /**
  * BC_MESSAGE messages
  */
-typedef enum PacketMessageTypes {
+typedef enum BcMessageType {
+
+    BC_MESSAGE_NO_MSG = -1,
 
     BC_MESSAGE_CUSTOM_MSG = 0,
     BC_MESSAGE_USER_PASS_INCORRECT_1 = 1,
@@ -58,4 +60,4 @@ typedef enum PacketMessageTypes {
     BC_MESSAGE_NOT_CBT_USER = 25,
     BC_MESSAGE_RATED_ESRB_TEEN = 26,
 
-} PacketMessageTypes;
+} BcMessageType;

@@ -1,5 +1,10 @@
 #include "memory.h"
 
+void destroy(void *_data) {
+    void **data = _data;
+    free(*data);
+    *data = NULL;
+}
 
 float *floatdup(float *f) {
 

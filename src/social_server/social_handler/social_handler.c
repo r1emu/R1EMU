@@ -49,7 +49,7 @@ static PacketHandlerState socialHandlerLogin(
 {
     #pragma pack(push, 1)
     struct {
-        char accountLogin[ACCOUNT_SESSION_LOGIN_MAXSIZE];
+        char accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
         char md5[17];
         uint64_t accountId;
     } *clientPacket = (void *) packet;
@@ -62,7 +62,7 @@ static PacketHandlerState socialHandlerLogin(
 
     // Authentication OK!
     session->socket.accountId = clientPacket->accountId;
-    accountSessionInit(&session->game.accountSession, clientPacket->accountLogin, session->socket.sessionKey,
+    accountSessionInit(&session->game.accountSession, clientPacket->accountName, session->socket.sessionKey,
         ACCOUNT_SESSION_PRIVILEGES_ADMIN);
     session->socket.authenticated = true;
 

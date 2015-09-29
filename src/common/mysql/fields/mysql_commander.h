@@ -102,6 +102,8 @@ bool mySqlRequestCommandersByAccountId(MySQL *self, uint64_t accountId, size_t *
 /**
  * Convert SQL results to in memory structures
  */
-bool mySqlGetCommanders(MySQL *self, Commander *commanders);
+bool mySqlGetCommanders(MySQL *self, Commander **commanders);
 
-bool mySqlCommanderCreate(MySQL *self, uint64_t accountId, CommanderCreateInfo *commanderCreate);
+bool mySqlCommanderInsert(MySQL *self, uint64_t accountId, Commander *commander);
+
+bool MySqlCommanderDelete(MySQL *self, uint64_t commanderId);

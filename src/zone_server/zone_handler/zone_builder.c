@@ -748,7 +748,7 @@ void zoneBuilderLeave(uint32_t targetPcId, zmsg_t *replyMsg) {
 
 void zoneBuilderCampInfo(uint64_t accountId, zmsg_t *replyMsg) {}
 
-void zoneBuilderEnterPc(CommanderInfo *commander, zmsg_t *replyMsg) {
+void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
@@ -1236,6 +1236,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
 
         }
     }
+
 }
 
 void zoneBuilderStartInfo(zmsg_t *replyMsg) {
@@ -1518,7 +1519,7 @@ void zoneBuilderMoveSpeed(uint32_t targetPcId, float movementSpeed, zmsg_t *repl
     }
 }
 
-void zoneBuilderChat(CommanderInfo *commander, uint8_t *chatText, zmsg_t *replyMsg) {
+void zoneBuilderChat(Commander *commander, uint8_t *chatText, zmsg_t *replyMsg) {
 
     size_t chatTextLen = strlen(chatText) + 1;
 
@@ -1586,10 +1587,9 @@ void zoneBuilderJump(uint32_t targetPcId, float height, zmsg_t *replyMsg) {
 }
 
 void zoneBuilderConnectOk(
-    uint32_t pcId,
     uint8_t gameMode,
     uint8_t accountPrivileges,
-    CommanderInfo *commander,
+    Commander *commander,
     zmsg_t *replyMsg)
 {
     #pragma pack(push, 1)
@@ -1604,7 +1604,22 @@ void zoneBuilderConnectOk(
         uint8_t passport[41];
         uint32_t pcId;
         uint32_t unk5;
-        CommanderInfo commander;
+
+        CommanderAppearance appearance;
+        PositionXYZ pos;
+        uint32_t currentXP;
+        uint32_t maxXP;
+        uint32_t _pcId;
+        uint64_t socialInfoId;
+        uint64_t commanderId;
+        uint32_t currentHP;
+        uint32_t maxHP;
+        uint16_t currentSP;
+        uint16_t maxSP;
+        uint32_t currentStamina;
+        uint32_t maxStamina;
+        uint16_t unk6;
+        uint16_t unk7;
     } replyPacket;
     #pragma pack(pop)
 
@@ -1622,10 +1637,22 @@ void zoneBuilderConnectOk(
         replyPacket.unk3 = 0; // ICBT
         memcpy(replyPacket.markers, "*\x00*", sizeof(replyPacket.markers));
         memcpy(replyPacket.passport, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", sizeof(replyPacket.passport));
-        replyPacket.pcId = pcId;
+        replyPacket.pcId = commander->pcId;
         replyPacket.unk5 = 0; // ICBT
-        // Copy the current commander information
-        memcpy(&replyPacket.commander, commander, sizeof(replyPacket.commander));
+
+        replyPacket.appearance = commander->appearance;
+        replyPacket.pos = commander->pos;
+        replyPacket.currentXP = commander->currentXP;
+        replyPacket.maxXP = commander->maxXP;
+        replyPacket._pcId = commander->pcId;
+        replyPacket.socialInfoId = commander->socialInfoId;
+        replyPacket.commanderId = commander->commanderId;
+        replyPacket.currentHP = commander->currentHP;
+        replyPacket.maxHP = commander->maxHP;
+        replyPacket.currentSP = commander->currentSP;
+        replyPacket.maxSP = commander->maxSP;
+        replyPacket.currentStamina = commander->currentStamina;
+        replyPacket.maxStamina = commander->maxStamina;
     }
 }
 
@@ -1658,38 +1685,128 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
     size_t inventoryCount = inventoryGetItemsCount(inventory);
 
     // Calculate size in packet to store all items
-    size_t itemAttributesSize[inventoryCount];
+    size_t itemAttributesSize[INVENTORY_CAT_Count][inventoryCount];
     size_t totalSize = 0;
 
-    Item *item = inventoryGetFirstItem(inventory);
-    uint8_t inventoryIndex = -1;
+    // Itarate all inventory bags
+    for (int category = 0; category < INVENTORY_CAT_Count; category++) {
 
-    while (item) {
+        // Iterate through all items in this bag
+        Item *item = inventoryGetFirstItem(inventory, category);
+        uint8_t inventoryIndex = 0;
 
-        inventoryIndex++;
+        while (item) {
 
         size_t attrSize = item ? itemAttributesGetPacketSize(&item->attributes) : 0;
 
-        #pragma pack(push, 1)
-        struct {
-            uint32_t itemType;
-            uint16_t sizeOfAttributes;
-            uint16_t unkown1;
-            uint64_t itemId;
-            uint32_t amount;
-            uint32_t price;
-            uint8_t inventoryIndex;
-            uint32_t unkown2;
-            uint8_t attributes[attrSize];
-        } InventoryItemPacket;
-        #pragma pack(pop)
 
-        itemAttributesSize[inventoryIndex] = attrSize;
-        totalSize += sizeof(InventoryItemPacket);
+            #pragma pack(push, 1)
+            struct {
+                uint32_t itemType;
+                uint16_t sizeOfAttributes;
+                uint16_t unkown1;
+                uint64_t itemId;
+                uint32_t amount;
+                uint32_t price;
+                uint32_t inventoryIndex;
+                uint32_t unkown2;
+                uint8_t attributes[attrSize];
+            } InventoryItemPacket;
+            #pragma pack(pop)
 
-        item = inventoryGetNextItem(inventory);
+            itemAttributesSize[category][inventoryIndex] = attrSize;
+            totalSize += sizeof(InventoryItemPacket);
+
+            item = inventoryGetNextItem(inventory, category);
+            inventoryIndex++;
+        }
+    }
+
+
+
+    /// VERSION OF THE PACKET, NO COMPRESSED
+    /*
+    #pragma pack(push, 1)
+    struct InventoryListPacket {
+        VariableSizePacketHeader variableSizeHeader;
+        uint32_t inventoryCount;
+        uint16_t compression;
+        uint8_t itemsPacket[totalSize];
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_ITEM_INVENTORY_LIST;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    PacketStream packetStream;
+    packetStreamInit(&packetStream, &replyPacket);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
+
+        replyPacket.inventoryCount = inventoryCount;
+        replyPacket.compression = 0;
+
+        // we want to start writing at the offset of commandersBarrackInfoPacket
+        size_t offset = offsetof(struct InventoryListPacket, itemsPacket);
+        packetStreamAddOffset(&packetStream, offset);
+
+        item = inventoryGetFirstItem(inventory);
+        inventoryIndex = -1;
+
+        while (item) {
+
+            inventoryIndex++;
+            size_t attrSize = itemAttributesSize[inventoryIndex];
+
+            #pragma pack(push, 1)
+            struct InventoryItemPacket {
+                uint32_t itemType;
+                uint16_t sizeOfAttributes;
+                uint16_t unkown1;
+                uint64_t itemId;
+                uint32_t amount;
+                uint32_t price;
+                uint32_t inventoryIndex;
+                uint32_t unkown2;
+                uint8_t attributes[attrSize];
+
+            } *inventoryItemPacket  = packetStreamGetCurrentBuffer(&packetStream);
+            #pragma pack(pop)
+
+            inventoryItemPacket->itemType = item->itemType;
+            inventoryItemPacket->sizeOfAttributes = attrSize;
+            inventoryItemPacket->unkown1 = 0;
+            inventoryItemPacket->itemId = item ? item->itemId : 0;
+            inventoryItemPacket->amount = item->amount;
+            inventoryItemPacket->price = 0;
+            inventoryItemPacket->inventoryIndex = INVENTORY_CAT_SIZE * item->itemCategory + item->inventoryIndex;
+            inventoryItemPacket->unkown2 = 0;
+
+            // fill attribute buffer
+            size_t offset = offsetof(struct InventoryItemPacket, attributes);
+            packetStreamAddOffset(&packetStream, offset);
+
+            // write in the buffer
+            if (attrSize > 0) {
+                itemAttributesGetPacket(item->attributes, packetStreamGetCurrentBuffer(&packetStream));
+                // relocate the stream position
+                packetStreamAddOffset(&packetStream, attrSize);
+            }
+
+
+            item = inventoryGetNextItem(inventory);
+        }
 
     }
+
+    // Debug purposes
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
+
+    */
+
+    /// VERSION OF THE PACKET, USING zLIB compression
 
     // Populate packet for Items
     uint8_t itemsPacket[totalSize];
@@ -1697,40 +1814,29 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
     PacketStream packetStream;
     packetStreamInit(&packetStream, &itemsPacket);
 
-    item = inventoryGetFirstItem(inventory);
-    inventoryIndex = -1;
+    // Itarate all inventory bags
+    for (int category = 0; category < INVENTORY_CAT_Count; category++) {
 
-    while (item) {
+        // Iterate through all items in this bag
+        Item *item = inventoryGetFirstItem(inventory, category);
+        uint8_t inventoryIndex = 0;
 
-        inventoryIndex++;
-        size_t attrSize = itemAttributesSize[inventoryIndex];
+        while (item) {
 
-        #pragma pack(push, 1)
-        struct InventoryItemPacket {
-            uint32_t itemType;
-            uint16_t sizeOfAttributes;
-            uint16_t unkown1;
-            uint64_t itemId;
-            uint32_t amount;
-            uint32_t price;
-            uint8_t inventoryIndex;
-            uint32_t unkown2;
-            uint8_t attributes[attrSize];
-        } *inventoryItemPacket  = packetStreamGetCurrentBuffer(&packetStream);
-        #pragma pack(pop)
+            size_t attrSize = itemAttributesSize[category][inventoryIndex];
 
-        inventoryItemPacket->itemType = item->itemType;
-        inventoryItemPacket->sizeOfAttributes = attrSize;
-        inventoryItemPacket->unkown1 = 0;
-        inventoryItemPacket->itemId = item ? item->itemId : 0;
-        inventoryItemPacket->amount = item->amount;
-        inventoryItemPacket->price = 0;
-        inventoryItemPacket->inventoryIndex = inventoryIndex;
-        inventoryItemPacket->unkown2 = 1;
-
-        // fill attribute buffer
-        size_t offset = offsetof(struct InventoryItemPacket, attributes);
-        packetStreamAddOffset(&packetStream, offset);
+            #pragma pack(push, 1)
+            struct InventoryItemPacket {
+                uint32_t itemType;
+                uint16_t sizeOfAttributes;
+                uint16_t unkown1;
+                uint64_t itemId;
+                uint32_t amount;
+                uint32_t price;
+                uint32_t inventoryIndex;
+                uint32_t unkown2;
+                uint8_t attributes[attrSize];
+            };
 
         // write in the buffer
         if (attrSize > 0) {
@@ -1739,11 +1845,14 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
             packetStreamAddOffset(&packetStream, attrSize);
         }
 
-        item = inventoryGetNextItem(inventory);
+            item = inventoryGetNextItem(inventory, category);
+            inventoryIndex++;
+        }
     }
 
+
     // Debug purposes
-    // buffer_print(&itemsPacket, sizeof(itemsPacket), NULL);
+    buffer_print(&itemsPacket, sizeof(itemsPacket), NULL);
 
 
     #pragma pack(push, 1)
@@ -1757,6 +1866,8 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
     PacketType packetType = ZC_ITEM_INVENTORY_LIST;
     CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
 
+    replyPacket.inventoryCount = inventoryCount;
+
     // compress content of packek (items)
     zlibCompress(&replyPacket.zlibData, &itemsPacket, sizeof(itemsPacket));
     size_t outPacketSize = ZLIB_GET_COMPRESSED_PACKET_SIZE(&replyPacket.zlibData, sizeof(replyPacket));
@@ -1764,8 +1875,10 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
 
     zmsg_add(replyMsg, zframe_new(&replyPacket, outPacketSize));
 
+
+
     // Debug purposes
-    // buffer_print(&replyPacket, outPacketSize, NULL);
+    buffer_print(&replyPacket, outPacketSize, NULL);
 }
 
 void zoneBuilderMoveDir(
@@ -1964,5 +2077,30 @@ void zoneBuilderChangeCamera(uint8_t mode, PositionXYZ *pos, float fspd, float i
         memcpy(&replyPacket.pos, pos, sizeof(replyPacket.pos));
         replyPacket.fspd = fspd;
         replyPacket.ispd = ispd;
+    }
+}
+
+void zoneBuilderItemRemove(Item *item, uint8_t removalType, uint8_t inventoryType, zmsg_t *replyMsg) {
+
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint64_t itemId;
+        uint32_t amount;
+        uint8_t removalType;
+        uint8_t inventoryType;
+    } replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_ITEM_REMOVE;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+        replyPacket.itemId = item->itemType;
+        replyPacket.amount = item->amount;
+        replyPacket.removalType = removalType;
+        replyPacket.inventoryType = inventoryType;
     }
 }

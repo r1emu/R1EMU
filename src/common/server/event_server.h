@@ -260,7 +260,7 @@ GraphNode *eventServerGetClientNode(EventServer *self, uint8_t *socketId);
  * @return a zlist_t of identity keys
  */
 zlist_t *
-eventServerRedisGetClientsWithinRange (
+eventServerRedisGetClientsWithinRange(
     EventServer *self,
     uint16_t mapId,
     uint8_t *ignoredSessionKey,

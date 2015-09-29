@@ -46,7 +46,7 @@ void barrackBuilderMessage(uint8_t msgType, uint8_t *message, zmsg_t *replyMsg) 
 
 void barrackBuilderLoginOk(
     uint64_t accountId,
-    uint8_t *accountLogin,
+    uint8_t *accountName,
     uint8_t *sessionKey,
     AccountSessionPrivileges accountPrivileges,
     zmsg_t *replyMsg)
@@ -56,7 +56,7 @@ void barrackBuilderLoginOk(
         ServerPacketHeader header;
         uint16_t unk1;
         uint64_t accountId;
-        uint8_t accountLogin[ACCOUNT_SESSION_LOGIN_MAXSIZE];
+        uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
         uint32_t accountPrivileges;
         uint8_t sessionKey[GAME_SESSION_KEY_MAXSIZE];
     } replyPacket;
@@ -71,7 +71,7 @@ void barrackBuilderLoginOk(
         replyPacket.unk1 = 0x3E9; // from iCBT1
         replyPacket.accountId = accountId;
         replyPacket.accountPrivileges = accountPrivileges;
-        strncpy(replyPacket.accountLogin, accountLogin, sizeof(replyPacket.accountLogin));
+        strncpy(replyPacket.accountName, accountName, sizeof(replyPacket.accountName));
         strncpy(replyPacket.sessionKey, sessionKey, sizeof(replyPacket.sessionKey));
     }
 }
@@ -238,7 +238,7 @@ void barrackBuilderServerEntry(
 void barrackBuilderCommanderList(
     uint64_t accountId,
     GameSession *gameSession,
-    Commander *commanders,
+    Commander **commanders,
     int commandersCount,
     zmsg_t *replyMsg)
 {
@@ -250,20 +250,8 @@ void barrackBuilderCommanderList(
     for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
 
         // iterate through all commander
-        Commander *curCommander = &commanders[commanderIndex];
+        Commander *curCommander = commanders[commanderIndex];
         Inventory *inventory = &curCommander->inventory;
-
-        // TESTIG PURPOSES, DELETE LATER
-        /*
-        Item newItem;
-        newItem.itemId = 1234;
-        newItem.itemType = 531101;
-        newItem.amount = 1;
-        newItem.equipSlot = EQSLOT_BODY_ARMOR;
-        newItem.attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
-        inventoryAddItem(inventory, &newItem);
-        inventoryEquipItem(inventory, newItem.itemId, EQSLOT_BODY_ARMOR);
-        */
 
         // get attributes size
         size_t attributesSize = 0;
@@ -319,8 +307,9 @@ void barrackBuilderCommanderList(
         uint64_t accountId;
         uint8_t unk1;
         uint8_t commandersCount;
-        uint8_t familyName [COMMANDER_FAMILY_NAME_SIZE];
+        uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
 
+        // TODO : Fix it
         uint16_t accountInfoLength; // sizeof(accountInfo)
         //AccountInfo accountInfo[accountInfoCount];
 
@@ -360,15 +349,16 @@ void barrackBuilderCommanderList(
         replyPacket.creditsAmount3 = 0;
 
         // we want to start writing at the offset of commandersBarrackInfoPacket
-        size_t offset = offsetof(struct BarrackBuilderCommanderListPacket, commandersBarrackInfoPacket);
-        packetStreamAddOffset(&packetStream, offset);
+        if (commanderBarrackInfoPacketSize > 0) {
+            size_t offset = offsetof(struct BarrackBuilderCommanderListPacket, commandersBarrackInfoPacket);
+            packetStreamAddOffset(&packetStream, offset);
+        }
 
         // fill commandersBarrackInfoPacket
         for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
 
             // iterate through all commander
-            Commander *curCommander = &commanders[commanderIndex];
-            CommanderInfo *cInfo = &curCommander->info;
+            Commander *curCommander = commanders[commanderIndex];
             Inventory *inventory = &curCommander->inventory;
 
             // Define CommanderBarrackInfoPacket current structure
@@ -394,14 +384,14 @@ void barrackBuilderCommanderList(
             #pragma pack(pop)
 
             // fill it
-            curCommandersBarrackInfoPacket->appearance = cInfo->appearance;
+            curCommandersBarrackInfoPacket->appearance = curCommander->appearance;
 
-            curCommandersBarrackInfoPacket->socialInfoId = cInfo->socialInfoId; // CharUniqueId?
+            curCommandersBarrackInfoPacket->socialInfoId = curCommander->socialInfoId; // CharUniqueId?
             curCommandersBarrackInfoPacket->commanderPosition = commanderIndex + 1;
             curCommandersBarrackInfoPacket->mapId = 1002; /// FIXME : No MapId in the current structure!
             curCommandersBarrackInfoPacket->unk4 = SWAP_UINT32(0x02000000);
             curCommandersBarrackInfoPacket->unk5 = 0;
-            curCommandersBarrackInfoPacket->maxXP = cInfo->maxXP;
+            curCommandersBarrackInfoPacket->maxXP = curCommander->maxXP;
             curCommandersBarrackInfoPacket->unk6 = SWAP_UINT32(0xC01C761C);
             curCommandersBarrackInfoPacket->pos = PositionXYZ_decl(
                 SWAP_UINT32(0x25e852c1), SWAP_UINT32(0x6519e541), SWAP_UINT32(0x39f4ef42)
@@ -448,6 +438,8 @@ void barrackBuilderCommanderList(
             packetStreamAddOffset(&packetStream, sizeof_struct_member(struct CommanderBarrackInfoPacket, unk9));
         }
     }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }
 
 void barrackBuilderPetInformation(zmsg_t *replyMsg) {
@@ -553,12 +545,12 @@ void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg) {
     zmsg_add(replyMsg, zframe_new(&compressedPacket, outPacketSize));
 }
 
-void barrackBuilderBarrackNameChange(BarrackNameResultType resultType, uint8_t *barrackName, zmsg_t *replyMsg) {
+void barrackBuilderBarrackNameChange(BarrackNameChangeStatus status, uint8_t *barrackName, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
         uint8_t changed;
-        uint32_t resultType;
+        uint32_t status;
         uint8_t barrackName[64];
     } replyPacket;
     #pragma pack(pop)
@@ -569,8 +561,8 @@ void barrackBuilderBarrackNameChange(BarrackNameResultType resultType, uint8_t *
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
-        replyPacket.changed = (resultType == BC_BARRACKNAME_CHANGE_OK);
-        replyPacket.resultType = resultType;
+        replyPacket.changed = (status == BC_BARRACKNAME_CHANGE_OK);
+        replyPacket.status = status;
         strncpy(replyPacket.barrackName, barrackName, sizeof(replyPacket.barrackName));
     }
 }
@@ -593,17 +585,16 @@ void barrackBuilderCommanderDestroy(uint8_t commanderDestroyMask, zmsg_t *replyM
     }
 }
 
-void barrackBuilderCommanderCreate(CommanderCreateInfo *commanderCreate, zmsg_t *replyMsg) {
+void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        CommanderCreateInfo commanderCreate;
+        CommanderCreatePacket commanderCreate;
     } replyPacket;
     #pragma pack(pop)
 
-    // ICBT : those values are zeroes for some reason
-    memset(commanderCreate->appearance.familyName, 0, sizeof(commanderCreate->appearance.familyName));
-    commanderCreate->appearance.accountId = 0;
+    // Build the reply packet
+    PositionXZ commanderDir = PositionXZ_decl(-0.707107f, 0.707107f);
 
     PacketType packetType = BC_COMMANDER_CREATE;
     CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
@@ -611,8 +602,21 @@ void barrackBuilderCommanderCreate(CommanderCreateInfo *commanderCreate, zmsg_t 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
-        memcpy(&replyPacket.commanderCreate, commanderCreate, sizeof(replyPacket.commanderCreate));
+        replyPacket.commanderCreate.appearance = commander->appearance;
+        replyPacket.commanderCreate.mapId = commander->mapId;
+        replyPacket.commanderCreate.socialInfoId = commander->socialInfoId;
+        replyPacket.commanderCreate.commanderPosition = commandersCount;
+        replyPacket.commanderCreate.unk4 = SWAP_UINT32(0x02000000); // ICBT
+        replyPacket.commanderCreate.unk5 = 0;
+        replyPacket.commanderCreate.maxXP = 0xC; // ICBT ; TODO : Implement EXP table
+        replyPacket.commanderCreate.unk6 = SWAP_UINT32(0xC01C761C); // ICBT
+        replyPacket.commanderCreate.pos = commander->pos;
+        replyPacket.commanderCreate.dir = commanderDir;
+        replyPacket.commanderCreate.pos2 = commander->pos;
+        replyPacket.commanderCreate.dir2 = commanderDir;
     }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }
 
 void barrackBuilderLogoutOk(zmsg_t *replyMsg) {

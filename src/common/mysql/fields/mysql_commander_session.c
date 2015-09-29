@@ -15,7 +15,7 @@
 // ---------- Includes ------------
 #include "mysql_commander_session.h"
 
-bool mySqlCommanderInsertCommanderInfo(MySQL *self, CommanderInfo *cInfo) {
+bool mySqlCommanderInsertCommander(MySQL *self, Commander *commander) {
 
     bool status = false;
 
@@ -32,33 +32,33 @@ bool mySqlCommanderInsertCommanderInfo(MySQL *self, CommanderInfo *cInfo) {
         "%d, %d, %d, %d, %d, %d, %d, "
         "%d, %d, %f, %f, %f, "
         "%d, %d, %d)",
-        cInfo->commanderId,
-        cInfo->appearance.accountId,
-        cInfo->appearance.commanderName,
-        cInfo->appearance.familyName,
-        cInfo->appearance.classId,
-        cInfo->appearance.gender,
-        cInfo->appearance.level,
-        cInfo->appearance.equipment.head_top,
-        cInfo->appearance.equipment.head_middle,
-        cInfo->appearance.equipment.necklace,
-        cInfo->appearance.equipment.body_armor,
-        cInfo->appearance.equipment.leg_armor,
-        cInfo->appearance.equipment.gloves,
-        cInfo->appearance.equipment.boots,
-        cInfo->appearance.equipment.weapon,
-        cInfo->appearance.equipment.shield,
-        cInfo->appearance.equipment.costume,
-        cInfo->appearance.equipment.bracelet,
-        cInfo->appearance.equipment.ring_left,
-        cInfo->appearance.equipment.ring_right,
-        cInfo->appearance.hairId,
-        cInfo->pos.x,
-        cInfo->pos.y,
-        cInfo->pos.z,
-        cInfo->currentXP,
-        cInfo->currentHP,
-        cInfo->currentSP))
+        commander->commanderId,
+        commander->appearance.accountId,
+        commander->appearance.commanderName,
+        commander->appearance.familyName,
+        commander->appearance.classId,
+        commander->appearance.gender,
+        commander->appearance.level,
+        commander->appearance.equipment.head_top,
+        commander->appearance.equipment.head_middle,
+        commander->appearance.equipment.necklace,
+        commander->appearance.equipment.body_armor,
+        commander->appearance.equipment.leg_armor,
+        commander->appearance.equipment.gloves,
+        commander->appearance.equipment.boots,
+        commander->appearance.equipment.weapon,
+        commander->appearance.equipment.shield,
+        commander->appearance.equipment.costume,
+        commander->appearance.equipment.bracelet,
+        commander->appearance.equipment.ring_left,
+        commander->appearance.equipment.ring_right,
+        commander->appearance.hairId,
+        commander->pos.x,
+        commander->pos.y,
+        commander->pos.z,
+        commander->currentXP,
+        commander->currentHP,
+        commander->currentSP))
     {
         error("SQL Error : %s" , mysql_error(self->handle));
         goto cleanup;
@@ -75,11 +75,10 @@ bool mySqlCommanderSessionFlush(MySQL *self, CommanderSession *commanderSession)
     bool status = false;
     MYSQL_ROW count;
 
-    Commander *commander = &commanderSession->currentCommander;
-    CommanderInfo *cInfo = &commander->info;
+    Commander *commander = commanderSession->currentCommander;
 
     // flush the commander
-    if (mySqlQuery(self, "SELECT count(*) FROM commander WHERE commander_id = %u", cInfo->commanderId)) {
+    if (mySqlQuery(self, "SELECT count(*) FROM commander WHERE commander_id = %u", commander->commanderId)) {
         error("SQL Error : %s" , mysql_error(self->handle));
         goto cleanup;
     }
@@ -88,7 +87,7 @@ bool mySqlCommanderSessionFlush(MySQL *self, CommanderSession *commanderSession)
 
     if (atoi(count[0]) == 0) {
         // insert the commander
-        if (!(mySqlCommanderInsertCommanderInfo(self, cInfo))) {
+        if (!(mySqlCommanderInsertCommander(self, commander))) {
             error("Cannot insert a new commander.");
             goto cleanup;
         }

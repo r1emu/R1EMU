@@ -290,7 +290,7 @@ static bool workerProcessClientPacket(Worker *self, zmsg_t *msg) {
     zframe_t *headerAnswer = NULL;
 
     // Read the message
-    zframe_t *sessionKeyFrame = zmsg_first (msg);
+    zframe_t *sessionKeyFrame = zmsg_first(msg);
     zframe_t *packetFrame = zmsg_next(msg);
     // We don't need the client packet in the reply
     zmsg_remove (msg, packetFrame);
@@ -346,7 +346,7 @@ workerGetOrCreateSessionObject(Worker *self, uint8_t *sessionKey, DbObject **_ob
 
     if (!object) {
         // Session doesn't not exist yet, create it
-        info("Welcome, %s!", sessionKey);
+        info("Welcome, socket session %s!", sessionKey);
         if (!(session = sessionNew(self->info.routerId, sessionKey))) {
             error("Cannot allocate a new session.");
             goto cleanup;
@@ -451,6 +451,9 @@ workerProcessOneRequest(
         }
     }
 
+    Session sessionCopy;
+    memcpy(&sessionCopy, session, sizeof(sessionCopy));
+
     // Answer
     switch (workerHandlePacket(
         self,
@@ -462,6 +465,10 @@ workerProcessOneRequest(
     {
         case PACKET_HANDLER_ERROR:
             zframe_reset(headerAnswer, PACKET_HEADER(ROUTER_WORKER_ERROR), sizeof(ROUTER_WORKER_ERROR));
+            if (memcmp(&sessionCopy, session, sizeof(sessionCopy)) != 0) {
+                error("The session was modified but the worker returned an error status. "
+                      "Please change the source code so the session isn't modified before returning an error status.");
+            }
             goto cleanup;
         break;
 
@@ -621,7 +628,7 @@ bool workerStart(Worker *self) {
     status = true;
 
 cleanup:
-    free(endpoint);
+    zstr_free(&endpoint);
     return status;
 }
 
@@ -771,7 +778,7 @@ static int workerHandlePublicRequest(zloop_t *loop, zsock_t *worker, void *_self
 
     if (!(workerProcessClientPacket(self, msg))) {
         workerError(self, "Cannot handle correctly the client packet.");
-        result = -1;
+        result = 0;
         // Don't return, we want to send back an answer so the Worker doesn't quit
     }
 

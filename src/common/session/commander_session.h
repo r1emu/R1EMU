@@ -23,11 +23,8 @@
  * @brief
  */
 struct CommanderSession {
-    // current mapId
-    uint16_t mapId;
-
     // current commander
-    Commander currentCommander;
+    Commander *currentCommander;
 };
 
 typedef struct CommanderSession CommanderSession;

@@ -34,10 +34,16 @@
 /**
  * @brief Get Account Data from MySQL
  */
-bool mySqlGetAccountData(MySQL *self, char *accountName, unsigned char *password, AccountSession * accountSession);
+bool mySqlGetAccountData(
+    MySQL *self,
+    char *accountName,
+    unsigned char *password,
+    AccountSession *accountSession,
+    bool *goodCredentials);
 
 /**
  * @brief Set Family name into MySQL for a given AccountSession
  */
-BarrackNameResultType mySqlSetFamilyName(MySQL *self, AccountSession *accountSession, char *familyName);
+BarrackNameChangeStatus mySqlSetFamilyName(MySQL *self, uint64_t accountId, char *familyName);
 
+bool mySqlLoadAccountCommanders(MySQL *self, AccountSession *accountSession, uint64_t accountId, size_t *commandersCount);

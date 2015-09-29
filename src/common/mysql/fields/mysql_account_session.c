@@ -13,9 +13,44 @@
 
 #include "mysql_account_session.h"
 #include "barrack_server/barrack_handler/barrack_builder.h"
+#include "mysql_commander.h"
 
-bool mySqlGetAccountData(MySQL *self, char *accountName, unsigned char *password, AccountSession * accountSession) {
+bool mySqlLoadAccountCommanders(MySQL *self, AccountSession *accountSession, uint64_t accountId, size_t *commandersCount) {
 
+    bool status = false;
+
+    // Request to SQL the list of commanders, retrieve the count
+    if (!(mySqlRequestCommandersByAccountId(self, accountId, commandersCount))) {
+        error("Cannot request commanders by accountId = %llx", accountId);
+        goto cleanup;
+    }
+
+    // Allocate the commanders array depending of the count of commanders
+    accountSession->commandersCountMax = 5; /// FIXME
+    if (!(accountSessionCommandersInit(accountSession, accountSession->commandersCountMax, *commandersCount))) {
+        error("Cannot initialize commanders in session.");
+        goto cleanup;
+    }
+
+    // Write commanders array from SQL result
+    if (!(mySqlGetCommanders(self, accountSession->commanders))) {
+        error("Cannot get commanders by accountId = %llx", accountId);
+        goto cleanup;
+    }
+
+    status = true;
+
+cleanup:
+    return status;
+}
+
+bool mySqlGetAccountData(
+    MySQL *self,
+    char *accountName,
+    unsigned char *password,
+    AccountSession *accountSession,
+    bool *goodCredentials)
+{
     bool status = false;
     MYSQL_ROW row;
 
@@ -43,21 +78,22 @@ bool mySqlGetAccountData(MySQL *self, char *accountName, unsigned char *password
     }
 
     if (mysql_num_rows(self->result) == 0) {
-        dbg("MySQL: Account/Password is incorrect.");
-        goto cleanup;
+        // Wrong account / password
+        warning("MySQL: Account/Password is incorrect.");
+        *goodCredentials = false;
+    } else {
+        // update the commander
+        row = mysql_fetch_row(self->result);
+        strncpy(accountSession->accountName, accountName, sizeof(accountSession->accountName));
+        accountSession->accountId = strtoll(row[0], NULL, 10);
+        accountSession->isBanned = row[1][0] == 'y';
+        accountSession->timeBanned = strtol(row[2], NULL, 10); // FIXME : not sure if 32 or 64 bits
+        accountSession->credits = strtof(row[3], NULL);
+        accountSession->privilege = strtol(row[4], NULL, 10);
+        strncpy(accountSession->familyName, row[5], sizeof(accountSession->familyName));
+        accountSession->barrackType = strtol(row[6], NULL, 10);
+        *goodCredentials = true;
     }
-
-    row = mysql_fetch_row(self->result);
-
-    // update the commander
-    strncpy(accountSession->login, accountName, sizeof(accountSession->login));
-    accountSession->accountId = strtoll(row[0], NULL, 10);
-    accountSession->isBanned = row[1][0] == 'y';
-    accountSession->timeBanned = strtol(row[2], NULL, 10); // FIXME : not sure if 32 or 64 bits
-    accountSession->credits = strtof(row[3], NULL);
-    accountSession->privilege = strtol(row[4], NULL, 10);
-    strncpy(accountSession->familyName, row[5], sizeof(accountSession->familyName));
-    accountSession->barrackType = strtol(row[6], NULL, 10);
 
     status = true;
 
@@ -65,13 +101,13 @@ cleanup:
     return status;
 }
 
-BarrackNameResultType mySqlSetFamilyName(MySQL *self, AccountSession *accountSession, char *familyName) {
+BarrackNameChangeStatus mySqlSetFamilyName(MySQL *self, uint64_t accountId, char *familyName) {
 
-    BarrackNameResultType status = BC_BARRACKNAME_CHANGE_ERROR;
+    BarrackNameChangeStatus status = BC_BARRACKNAME_CHANGE_ERROR;
     MYSQL_ROW row;
 
     // Perform query to change name
-    if (mySqlQuery(self, "CALL bSetFamilyName(%llx, '%s');", accountSession->accountId, familyName)) {
+    if (mySqlQuery(self, "CALL bSetFamilyName(%llx, '%s');", accountId, familyName)) {
         error("SQL Error : %s" , mysql_error(self->handle));
         goto cleanup;
     }
@@ -83,8 +119,7 @@ BarrackNameResultType mySqlSetFamilyName(MySQL *self, AccountSession *accountSes
     }
 
     if (mysql_num_rows(self->result) == 0) {
-        error("MySQL: Procedure bSetFamilyName(%llx, '%s') didn't return value",
-            accountSession->accountId, familyName);
+        error("MySQL: Procedure bSetFamilyName(%llx, '%s') didn't return value", accountId, familyName);
         goto cleanup;
     }
 

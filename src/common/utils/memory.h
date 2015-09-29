@@ -29,5 +29,6 @@
 // ------ Structure declaration -------
 
 // ----------- Functions ------------
+void destroy(void *data);
 float *floatdup(float *f);
 int *intdup(int *i);

@@ -39,13 +39,13 @@ typedef enum PacketTypeBarrackNormal {
 /**
  * BC_BARRACKNAME_CHANGE result types
  */
-typedef enum BarrackNameResultType {
+typedef enum BarrackNameChangeStatus {
 
     BC_BARRACKNAME_CHANGE_ALREADYEXIST = -1,
     BC_BARRACKNAME_CHANGE_OK = 0,
     BC_BARRACKNAME_CHANGE_ERROR = 1,
 
-} BarrackNameResultType;
+} BarrackNameChangeStatus;
 
 /**
  * @brief Send message to client
@@ -57,7 +57,7 @@ void barrackBuilderMessage(uint8_t msgType, uint8_t *message, zmsg_t *replyMsg);
  */
 void barrackBuilderLoginOk(
     uint64_t accountId,
-    uint8_t *accountLogin,
+    uint8_t *accountName,
     uint8_t *sessionKey,
     AccountSessionPrivileges accountPrivileges,
     zmsg_t *replyMsg
@@ -104,7 +104,7 @@ void barrackBuilderServerEntry(
 void barrackBuilderCommanderList(
     uint64_t accountId,
     GameSession *gameSession,
-    Commander *commanders,
+    Commander **commanders,
     int commandersCount,
     zmsg_t *replyMsg);
 
@@ -117,7 +117,7 @@ void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg);
  * @brief Change the name of the barrack
  */
 void
-barrackBuilderBarrackNameChange(BarrackNameResultType resultType, uint8_t *barrackName, zmsg_t *replyMsg);
+barrackBuilderBarrackNameChange(BarrackNameChangeStatus resultType, uint8_t *barrackName, zmsg_t *replyMsg);
 
 /**
  * @brief Destroy commanders
@@ -128,8 +128,7 @@ barrackBuilderCommanderDestroy(uint8_t commanderDestroyMask, zmsg_t *replyMsg);
 /**
  * @brief Create a new commander
  */
-void
-barrackBuilderCommanderCreate(CommanderCreateInfo *commander, zmsg_t *replyMsg);
+void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount, zmsg_t *replyMsg);
 
 /**
  * @brief Send information about the pets of the account

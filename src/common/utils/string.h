@@ -18,7 +18,7 @@
 
 #include "R1EMU.h"
 
-void md5BytesToStr(char *md5Bytes, char *md5Str);
+void md5BytesToStr(uint8_t *md5Bytes, uint8_t *md5Str);
 
 int strGetLine(char *str, char *dest, int maxlen, int pos);
 

@@ -28,7 +28,7 @@
 /** Event data needed for a commander to update position */
 typedef struct {
     uint16_t mapId;
-    CommanderInfo info;
+    Commander commander;
     PositionXYZ newPosition;
 } GameEventUpdatePosition;
 
@@ -65,10 +65,16 @@ typedef struct {
 } GameEventEnterPc;
 
 /** Event data needed for a commander to chat */
-typedef struct {
-    CommanderInfo info;
-    uint8_t chatText[0]; // variable length array
+#define DECLARE_GameEventChat(chatTextSize) \
+typedef struct { \
+    Commander commander; \
+    uint8_t chatText[chatTextSize]; \
 } GameEventChat;
+#define CHAT_TEXT_SIZE_MAX 500
+typedef struct {
+    Commander commander;
+    uint8_t chatText[CHAT_TEXT_SIZE_MAX];
+} _GameEventChat;
 
 /** Event data needed for a commander to rotate head */
 typedef struct {
@@ -102,7 +108,7 @@ typedef union {
     GameEventRestSit restSit;
     GameEventJump jump;
     GameEventEnterPc enterPc;
-    GameEventChat chat;
+    _GameEventChat chat;
     GameEventHeadRotate headRotate;
     GameEventRotate rotate;
     GameEventLeave leave;

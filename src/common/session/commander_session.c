@@ -55,7 +55,7 @@ commanderSessionPrint (
     CommanderSession *self
 ) {
     dbg("==== CommanderSession %p ====", self);
-    commanderInfoPrint (&self->currentCommander.info);
+    commanderPrint (self->currentCommander);
 }
 
 void

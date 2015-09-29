@@ -194,7 +194,7 @@ routerMonitorProcess (
     }
 
     // Get the frame header of the message
-    if (!(header = zmsg_first (msg))) {
+    if (!(header = zmsg_first(msg))) {
         error("Frame header cannot be retrieved.");
         result = -1;
         goto cleanup;
@@ -305,7 +305,7 @@ routerMonitorSubscribe (
     }
 
     // Get the frame header of the message
-    if (!(header = zmsg_first (msg))) {
+    if (!(header = zmsg_first(msg))) {
         error("Frame header cannot be retrieved.");
         result = -1;
         goto cleanup;

@@ -57,8 +57,8 @@ typedef struct CommanderEquipment {
  */
 typedef struct CommanderAppearance
 {
-    uint8_t commanderName [COMMANDER_NAME_SIZE+1];
-    uint8_t familyName [COMMANDER_FAMILY_NAME_SIZE];
+    uint8_t commanderName[COMMANDER_NAME_SIZE+1];
+    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
     uint8_t unk2[7];
     uint64_t accountId;
     uint16_t classId;
@@ -78,7 +78,7 @@ typedef struct CommanderAppearance
 /**
  * Structure of variables needed for BC_COMMANDER_CREATE
  */
-typedef struct CommanderCreateInfo {
+typedef struct CommanderCreatePacket {
     CommanderAppearance appearance;
     uint64_t socialInfoId;
     uint16_t commanderPosition;
@@ -92,31 +92,7 @@ typedef struct CommanderCreateInfo {
     PositionXYZ pos2;
     PositionXZ dir2;
     uint32_t unk8;
-} CommanderCreateInfo;
-#pragma pack(pop)
-
-/**
- * Contains information about a commander exchanged between the client and server
- */
-#pragma pack(push, 1)
-typedef struct
-{
-    CommanderAppearance appearance;
-    PositionXYZ pos;
-    uint32_t currentXP;
-    uint32_t maxXP;
-    uint32_t pcId;
-    uint64_t socialInfoId;
-    uint64_t commanderId;
-    uint32_t currentHP;
-    uint32_t maxHP;
-    uint16_t currentSP;
-    uint16_t maxSP;
-    uint32_t currentStamina;
-    uint32_t maxStamina;
-    uint16_t unk6;
-    uint16_t unk7;
-} CommanderInfo;
+} CommanderCreatePacket;
 #pragma pack(pop)
 
 /**
@@ -125,10 +101,28 @@ typedef struct
 #pragma pack(push, 1)
 typedef struct
 {
-    CommanderInfo info;
+    CommanderAppearance appearance;
     Inventory inventory;
 
-    uint16_t mapId; // Is it the right place?
+    PositionXYZ pos;
+
+    uint32_t currentXP;
+    uint32_t maxXP;
+
+    uint32_t pcId;
+    uint64_t socialInfoId;
+    uint64_t commanderId;
+
+    uint32_t currentHP;
+    uint32_t maxHP;
+
+    uint16_t currentSP;
+    uint16_t maxSP;
+
+    uint32_t currentStamina;
+    uint32_t maxStamina;
+
+    uint16_t mapId;
 
 } Commander;
 #pragma pack(pop)
@@ -213,15 +207,38 @@ typedef enum CommanderHair
     COMMANDER_HAIR_COUNT
 } CommanderHair;
 
+
+/**
+ * Allocate a new Commander structure.
+ * @return A pointer to an allocated Commander, or NULL if an error occured.
+ */
+Commander *commanderNew(void);
+
+/**
+ * Initialize an allocated Commander structure.
+ * @param self An allocated Commander to initialize.
+ * @return true on success, false otherwise.
+ */
+bool commanderInit(Commander *commander);
+
 /**
  * @brief Initialize a commander with basic information
  */
-void commanderInfoInit(CommanderInfo *commander);
-void commanderApparenceInit(CommanderAppearance *appearance);
-void commanderInit(Commander *commander);
+bool commanderApparenceInit(CommanderAppearance *appearance);
 
 /**
- * @brief Dump a CommanderInfo in the console
+ * @brief Print commander basic information
  */
-void commanderInfoPrint(CommanderInfo *commander);
 void commanderAppearancePrint(CommanderAppearance *appearance);
+void commanderPrint(Commander *commander);
+
+/**
+ * @brief Duplicate a commander in memory
+ */
+Commander *commanderDup(Commander *src);
+
+/**
+ * @brief Free a commander in memory
+ */
+void commanderFree(Commander *self);
+void commanderDestroy(Commander **_self);

@@ -18,8 +18,9 @@
 
 #include "R1EMU.h"
 #include "common/session/socket_session.h"
+#include "common/commander/commander.h"
 
-#define ACCOUNT_SESSION_LOGIN_MAXSIZE 33
+#define ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE 33
 
 /**
  * @brief AccountSessionPrivileges enumerates the different levels of privileges
@@ -37,7 +38,7 @@ typedef enum AccountSessionPrivileges {
  */
 struct AccountSession {
     // The account login
-    uint8_t login[ACCOUNT_SESSION_LOGIN_MAXSIZE];
+    uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
 
     // Session key
     uint8_t sessionKey[SOCKET_SESSION_ID_SIZE];
@@ -50,10 +51,12 @@ struct AccountSession {
     time_t timeBanned;
     float credits;
     time_t timeLastLogin;
-    uint8_t familyName [64]; ///TODO SIZE
+    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
     uint32_t barrackType;
-    uint8_t charactersCreatedCount; // Makes any sense to have a variable to store this information? Copied for deprecated "BarrackSession"
 
+    // Array of commanders in the barrack
+    Commander **commanders;
+    size_t commandersCountMax;
 };
 
 typedef struct AccountSession AccountSession;
@@ -63,7 +66,7 @@ typedef struct AccountSession AccountSession;
  * @return A pointer to an allocated AccountSession.
  */
 AccountSession *accountSessionNew(
-    uint8_t *accountLogin,
+    uint8_t *accountName,
     uint8_t *socketId,
     AccountSessionPrivileges accountPrivilege);
 
@@ -74,13 +77,30 @@ AccountSession *accountSessionNew(
  */
 bool accountSessionInit(
     AccountSession *self,
-    uint8_t *accountLogin,
+    uint8_t *accountName,
     uint8_t *socketId,
     AccountSessionPrivileges accountPrivilege);
 
 /**
+ * @brief Get the number of commanders in the current account session
+ * @return A pointer to an initialized AccountSession.
+ */
+size_t accountSessionGetCommandersCount(AccountSession *self);
+
+/**
+ * @brief Get a commander by its array index
+ * @return true on success, false otherwise
+ */
+bool accountSessionGetCommanderByIndex(AccountSession *self, int index, Commander **commander);
+
+/**
+ * @brief Initialize commanders in the session
+ * @return true on success, false otherwise
+ */
+bool accountSessionCommandersInit(AccountSession *self, size_t commandersCountMax, size_t commandersCount);
+
+/**
  * @brief Prints a AccountSession structure.
- * @param self An allocated AccountSession
  */
 void accountSessionPrint(AccountSession *self);
 
@@ -95,3 +115,10 @@ void accountSessionDestroy(AccountSession **self);
  * @param self A pointer to an allocated AccountSession.
  */
 void accountSessionFree(AccountSession *self);
+
+/**
+ * @brief Check if a given slot index is empty in account commanders
+ * @param self A pointer to an allocated AccountSession.
+ * @param commanderIndex the slot index to look into
+ */
+bool accountSessionIsCommanderSlotEmpty(AccountSession *self, int commanderIndex);
