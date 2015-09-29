@@ -92,7 +92,7 @@ MySQLStatus mySqlQuery(MySQL *self, const char* query, ...) {
 
 	dbg("Launching SQL command : %s", buf);
 
-	if (mysql_real_query(self->handle, buf,(unsigned long) strlen(buf))) {
+	if (mysql_real_query(self->handle, buf, (unsigned long) strlen(buf))) {
 		return SQL_ERROR;
 	}
 

@@ -143,6 +143,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/mysql/fields/mysql_commander_session.h" />
+		<Unit filename="../../../src/common/mysql/fields/mysql_item_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/mysql/fields/mysql_item_data.h" />
 		<Unit filename="../../../src/common/mysql/fields/mysql_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
