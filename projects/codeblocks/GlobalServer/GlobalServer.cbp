@@ -74,6 +74,20 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/barrack_server/barrack_server.h" />
+		<Unit filename="../../../src/common/actor/a_equipable_item.h" />
+		<Unit filename="../../../src/common/actor/a_item.h" />
+		<Unit filename="../../../src/common/actor/actor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/actor.h" />
+		<Unit filename="../../../src/common/actor/item/equipable/equipable_item.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/equipable/equipable_item.h" />
+		<Unit filename="../../../src/common/actor/item/item.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/item.h" />
 		<Unit filename="../../../src/common/commander/commander.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -123,13 +137,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/graph/graph.h" />
-		<Unit filename="../../../src/common/item/item.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../../src/common/item/item.h" />
-		<Unit filename="../../../src/common/item/item_attribute.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../../src/common/item/item_attribute.h" />
 		<Unit filename="../../../src/common/mysql/fields/mysql_account_session.c">
 			<Option compilerVar="CC" />

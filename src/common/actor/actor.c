@@ -13,14 +13,14 @@
 
 #include "actor.h"
 
-bool actorInit(Actor *self, uint64_t id) {
-    // Set attributes
-    self->id = id;
-    // Set methods
+// Inlined functions
+extern inline ActorId_t actorGetUId(Actor *self);
 
+bool actorInit(Actor *self, ActorId_t uid) {
+    self->uid = uid;
     return true;
 }
 
-uint64_t actorGetId(Actor *self) {
-    return self->id;
+void actorGenKey(ActorId_t uid, ActorKey key) {
+    snprintf(key, ACTOR_KEY_SIZE, "%I64x", uid);
 }

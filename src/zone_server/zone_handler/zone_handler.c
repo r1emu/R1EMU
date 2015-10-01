@@ -443,7 +443,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[0].itemId = 1111;
     items[0].itemType = 645001;
     items[0].amount = 5003;
-    items[0].itemCategory = INVENTORY_CAT_CONSUMABLE;
+    items[0].itemCategory = ITEM_CAT_CONSUMABLE;
     items[0].inventoryIndex = 1;
     //items[0].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[0]);
@@ -451,7 +451,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[1].itemId = 2222;
     items[1].itemType = 640026;
     items[1].amount = 5;
-    items[1].itemCategory = INVENTORY_CAT_CONSUMABLE;
+    items[1].itemCategory = ITEM_CAT_CONSUMABLE;
     items[1].inventoryIndex = 2;
     //items[1].attributes = itemAttributesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[1]);
@@ -460,7 +460,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[2].itemId = 3333;
     items[2].itemType = 531102;
     items[2].amount = 1;
-    items[2].itemCategory = INVENTORY_CAT_ARMOR;
+    items[2].itemCategory = ITEM_CAT_ARMOR;
     //items[2].equipSlot = EQSLOT_BODY_ARMOR;
     //items[2].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[2]);
@@ -468,18 +468,18 @@ static PacketHandlerState zoneHandlerGameReady(
     items[3].itemId = 4444;
     items[3].itemType = 531101;
     items[3].amount = 1;
-    items[3].itemCategory = INVENTORY_CAT_ARMOR;
+    items[3].itemCategory = ITEM_CAT_ARMOR;
     //items[3].equipSlot = EQSLOT_BODY_ARMOR;
     //items[3].attributes = itemAttributesNew(4200, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[3]);
 
 
-    inventoryPrintBag(inventory, INVENTORY_CAT_CONSUMABLE);
-    inventoryPrintBag(inventory, INVENTORY_CAT_ARMOR);
+    inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
+    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
 
     inventoryRemoveItem(inventory, &items[1]);
 
-    inventoryPrintBag(inventory, INVENTORY_CAT_CONSUMABLE);
+    inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
     */
     zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
     zoneBuilderSessionObjects(replyMsg);

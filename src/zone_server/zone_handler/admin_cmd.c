@@ -14,7 +14,7 @@
 #include "admin_cmd.h"
 #include "common/commander/commander.h"
 #include "common/commander/inventory.h"
-#include "common/item/item.h"
+#include "common/actor/item/item.h"
 #include "common/redis/fields/redis_game_session.h"
 #include "common/redis/fields/redis_socket_session.h"
 #include "common/session/session.h"
@@ -122,6 +122,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
 
+    /*
     uint32_t itemType = strtol(args, &args, 10);
     args++;
     uint32_t amount = strtol(args, &args, 10);
@@ -134,18 +135,20 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
     dbg("item position: %d", itemPosition);
 
     Item newItem;
+        TODO : Rework
 
     itemInit(&newItem,
         r1emuGenerateRandom64(&self->seed),
         itemType,
         amount,
-        INVENTORY_CAT_SIZE * INVENTORY_CAT_CONSUMABLE + itemPosition
+        ITEM_CAT_SIZE * ITEM_CAT_CONSUMABLE + itemPosition
     );
     itemAddAttribute(&newItem, ITEM_ATTRIBUTE_ID_DURABILITY, (float[]) {4200});
 
     inventoryAddItem(inventory, &newItem);
 
     zoneBuilderItemAdd(&newItem, INVENTORY_ADD_PICKUP, replyMsg);
+    */
 }
 
 void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {

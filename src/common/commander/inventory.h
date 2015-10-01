@@ -20,11 +20,11 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
-#include "common/actor/a_item.h"
-#include "common/actor/a_equipable_item.h"
+#include "common/actor/item/item.h"
+#include "common/actor/item/equipable/equipable_item.h"
 
 // ---------- Defines -------------
-#define INVENTORY_CAT_SIZE 5000
+#define ITEM_CAT_SIZE 5000
 
 typedef enum {
     INVENTORY_TYPE_COMMANDER = 0,
@@ -36,24 +36,6 @@ typedef enum {
     INVENTORY_ADD_PICKUP = 3,
     INVENTORY_ADD_NOT_NEW = 4,
 }   InventoryAddType;
-
-typedef enum {
-    INVENTORY_CAT_WEAPON = 1,
-    INVENTORY_CAT_ARMOR = 2,
-    INVENTORY_CAT_SUBWEAPON = 3,
-    INVENTORY_CAT_COSTUME = 4,
-    INVENTORY_CAT_ACCESSORY = 5,
-    INVENTORY_CAT_CONSUMABLE = 6,
-    INVENTORY_CAT_GEM = 7,
-    INVENTORY_CAT_MATERIAL = 8,
-    INVENTORY_CAT_CARD = 9,
-    INVENTORY_CAT_COLLECTION = 10,
-    INVENTORY_CAT_BOOK = 11,
-    INVENTORY_CAT_QUEST = 12,
-    INVENTORY_CAT_PETWEAPON = 13,
-    INVENTORY_CAT_PETARMOR = 14,
-    INVENTORY_CAT_Count,
-}   InventoryCategory;
 
 typedef enum {
     EQSLOT_HEAD_TOP = 0,
@@ -76,7 +58,7 @@ typedef enum {
     EQSLOT_RIGHT_LEFT,
     EQSLOT_RIGHT_RIGHT,
     EQSLOT_NECKLACE,
-    EQSLOT_Count
+    EQSLOT_COUNT
 } EquipmentSlot;
 
 typedef enum {
@@ -114,9 +96,22 @@ typedef struct Inventory Inventory;
 struct Inventory
 {
     zhash_t *items;
-    zlist_t *bags[INVENTORY_CAT_Count];
-    EquipableItem *equippedItems[EQSLOT_Count];
+    zlist_t *bags[ITEM_CAT_COUNT];
+    EquipableItem *equippedItems[EQSLOT_COUNT];
 };
+
+#define DEFINE_InventoryItemCPacket(attrSize)             \
+typedef struct {                                          \
+    ItemId_t itemId;                                      \
+    uint16_t sizeOfAttributes;                            \
+    uint16_t unkown1;                                     \
+    ActorId_t itemUId;                                    \
+    ItemAmount_t amount;                                  \
+    ItemPrice_t price;                                    \
+    ItemInventoryIndex_t inventoryIndex;                  \
+    uint32_t unkown2;                                     \
+    uint8_t attributes[attrSize];                         \
+} InventoryItemCPacket;
 
 // ----------- Functions ------------
 /**
@@ -159,13 +154,13 @@ bool inventoryRemoveItem(Inventory *self, Item *itemToRemove);
  */
 size_t inventoryGetItemsCount(Inventory *self);
 
-Item *inventoryGetFirstItem(Inventory *self, InventoryCategory category);
-Item *inventoryGetNextItem(Inventory *self, InventoryCategory category);
+Item *inventoryGetFirstItem(Inventory *self, ItemCategory category);
+Item *inventoryGetNextItem(Inventory *self, ItemCategory category);
 
 bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot);
 void inventoryPrintEquipment(Inventory *self);
-bool inventoryGetEquipmentEmptySlot(EquipmentSlot slot, uint32_t *value);
-void inventoryPrintBag(Inventory *self, InventoryCategory category);
+uint32_t inventoryGetEquipmentEmptySlot(EquipmentSlot slot);
+void inventoryPrintBag(Inventory *self, ItemCategory category);
 bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item);
 bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2);
 

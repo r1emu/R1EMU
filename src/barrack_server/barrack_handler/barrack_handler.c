@@ -18,7 +18,7 @@
 #include "common/server/worker.h"
 #include "common/commander/commander.h"
 #include "common/commander/inventory.h"
-#include "common/item/item.h"
+#include "common/actor/item/item.h"
 #include "common/packet/packet_stream.h"
 #include "common/redis/fields/redis_session.h"
 #include "common/redis/fields/redis_game_session.h"

@@ -23,7 +23,7 @@
 #include "common/commander/commander.h"
 #include "common/server/worker.h"
 #include "common/commander/inventory.h"
-#include "common/item/item.h"
+#include "common/actor/item/item.h"
 
 typedef enum PacketTypeZoneNormal {
     ZC_NORMAL_UNKNOWN_1 = 0x11,

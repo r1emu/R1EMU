@@ -17,7 +17,7 @@
 #include "common/packet/packet_stream.h"
 #include "common/packet/packet_type.h"
 #include "common/commander/inventory.h"
-#include "common/item/item.h"
+#include "common/actor/item/item.h"
 
 void barrackBuilderMessage(uint8_t msgType, uint8_t *message, zmsg_t *replyMsg) {
 
@@ -246,7 +246,7 @@ void barrackBuilderCommanderList(
     // Keep sizes in memory
     size_t commanderBarrackInfoPacketSize = 0;
     size_t attributesSizeAllCommanders[commandersCount];
-    size_t attributeSizeAllCommanders[commandersCount][EQSLOT_Count];
+    size_t attributeSizeAllCommanders[commandersCount][EQSLOT_COUNT];
 
     for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
 
@@ -256,12 +256,12 @@ void barrackBuilderCommanderList(
 
         // get attributes size
         size_t attributesSize = 0;
-        for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_Count; eqSlotIndex++) {
+        for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
 
             Item *item = inventory->equippedItems[eqSlotIndex];
 
             // get attribute size
-            size_t attrSize = item ? itemAttributesGetPacketSize(&item->attributes) : 0;
+            size_t attrSize = item ? itemGetAttributesCPacketSize(&item->attributes) : 0;
 
             // get total structure size
             #pragma pack(push, 1)
@@ -407,7 +407,7 @@ void barrackBuilderCommanderList(
             size_t offset = offsetof(struct CommanderBarrackInfoPacket, attributesPacket);
             packetStreamAddOffset(&packetStream, offset);
 
-            for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_Count; eqSlotIndex++) {
+            for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
 
                 Item *item = inventory->equippedItems[eqSlotIndex];
 
@@ -430,7 +430,7 @@ void barrackBuilderCommanderList(
 
                 // write in the buffer
                 if (item) {
-                    itemAttributesGetPacket(&item->attributes, packetStreamGetCurrentBuffer(&packetStream));
+                    itemAttributesGetCPacket(&item->attributes, packetStreamGetCurrentBuffer(&packetStream));
                     // relocate the stream position
                     packetStreamAddOffset(&packetStream, attrSize);
                 }
