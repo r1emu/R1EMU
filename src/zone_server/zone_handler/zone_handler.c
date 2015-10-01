@@ -1032,7 +1032,7 @@ static PacketHandlerState zoneHandlerItemDelete(
     Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
 
     Item *item;
-    if (inventoryGetItemByItemId(inventory, clientPacket->itemId, &item)) {
+    if (inventoryGetItemByActorId(inventory, clientPacket->itemId, &item)) {
         inventoryRemoveItem(&session->game.commanderSession.currentCommander->inventory, item);
     } else {
         error("Item not found in inventory");
@@ -1073,12 +1073,12 @@ static PacketHandlerState zoneHandlerSwapEtcInvChangeIndex(
     Item *item1;
     Item *item2;
 
-    if (!inventoryGetItemByItemId(inventory, clientPacket->itemId1, &item1)) {
+    if (!inventoryGetItemByActorId(inventory, clientPacket->itemId1, &item1)) {
         error("Item1 not found in inventory");
         return PACKET_HANDLER_ERROR;
     }
 
-    if (!inventoryGetItemByItemId(inventory, clientPacket->itemId2, &item2)) {
+    if (!inventoryGetItemByActorId(inventory, clientPacket->itemId2, &item2)) {
         error("Item2 not found in inventory");
         return PACKET_HANDLER_ERROR;
     }

@@ -157,10 +157,10 @@ size_t inventoryGetItemsCount(Inventory *self);
 Item *inventoryGetFirstItem(Inventory *self, ItemCategory category);
 Item *inventoryGetNextItem(Inventory *self, ItemCategory category);
 
-bool inventoryEquipItem(Inventory *self, uint64_t itemId, EquipmentSlot eqSlot);
+bool inventoryEquipItem(Inventory *self, ActorId_t actorId, EquipmentSlot eqSlot);
 void inventoryPrintEquipment(Inventory *self);
 uint32_t inventoryGetEquipmentEmptySlot(EquipmentSlot slot);
 void inventoryPrintBag(Inventory *self, ItemCategory category);
-bool inventoryGetItemByItemId(Inventory *self, uint64_t itemId, Item **_item);
+bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, Item **_item);
 bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2);
 

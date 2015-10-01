@@ -75,7 +75,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/barrack_server/barrack_server.h" />
-		<Unit filename="../../../src/common/actor/a_item.h" />
 		<Unit filename="../../../src/common/actor/actor.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -94,8 +93,6 @@
 		<Unit filename="../../../src/common/commander/commander.h" />
 		<Unit filename="../../../src/common/commander/inventory.c">
 			<Option compilerVar="CC" />
-			<Option compile="0" />
-			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/common/commander/inventory.h" />
 		<Unit filename="../../../src/common/crypto/bf/bf_ecb.c">
@@ -138,8 +135,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/graph/graph.h" />
-		<Unit filename="../../../src/common/item/item.h" />
-		<Unit filename="../../../src/common/item/item_attribute.h" />
 		<Unit filename="../../../src/common/mysql/fields/mysql_account_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
