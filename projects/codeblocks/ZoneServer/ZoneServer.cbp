@@ -79,14 +79,58 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/actor/actor.h" />
-		<Unit filename="../../../src/common/actor/item/equipable/equipable_item.c">
+		<Unit filename="../../../src/common/actor/attribute.h" />
+		<Unit filename="../../../src/common/actor/item/common/book/item_book.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../src/common/actor/item/common/book/item_book.h" />
+		<Unit filename="../../../src/common/actor/item/common/card/item_card.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/common/card/item_card.h" />
+		<Unit filename="../../../src/common/actor/item/common/consumable/item_consumable.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/common/consumable/item_consumable.h" />
+		<Unit filename="../../../src/common/actor/item/common/gem/item_gem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/common/gem/item_gem.h" />
+		<Unit filename="../../../src/common/actor/item/common/item_consumable.h" />
+		<Unit filename="../../../src/common/actor/item/common/material/item_material.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/common/material/item_material.h" />
+		<Unit filename="../../../src/common/actor/item/common/quest/item_quest.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/common/quest/item_quest.h" />
+		<Unit filename="../../../src/common/actor/item/equipable/accessory/item_accessory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/equipable/accessory/item_accessory.h" />
+		<Unit filename="../../../src/common/actor/item/equipable/armor/item_armor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/equipable/armor/item_armor.h" />
 		<Unit filename="../../../src/common/actor/item/equipable/equipable_item.h" />
+		<Unit filename="../../../src/common/actor/item/equipable/item_equipable.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/equipable/item_equipable.h" />
+		<Unit filename="../../../src/common/actor/item/equipable/weapon/item_weapon.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/equipable/weapon/item_weapon.h" />
 		<Unit filename="../../../src/common/actor/item/item.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/actor/item/item.h" />
+		<Unit filename="../../../src/common/actor/item/item_attribute.h" />
+		<Unit filename="../../../src/common/actor/item/item_interface.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/item_interface.h" />
 		<Unit filename="../../../src/common/commander/commander.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -167,6 +211,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/packet/packet_type.h" />
+		<Unit filename="../../../src/common/property/property.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/property/property.h" />
 		<Unit filename="../../../src/common/redis/fields/redis_game_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -219,6 +267,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/session/account_session.h" />
+		<Unit filename="../../../src/common/session/barrack_session.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/session/barrack_session.h" />
 		<Unit filename="../../../src/common/session/commander_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
