@@ -110,4 +110,4 @@ inline ItemInventoryIndex_t itemGetInventoryIndex(Item *self) { return self->inv
  * Serialization / Unserialization
  */
 size_t itemGetPropertiesCPacketSize(Item *self);
-void itemAttributesGetCPacket(Item *self, PacketStream *stream);
+void itemPropertiesGetCPacket(Item *self, PacketStream *stream);

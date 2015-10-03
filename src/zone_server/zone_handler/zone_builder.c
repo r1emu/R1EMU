@@ -73,7 +73,7 @@ void zoneBuilderItemAdd(Item *item, InventoryAddType addType, zmsg_t *replyMsg) 
 
         PacketStream packetStream;
         packetStreamInit(&packetStream, replyPacket.attributes);
-        itemAttributesGetCPacket(item, &packetStream);
+        itemPropertiesGetCPacket(item, &packetStream);
     }
 }
 
@@ -1150,7 +1150,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
         uint8_t attributes[attrSize];            \
     }   EquippedItemCPacket;
 
-    size_t itemAttributesSize[EQSLOT_COUNT];
+    size_t itemPropertiesSize[EQSLOT_COUNT];
     size_t itemsPacketSize = 0;
 
     for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
@@ -1163,7 +1163,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
         DEFINE_EquippedItemCPacket(attrSize);
         #pragma pack(pop)
 
-        itemAttributesSize[eqSlotIndex] = attrSize;
+        itemPropertiesSize[eqSlotIndex] = attrSize;
         itemsPacketSize += sizeof(EquippedItemCPacket);
     }
 
@@ -1192,7 +1192,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
 
             ItemEquipable *eqItem = inventory->equippedItems[eqSlotIndex];
 
-            size_t attrSize = itemAttributesSize[eqSlotIndex];
+            size_t attrSize = itemPropertiesSize[eqSlotIndex];
 
             #pragma pack(push, 1)
             DEFINE_EquippedItemCPacket(attrSize);
@@ -1215,7 +1215,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
             // write in the buffer
             if (attrSize > 0) {
                 dbg("Get item attribute UID : %llx", actorGetUId((Actor *) eqItem));
-                itemAttributesGetCPacket(&eqItem->item, &packetStream);
+                itemPropertiesGetCPacket(&eqItem->item, &packetStream);
             }
         }
     }
@@ -1669,7 +1669,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
     size_t inventoryCount = inventoryGetItemsCount(inventory);
 
     // Calculate size in packet to store all items
-    size_t itemAttributesSize[ITEM_CAT_COUNT][inventoryCount];
+    size_t itemPropertiesSize[ITEM_CAT_COUNT][inventoryCount];
     size_t totalSize = 0;
 
     // Itarate all inventory bags
@@ -1687,7 +1687,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
             DEFINE_InventoryItemCPacket(attrSize);
             #pragma pack(pop)
 
-            itemAttributesSize[category][inventoryIndex] = attrSize;
+            itemPropertiesSize[category][inventoryIndex] = attrSize;
             totalSize += sizeof(InventoryItemCPacket);
 
             item = inventoryGetNextItem(inventory, category);
@@ -1731,7 +1731,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
         while (item) {
 
             inventoryIndex++;
-            size_t attrSize = itemAttributesSize[inventoryIndex];
+            size_t attrSize = itemPropertiesSize[inventoryIndex];
 
             #pragma pack(push, 1)
             DEFINE_InventoryItemCPacket(attrSize);
@@ -1754,7 +1754,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
 
             // write in the buffer
             if (attrSize > 0) {
-                itemAttributesGetCPacket(item->attributes, packetStreamGetCurrentBuffer(&packetStream));
+                itemPropertiesGetCPacket(item->attributes, packetStreamGetCurrentBuffer(&packetStream));
                 // relocate the stream position
                 packetStreamAddOffset(&packetStream, attrSize);
             }
@@ -1786,11 +1786,11 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
         uint8_t inventoryIndex = 0;
 
         while (item) {
-            size_t attrSize = itemAttributesSize[category][inventoryIndex];
+            size_t attrSize = itemPropertiesSize[category][inventoryIndex];
 
             // write in the buffer
             if (attrSize > 0) {
-                itemAttributesGetCPacket(item, &packetStream);
+                itemPropertiesGetCPacket(item, &packetStream);
             }
 
             item = inventoryGetNextItem(inventory, category);

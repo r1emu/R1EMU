@@ -104,7 +104,7 @@ size_t itemGetPropertiesCPacketSize(Item *self) {
     return size;
 }
 
-void itemAttributesGetCPacket(Item *self, PacketStream *stream) {
+void itemPropertiesGetCPacket(Item *self, PacketStream *stream) {
 
     switch (self->category) {
         case ITEM_CAT_CONSUMABLE:

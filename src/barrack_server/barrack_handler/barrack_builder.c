@@ -242,155 +242,88 @@ void barrackBuilderCommanderList(
     int commandersCount,
     zmsg_t *replyMsg)
 {
-    /**
-        #pragma pack(push, 1)
-        struct BarrackBuilderCommanderListPacket {
-            VariableSizePacketHeader variableSizeHeader;
-            uint64_t accountId;
-            uint8_t unk1;
-            uint8_t commandersCount;
-            uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
-
-            // TODO : Fix it
-            uint16_t accountInfoLength; // sizeof(accountInfo)
-            //AccountInfo accountInfo[accountInfoCount];
-
-            // AccountInfo
-            uint16_t typeCredits;
-            float creditsAmount;
-            uint16_t typeCredits2;
-            float creditsAmount2;
-            uint16_t typeCredits3;
-            float creditsAmount3;
-
-            uint8_t commandersBarrackInfoPacket[commanderBarrackInfoPacketSize];
-        } replyPacket;
-        #pragma pack(pop)
-    */
-
-    /**
-        #pragma pack(push, 1)
-        typedef struct {
-            CommanderAppearance commander;
-            uint64_t socialInfoId;
-            uint16_t commanderPosition;
-            uint16_t mapId;
-            uint32_t unk4;
-            uint32_t unk5;
-            uint32_t maxXP;
-            uint32_t unk6;
-            PositionXYZ pos;
-            PositionXZ dir;
-            PositionXYZ pos2;
-            PositionXZ dir2;
-            uint32_t unk8;
-            uint8_t attributesPacket[attributesSize];
-            uint16_t unk9;
-        } CommanderBarrackInfoPacket;
-        #pragma pack(pop)
-    */
-
-    /**
-        #pragma pack(push, 1)
-        typedef struct {
-            uint16_t attrSize;
-            uint8_t attrBuffer[attrSize];
-        } AttributePacket;
-        #pragma pack(pop)
-    */
+    #define DEFINE_CommanderBarrackInfoCPacket(x)     \
+        typedef struct {                              \
+            CommanderAppearance appearance;           \
+            uint64_t socialInfoId;                    \
+            uint16_t commanderPosition;               \
+            uint16_t mapId;                           \
+            uint32_t unk4;                            \
+            uint32_t unk5;                            \
+            uint32_t maxXP;                           \
+            uint32_t unk6;                            \
+            PositionXYZ pos;                          \
+            PositionXZ dir;                           \
+            PositionXYZ pos2;                         \
+            PositionXZ dir2;                          \
+            uint32_t unk8;                            \
+            uint8_t propertiesPacket[x];              \
+            uint16_t unk9;                            \
+        } CommanderBarrackInfoCPacket;
 
     // Keep sizes in memory
     size_t commanderBarrackInfoPacketSize = 0;
-    size_t attributesSizeAllCommanders[commandersCount];
-    size_t attributeSizeAllCommanders[commandersCount][EQSLOT_COUNT];
+    size_t propertiesSizeAllCommanders[commandersCount];
+    size_t propertySizeAllCommanders[commandersCount][EQSLOT_COUNT];
 
     for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
-
-    }
-
-    /*
-    // Keep sizes in memory
-    size_t commanderBarrackInfoPacketSize = 0;
-    size_t attributesSizeAllCommanders[commandersCount];
-    size_t attributeSizeAllCommanders[commandersCount][EQSLOT_COUNT];
-
-    for (int commanderIndex = 0; commanderIndex < commandersCount; commanderIndex++) {
-
-        // iterate through all commander
+        // Iterate through all commander
         Commander *curCommander = commanders[commanderIndex];
         Inventory *inventory = &curCommander->inventory;
 
-        // get attributes size
-        size_t attributesSize = 0;
+        // Get attributes size
+        size_t propertiesSize = 0;
         for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
 
-            ItemEquipable *item = inventory->equippedItems[eqSlotIndex];
+            Item *item = (Item *) inventory->equippedItems[eqSlotIndex];
 
-            // get attribute size
-            size_t attrSize = item ? itemGetPropertiesCPacketSize(&item->attributes) : 0;
+            // Get attribute size
+            size_t propSize = item ? itemGetPropertiesCPacketSize(item) : 0;
 
-            // get total structure size
+            // Define size
             #pragma pack(push, 1)
-            typedef struct {
-                uint16_t attrSize;
-                uint8_t attrBuffer[attrSize];
-            } AttributePacket;
+            DECLARE_PropertyCPacket(propSize);
             #pragma pack(pop)
 
-            attributesSize += sizeof(AttributePacket);
-            attributeSizeAllCommanders[commanderIndex][eqSlotIndex] = attrSize;
+            propertiesSize += sizeof(PropertyCPacket);
+            propertySizeAllCommanders[commanderIndex][eqSlotIndex] = propSize;
         }
 
-        attributesSizeAllCommanders[commanderIndex] = attributesSize;
+        propertiesSizeAllCommanders[commanderIndex] = propertiesSize;
 
-        // get CommanderBarrackInfoPacket size
+        // Define encapsulating scruture
         #pragma pack(push, 1)
-        typedef struct {
-            CommanderAppearance commander;
-            uint64_t socialInfoId;
-            uint16_t commanderPosition;
-            uint16_t mapId;
-            uint32_t unk4;
-            uint32_t unk5;
-            uint32_t maxXP;
-            uint32_t unk6;
-            PositionXYZ pos;
-            PositionXZ dir;
-            PositionXYZ pos2;
-            PositionXZ dir2;
-            uint32_t unk8;
-            uint8_t attributesPacket[attributesSize];
-            uint16_t unk9;
-        } CommanderBarrackInfoPacket;
+        DEFINE_CommanderBarrackInfoCPacket(propertiesSize);
         #pragma pack(pop)
-
-        commanderBarrackInfoPacketSize += sizeof(CommanderBarrackInfoPacket);
+        commanderBarrackInfoPacketSize += sizeof(CommanderBarrackInfoCPacket);
     }
 
     // We got the final packet size, allocate replyPacket
+    #define DEFINE_BarrackBuilderCommanderListCPacket(x)    \
+    typedef struct {                                        \
+        VariableSizePacketHeader variableSizeHeader;        \
+        uint64_t accountId;                                 \
+        uint8_t unk1;                                       \
+        uint8_t commandersCount;                            \
+        uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];     \
+                                                            \
+        uint16_t accountInfoBytesLength;                    \
+                                                            \
+        /* FIXME : Create AccountInfo */                    \
+        uint16_t typeCredits;                               \
+        float creditsAmount;                                \
+        uint16_t typeCredits2;                              \
+        float creditsAmount2;                               \
+        uint16_t typeCredits3;                              \
+        float creditsAmount3;                               \
+                                                            \
+        uint8_t commandersBarrackInfoPacket[x];             \
+    }   BarrackBuilderCommanderListCPacket;
+
     #pragma pack(push, 1)
-    struct BarrackBuilderCommanderListPacket {
-        VariableSizePacketHeader variableSizeHeader;
-        uint64_t accountId;
-        uint8_t unk1;
-        uint8_t commandersCount;
-        uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
-
-        // TODO : Fix it
-        uint16_t accountInfoLength; // sizeof(accountInfo)
-        //AccountInfo accountInfo[accountInfoCount];
-
-        // AccountInfo
-        uint16_t typeCredits;
-        float creditsAmount;
-        uint16_t typeCredits2;
-        float creditsAmount2;
-        uint16_t typeCredits3;
-        float creditsAmount3;
-
-        uint8_t commandersBarrackInfoPacket[commanderBarrackInfoPacketSize];
-    } replyPacket;
+    DEFINE_BarrackBuilderCommanderListCPacket(commanderBarrackInfoPacketSize);
     #pragma pack(pop)
+    BarrackBuilderCommanderListCPacket replyPacket;
 
     PacketStream packetStream;
     packetStreamInit(&packetStream, &replyPacket);
@@ -401,13 +334,13 @@ void barrackBuilderCommanderList(
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        // fill replyPacket
+        // Fill replyPacket
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
         replyPacket.accountId = accountId;
         replyPacket.unk1 = 1; // ICBT - equal to 1 or 4
         replyPacket.commandersCount = commandersCount;
         strncpy(replyPacket.familyName, gameSession->accountSession.familyName, sizeof(replyPacket.familyName));
-        replyPacket.accountInfoLength = 0x12; // 3 sets
+        replyPacket.accountInfoBytesLength = 0x12; // 3 sets
         replyPacket.typeCredits = SWAP_UINT16(0x940e); // 94 0E = Medal (iCoin)
         replyPacket.creditsAmount = gameSession->accountSession.credits;
         replyPacket.typeCredits2 = SWAP_UINT16(0x970e); // 94 0E = Medal (iCoin)
@@ -417,7 +350,7 @@ void barrackBuilderCommanderList(
 
         // we want to start writing at the offset of commandersBarrackInfoPacket
         if (commanderBarrackInfoPacketSize > 0) {
-            size_t offset = offsetof(struct BarrackBuilderCommanderListPacket, commandersBarrackInfoPacket);
+            size_t offset = offsetof(BarrackBuilderCommanderListCPacket, commandersBarrackInfoPacket);
             packetStreamAddOffset(&packetStream, offset);
         }
 
@@ -428,29 +361,14 @@ void barrackBuilderCommanderList(
             Commander *curCommander = commanders[commanderIndex];
             Inventory *inventory = &curCommander->inventory;
 
-            // Define CommanderBarrackInfoPacket current structure
-            size_t attributesSize = attributesSizeAllCommanders[commanderIndex];
+            // Define CommanderBarrackInfoCPacket current structure
+            size_t propertiesSize = propertiesSizeAllCommanders[commanderIndex];
             #pragma pack(push, 1)
-            struct CommanderBarrackInfoPacket {
-                CommanderAppearance appearance;
-                uint64_t socialInfoId;
-                uint16_t commanderPosition;
-                uint16_t mapId;
-                uint32_t unk4;
-                uint32_t unk5;
-                uint32_t maxXP;
-                uint32_t unk6;
-                PositionXYZ pos;
-                PositionXZ dir;
-                PositionXYZ pos2;
-                PositionXZ dir2;
-                uint32_t unk8;
-                uint8_t attributesPacket[attributesSize];
-                uint16_t unk9;
-            } *curCommandersBarrackInfoPacket = packetStreamGetCurrentBuffer(&packetStream);
+            DEFINE_CommanderBarrackInfoCPacket(propertiesSize);
             #pragma pack(pop)
+            CommanderBarrackInfoCPacket *curCommandersBarrackInfoPacket = packetStreamGetCurrentBuffer(&packetStream);
 
-            // fill it
+            // Fill it
             curCommandersBarrackInfoPacket->appearance = curCommander->appearance;
 
             curCommandersBarrackInfoPacket->socialInfoId = curCommander->socialInfoId; // CharUniqueId?
@@ -470,44 +388,40 @@ void barrackBuilderCommanderList(
             curCommandersBarrackInfoPacket->unk9 = 0;
 
             // fill attributes
-            size_t offset = offsetof(struct CommanderBarrackInfoPacket, attributesPacket);
+            size_t offset = offsetof(CommanderBarrackInfoCPacket, propertiesPacket);
             packetStreamAddOffset(&packetStream, offset);
 
             for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
 
                 ItemEquipable *item = inventory->equippedItems[eqSlotIndex];
 
-                // get attribute size
-                size_t attrSize = attributeSizeAllCommanders[commanderIndex][eqSlotIndex];
-
-                // Define AttributePacket current structure
-                #pragma pack(push, 1)
-                struct AttributePacket {
-                    uint16_t attrSize;
-                    uint8_t attrBuffer[attrSize];
-                } *attributePacket = packetStreamGetCurrentBuffer(&packetStream);
-                #pragma pack(pop)
-
-                attributePacket->attrSize = attrSize;
-
-                // fill attribute buffer
-                size_t offset = offsetof(struct AttributePacket, attrBuffer);
-                packetStreamAddOffset(&packetStream, offset);
-
-                // write in the buffer
                 if (item) {
-                    itemAttributesGetCPacket(&item->attributes, packetStreamGetCurrentBuffer(&packetStream));
-                    // relocate the stream position
-                    packetStreamAddOffset(&packetStream, attrSize);
+                    // get property size
+                    size_t propSize = propertySizeAllCommanders[commanderIndex][eqSlotIndex];
+
+                    // Define PropertyPacket current structure
+                    #pragma pack(push, 1)
+                    DECLARE_PropertyCPacket(propSize);
+                    #pragma pack(pop)
+
+                    // TODO : improve this so it uses packet stream only
+                    PropertyCPacket *propertyPacket = packetStreamGetCurrentBuffer(&packetStream);
+                    propertyPacket->size = propSize;
+
+                    // fill properties buffer
+                    size_t offset = offsetof(PropertyCPacket, data);
+                    packetStreamAddOffset(&packetStream, offset);
+
+                    // write in the buffer
+                    itemPropertiesGetCPacket((Item *) item, &packetStream);
                 }
             }
 
-            packetStreamAddOffset(&packetStream, sizeof_struct_member(struct CommanderBarrackInfoPacket, unk9));
+            packetStreamAddOffset(&packetStream, sizeof_struct_member(CommanderBarrackInfoCPacket, unk9));
         }
     }
 
     buffer_print(&replyPacket, sizeof(replyPacket), NULL);
-    */
 }
 
 void barrackBuilderPetInformation(zmsg_t *replyMsg) {
