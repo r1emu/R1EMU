@@ -382,6 +382,7 @@ static PacketHandlerState barrackHandlerStartBarrack(
     // Update session
     session->game.accountSession = tmpAccountSession;
 
+    /*
     Inventory *inventory = &tmpAccountSession.commanders[0]->inventory;
 
     Item items[20];
@@ -392,7 +393,7 @@ static PacketHandlerState barrackHandlerStartBarrack(
     items[0].category = ITEM_CAT_CONSUMABLE;
     inventoryAddItem(inventory, &items[0]);
 
-    EquipableItem equipItem[20];
+    ItemEquipable equipItem[20];
 
     equipItem[0].item.actor.uid = 2222;
     equipItem[0].item.id = 531001;
@@ -420,10 +421,7 @@ static PacketHandlerState barrackHandlerStartBarrack(
 
     inventoryPrintEquipment(inventory);
     inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
-
-
-
-
+    */
 
     // Send the commander list
     barrackBuilderCommanderList(

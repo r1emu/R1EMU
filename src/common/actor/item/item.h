@@ -20,6 +20,7 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
+#include "common/property/property.h"
 #include "common/actor/actor.h"
 #include "common/packet/packet_stream.h"
 
@@ -27,71 +28,48 @@
 
 
 // ------ Structure declaration -------
+/** Item fields packet size */
 typedef uint32_t ItemId_t;
 typedef uint32_t ItemAmount_t;
 typedef uint32_t ItemInventoryIndex_t;
 typedef uint32_t ItemPrice_t;
 
+/** Item categories */
 typedef enum {
-    ITEM_CAT_WEAPON = 1,
-    ITEM_CAT_ARMOR = 2,
-    ITEM_CAT_SUBWEAPON = 3,
-    ITEM_CAT_COSTUME = 4,
-    ITEM_CAT_ACCESSORY = 5,
-    ITEM_CAT_CONSUMABLE = 6,
-    ITEM_CAT_GEM = 7,
-    ITEM_CAT_MATERIAL = 8,
-    ITEM_CAT_CARD = 9,
-    ITEM_CAT_COLLECTION = 10,
-    ITEM_CAT_BOOK = 11,
-    ITEM_CAT_QUEST = 12,
-    ITEM_CAT_PETWEAPON = 13,
-    ITEM_CAT_PETARMOR = 14,
+    ITEM_CAT_CONSUMABLE,
+    ITEM_CAT_ARMOR,
+    ITEM_CAT_QUEST,
+    ITEM_CAT_BOOK,
+    ITEM_CAT_MATERIAL,
+    ITEM_CAT_GEM,
+    ITEM_CAT_WEAPON,
+    ITEM_CAT_CARD,
+    ITEM_CAT_ACCESSORY,
+    ITEM_CAT_SUBWEAPON,
+    ITEM_CAT_CURRENCY,
     ITEM_CAT_COUNT,
 }   ItemCategory;
 
 /**
- * @brief Item is the server structure of item attributes
- */
-typedef struct ItemAttributes {
-
-
-}   ItemAttributes;
-
-/**
  * @brief Item is the server structure of an item
  */
-typedef struct Item {
+typedef struct {
    Actor actor;
    ItemId_t id;
    ItemAmount_t amount;
    ItemCategory category;
-   ItemAttributes attributes;
    ItemInventoryIndex_t inventoryIndex;
 } Item;
 
 /**
  * @brief ItemCPacket is the client packet structure of an item
  */
-typedef struct ItemCPacket {
+typedef struct {
     ActorId_t uid;
     ItemId_t id;
     ItemAmount_t amount;
     ItemInventoryIndex_t inventoryIndex;
 } ItemCPacket;
-
-#define DEFINE_EquippedItemCPacket(attrSize) \
-typedef struct EquippedItemCPacket {         \
-    ItemId_t id;                             \
-    uint16_t sizeOfAttributes;               \
-    uint16_t unk1;                           \
-    ActorId_t uid;                           \
-    uint8_t eqSlotIndex;                     \
-    uint8_t unk2;                            \
-    uint16_t unk3;                           \
-    uint32_t unk4;                           \
-    uint8_t attributes[attrSize];            \
-}   EquippedItemCPacket;
 
 // ----------- Functions ------------
 
@@ -123,29 +101,13 @@ void itemDestroy(Item **self);
 /**
  * Getters & Setters
  */
-inline ActorId_t itemGetUId(Item *self) {
-    return actorGetUId(&self->actor);
-}
-
-inline ItemId_t itemGetId(Item *self) {
-    return self->id;
-}
-
-inline ItemInventoryIndex_t itemGetInventoryIndex(Item *self) {
-    return self->inventoryIndex;
-}
-
-inline ItemAmount_t itemGetAmount(Item *self) {
-    return self->amount;
-}
-
-inline ItemCategory itemGetCategory(Item *self) {
-    return self->category;
-}
-
+inline ItemId_t itemGetId(Item *self) { return self->id; }
+inline ItemAmount_t itemGetAmount(Item *self) { return self->amount; }
+inline ItemCategory itemGetCategory(Item *self) { return self->category; }
+inline ItemInventoryIndex_t itemGetInventoryIndex(Item *self) { return self->inventoryIndex; }
 
 /**
  * Serialization / Unserialization
  */
-size_t itemGetAttributesCPacketSize(Item *self);
+size_t itemGetPropertiesCPacketSize(Item *self);
 void itemAttributesGetCPacket(Item *self, PacketStream *stream);

@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file equipable_item.h
+ * @file item_equipable.h
  * @brief
  *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
@@ -23,49 +23,38 @@
 // ---------- Defines -------------
 
 // ------ Structure declaration -------
-typedef struct EquipableItem {
+typedef struct ItemEquipable {
    Item item;
    int slot;
-} EquipableItem;
+} ItemEquipable;
 
 // ----------- Functions ------------
 /**
- * Allocate a new EquipableItem structure.
- * @return A pointer to an allocated EquipableItem, or NULL if an error occured.
+ * Allocate a new ItemEquipable structure.
+ * @return A pointer to an allocated ItemEquipable, or NULL if an error occured.
  */
-EquipableItem *equipableItemNew(void);
+ItemEquipable *equipableItemNew(void);
 
 /**
- * Initialize an allocated EquipableItem structure.
- * @param self An allocated EquipableItem to initialize.
+ * Initialize an allocated ItemEquipable structure.
+ * @param self An allocated ItemEquipable to initialize.
  * @return true on success, false otherwise.
  */
-bool equipableItemInit(EquipableItem *self);
+bool equipableItemInit(ItemEquipable *self);
 
 /**
- * Free an allocated EquipableItem structure.
- * @param self A pointer to an allocated EquipableItem.
+ * Free an allocated ItemEquipable structure.
+ * @param self A pointer to an allocated ItemEquipable.
  */
-void equipableItemFree(EquipableItem *self);
+void equipableItemFree(ItemEquipable *self);
 
 /**
- * Free an allocated EquipableItem structure and nullify the content of the pointer.
- * @param self A pointer to an allocated EquipableItem.
+ * Free an allocated ItemEquipable structure and nullify the content of the pointer.
+ * @param self A pointer to an allocated ItemEquipable.
  */
-void equipableItemDestroy(EquipableItem **self);
+void equipableItemDestroy(ItemEquipable **self);
 
 /**
  * Getters & Setters
  */
-inline ItemId_t equipableItemGetId(EquipableItem *self) {
-    return itemGetId(&self->item);
-}
-
-inline ItemId_t equipableItemGetUId(EquipableItem *self) {
-    return itemGetUId(&self->item);
-}
-
-inline int equipableItemGetSlot(EquipableItem *self) {
-    return self->slot;
-}
-
+inline int equipableItemGetSlot(ItemEquipable *self) { return self->slot; }

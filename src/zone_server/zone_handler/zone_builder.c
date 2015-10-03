@@ -42,7 +42,7 @@ void zoneBuilderRestSit(uint32_t targetPcId, zmsg_t *replyMsg) {
 
 void zoneBuilderItemAdd(Item *item, InventoryAddType addType, zmsg_t *replyMsg) {
 
-    size_t attributesSize = itemGetAttributesCPacketSize(item);
+    size_t attributesSize = itemGetPropertiesCPacketSize(item);
 
     #pragma pack(push, 1)
     struct {
@@ -62,7 +62,7 @@ void zoneBuilderItemAdd(Item *item, InventoryAddType addType, zmsg_t *replyMsg) 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
-        replyPacket.item.uid = itemGetUId(item);
+        replyPacket.item.uid = actorGetUId(item);
         replyPacket.item.id = itemGetId(item);
         replyPacket.item.amount = itemGetAmount(item);
         replyPacket.item.inventoryIndex = itemGetInventoryIndex(item);
@@ -1134,14 +1134,30 @@ void zoneBuilderSkillList(uint32_t targetPcId, zmsg_t *replyMsg) {
 
 void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
 
+    /**
+     * @brief ItemCPacket is the client packet structure of an equiped item
+     */
+    #define DEFINE_EquippedItemCPacket(attrSize) \
+    typedef struct EquippedItemCPacket {         \
+        ItemId_t id;                             \
+        uint16_t sizeOfAttributes;               \
+        uint16_t unk1;                           \
+        ActorId_t uid;                           \
+        uint8_t eqSlotIndex;                     \
+        uint8_t unk2;                            \
+        uint16_t unk3;                           \
+        uint32_t unk4;                           \
+        uint8_t attributes[attrSize];            \
+    }   EquippedItemCPacket;
+
     size_t itemAttributesSize[EQSLOT_COUNT];
     size_t itemsPacketSize = 0;
 
     for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
 
-        EquipableItem *eqItem = inventory->equippedItems[eqSlotIndex];
+        ItemEquipable *eqItem = inventory->equippedItems[eqSlotIndex];
         // get attribute size
-        size_t attrSize = eqItem ? itemGetAttributesCPacketSize(&eqItem->item) : 0;
+        size_t attrSize = eqItem ? itemGetPropertiesCPacketSize(&eqItem->item) : 0;
 
         #pragma pack(push, 1)
         DEFINE_EquippedItemCPacket(attrSize);
@@ -1149,7 +1165,6 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
 
         itemAttributesSize[eqSlotIndex] = attrSize;
         itemsPacketSize += sizeof(EquippedItemCPacket);
-
     }
 
     #pragma pack(push, 1)
@@ -1175,7 +1190,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
 
         for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
 
-            EquipableItem *eqItem = inventory->equippedItems[eqSlotIndex];
+            ItemEquipable *eqItem = inventory->equippedItems[eqSlotIndex];
 
             size_t attrSize = itemAttributesSize[eqSlotIndex];
 
@@ -1185,10 +1200,10 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
 
             EquippedItemCPacket *eqItemPkt = packetStreamGetCurrentBuffer(&packetStream);
 
-            eqItemPkt->id = eqItem ? equipableItemGetId(eqItem) : inventoryGetEquipmentEmptySlot(eqSlotIndex);
+            eqItemPkt->id = eqItem ? itemGetId((Item *) eqItem) : inventoryGetEquipmentEmptySlot(eqSlotIndex);
             eqItemPkt->sizeOfAttributes = attrSize;
             eqItemPkt->unk1 = 0;
-            eqItemPkt->uid = eqItem ? equipableItemGetUId(eqItem) : 0;
+            eqItemPkt->uid = eqItem ? actorGetUId((Actor *) eqItem) : 0;
             eqItemPkt->eqSlotIndex = eqSlotIndex;
             eqItemPkt->unk2 = 0;
             eqItemPkt->unk3 = 0;
@@ -1199,7 +1214,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
 
             // write in the buffer
             if (attrSize > 0) {
-                dbg("Get item attribute UID : %llx", equipableItemGetUId(eqItem));
+                dbg("Get item attribute UID : %llx", actorGetUId((Actor *) eqItem));
                 itemAttributesGetCPacket(&eqItem->item, &packetStream);
             }
         }
@@ -1208,6 +1223,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
 }
 
 void zoneBuilderStartInfo(zmsg_t *replyMsg) {
+
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
@@ -1665,7 +1681,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
 
         while (item) {
 
-        size_t attrSize = item ? itemGetAttributesCPacketSize(item) : 0;
+        size_t attrSize = item ? itemGetPropertiesCPacketSize(item) : 0;
 
             #pragma pack(push, 1)
             DEFINE_InventoryItemCPacket(attrSize);
@@ -2028,7 +2044,7 @@ void zoneBuilderItemRemove(Item *item, uint8_t removalType, uint8_t inventoryTyp
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
-        replyPacket.uid = itemGetUId(item);
+        replyPacket.uid = actorGetUId(item);
         replyPacket.amount = item->amount;
         replyPacket.removalType = removalType;
         replyPacket.inventoryType = inventoryType;

@@ -21,7 +21,7 @@
 // ---------- Includes ------------
 #include "R1EMU.h"
 #include "common/actor/item/item.h"
-#include "common/actor/item/equipable/equipable_item.h"
+#include "common/actor/item/equipable/item_equipable.h"
 
 // ---------- Defines -------------
 #define ITEM_CAT_SIZE 5000
@@ -97,7 +97,7 @@ struct Inventory
 {
     zhash_t *items;
     zlist_t *bags[ITEM_CAT_COUNT];
-    EquipableItem *equippedItems[EQSLOT_COUNT];
+    ItemEquipable *equippedItems[EQSLOT_COUNT];
 };
 
 #define DEFINE_InventoryItemCPacket(attrSize)             \
@@ -163,4 +163,5 @@ uint32_t inventoryGetEquipmentEmptySlot(EquipmentSlot slot);
 void inventoryPrintBag(Inventory *self, ItemCategory category);
 bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, Item **_item);
 bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2);
+void itemGenActorKey(Item *self, ActorKey key);
 

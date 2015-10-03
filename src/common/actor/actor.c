@@ -14,7 +14,7 @@
 #include "actor.h"
 
 // Inlined functions
-extern inline ActorId_t actorGetUId(Actor *self);
+extern inline ActorId_t actorGetUId(void *self);
 
 bool actorInit(Actor *self, ActorId_t uid) {
     self->uid = uid;

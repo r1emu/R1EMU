@@ -38,7 +38,8 @@ bool actorInit(Actor *self, ActorId_t id);
 /**
  * Getters & Setters
  */
-inline ActorId_t actorGetUId(Actor *self) {
+inline ActorId_t actorGetUId(void *_self) {
+    Actor *self = _self;
     return self->uid;
 }
 

@@ -76,33 +76,17 @@ void inventoryDestroy(Inventory **_self) {
 bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
     ItemCategory itemCategory = itemGetCategory(itemToAdd);
-
-    if (!itemCategory) {
-        error("Item has no category");
-        return false;
-    }
-
-    if (itemCategory > ITEM_CAT_COUNT) {
-        error("Item has invalid category");
-        return false;
-    }
-
-    ActorId_t actorId = actorGetUId((Actor*) itemToAdd);
-
-    dbg("itemIdKey: %d", actorId);
+    ActorId_t actorId = actorGetUId(itemToAdd);
 
     ActorKey itemKey;
     actorGenKey(actorId, itemKey);
-
-    dbg("itemKey: %s", itemKey);
 
     if (zhash_insert(self->items, itemKey, itemToAdd) != 0) {
         error("Cannot insert the item '%s' in the hashtable.", itemKey);
         return false;
     }
 
-    int result = zlist_append(self->bags[itemCategory], itemToAdd);
-    if (result == -1) {
+    if (zlist_append(self->bags[itemCategory], itemToAdd) != 0) {
         error("Cannot push item into the category bag in inventory");
         return false;
     }
@@ -112,7 +96,7 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
 bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
 
-    ActorId_t actorId = actorGetUId((Actor*) itemToRemove);
+    ActorId_t actorId = actorGetUId(itemToRemove);
     ItemCategory itemCategory = itemGetCategory(itemToRemove);
 
     ActorKey itemKey;
@@ -124,8 +108,12 @@ bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
     return true;
 }
 
-bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, Item **_item) {
+void itemGenActorKey(Item *self, ActorKey itemKey) {
+    ActorId_t actorId = actorGetUId(self);
+    actorGenKey(actorId, itemKey);
+}
 
+bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, Item **_item) {
 
     Item *item = NULL;
 
@@ -140,7 +128,6 @@ bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, Item **_item)
     }
 
     *_item = item;
-
 
     return true;
 }
@@ -159,7 +146,7 @@ Item *inventoryGetNextItem(Inventory *self, ItemCategory category) {
 
 bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
 
-    EquipableItem *itemToUnequip = self->equippedItems[eqSlot];
+    ItemEquipable *itemToUnequip = self->equippedItems[eqSlot];
 
     if (itemToUnequip == NULL) {
         // We return false here because the system should have detected earlier that the slot is free
@@ -184,8 +171,7 @@ bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
 
 bool inventoryEquipItem(Inventory *self, ActorId_t actorId, EquipmentSlot eqSlot) {
 
-
-    EquipableItem *itemToEquip;
+    ItemEquipable *itemToEquip;
 
     // Get item from inventory
     if (!inventoryGetItemByActorId(self, actorId, (Item**) &itemToEquip)) {
@@ -194,7 +180,15 @@ bool inventoryEquipItem(Inventory *self, ActorId_t actorId, EquipmentSlot eqSlot
     }
 
     // Check if eqSlot is right for the item we want to equip.
-    /// TODO
+    /*
+    bool expectedEqSlot = false;
+    switch (itemEquipableGetCategory(itemToEquip)) {
+    }
+    if (!expectedEqSlot) {
+        error("Unexcepted equipment slot encountered : %d", expectedEqSlot);
+        return false;
+    }
+    */
 
     // Check if there is the slot already, if so, unequip.
     if (self->equippedItems[eqSlot] != NULL) {
@@ -220,9 +214,7 @@ bool inventoryEquipItem(Inventory *self, ActorId_t actorId, EquipmentSlot eqSlot
     // Process Equipment events
     /// TODO
 
-
     return true;
-
 }
 
 uint32_t inventoryGetEquipmentEmptySlot(EquipmentSlot slot) {
@@ -266,24 +258,32 @@ uint32_t inventoryGetEquipmentEmptySlot(EquipmentSlot slot) {
 }
 
 bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2) {
-    /*
+
     // Check bag
     Item *item1 = *_item1;
     Item *item2 = *_item2;
-    if (item1->itemCategory != item2->itemCategory) {
+
+    if (item1->category != item2->category) {
         error("Items to swap are from different bags");
         return false;
     }
 
-    Item *itemTemp;
+    ActorKey itemKey1, itemKey2;
+    itemGenActorKey(item1, itemKey1);
+    itemGenActorKey(item2, itemKey2);
 
-    itemTemp = item1;
-    item1 = item2;
-    item2 = itemTemp;
+    // Swap inventory
+    if (zhash_rename(self->items, itemKey1, itemKey2) != 0) {
+        error("Cannot move '%s' to '%s'", itemKey1, itemKey2);
+        return false;
+    }
 
-    */
+    if (zhash_rename(self->items, itemKey2, itemKey1) != 0) {
+        error("Cannot move '%s' to '%s'", itemKey2, itemKey1);
+        return false;
+    }
+
     return true;
-
 }
 
 

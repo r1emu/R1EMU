@@ -11,45 +11,53 @@
  *          See LICENSE file for further information
  */
 
-#include "equipable_item.h"
+#include "item_quest.h"
 
-// Inlined functions
-extern inline ItemId_t equipableItemGetId(EquipableItem *self);
-extern inline ItemId_t equipableItemGetUId(EquipableItem *self);
-extern inline int equipableItemGetSlot(EquipableItem *self);
+ItemQuest *itemQuestNew(void) {
+    ItemQuest *self;
 
-EquipableItem *equipableItemNew(void) {
-    EquipableItem *self;
-
-    if ((self = malloc(sizeof(EquipableItem))) == NULL) {
+    if ((self = malloc(sizeof(ItemQuest))) == NULL) {
         return NULL;
     }
 
-    if (!equipableItemInit(self)) {
-        equipableItemDestroy(&self);
-        error("EquipableItem failed to initialize.");
+    if (!itemQuestInit(self)) {
+        itemQuestDestroy(&self);
+        error("ItemQuest failed to initialize.");
         return NULL;
     }
 
     return self;
 }
 
-bool equipableItemInit(EquipableItem *self) {
+bool itemQuestInit(ItemQuest *self) {
     memset(self, 0, sizeof(*self));
 
     return true;
 }
 
-void equipableItemFree(EquipableItem *self) {
+void itemQuestFree(ItemQuest *self) {
     // TODO
 }
 
-void equipableItemDestroy(EquipableItem **_self) {
-    EquipableItem *self = *_self;
+void itemQuestDestroy(ItemQuest **_self) {
+    ItemQuest *self = *_self;
 
     if (_self && self) {
-        equipableItemFree(self);
+        itemQuestFree(self);
         free(self);
         *_self = NULL;
     }
+}
+
+size_t itemQuestGetPropertiesCPacketSize(ItemQuest *self) {
+    size_t size = 0;
+
+    size += propertyFloatGetCPacketSize(); // cooldown
+
+    return size;
+}
+
+void itemQuestGetPropertiesCPacket(ItemQuest *self, PacketStream *stream) {
+
+    propertyFloatGetCPacket(ITEM_QUEST_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
