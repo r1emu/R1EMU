@@ -33,14 +33,14 @@ enum {
 
 typedef struct {
     Item item;
-    float cooldown;
+    float *cooldown;
 }   ItemConsumable;
 
 // ----------- Functions ------------
 
 /**
- * Allocate a new ItemConsumable structure.
  * @return A pointer to an allocated ItemConsumable, or NULL if an error occured.
+ * Allocate a new ItemConsumable structure.
  */
 ItemConsumable *itemConsumableNew(Item *item, float cooldown);
 
@@ -66,7 +66,7 @@ void itemConsumableDestroy(ItemConsumable **self);
 /**
  * Getters & Setters
  */
-inline float itemConsumableGetCooldown(ItemConsumable *self) { return self->cooldown; }
+inline float *itemConsumableGetCooldown(ItemConsumable *self) { return self->cooldown; }
 
 /**
  * Serialization / Unserialization

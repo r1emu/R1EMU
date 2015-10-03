@@ -29,7 +29,7 @@
 // ------ Structure declaration -------
 typedef struct {
     Item item;
-    float cooldown;
+    float *cooldown;
 }   ItemQuest;
 
 enum {
@@ -67,7 +67,7 @@ void itemQuestDestroy(ItemQuest **self);
 /**
  * Getters & Setters
  */
-inline float itemQuestGetCooldown(ItemQuest *self) { return self->cooldown; }
+inline float *itemQuestGetCooldown(ItemQuest *self) { return self->cooldown; }
 
 
 /**

@@ -12,9 +12,9 @@
  */
 
 #include "item_armor.h"
-extern inline float itemArmorGetDef(ItemArmor *self);
-extern inline float itemArmorGetCooldown(ItemArmor *self);
-extern inline float itemArmorGetReinforce(ItemArmor *self);
+extern inline float *itemArmorGetDef(ItemArmor *self);
+extern inline float *itemArmorGetCooldown(ItemArmor *self);
+extern inline float *itemArmorGetReinforce(ItemArmor *self);
 extern inline char *itemArmorGetMemo(ItemArmor *self);
 extern inline char *itemArmorGetCustomName(ItemArmor *self);
 extern inline char *itemArmorGetMaker(ItemArmor *self);
@@ -56,9 +56,9 @@ bool itemArmorInit(
     memset(self, 0, sizeof(*self));
 
     memcpy(&self->equipable, equipable, sizeof(self->equipable));
-    self->def = def;
-    self->cooldown = cooldown;
-    self->reinforce = reinforce;
+    self->def = floatdup(def);
+    self->cooldown = floatdup(cooldown);
+    self->reinforce = floatdup(reinforce);
     self->memo = strdup(memo);
     self->customName = strdup(customName);
     self->maker = strdup(maker);
@@ -67,6 +67,9 @@ bool itemArmorInit(
 }
 
 void itemArmorFree(ItemArmor *self) {
+    free(self->def);
+    free(self->cooldown);
+    free(self->reinforce);
     free(self->memo);
     free(self->customName);
     free(self->maker);

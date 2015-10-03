@@ -36,11 +36,15 @@ size_t propertyStringGetCPacketSize(char *value) {
     return size;
 }
 
-void propertyFloatGetCPacket(PropertyId id, float value, PacketStream *stream) {
+void propertyFloatGetCPacket(PropertyId id, float *value, PacketStream *stream) {
+
+    if (!value) {
+        return;
+    }
 
     PropertyFloatCPacket packet = {
         .id = id,
-        .value = value
+        .value = *value
     };
 
     packetStreamAppend(stream, &packet, sizeof(packet));

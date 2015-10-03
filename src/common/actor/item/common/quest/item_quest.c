@@ -58,6 +58,5 @@ size_t itemQuestGetPropertiesCPacketSize(ItemQuest *self) {
 }
 
 void itemQuestGetPropertiesCPacket(ItemQuest *self, PacketStream *stream) {
-
     propertyFloatGetCPacket(ITEM_QUEST_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }

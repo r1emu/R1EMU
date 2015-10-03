@@ -6,7 +6,7 @@ void destroy(void *_data) {
     *data = NULL;
 }
 
-float *floatdup(float *f) {
+float *floatdup(float f) {
 
     float *mem = malloc(sizeof(float));
 
@@ -14,7 +14,7 @@ float *floatdup(float *f) {
         return NULL;
     }
 
-    *mem = *f;
+    *mem = f;
 
     return mem;
 }

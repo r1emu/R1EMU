@@ -34,9 +34,9 @@ typedef struct
 {
     ItemEquipable equipable;
 
-    float def;
-    float cooldown;
-    float reinforce;
+    float *def;
+    float *cooldown;
+    float *reinforce;
     char *memo;
     char *customName;
     char *maker;
@@ -95,19 +95,18 @@ void itemArmorFree(ItemArmor *self);
  */
 void itemArmorDestroy(ItemArmor **self);
 
-
-/**
- * Getters & Setters
- */
-inline float itemArmorGetDef(ItemArmor *self) { return self->def; }
-inline float itemArmorGetCooldown(ItemArmor *self) { return self->cooldown; }
-inline float itemArmorGetReinforce(ItemArmor *self) { return self->reinforce; }
-inline char *itemArmorGetMemo(ItemArmor *self) { return self->memo; }
-inline char *itemArmorGetCustomName(ItemArmor *self) { return self->customName; }
-inline char *itemArmorGetMaker(ItemArmor *self) { return self->maker; }
-
 /**
  * Serialization / Unserialization
  */
 size_t itemArmorGetPropertiesCPacketSize(ItemArmor *self);
 void itemArmorGetPropertiesCPacket(ItemArmor *self, PacketStream *stream);
+
+/**
+ * Getters and Setters
+ */
+inline float *itemArmorGetDef(ItemArmor *self) { return self->def; }
+inline float *itemArmorGetCooldown(ItemArmor *self) { return self->cooldown; }
+inline float *itemArmorGetReinforce(ItemArmor *self) { return self->reinforce; }
+inline char *itemArmorGetMemo(ItemArmor *self) { return self->memo; }
+inline char *itemArmorGetCustomName(ItemArmor *self) { return self->customName; }
+inline char *itemArmorGetMaker(ItemArmor *self) { return self->maker; }
