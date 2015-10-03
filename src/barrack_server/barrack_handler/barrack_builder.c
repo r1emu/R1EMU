@@ -393,7 +393,7 @@ void barrackBuilderCommanderList(
 
             for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
 
-                ItemEquipable *item = inventory->equippedItems[eqSlotIndex];
+                Item *item = (Item *) inventory->equippedItems[eqSlotIndex];
 
                 if (item) {
                     // get property size
