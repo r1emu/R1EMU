@@ -15,14 +15,14 @@
 
 extern inline float *itemBookGetCooldown(ItemBook *self);
 
-ItemBook *itemBookNew(void) {
+ItemBook *itemBookNew(Item *item) {
     ItemBook *self;
 
     if ((self = malloc(sizeof(ItemBook))) == NULL) {
         return NULL;
     }
 
-    if (!itemBookInit(self)) {
+    if (!itemBookInit(self, item)) {
         itemBookDestroy(&self);
         error("ItemBook failed to initialize.");
         return NULL;
@@ -31,14 +31,17 @@ ItemBook *itemBookNew(void) {
     return self;
 }
 
-bool itemBookInit(ItemBook *self) {
+bool itemBookInit(ItemBook *self, Item *item) {
     memset(self, 0, sizeof(*self));
+
+    self->item = *item;
 
     return true;
 }
 
 void itemBookFree(ItemBook *self) {
-    // TODO
+    itemFree(&self->item);
+    free(self->cooldown);
 }
 
 void itemBookDestroy(ItemBook **_self) {

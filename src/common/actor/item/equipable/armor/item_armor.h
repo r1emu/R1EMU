@@ -58,30 +58,14 @@ enum {
  * Allocate a new ItemArmor structure.
  * @return A pointer to an allocated ItemArmor, or NULL if an error occured.
  */
-ItemArmor *itemArmorNew(
-    ItemEquipable *equipable,
-    float def,
-    float cooldown,
-    float reinforce,
-    char *memo,
-    char *customName,
-    char *maker
-);
+ItemArmor *itemArmorNew(Item *item);
 
 /**
  * Initialize an allocated ItemArmor structure.
  * @param self An allocated ItemArmor to initialize.
  * @return true on success, false otherwise.
  */
-bool itemArmorInit(
-    ItemArmor *self,
-    ItemEquipable *equipable,
-    float def,
-    float cooldown,
-    float reinforce,
-    char *memo,
-    char *customName,
-    char *maker);
+bool itemArmorInit(ItemArmor *self, Item *item);
 
 /**
  * Free an allocated ItemArmor structure.

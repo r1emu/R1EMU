@@ -13,14 +13,14 @@
 
 #include "item_material.h"
 
-ItemMaterial *itemMaterialNew(void) {
+ItemMaterial *itemMaterialNew(Item *item) {
     ItemMaterial *self;
 
     if ((self = malloc(sizeof(ItemMaterial))) == NULL) {
         return NULL;
     }
 
-    if (!itemMaterialInit(self)) {
+    if (!itemMaterialInit(self, item)) {
         itemMaterialDestroy(&self);
         error("ItemMaterial failed to initialize.");
         return NULL;
@@ -29,14 +29,17 @@ ItemMaterial *itemMaterialNew(void) {
     return self;
 }
 
-bool itemMaterialInit(ItemMaterial *self) {
+bool itemMaterialInit(ItemMaterial *self, Item *item) {
     memset(self, 0, sizeof(*self));
+
+    self->item = *item;
 
     return true;
 }
 
 void itemMaterialFree(ItemMaterial *self) {
-    // TODO
+    itemFree(&self->item);
+    free(self->cooldown);
 }
 
 void itemMaterialDestroy(ItemMaterial **_self) {

@@ -13,14 +13,14 @@
 
 #include "item_currency.h"
 
-ItemCurrency *itemCurrencyNew(void) {
+ItemCurrency *itemCurrencyNew(Item *item) {
     ItemCurrency *self;
 
     if ((self = malloc(sizeof(ItemCurrency))) == NULL) {
         return NULL;
     }
 
-    if (!itemCurrencyInit(self)) {
+    if (!itemCurrencyInit(self, item)) {
         itemCurrencyDestroy(&self);
         error("ItemCurrency failed to initialize.");
         return NULL;
@@ -29,14 +29,17 @@ ItemCurrency *itemCurrencyNew(void) {
     return self;
 }
 
-bool itemCurrencyInit(ItemCurrency *self) {
+bool itemCurrencyInit(ItemCurrency *self, Item *item) {
     memset(self, 0, sizeof(*self));
+
+    self->item = *item;
 
     return true;
 }
 
 void itemCurrencyFree(ItemCurrency *self) {
-    // TODO
+    itemFree(&self->item);
+    free(self->cooldown);
 }
 
 void itemCurrencyDestroy(ItemCurrency **_self) {

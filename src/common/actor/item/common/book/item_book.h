@@ -42,14 +42,14 @@ enum {
  * Allocate a new ItemBook structure.
  * @return A pointer to an allocated ItemBook, or NULL if an error occured.
  */
-ItemBook *itemBookNew(void);
+ItemBook *itemBookNew(Item *item);
 
 /**
  * Initialize an allocated ItemBook structure.
  * @param self An allocated ItemBook to initialize.
  * @return true on success, false otherwise.
  */
-bool itemBookInit(ItemBook *self);
+bool itemBookInit(ItemBook *self, Item *item);
 
 /**
  * Free an allocated ItemBook structure.

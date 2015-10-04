@@ -16,14 +16,14 @@
 extern inline float *itemAccessoryGetPr(ItemAccessory *self);
 extern inline float *itemAccessoryGetCooldown(ItemAccessory *self);
 
-ItemAccessory *itemAccessoryNew(void) {
+ItemAccessory *itemAccessoryNew(Item *item) {
     ItemAccessory *self;
 
     if ((self = malloc(sizeof(ItemAccessory))) == NULL) {
         return NULL;
     }
 
-    if (!itemAccessoryInit(self)) {
+    if (!itemAccessoryInit(self, item)) {
         itemAccessoryDestroy(&self);
         error("ItemAccessory failed to initialize.");
         return NULL;
@@ -32,14 +32,21 @@ ItemAccessory *itemAccessoryNew(void) {
     return self;
 }
 
-bool itemAccessoryInit(ItemAccessory *self) {
+bool itemAccessoryInit(ItemAccessory *self, Item *item) {
     memset(self, 0, sizeof(*self));
+
+    if (!(itemEquipableInit(&self->equipable, item))) {
+        error("Cannot initialize an equipable item.");
+        return false;
+    }
 
     return true;
 }
 
 void itemAccessoryFree(ItemAccessory *self) {
-    // TODO
+    itemEquipableFree(&self->equipable);
+    free(self->pr);
+    free(self->cooldown);
 }
 
 void itemAccessoryDestroy(ItemAccessory **_self) {

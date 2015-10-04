@@ -42,14 +42,14 @@ enum {
  * Allocate a new ItemCurrency structure.
  * @return A pointer to an allocated ItemCurrency, or NULL if an error occured.
  */
-ItemCurrency *itemCurrencyNew(void);
+ItemCurrency *itemCurrencyNew(Item *item);
 
 /**
  * Initialize an allocated ItemCurrency structure.
  * @param self An allocated ItemCurrency to initialize.
  * @return true on success, false otherwise.
  */
-bool itemCurrencyInit(ItemCurrency *self);
+bool itemCurrencyInit(ItemCurrency *self, Item *item);
 
 /**
  * Free an allocated ItemCurrency structure.

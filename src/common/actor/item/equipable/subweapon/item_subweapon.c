@@ -16,14 +16,14 @@
 extern inline float *itemSubWeaponGetPetPosition(ItemSubWeapon *self);
 extern inline float *itemSubWeaponGetCooldown(ItemSubWeapon *self);
 
-ItemSubWeapon *itemSubWeaponNew(void) {
+ItemSubWeapon *itemSubWeaponNew(Item *item) {
     ItemSubWeapon *self;
 
     if ((self = malloc(sizeof(ItemSubWeapon))) == NULL) {
         return NULL;
     }
 
-    if (!itemSubWeaponInit(self)) {
+    if (!itemSubWeaponInit(self, item)) {
         itemSubWeaponDestroy(&self);
         error("ItemSubWeapon failed to initialize.");
         return NULL;
@@ -32,14 +32,21 @@ ItemSubWeapon *itemSubWeaponNew(void) {
     return self;
 }
 
-bool itemSubWeaponInit(ItemSubWeapon *self) {
+bool itemSubWeaponInit(ItemSubWeapon *self, Item *item) {
     memset(self, 0, sizeof(*self));
+
+    if (!(itemEquipableInit(&self->equipable, item))) {
+        error("Cannot initialize an equipable item.");
+        return false;
+    }
 
     return true;
 }
 
 void itemSubWeaponFree(ItemSubWeapon *self) {
-    // TODO
+    itemEquipableFree(&self->equipable);
+    free(self->petPosition);
+    free(self->cooldown);
 }
 
 void itemSubWeaponDestroy(ItemSubWeapon **_self) {

@@ -144,7 +144,7 @@ Item *inventoryGetNextItem(Inventory *self, ItemCategory category) {
     return (Item*) zlist_next(self->bags[category]);
 }
 
-bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
+bool inventoryUnequipItem(Inventory *self, ItemEquipmentSlot eqSlot) {
 
     ItemEquipable *itemToUnequip = self->equippedItems[eqSlot];
 
@@ -169,7 +169,7 @@ bool inventoryUnequipItem(Inventory *self, EquipmentSlot eqSlot) {
     return true;
 }
 
-bool inventoryEquipItem(Inventory *self, ActorId_t actorId, EquipmentSlot eqSlot) {
+bool inventoryEquipItem(Inventory *self, ActorId_t actorId, ItemEquipmentSlot eqSlot) {
 
     ItemEquipable *itemToEquip;
 
@@ -217,34 +217,34 @@ bool inventoryEquipItem(Inventory *self, ActorId_t actorId, EquipmentSlot eqSlot
     return true;
 }
 
-uint32_t inventoryGetEquipmentEmptySlot(EquipmentSlot slot) {
+uint32_t inventoryGetEquipmentEmptySlot(ItemEquipmentSlot slot) {
 
     uint32_t value;
 
     switch (slot) {
-        case EQSLOT_HEAD_TOP: value = EMPTYEQSLOT_NoHat; break;
-        case EQSLOT_HEAD_MIDDLE: value = EMPTYEQSLOT_NoHat; break;
-        case EQSLOT_UNKOWN1: value = EMPTYEQSLOT_NoOuter; break;
-        case EQSLOT_BODY_ARMOR: value = EMPTYEQSLOT_NoHat; break;
-        case EQSLOT_GLOVES: value = EMPTYEQSLOT_NoGloves; break;
-        case EQSLOT_BOOTS: value = EMPTYEQSLOT_NoBoots; break;
-        case EQSLOT_HELMET: value = EMPTYEQSLOT_NoHelmet; break;
-        case EQSLOT_BRACELET: value = EMPTYEQSLOT_NoArmband; break;
-        case EQSLOT_WEAPON: value = EMPTYEQSLOT_NoWeapon; break;
-        case EQSLOT_SHIELD: value = EMPTYEQSLOT_NoWeapon; break;
-        case EQSLOT_COSTUME: value = EMPTYEQSLOT_NoOuter; break;
-        case EQSLOT_UNKOWN3: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_UNKOWN4: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_UNKOWN5: value = EMPTYEQSLOT_NoOuter; break;
-        case EQSLOT_LEG_ARMOR: value = EMPTYEQSLOT_NoShirt; break;
-        case EQSLOT_UNKOWN6: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_UNKOWN7: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_RIGHT_LEFT: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_RIGHT_RIGHT: value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_NECKLACE: value = EMPTYEQSLOT_NoNeck; break;
+        case EQSLOT_HEAD_TOP    : value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_HEAD_MIDDLE : value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_UNKOWN1     : value = EMPTYEQSLOT_NoOuter; break;
+        case EQSLOT_BODY_ARMOR  : value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_GLOVES      : value = EMPTYEQSLOT_NoGloves; break;
+        case EQSLOT_BOOTS       : value = EMPTYEQSLOT_NoBoots; break;
+        case EQSLOT_HELMET      : value = EMPTYEQSLOT_NoHelmet; break;
+        case EQSLOT_BRACELET    : value = EMPTYEQSLOT_NoArmband; break;
+        case EQSLOT_WEAPON      : value = EMPTYEQSLOT_NoWeapon; break;
+        case EQSLOT_SHIELD      : value = EMPTYEQSLOT_NoWeapon; break;
+        case EQSLOT_COSTUME     : value = EMPTYEQSLOT_NoOuter; break;
+        case EQSLOT_UNKOWN3     : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKOWN4     : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKOWN5     : value = EMPTYEQSLOT_NoOuter; break;
+        case EQSLOT_LEG_ARMOR   : value = EMPTYEQSLOT_NoShirt; break;
+        case EQSLOT_UNKOWN6     : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKOWN7     : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_RIGHT_LEFT  : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_RIGHT_RIGHT : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_NECKLACE    : value = EMPTYEQSLOT_NoNeck; break;
 
-        case EQSLOT_COUNT: warning("EQSLOT_COUNT not expected."); break;
-
+        case EQSLOT_NOSLOT      :
+        case EQSLOT_COUNT       : warning("Equipment slot not expected."); break;
         /*
             DONTFIX : We want the compiler to warn about missing cases.
 

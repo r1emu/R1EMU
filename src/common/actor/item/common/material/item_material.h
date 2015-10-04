@@ -42,14 +42,14 @@ enum {
  * Allocate a new ItemMaterial structure.
  * @return A pointer to an allocated ItemMaterial, or NULL if an error occured.
  */
-ItemMaterial *itemMaterialNew(void);
+ItemMaterial *itemMaterialNew(Item *item);
 
 /**
  * Initialize an allocated ItemMaterial structure.
  * @param self An allocated ItemMaterial to initialize.
  * @return true on success, false otherwise.
  */
-bool itemMaterialInit(ItemMaterial *self);
+bool itemMaterialInit(ItemMaterial *self, Item *item);
 
 /**
  * Free an allocated ItemMaterial structure.

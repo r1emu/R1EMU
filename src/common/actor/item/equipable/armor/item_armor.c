@@ -19,14 +19,7 @@ extern inline char *itemArmorGetMemo(ItemArmor *self);
 extern inline char *itemArmorGetCustomName(ItemArmor *self);
 extern inline char *itemArmorGetMaker(ItemArmor *self);
 
-ItemArmor *itemArmorNew(
-    ItemEquipable *equipable,
-    float def,
-    float cooldown,
-    float reinforce,
-    char *memo,
-    char *customName,
-    char *maker)
+ItemArmor *itemArmorNew(Item *item)
 {
     ItemArmor *self;
 
@@ -34,7 +27,7 @@ ItemArmor *itemArmorNew(
         return NULL;
     }
 
-    if (!itemArmorInit(self, equipable, def, cooldown, reinforce, memo, customName, maker)) {
+    if (!itemArmorInit(self, item)) {
         itemArmorDestroy(&self);
         error("ItemArmor failed to initialize.");
         return NULL;
@@ -43,30 +36,19 @@ ItemArmor *itemArmorNew(
     return self;
 }
 
-bool itemArmorInit(
-    ItemArmor *self,
-    ItemEquipable *equipable,
-    float def,
-    float cooldown,
-    float reinforce,
-    char *memo,
-    char *customName,
-    char *maker)
-{
+bool itemArmorInit(ItemArmor *self, Item *item) {
     memset(self, 0, sizeof(*self));
 
-    memcpy(&self->equipable, equipable, sizeof(self->equipable));
-    self->def = floatdup(def);
-    self->cooldown = floatdup(cooldown);
-    self->reinforce = floatdup(reinforce);
-    self->memo = strdup(memo);
-    self->customName = strdup(customName);
-    self->maker = strdup(maker);
+    if (!(itemEquipableInit(&self->equipable, item))) {
+        error("Cannot initialize an equipable item.");
+        return false;
+    }
 
     return true;
 }
 
 void itemArmorFree(ItemArmor *self) {
+    itemEquipableFree(&self->equipable);
     free(self->def);
     free(self->cooldown);
     free(self->reinforce);

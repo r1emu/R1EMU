@@ -17,14 +17,14 @@ extern inline float *itemWeaponGetMaxAtk(ItemWeapon *self);
 extern inline float *itemWeaponGetMinAtk(ItemWeapon *self);
 extern inline float *itemWeaponGetCooldown(ItemWeapon *self);
 
-ItemWeapon *itemWeaponNew(void) {
+ItemWeapon *itemWeaponNew(Item *item) {
     ItemWeapon *self;
 
     if ((self = malloc(sizeof(ItemWeapon))) == NULL) {
         return NULL;
     }
 
-    if (!itemWeaponInit(self)) {
+    if (!itemWeaponInit(self, item)) {
         itemWeaponDestroy(&self);
         error("ItemWeapon failed to initialize.");
         return NULL;
@@ -33,14 +33,22 @@ ItemWeapon *itemWeaponNew(void) {
     return self;
 }
 
-bool itemWeaponInit(ItemWeapon *self) {
+bool itemWeaponInit(ItemWeapon *self, Item *item) {
     memset(self, 0, sizeof(*self));
+
+    if (!(itemEquipableInit(&self->equipable, item))) {
+        error("Cannot initialize an equipable item.");
+        return false;
+    }
 
     return true;
 }
 
 void itemWeaponFree(ItemWeapon *self) {
-    // TODO
+    itemEquipableFree(&self->equipable);
+    free(self->maxAtk);
+    free(self->minAtk);
+    free(self->cooldown);
 }
 
 void itemWeaponDestroy(ItemWeapon **_self) {

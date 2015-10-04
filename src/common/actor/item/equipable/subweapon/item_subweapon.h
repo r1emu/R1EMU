@@ -20,14 +20,14 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
-#include "common/actor/item/item.h"
+#include "common/actor/item/equipable/item_equipable.h"
 
 // ---------- Defines -------------
 
 
 // ------ Structure declaration -------
 typedef struct {
-    Item item;
+    ItemEquipable equipable;
     float *petPosition;
     float *cooldown;
 }   ItemSubWeapon;
@@ -43,14 +43,14 @@ enum {
  * Allocate a new ItemSubWeapon structure.
  * @return A pointer to an allocated ItemSubWeapon, or NULL if an error occured.
  */
-ItemSubWeapon *itemSubWeaponNew(void);
+ItemSubWeapon *itemSubWeaponNew(Item *item);
 
 /**
  * Initialize an allocated ItemSubWeapon structure.
  * @param self An allocated ItemSubWeapon to initialize.
  * @return true on success, false otherwise.
  */
-bool itemSubWeaponInit(ItemSubWeapon *self);
+bool itemSubWeaponInit(ItemSubWeapon *self, Item *item);
 
 /**
  * Free an allocated ItemSubWeapon structure.

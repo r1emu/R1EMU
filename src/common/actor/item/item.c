@@ -57,7 +57,7 @@ bool itemInit(Item *self, Actor *actor, ItemCategory category, ItemId_t id, Item
 }
 
 void itemFree(Item *self) {
-    // TODO
+    actorFree(&self->actor);
 }
 
 void itemDestroy(Item **_self) {
@@ -87,7 +87,7 @@ size_t itemGetPropertiesCPacketSize(Item *self) {
         case ITEM_CAT_SUBWEAPON  : size += itemSubWeaponGetPropertiesCPacketSize((ItemSubWeapon *) self); break;
         case ITEM_CAT_CURRENCY   : size += itemCurrencyGetPropertiesCPacketSize((ItemCurrency *) self); break;
 
-        case ITEM_CAT_COUNT: error("Unexpected item category."); break;
+        case ITEM_CAT_COUNT      : error("Unexpected item category."); break;
     }
 
     return size;
@@ -109,7 +109,7 @@ void itemPropertiesGetCPacket(Item *self, PacketStream *stream) {
         case ITEM_CAT_SUBWEAPON  : itemSubWeaponGetPropertiesCPacket((ItemSubWeapon *) self, stream); break;
         case ITEM_CAT_CURRENCY   : itemCurrencyGetPropertiesCPacket((ItemCurrency *) self, stream); break;
 
-        case ITEM_CAT_COUNT: error("Unexpected item category."); break;
+        case ITEM_CAT_COUNT      : error("Unexpected item category."); break;
     }
 
 }

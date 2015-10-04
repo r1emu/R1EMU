@@ -38,30 +38,6 @@ typedef enum {
 }   InventoryAddType;
 
 typedef enum {
-    EQSLOT_HEAD_TOP = 0,
-    EQSLOT_HEAD_MIDDLE,
-    EQSLOT_UNKOWN1,
-    EQSLOT_BODY_ARMOR,
-    EQSLOT_GLOVES,
-    EQSLOT_BOOTS,
-    EQSLOT_HELMET,
-    EQSLOT_BRACELET,
-    EQSLOT_WEAPON,
-    EQSLOT_SHIELD,
-    EQSLOT_COSTUME,
-    EQSLOT_UNKOWN3,
-    EQSLOT_UNKOWN4,
-    EQSLOT_UNKOWN5,
-    EQSLOT_LEG_ARMOR,
-    EQSLOT_UNKOWN6,
-    EQSLOT_UNKOWN7,
-    EQSLOT_RIGHT_LEFT,
-    EQSLOT_RIGHT_RIGHT,
-    EQSLOT_NECKLACE,
-    EQSLOT_COUNT
-} EquipmentSlot;
-
-typedef enum {
     EMPTYEQSLOT_NoHat = 2,
     EMPTYEQSLOT_NoOuter = 4,
     EMPTYEQSLOT_NoPants = 5,
@@ -84,7 +60,7 @@ typedef enum {
     EMPTYEQSLOT_NoWeapon_Shotsword = 9999997,
     EMPTYEQSLOT_NoWeapon_Mace = 9999998,
     EMPTYEQSLOT_NoWeapon_THStaff = 9999999,
-} EmptyEquipmentSlot;
+} EmptyItemEquipmentSlot;
 
 // ------ Structure declaration -------
 
@@ -157,9 +133,9 @@ size_t inventoryGetItemsCount(Inventory *self);
 Item *inventoryGetFirstItem(Inventory *self, ItemCategory category);
 Item *inventoryGetNextItem(Inventory *self, ItemCategory category);
 
-bool inventoryEquipItem(Inventory *self, ActorId_t actorId, EquipmentSlot eqSlot);
+bool inventoryEquipItem(Inventory *self, ActorId_t actorId, ItemEquipmentSlot eqSlot);
 void inventoryPrintEquipment(Inventory *self);
-uint32_t inventoryGetEquipmentEmptySlot(EquipmentSlot slot);
+uint32_t inventoryGetEquipmentEmptySlot(ItemEquipmentSlot slot);
 void inventoryPrintBag(Inventory *self, ItemCategory category);
 bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, Item **_item);
 bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2);

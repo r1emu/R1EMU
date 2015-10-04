@@ -17,14 +17,14 @@ extern inline float *itemGemGetLevel(ItemGem *self);
 extern inline float *itemGemGetItemExp(ItemGem *self);
 extern inline float *itemGemGetCooldown(ItemGem *self);
 
-ItemGem *itemGemNew(void) {
+ItemGem *itemGemNew(Item *item) {
     ItemGem *self;
 
     if ((self = malloc(sizeof(ItemGem))) == NULL) {
         return NULL;
     }
 
-    if (!itemGemInit(self)) {
+    if (!itemGemInit(self, item)) {
         itemGemDestroy(&self);
         error("ItemGem failed to initialize.");
         return NULL;
@@ -33,14 +33,19 @@ ItemGem *itemGemNew(void) {
     return self;
 }
 
-bool itemGemInit(ItemGem *self) {
+bool itemGemInit(ItemGem *self, Item *item) {
     memset(self, 0, sizeof(*self));
+
+    self->item = *item;
 
     return true;
 }
 
 void itemGemFree(ItemGem *self) {
-    // TODO
+    itemFree(&self->item);
+    free(self->level);
+    free(self->itemExp);
+    free(self->cooldown);
 }
 
 void itemGemDestroy(ItemGem **_self) {

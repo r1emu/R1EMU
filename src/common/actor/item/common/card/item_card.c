@@ -17,14 +17,14 @@ extern inline float *itemCardGetLevel(ItemCard *self);
 extern inline float *itemCardGetCooldown(ItemCard *self);
 extern inline float *itemCardGetItemExp(ItemCard *self);
 
-ItemCard *itemCardNew(void) {
+ItemCard *itemCardNew(Item *item) {
     ItemCard *self;
 
     if ((self = malloc(sizeof(ItemCard))) == NULL) {
         return NULL;
     }
 
-    if (!itemCardInit(self)) {
+    if (!itemCardInit(self, item)) {
         itemCardDestroy(&self);
         error("ItemCard failed to initialize.");
         return NULL;
@@ -33,14 +33,19 @@ ItemCard *itemCardNew(void) {
     return self;
 }
 
-bool itemCardInit(ItemCard *self) {
+bool itemCardInit(ItemCard *self, Item *item) {
     memset(self, 0, sizeof(*self));
+
+    self->item = *item;
 
     return true;
 }
 
 void itemCardFree(ItemCard *self) {
-    // TODO
+    itemFree(&self->item);
+    free(self->level);
+    free(self->cooldown);
+    free(self->itemExp);
 }
 
 void itemCardDestroy(ItemCard **_self) {

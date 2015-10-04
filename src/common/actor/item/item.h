@@ -54,10 +54,10 @@ typedef enum {
  * @brief Item is the server structure of an item
  */
 typedef struct {
-   Actor actor;
-   ItemId_t id;
-   ItemAmount_t amount;
-   ItemCategory category;
+    Actor actor;
+    ItemId_t id;
+    ItemAmount_t amount;
+    ItemCategory category;
 } Item;
 
 /**

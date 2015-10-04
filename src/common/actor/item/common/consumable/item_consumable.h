@@ -42,14 +42,14 @@ typedef struct {
  * @return A pointer to an allocated ItemConsumable, or NULL if an error occured.
  * Allocate a new ItemConsumable structure.
  */
-ItemConsumable *itemConsumableNew(Item *item, float cooldown);
+ItemConsumable *itemConsumableNew(Item *item);
 
 /**
  * Initialize an allocated ItemConsumable structure.
  * @param self An allocated ItemConsumable to initialize.
  * @return true on success, false otherwise.
  */
-bool itemConsumableInit(ItemConsumable *self, Item *item, float cooldown);
+bool itemConsumableInit(ItemConsumable *self, Item *item);
 
 /**
  * Free an allocated ItemConsumable structure.

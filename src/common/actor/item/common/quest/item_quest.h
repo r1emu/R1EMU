@@ -42,14 +42,14 @@ enum {
  * Allocate a new ItemQuest structure.
  * @return A pointer to an allocated ItemQuest, or NULL if an error occured.
  */
-ItemQuest *itemQuestNew(void);
+ItemQuest *itemQuestNew(Item *item);
 
 /**
  * Initialize an allocated ItemQuest structure.
  * @param self An allocated ItemQuest to initialize.
  * @return true on success, false otherwise.
  */
-bool itemQuestInit(ItemQuest *self);
+bool itemQuestInit(ItemQuest *self, Item *item);
 
 /**
  * Free an allocated ItemQuest structure.

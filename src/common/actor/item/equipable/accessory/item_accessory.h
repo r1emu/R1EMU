@@ -20,7 +20,7 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
-#include "common/actor/item/item.h"
+#include "common/actor/item/equipable/item_equipable.h"
 #include "common/property/property.h"
 
 // ---------- Defines -------------
@@ -28,7 +28,7 @@
 
 // ------ Structure declaration -------
 typedef struct {
-    Item item;
+    ItemEquipable equipable;
     float *pr;
     float *cooldown;
 }   ItemAccessory;
@@ -44,14 +44,14 @@ enum {
  * Allocate a new ItemAccessory structure.
  * @return A pointer to an allocated ItemAccessory, or NULL if an error occured.
  */
-ItemAccessory *itemAccessoryNew(void);
+ItemAccessory *itemAccessoryNew(Item *item);
 
 /**
  * Initialize an allocated ItemAccessory structure.
  * @param self An allocated ItemAccessory to initialize.
  * @return true on success, false otherwise.
  */
-bool itemAccessoryInit(ItemAccessory *self);
+bool itemAccessoryInit(ItemAccessory *self, Item *item);
 
 /**
  * Free an allocated ItemAccessory structure.

@@ -33,7 +33,7 @@ Actor *actorNew(ActorId_t uid) {
 }
 
 void actorFree(Actor *self) {
-    // TODO
+
 }
 
 void actorDestroy(Actor **_self) {

@@ -46,14 +46,14 @@ enum {
  * Allocate a new ItemGem structure.
  * @return A pointer to an allocated ItemGem, or NULL if an error occured.
  */
-ItemGem *itemGemNew(void);
+ItemGem *itemGemNew(Item *item);
 
 /**
  * Initialize an allocated ItemGem structure.
  * @param self An allocated ItemGem to initialize.
  * @return true on success, false otherwise.
  */
-bool itemGemInit(ItemGem *self);
+bool itemGemInit(ItemGem *self, Item *item);
 
 /**
  * Free an allocated ItemGem structure.

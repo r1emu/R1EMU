@@ -46,14 +46,14 @@ enum {
  * Allocate a new ItemCard structure.
  * @return A pointer to an allocated ItemCard, or NULL if an error occured.
  */
-ItemCard *itemCardNew(void);
+ItemCard *itemCardNew(Item *item);
 
 /**
  * Initialize an allocated ItemCard structure.
  * @param self An allocated ItemCard to initialize.
  * @return true on success, false otherwise.
  */
-bool itemCardInit(ItemCard *self);
+bool itemCardInit(ItemCard *self, Item *item);
 
 /**
  * Free an allocated ItemCard structure.
