@@ -42,6 +42,7 @@
 
 // utils
 #include "common/utils/utils.h"
+#include "common/utils/memory.h"
 
 // Servers
 /** @brief Global types of the servers of the architecture */

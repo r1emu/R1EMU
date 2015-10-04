@@ -18,7 +18,7 @@
 #include "common/server/worker.h"
 #include "common/commander/commander.h"
 #include "common/commander/inventory.h"
-#include "common/item/item.h"
+#include "common/actor/item/item.h"
 #include "common/packet/packet_stream.h"
 #include "common/redis/fields/redis_session.h"
 #include "common/redis/fields/redis_game_session.h"
@@ -381,6 +381,47 @@ static PacketHandlerState barrackHandlerStartBarrack(
 
     // Update session
     session->game.accountSession = tmpAccountSession;
+
+    /*
+    Inventory *inventory = &tmpAccountSession.commanders[0]->inventory;
+
+    Item items[20];
+
+    items[0].actor.uid = 1111;
+    items[0].id = 2;
+    items[0].amount = 1;
+    items[0].category = ITEM_CAT_CONSUMABLE;
+    inventoryAddItem(inventory, &items[0]);
+
+    ItemEquipable equipItem[20];
+
+    equipItem[0].item.actor.uid = 2222;
+    equipItem[0].item.id = 531001;
+    equipItem[0].item.amount = 1;
+    equipItem[0].item.category = ITEM_CAT_ARMOR;
+    inventoryAddItem(inventory, (Item*) &equipItem[0]);
+
+    equipItem[1].item.actor.uid = 3333;
+    equipItem[1].item.id = 666666;
+    equipItem[1].item.amount = 1;
+    equipItem[1].item.category = ITEM_CAT_ARMOR;
+    inventoryAddItem(inventory, (Item*) &equipItem[1]);
+
+    dbg("Inventory count: %d", inventoryGetItemsCount(inventory));
+    dbg("Print inventory");
+    inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
+    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
+
+    inventoryEquipItem(inventory, 2222, EQSLOT_BODY_ARMOR);
+
+    inventoryPrintEquipment(inventory);
+    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
+
+    inventoryEquipItem(inventory, 3333, EQSLOT_BODY_ARMOR);
+
+    inventoryPrintEquipment(inventory);
+    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
+    */
 
     // Send the commander list
     barrackBuilderCommanderList(
