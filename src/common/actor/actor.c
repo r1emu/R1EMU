@@ -47,6 +47,7 @@ void actorDestroy(Actor **_self) {
 }
 
 bool actorInit(Actor *self, ActorId_t uid) {
+    memset(self, 0, sizeof(*self));
     self->uid = uid;
     return true;
 }

@@ -51,7 +51,7 @@ Item *itemFactoryCreate(ItemCategory category, ItemId_t id, ItemAmount_t amount)
         case ITEM_CAT_SUBWEAPON  : itemSize = sizeof(ItemSubWeapon); break;
         case ITEM_CAT_CURRENCY   : itemSize = sizeof(ItemCurrency); break;
 
-        case ITEM_CAT_COUNT      : error("Unexpected item category."); break;
+        case ITEM_CAT_COUNT      : error("Unexpected item category."); return NULL; break;
     }
 
     if (!(item = malloc(itemSize))) {
@@ -174,7 +174,11 @@ bool itemFactoryInit(Item *item, ItemCategory category, ItemId_t id, ItemAmount_
             break;
         }
 
-        case ITEM_CAT_COUNT      : error("Invalid item category"); break;
+        case ITEM_CAT_COUNT      : {
+            error("Invalid item category");
+            return false;
+            break;
+        }
     }
 
     return true;
