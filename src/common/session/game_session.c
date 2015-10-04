@@ -40,7 +40,7 @@ bool gameSessionInit(GameSession *self, Commander *commander) {
 
     memset(self, 0, sizeof(GameSession));
 
-    if (!(accountSessionInit(&self->accountSession, "undefined", "undefined", ACCOUNT_SESSION_PRIVILEGES_UNKNOWN))) {
+    if (!(accountSessionInit(&self->accountSession, "undefined", "undefined", ACCOUNT_SESSION_PRIVILEGES_PLAYER))) {
         error("Cannot initialize the account session.");
         return false;
     }

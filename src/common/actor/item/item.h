@@ -31,8 +31,8 @@
 /** Item fields packet size */
 typedef uint32_t ItemId_t;
 typedef uint32_t ItemAmount_t;
-typedef uint32_t ItemInventoryIndex_t;
 typedef uint32_t ItemPrice_t;
+typedef uint32_t ItemInventoryIndex_t;
 
 /** Item categories */
 typedef enum {
@@ -58,7 +58,6 @@ typedef struct {
    ItemId_t id;
    ItemAmount_t amount;
    ItemCategory category;
-   ItemInventoryIndex_t inventoryIndex;
 } Item;
 
 /**
@@ -104,7 +103,6 @@ void itemDestroy(Item **self);
 inline ItemId_t itemGetId(Item *self) { return self->id; }
 inline ItemAmount_t itemGetAmount(Item *self) { return self->amount; }
 inline ItemCategory itemGetCategory(Item *self) { return self->category; }
-inline ItemInventoryIndex_t itemGetInventoryIndex(Item *self) { return self->inventoryIndex; }
 
 /**
  * Serialization / Unserialization

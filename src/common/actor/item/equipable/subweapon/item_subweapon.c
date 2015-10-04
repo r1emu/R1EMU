@@ -11,55 +11,58 @@
  *          See LICENSE file for further information
  */
 
-#include "item_accessory.h"
+#include "item_subweapon.h"
 
-extern inline float *itemAccessoryGetPr(ItemAccessory *self);
-extern inline float *itemAccessoryGetCooldown(ItemAccessory *self);
+extern inline float *itemSubWeaponGetPetPosition(ItemSubWeapon *self);
+extern inline float *itemSubWeaponGetCooldown(ItemSubWeapon *self);
 
-ItemAccessory *itemAccessoryNew(void) {
-    ItemAccessory *self;
+ItemSubWeapon *itemSubWeaponNew(void) {
+    ItemSubWeapon *self;
 
-    if ((self = malloc(sizeof(ItemAccessory))) == NULL) {
+    if ((self = malloc(sizeof(ItemSubWeapon))) == NULL) {
         return NULL;
     }
 
-    if (!itemAccessoryInit(self)) {
-        itemAccessoryDestroy(&self);
-        error("ItemAccessory failed to initialize.");
+    if (!itemSubWeaponInit(self)) {
+        itemSubWeaponDestroy(&self);
+        error("ItemSubWeapon failed to initialize.");
         return NULL;
     }
 
     return self;
 }
 
-bool itemAccessoryInit(ItemAccessory *self) {
+bool itemSubWeaponInit(ItemSubWeapon *self) {
     memset(self, 0, sizeof(*self));
 
     return true;
 }
 
-void itemAccessoryFree(ItemAccessory *self) {
+void itemSubWeaponFree(ItemSubWeapon *self) {
     // TODO
 }
 
-void itemAccessoryDestroy(ItemAccessory **_self) {
-    ItemAccessory *self = *_self;
+void itemSubWeaponDestroy(ItemSubWeapon **_self) {
+    ItemSubWeapon *self = *_self;
 
     if (_self && self) {
-        itemAccessoryFree(self);
+        itemSubWeaponFree(self);
         free(self);
         *_self = NULL;
     }
 }
 
-size_t itemAccessoryGetPropertiesCPacketSize(ItemAccessory *self) {
+
+size_t itemSubWeaponGetPropertiesCPacketSize(ItemSubWeapon *self) {
     size_t size = 0;
-    size += propertyFloatGetCPacketSize(); // pr
+
+    size += propertyFloatGetCPacketSize(); // petPosition
     size += propertyFloatGetCPacketSize(); // cooldown
+
     return size;
 }
 
-void itemAccessoryGetPropertiesCPacket(ItemAccessory *self, PacketStream *stream) {
-    propertyFloatGetCPacket(ITEM_ACCESSORY_PROPERTY_ID_PR, self->pr, stream);
-    propertyFloatGetCPacket(ITEM_ACCESSORY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+void itemSubWeaponGetPropertiesCPacket(ItemSubWeapon *self, PacketStream *stream) {
+    propertyFloatGetCPacket(ITEM_SUBWEAPON_PROPERTY_ID_PET_POSITION, self->petPosition, stream);
+    propertyFloatGetCPacket(ITEM_SUBWEAPON_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }

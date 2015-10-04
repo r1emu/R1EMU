@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file item_gem.h
+ * @file item_currency.h
  * @brief
  *
  *
@@ -29,54 +29,50 @@
 // ------ Structure declaration -------
 typedef struct {
     Item item;
-    float *level;
-    float *itemExp;
     float *cooldown;
-}   ItemGem;
+}   ItemCurrency;
 
 enum {
-    ITEM_GEM_PROPERTY_ID_LEVEL = 3779,
-    ITEM_GEM_PROPERTY_ID_ITEM_EXP = 3768,
-    ITEM_GEM_PROPERTY_ID_COOLDOWN = 3843
+    ITEM_CURRENCY_PROPERTY_ID_COOLDOWN = 3750
 };
 
 // ----------- Functions ------------
 
 /**
- * Allocate a new ItemGem structure.
- * @return A pointer to an allocated ItemGem, or NULL if an error occured.
+ * Allocate a new ItemCurrency structure.
+ * @return A pointer to an allocated ItemCurrency, or NULL if an error occured.
  */
-ItemGem *itemGemNew(void);
+ItemCurrency *itemCurrencyNew(void);
 
 /**
- * Initialize an allocated ItemGem structure.
- * @param self An allocated ItemGem to initialize.
+ * Initialize an allocated ItemCurrency structure.
+ * @param self An allocated ItemCurrency to initialize.
  * @return true on success, false otherwise.
  */
-bool itemGemInit(ItemGem *self);
+bool itemCurrencyInit(ItemCurrency *self);
 
 /**
- * Free an allocated ItemGem structure.
- * @param self A pointer to an allocated ItemGem.
+ * Free an allocated ItemCurrency structure.
+ * @param self A pointer to an allocated ItemCurrency.
  */
-void itemGemFree(ItemGem *self);
+void itemCurrencyFree(ItemCurrency *self);
 
 /**
- * Free an allocated ItemGem structure and nullify the content of the pointer.
- * @param self A pointer to an allocated ItemGem.
+ * Free an allocated ItemCurrency structure and nullify the content of the pointer.
+ * @param self A pointer to an allocated ItemCurrency.
  */
-void itemGemDestroy(ItemGem **self);
+void itemCurrencyDestroy(ItemCurrency **self);
+
 
 /**
  * Getters & Setters
  */
-inline float *itemGemGetLevel(ItemGem *self) { return self->level; }
-inline float *itemGemGetItemExp(ItemGem *self) { return self->itemExp; }
-inline float *itemGemGetCooldown(ItemGem *self) { return self->cooldown; }
+inline float *itemCurrencyGetCooldown(ItemCurrency *self) { return self->cooldown; }
+
 
 /**
  * Serialization / Unserialization
  */
-size_t itemGemGetPropertiesCPacketSize(ItemGem *self);
-void itemGemGetPropertiesCPacket(ItemGem *self, PacketStream *stream);
+size_t itemCurrencyGetPropertiesCPacketSize(ItemCurrency *self);
+void itemCurrencyGetPropertiesCPacket(ItemCurrency *self, PacketStream *stream);
 

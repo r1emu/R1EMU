@@ -40,19 +40,19 @@ void zoneBuilderRestSit(uint32_t targetPcId, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderItemAdd(Item *item, InventoryAddType addType, zmsg_t *replyMsg) {
+void zoneBuilderItemAdd(Item *item, ItemInventoryIndex_t inventoryIndex, InventoryAddType addType, zmsg_t *replyMsg) {
 
-    size_t attributesSize = itemGetPropertiesCPacketSize(item);
+    size_t propertiesSize = itemGetPropertiesCPacketSize(item);
 
     #pragma pack(push, 1)
     struct {
         VariableSizePacketHeader variableSizeHeader;
         ItemCPacket item;
-        uint16_t attributesSize;
+        uint16_t propertiesSize;
         uint8_t addType;
         float notificationDelay;
         uint8_t inventoryType;
-        uint8_t attributes[attributesSize];
+        uint8_t properties[propertiesSize];
     } replyPacket;
     #pragma pack(pop)
 
@@ -65,14 +65,14 @@ void zoneBuilderItemAdd(Item *item, InventoryAddType addType, zmsg_t *replyMsg) 
         replyPacket.item.uid = actorGetUId(item);
         replyPacket.item.id = itemGetId(item);
         replyPacket.item.amount = itemGetAmount(item);
-        replyPacket.item.inventoryIndex = itemGetInventoryIndex(item);
-        replyPacket.attributesSize = attributesSize;
+        replyPacket.item.inventoryIndex = inventoryIndex;
+        replyPacket.propertiesSize = propertiesSize;
         replyPacket.addType = addType;
         replyPacket.notificationDelay = 0.0f;
         replyPacket.inventoryType = 0;
 
         PacketStream packetStream;
-        packetStreamInit(&packetStream, replyPacket.attributes);
+        packetStreamInit(&packetStream, replyPacket.properties);
         itemPropertiesGetCPacket(item, &packetStream);
     }
 }
@@ -1147,7 +1147,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
         uint8_t unk2;                            \
         uint16_t unk3;                           \
         uint32_t unk4;                           \
-        uint8_t attributes[attrSize];            \
+        uint8_t properties[attrSize];            \
     }   EquippedItemCPacket;
 
     size_t itemPropertiesSize[EQSLOT_COUNT];
@@ -1156,7 +1156,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
     for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
 
         ItemEquipable *eqItem = inventory->equippedItems[eqSlotIndex];
-        // get attribute size
+        // get property size
         size_t attrSize = eqItem ? itemGetPropertiesCPacketSize(&eqItem->item) : 0;
 
         #pragma pack(push, 1)
@@ -1209,12 +1209,12 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
             eqItemPkt->unk3 = 0;
             eqItemPkt->unk4 = 0;
 
-            // fill attribute buffer
-            packetStreamAddOffset(&packetStream, offsetof(struct EquippedItemCPacket, attributes));
+            // fill property buffer
+            packetStreamAddOffset(&packetStream, offsetof(struct EquippedItemCPacket, properties));
 
             // write in the buffer
             if (attrSize > 0) {
-                dbg("Get item attribute UID : %llx", actorGetUId((Actor *) eqItem));
+                dbg("Get item property UID : %llx", actorGetUId((Actor *) eqItem));
                 itemPropertiesGetCPacket(&eqItem->item, &packetStream);
             }
         }
@@ -1748,13 +1748,13 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
             inventoryItemCPacket->inventoryIndex = ITEM_CAT_SIZE * item->itemCategory + item->inventoryIndex;
             inventoryItemCPacket->unkown2 = 0;
 
-            // fill attribute buffer
-            size_t offset = offsetof(struct InventoryItemCPacket, attributes);
+            // fill property buffer
+            size_t offset = offsetof(struct InventoryItemCPacket, properties);
             packetStreamAddOffset(&packetStream, offset);
 
             // write in the buffer
             if (attrSize > 0) {
-                itemPropertiesGetCPacket(item->attributes, packetStreamGetCurrentBuffer(&packetStream));
+                itemPropertiesGetCPacket(item->properties, packetStreamGetCurrentBuffer(&packetStream));
                 // relocate the stream position
                 packetStreamAddOffset(&packetStream, attrSize);
             }

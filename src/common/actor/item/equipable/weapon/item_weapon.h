@@ -20,12 +20,24 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
+#include "common/actor/item/item.h"
 
 // ---------- Defines -------------
 
 
 // ------ Structure declaration -------
-typedef struct ItemWeapon ItemWeapon;
+typedef struct {
+    Item item;
+    float *maxAtk;
+    float *minAtk;
+    float *cooldown;
+}   ItemWeapon;
+
+enum {
+    ITEM_WEAPON_PROPERTY_ID_MAXATK = 3796,
+    ITEM_WEAPON_PROPERTY_ID_MINATK = 3858,
+    ITEM_WEAPON_PROPERTY_ID_COOLDOWN = 3843
+};
 
 // ----------- Functions ------------
 
@@ -54,3 +66,15 @@ void itemWeaponFree(ItemWeapon *self);
  */
 void itemWeaponDestroy(ItemWeapon **self);
 
+/**
+ * Serialization / Unserialization
+ */
+size_t itemWeaponGetPropertiesCPacketSize(ItemWeapon *self);
+void itemWeaponGetPropertiesCPacket(ItemWeapon *self, PacketStream *stream);
+
+/**
+ * Getters and Setters
+ */
+inline float *itemWeaponGetMaxAtk(ItemWeapon *self) { return self->maxAtk; }
+inline float *itemWeaponGetMinAtk(ItemWeapon *self) { return self->minAtk; }
+inline float *itemWeaponGetCooldown(ItemWeapon *self) { return self->cooldown; }

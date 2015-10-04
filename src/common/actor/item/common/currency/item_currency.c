@@ -11,55 +11,52 @@
  *          See LICENSE file for further information
  */
 
-#include "item_accessory.h"
+#include "item_currency.h"
 
-extern inline float *itemAccessoryGetPr(ItemAccessory *self);
-extern inline float *itemAccessoryGetCooldown(ItemAccessory *self);
+ItemCurrency *itemCurrencyNew(void) {
+    ItemCurrency *self;
 
-ItemAccessory *itemAccessoryNew(void) {
-    ItemAccessory *self;
-
-    if ((self = malloc(sizeof(ItemAccessory))) == NULL) {
+    if ((self = malloc(sizeof(ItemCurrency))) == NULL) {
         return NULL;
     }
 
-    if (!itemAccessoryInit(self)) {
-        itemAccessoryDestroy(&self);
-        error("ItemAccessory failed to initialize.");
+    if (!itemCurrencyInit(self)) {
+        itemCurrencyDestroy(&self);
+        error("ItemCurrency failed to initialize.");
         return NULL;
     }
 
     return self;
 }
 
-bool itemAccessoryInit(ItemAccessory *self) {
+bool itemCurrencyInit(ItemCurrency *self) {
     memset(self, 0, sizeof(*self));
 
     return true;
 }
 
-void itemAccessoryFree(ItemAccessory *self) {
+void itemCurrencyFree(ItemCurrency *self) {
     // TODO
 }
 
-void itemAccessoryDestroy(ItemAccessory **_self) {
-    ItemAccessory *self = *_self;
+void itemCurrencyDestroy(ItemCurrency **_self) {
+    ItemCurrency *self = *_self;
 
     if (_self && self) {
-        itemAccessoryFree(self);
+        itemCurrencyFree(self);
         free(self);
         *_self = NULL;
     }
 }
 
-size_t itemAccessoryGetPropertiesCPacketSize(ItemAccessory *self) {
+size_t itemCurrencyGetPropertiesCPacketSize(ItemCurrency *self) {
     size_t size = 0;
-    size += propertyFloatGetCPacketSize(); // pr
+
     size += propertyFloatGetCPacketSize(); // cooldown
+
     return size;
 }
 
-void itemAccessoryGetPropertiesCPacket(ItemAccessory *self, PacketStream *stream) {
-    propertyFloatGetCPacket(ITEM_ACCESSORY_PROPERTY_ID_PR, self->pr, stream);
-    propertyFloatGetCPacket(ITEM_ACCESSORY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+void itemCurrencyGetPropertiesCPacket(ItemCurrency *self, PacketStream *stream) {
+    propertyFloatGetCPacket(ITEM_CURRENCY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }

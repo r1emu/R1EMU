@@ -445,7 +445,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[0].amount = 5003;
     items[0].itemCategory = ITEM_CAT_CONSUMABLE;
     items[0].inventoryIndex = 1;
-    //items[0].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    //items[0].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[0]);
 
     items[1].itemId = 2222;
@@ -453,7 +453,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[1].amount = 5;
     items[1].itemCategory = ITEM_CAT_CONSUMABLE;
     items[1].inventoryIndex = 2;
-    //items[1].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    //items[1].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[1]);
 
 
@@ -462,7 +462,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[2].amount = 1;
     items[2].itemCategory = ITEM_CAT_ARMOR;
     //items[2].equipSlot = EQSLOT_BODY_ARMOR;
-    //items[2].attributes = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    //items[2].properties = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[2]);
 
     items[3].itemId = 4444;
@@ -470,7 +470,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[3].amount = 1;
     items[3].itemCategory = ITEM_CAT_ARMOR;
     //items[3].equipSlot = EQSLOT_BODY_ARMOR;
-    //items[3].attributes = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    //items[3].properties = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[3]);
 
 
@@ -504,7 +504,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[0].itemType = 2;
     items[0].amount = 1;
     items[0].equipSlot = EQSLOT_HEAD_TOP;
-    items[0].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[0].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[0]);
     inventoryEquipItem(inventory, items[0].itemId, EQSLOT_HEAD_TOP);
 
@@ -513,7 +513,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[1].itemType = 2;
     items[1].amount = 1;
     items[1].equipSlot = EQSLOT_HEAD_MIDDLE;
-    items[1].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[1].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[1]);
     inventoryEquipItem(inventory, items[1].itemId, EQSLOT_HEAD_MIDDLE);
 
@@ -521,7 +521,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[2].itemType = 4;
     items[2].amount = 1;
     items[2].equipSlot = EQSLOT_UNKOWN1;
-    items[2].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[2].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[2]);
     inventoryEquipItem(inventory, items[2].itemId, EQSLOT_UNKOWN1);
 
@@ -529,7 +529,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[3].itemType = 531101;
     items[3].amount = 1;
     items[3].equipSlot = EQSLOT_BODY_ARMOR;
-    items[3].attributes = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    items[3].properties = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[3]);
     inventoryEquipItem(inventory, items[3].itemId, EQSLOT_BODY_ARMOR);
 
@@ -537,7 +537,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[4].itemType = 6;
     items[4].amount = 1;
     items[4].equipSlot = EQSLOT_GLOVES;
-    items[4].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[4].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[4]);
     inventoryEquipItem(inventory, items[4].itemId, EQSLOT_GLOVES);
 
@@ -545,7 +545,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[5].itemType = 7;
     items[5].amount = 1;
     items[5].equipSlot = EQSLOT_BOOTS;
-    items[5].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[5].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[5]);
     inventoryEquipItem(inventory, items[5].itemId, EQSLOT_BOOTS);
 
@@ -553,7 +553,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[6].itemType = 10000;
     items[6].amount = 1;
     items[6].equipSlot = EQSLOT_HELMET;
-    items[6].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[6].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[6]);
     inventoryEquipItem(inventory, items[6].itemId, EQSLOT_HELMET);
 
@@ -561,7 +561,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[7].itemType = 11000;
     items[7].amount = 1;
     items[7].equipSlot = EQSLOT_BRACELET;
-    items[7].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[7].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[7]);
     inventoryEquipItem(inventory, items[7].itemId, EQSLOT_BRACELET);
 
@@ -569,7 +569,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[8].itemType = 9999996;
     items[8].amount = 1;
     items[8].equipSlot = EQSLOT_WEAPON;
-    items[8].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[8].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[8]);
     inventoryEquipItem(inventory, items[8].itemId, EQSLOT_WEAPON);
 
@@ -577,7 +577,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[9].itemType = 9999996;
     items[9].amount = 1;
     items[9].equipSlot = EQSLOT_SHIELD;
-    items[9].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[9].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[9]);
     inventoryEquipItem(inventory, items[9].itemId, EQSLOT_SHIELD);
 
@@ -585,7 +585,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[10].itemType = 4;
     items[10].amount = 1;
     items[10].equipSlot = EQSLOT_COSTUME;
-    items[10].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[10].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[10]);
     inventoryEquipItem(inventory, items[10].itemId, EQSLOT_COSTUME);
 
@@ -593,7 +593,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[11].itemType = 9;
     items[11].amount = 1;
     items[11].equipSlot = EQSLOT_UNKOWN3;
-    items[11].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[11].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[11]);
     inventoryEquipItem(inventory, items[11].itemId, EQSLOT_UNKOWN3);
 
@@ -601,7 +601,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[12].itemType = 9;
     items[12].amount = 1;
     items[12].equipSlot = EQSLOT_UNKOWN4;
-    items[12].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[12].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[12]);
     inventoryEquipItem(inventory, items[12].itemId, EQSLOT_UNKOWN4);
 
@@ -609,7 +609,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[13].itemType = 4;
     items[13].amount = 1;
     items[13].equipSlot = EQSLOT_UNKOWN5;
-    items[13].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[13].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[13]);
     inventoryEquipItem(inventory, items[13].itemId, EQSLOT_UNKOWN5);
 
@@ -617,7 +617,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[14].itemType = 8;
     items[14].amount = 1;
     items[14].equipSlot = EQSLOT_LEG_ARMOR;
-    items[14].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[14].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[14]);
     inventoryEquipItem(inventory, items[14].itemId, EQSLOT_LEG_ARMOR);
 
@@ -625,7 +625,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[15].itemType = 9;
     items[15].amount = 1;
     items[15].equipSlot = EQSLOT_UNKOWN6;
-    items[15].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[15].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[15]);
     inventoryEquipItem(inventory, items[15].itemId, EQSLOT_UNKOWN6);
 
@@ -633,7 +633,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[16].itemType = 9;
     items[16].amount = 1;
     items[16].equipSlot = EQSLOT_UNKOWN7;
-    items[16].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[16].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[16]);
     inventoryEquipItem(inventory, items[16].itemId, EQSLOT_UNKOWN7);
 
@@ -641,7 +641,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[17].itemType = 9;
     items[17].amount = 1;
     items[17].equipSlot = EQSLOT_RIGHT_LEFT;
-    items[17].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[17].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[17]);
     inventoryEquipItem(inventory, items[17].itemId, EQSLOT_RIGHT_LEFT);
 
@@ -649,7 +649,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[18].itemType = 9;
     items[18].amount = 1;
     items[18].equipSlot = EQSLOT_RIGHT_RIGHT;
-    items[18].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[18].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[18]);
     inventoryEquipItem(inventory, items[18].itemId, EQSLOT_RIGHT_RIGHT);
 
@@ -657,7 +657,7 @@ static PacketHandlerState zoneHandlerGameReady(
     items[19].itemType = 10;
     items[19].amount = 1;
     items[19].equipSlot = EQSLOT_NECKLACE;
-    items[19].attributes = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
+    items[19].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[19]);
     inventoryEquipItem(inventory, items[19].itemId, EQSLOT_NECKLACE);
 

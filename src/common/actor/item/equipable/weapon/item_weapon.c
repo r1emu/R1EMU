@@ -13,13 +13,9 @@
 
 #include "item_weapon.h"
 
-/**
- * @brief ItemWeapon contains
- */
-struct ItemWeapon
-{
-
-};
+extern inline float *itemWeaponGetMaxAtk(ItemWeapon *self);
+extern inline float *itemWeaponGetMinAtk(ItemWeapon *self);
+extern inline float *itemWeaponGetCooldown(ItemWeapon *self);
 
 ItemWeapon *itemWeaponNew(void) {
     ItemWeapon *self;
@@ -55,4 +51,21 @@ void itemWeaponDestroy(ItemWeapon **_self) {
         free(self);
         *_self = NULL;
     }
+}
+
+
+size_t itemWeaponGetPropertiesCPacketSize(ItemWeapon *self) {
+    size_t size = 0;
+
+    size += propertyFloatGetCPacketSize(); // maxAtk
+    size += propertyFloatGetCPacketSize(); // minAtk
+    size += propertyFloatGetCPacketSize(); // cooldown
+
+    return size;
+}
+
+void itemWeaponGetPropertiesCPacket(ItemWeapon *self, PacketStream *stream) {
+    propertyFloatGetCPacket(ITEM_WEAPON_PROPERTY_ID_MAXATK, self->maxAtk, stream);
+    propertyFloatGetCPacket(ITEM_WEAPON_PROPERTY_ID_MINATK, self->minAtk, stream);
+    propertyFloatGetCPacket(ITEM_WEAPON_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }

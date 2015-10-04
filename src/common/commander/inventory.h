@@ -110,7 +110,7 @@ typedef struct {                                          \
     ItemPrice_t price;                                    \
     ItemInventoryIndex_t inventoryIndex;                  \
     uint32_t unkown2;                                     \
-    uint8_t attributes[attrSize];                         \
+    uint8_t properties[attrSize];                         \
 } InventoryItemCPacket;
 
 // ----------- Functions ------------

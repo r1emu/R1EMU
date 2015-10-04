@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file item_gem.h
+ * @file item_subweapon.h
  * @brief
  *
  *
@@ -21,7 +21,6 @@
 // ---------- Includes ------------
 #include "R1EMU.h"
 #include "common/actor/item/item.h"
-#include "common/property/property.h"
 
 // ---------- Defines -------------
 
@@ -29,54 +28,50 @@
 // ------ Structure declaration -------
 typedef struct {
     Item item;
-    float *level;
-    float *itemExp;
+    float *petPosition;
     float *cooldown;
-}   ItemGem;
+}   ItemSubWeapon;
 
 enum {
-    ITEM_GEM_PROPERTY_ID_LEVEL = 3779,
-    ITEM_GEM_PROPERTY_ID_ITEM_EXP = 3768,
-    ITEM_GEM_PROPERTY_ID_COOLDOWN = 3843
+    ITEM_SUBWEAPON_PROPERTY_ID_PET_POSITION = 3703,
+    ITEM_SUBWEAPON_PROPERTY_ID_COOLDOWN = 3843
 };
 
 // ----------- Functions ------------
 
 /**
- * Allocate a new ItemGem structure.
- * @return A pointer to an allocated ItemGem, or NULL if an error occured.
+ * Allocate a new ItemSubWeapon structure.
+ * @return A pointer to an allocated ItemSubWeapon, or NULL if an error occured.
  */
-ItemGem *itemGemNew(void);
+ItemSubWeapon *itemSubWeaponNew(void);
 
 /**
- * Initialize an allocated ItemGem structure.
- * @param self An allocated ItemGem to initialize.
+ * Initialize an allocated ItemSubWeapon structure.
+ * @param self An allocated ItemSubWeapon to initialize.
  * @return true on success, false otherwise.
  */
-bool itemGemInit(ItemGem *self);
+bool itemSubWeaponInit(ItemSubWeapon *self);
 
 /**
- * Free an allocated ItemGem structure.
- * @param self A pointer to an allocated ItemGem.
+ * Free an allocated ItemSubWeapon structure.
+ * @param self A pointer to an allocated ItemSubWeapon.
  */
-void itemGemFree(ItemGem *self);
+void itemSubWeaponFree(ItemSubWeapon *self);
 
 /**
- * Free an allocated ItemGem structure and nullify the content of the pointer.
- * @param self A pointer to an allocated ItemGem.
+ * Free an allocated ItemSubWeapon structure and nullify the content of the pointer.
+ * @param self A pointer to an allocated ItemSubWeapon.
  */
-void itemGemDestroy(ItemGem **self);
-
-/**
- * Getters & Setters
- */
-inline float *itemGemGetLevel(ItemGem *self) { return self->level; }
-inline float *itemGemGetItemExp(ItemGem *self) { return self->itemExp; }
-inline float *itemGemGetCooldown(ItemGem *self) { return self->cooldown; }
+void itemSubWeaponDestroy(ItemSubWeapon **self);
 
 /**
  * Serialization / Unserialization
  */
-size_t itemGemGetPropertiesCPacketSize(ItemGem *self);
-void itemGemGetPropertiesCPacket(ItemGem *self, PacketStream *stream);
+size_t itemSubWeaponGetPropertiesCPacketSize(ItemSubWeapon *self);
+void itemSubWeaponGetPropertiesCPacket(ItemSubWeapon *self, PacketStream *stream);
 
+/**
+ * Getters and Setters
+ */
+inline float *itemSubWeaponGetPetPosition(ItemSubWeapon *self) { return self->petPosition; }
+inline float *itemSubWeaponGetCooldown(ItemSubWeapon *self) { return self->cooldown; }

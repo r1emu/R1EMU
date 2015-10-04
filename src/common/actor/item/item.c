@@ -12,15 +12,22 @@
  */
 
 #include "item.h"
-#include "common/consumable/item_consumable.h"
-#include "common/quest/item_quest.h"
-#include "equipable/armor/item_armor.h"
+#include "common/actor/item/common/consumable/item_consumable.h"
+#include "common/actor/item/common/quest/item_quest.h"
+#include "common/actor/item/common/material/item_material.h"
+#include "common/actor/item/common/book/item_book.h"
+#include "common/actor/item/common/card/item_card.h"
+#include "common/actor/item/common/currency/item_currency.h"
+#include "common/actor/item/common/gem/item_gem.h"
+#include "common/actor/item/equipable/armor/item_armor.h"
+#include "common/actor/item/equipable/weapon/item_weapon.h"
+#include "common/actor/item/equipable/subweapon/item_subweapon.h"
+#include "common/actor/item/equipable/accessory/item_accessory.h"
 
 // Inlined getters & setters
 extern inline ItemId_t itemGetId(Item *self);
 extern inline ItemAmount_t itemGetAmount(Item *self);
 extern inline ItemCategory itemGetCategory(Item *self);
-extern inline ItemInventoryIndex_t itemGetInventoryIndex(Item *self);
 
 Item *itemNew(void) {
     Item *self;
@@ -62,41 +69,18 @@ size_t itemGetPropertiesCPacketSize(Item *self) {
     size_t size = 0;
 
     switch (self->category) {
-        case ITEM_CAT_CONSUMABLE:
-            size += itemConsumableGetPropertiesCPacketSize((ItemConsumable *) self);
-        break;
 
-        case ITEM_CAT_ARMOR:
-            size += itemArmorGetPropertiesCPacketSize((ItemArmor *) self);
-        break;
-
-        case ITEM_CAT_QUEST:
-            size += itemQuestGetPropertiesCPacketSize((ItemQuest *) self);
-        break;
-
-        case ITEM_CAT_BOOK:
-        break;
-
-        case ITEM_CAT_MATERIAL:
-        break;
-
-        case ITEM_CAT_GEM:
-        break;
-
-        case ITEM_CAT_WEAPON:
-        break;
-
-        case ITEM_CAT_CARD:
-        break;
-
-        case ITEM_CAT_ACCESSORY:
-        break;
-
-        case ITEM_CAT_SUBWEAPON:
-        break;
-
-        case ITEM_CAT_CURRENCY:
-        break;
+        case ITEM_CAT_CONSUMABLE : size += itemConsumableGetPropertiesCPacketSize((ItemConsumable *) self); break;
+        case ITEM_CAT_ARMOR      : size += itemArmorGetPropertiesCPacketSize((ItemArmor *) self); break;
+        case ITEM_CAT_QUEST      : size += itemQuestGetPropertiesCPacketSize((ItemQuest *) self); break;
+        case ITEM_CAT_BOOK       : size += itemBookGetPropertiesCPacketSize((ItemBook *) self); break;
+        case ITEM_CAT_MATERIAL   : size += itemMaterialGetPropertiesCPacketSize((ItemMaterial *) self); break;
+        case ITEM_CAT_GEM        : size += itemGemGetPropertiesCPacketSize((ItemGem *) self); break;
+        case ITEM_CAT_WEAPON     : size += itemWeaponGetPropertiesCPacketSize((ItemWeapon *) self); break;
+        case ITEM_CAT_CARD       : size += itemCardGetPropertiesCPacketSize((ItemCard *) self); break;
+        case ITEM_CAT_ACCESSORY  : size += itemAccessoryGetPropertiesCPacketSize((ItemAccessory *) self); break;
+        case ITEM_CAT_SUBWEAPON  : size += itemSubWeaponGetPropertiesCPacketSize((ItemSubWeapon *) self); break;
+        case ITEM_CAT_CURRENCY   : size += itemCurrencyGetPropertiesCPacketSize((ItemCurrency *) self); break;
 
         case ITEM_CAT_COUNT: error("Unexpected item category."); break;
     }
@@ -107,41 +91,18 @@ size_t itemGetPropertiesCPacketSize(Item *self) {
 void itemPropertiesGetCPacket(Item *self, PacketStream *stream) {
 
     switch (self->category) {
-        case ITEM_CAT_CONSUMABLE:
-            itemConsumableGetPropertiesCPacket((ItemConsumable *) self, stream);
-        break;
 
-        case ITEM_CAT_ARMOR:
-            itemArmorGetPropertiesCPacket((ItemArmor *) self, stream);
-        break;
-
-        case ITEM_CAT_QUEST:
-            itemQuestGetPropertiesCPacket((ItemQuest *) self, stream);
-        break;
-
-        case ITEM_CAT_BOOK:
-        break;
-
-        case ITEM_CAT_MATERIAL:
-        break;
-
-        case ITEM_CAT_GEM:
-        break;
-
-        case ITEM_CAT_WEAPON:
-        break;
-
-        case ITEM_CAT_CARD:
-        break;
-
-        case ITEM_CAT_ACCESSORY:
-        break;
-
-        case ITEM_CAT_SUBWEAPON:
-        break;
-
-        case ITEM_CAT_CURRENCY:
-        break;
+        case ITEM_CAT_CONSUMABLE : itemConsumableGetPropertiesCPacket((ItemConsumable *) self, stream); break;
+        case ITEM_CAT_ARMOR      : itemArmorGetPropertiesCPacket((ItemArmor *) self, stream); break;
+        case ITEM_CAT_QUEST      : itemQuestGetPropertiesCPacket((ItemQuest *) self, stream); break;
+        case ITEM_CAT_BOOK       : itemBookGetPropertiesCPacket((ItemBook *) self, stream); break;
+        case ITEM_CAT_MATERIAL   : itemMaterialGetPropertiesCPacket((ItemMaterial *) self, stream); break;
+        case ITEM_CAT_GEM        : itemGemGetPropertiesCPacket((ItemGem *) self, stream); break;
+        case ITEM_CAT_WEAPON     : itemWeaponGetPropertiesCPacket((ItemWeapon *) self, stream); break;
+        case ITEM_CAT_CARD       : itemCardGetPropertiesCPacket((ItemCard *) self, stream); break;
+        case ITEM_CAT_ACCESSORY  : itemAccessoryGetPropertiesCPacket((ItemAccessory *) self, stream); break;
+        case ITEM_CAT_SUBWEAPON  : itemSubWeaponGetPropertiesCPacket((ItemSubWeapon *) self, stream); break;
+        case ITEM_CAT_CURRENCY   : itemCurrencyGetPropertiesCPacket((ItemCurrency *) self, stream); break;
 
         case ITEM_CAT_COUNT: error("Unexpected item category."); break;
     }

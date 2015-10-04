@@ -271,13 +271,13 @@ void barrackBuilderCommanderList(
         Commander *curCommander = commanders[commanderIndex];
         Inventory *inventory = &curCommander->inventory;
 
-        // Get attributes size
+        // Get properties size
         size_t propertiesSize = 0;
         for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
 
             Item *item = (Item *) inventory->equippedItems[eqSlotIndex];
 
-            // Get attribute size
+            // Get property size
             size_t propSize = item ? itemGetPropertiesCPacketSize(item) : 0;
 
             // Define size
@@ -387,7 +387,7 @@ void barrackBuilderCommanderList(
             curCommandersBarrackInfoPacket->unk8 = 0;
             curCommandersBarrackInfoPacket->unk9 = 0;
 
-            // fill attributes
+            // fill properties
             size_t offset = offsetof(CommanderBarrackInfoCPacket, propertiesPacket);
             packetStreamAddOffset(&packetStream, offset);
 
