@@ -33,7 +33,30 @@ typedef struct Actor {
 
 
 // ----------- Functions ------------
+/**
+ * Allocate a new Actor structure.
+ * @return A pointer to an allocated Actor, or NULL if an error occured.
+ */
+Actor *actorNew(ActorId_t id);
+
+/**
+ * Initialize an allocated Actor structure.
+ * @param self An allocated Actor to initialize.
+ * @return true on success, false otherwise.
+ */
 bool actorInit(Actor *self, ActorId_t id);
+
+/**
+ * Free an allocated Actor structure.
+ * @param self A pointer to an allocated Actor.
+ */
+void actorFree(Actor *self);
+
+/**
+ * Free an allocated Actor structure and nullify the content of the pointer.
+ * @param self A pointer to an allocated Actor.
+ */
+void actorDestroy(Actor **self);
 
 /**
  * Getters & Setters
@@ -44,3 +67,4 @@ inline ActorId_t actorGetUId(void *_self) {
 }
 
 void actorGenKey(ActorId_t uid, ActorKey key);
+

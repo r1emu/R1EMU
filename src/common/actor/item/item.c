@@ -29,14 +29,14 @@ extern inline ItemId_t itemGetId(Item *self);
 extern inline ItemAmount_t itemGetAmount(Item *self);
 extern inline ItemCategory itemGetCategory(Item *self);
 
-Item *itemNew(void) {
+Item *itemNew(Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount) {
     Item *self;
 
     if ((self = malloc(sizeof(Item))) == NULL) {
         return NULL;
     }
 
-    if (!itemInit(self)) {
+    if (!itemInit(self, actor, category, id, amount)) {
         itemDestroy(&self);
         error("Item failed to initialize.");
         return NULL;
@@ -45,8 +45,13 @@ Item *itemNew(void) {
     return self;
 }
 
-bool itemInit(Item *self) {
+bool itemInit(Item *self, Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount) {
     memset(self, 0, sizeof(Item));
+
+    memcpy(&self->actor, actor, sizeof(self->actor));
+    self->category = category;
+    self->id = id;
+    self->amount = amount;
 
     return true;
 }

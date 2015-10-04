@@ -76,14 +76,14 @@ typedef struct {
  * Allocate a new Item structure.
  * @return A pointer to an allocated Item, or NULL if an error occured.
  */
-Item *itemNew(void);
+Item *itemNew(Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount);
 
 /**
  * Initialize an allocated Item structure.
  * @param self An allocated Item to initialize.
  * @return true on success, false otherwise.
  */
-bool itemInit(Item *self);
+bool itemInit(Item *self, Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount);
 
 /**
  * Free an allocated Item structure.

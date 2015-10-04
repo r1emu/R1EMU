@@ -78,11 +78,11 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
     ItemCategory itemCategory = itemGetCategory(itemToAdd);
     ActorId_t actorId = actorGetUId(itemToAdd);
 
-    ActorKey itemKey;
-    actorGenKey(actorId, itemKey);
+    ActorKey actorKey;
+    actorGenKey(actorId, actorKey);
 
-    if (zhash_insert(self->items, itemKey, itemToAdd) != 0) {
-        error("Cannot insert the item '%s' in the hashtable.", itemKey);
+    if (zhash_insert(self->items, actorKey, itemToAdd) != 0) {
+        error("Cannot insert the item '%s' in the hashtable.", actorKey);
         return false;
     }
 
@@ -99,31 +99,31 @@ bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
     ActorId_t actorId = actorGetUId(itemToRemove);
     ItemCategory itemCategory = itemGetCategory(itemToRemove);
 
-    ActorKey itemKey;
-    actorGenKey(actorId, itemKey);
+    ActorKey actorKey;
+    actorGenKey(actorId, actorKey);
 
     zlist_remove(self->bags[itemCategory], itemToRemove);
-    zhash_delete(self->items, itemKey);
+    zhash_delete(self->items, actorKey);
 
     return true;
 }
 
-void itemGenActorKey(Item *self, ActorKey itemKey) {
+void itemGenActorKey(Item *self, ActorKey actorKey) {
     ActorId_t actorId = actorGetUId(self);
-    actorGenKey(actorId, itemKey);
+    actorGenKey(actorId, actorKey);
 }
 
 bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, Item **_item) {
 
     Item *item = NULL;
 
-    ActorKey itemKey;
-    actorGenKey(actorId, itemKey);
+    ActorKey actorKey;
+    actorGenKey(actorId, actorKey);
 
     *_item = NULL;
 
-    if (!(item = zhash_lookup(self->items, itemKey))) {
-        error("Cannot find the item '%s' in the inventory.", itemKey);
+    if (!(item = zhash_lookup(self->items, actorKey))) {
+        error("Cannot find the item '%s' in the inventory.", actorKey);
         return false;
     }
 
