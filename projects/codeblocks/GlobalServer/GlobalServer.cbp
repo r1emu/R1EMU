@@ -80,6 +80,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/actor/actor.h" />
+		<Unit filename="../../../src/common/actor/actor_factory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/actor_factory.h" />
 		<Unit filename="../../../src/common/actor/attribute.h" />
 		<Unit filename="../../../src/common/actor/item/common/book/item_book.c">
 			<Option compilerVar="CC" />
@@ -93,6 +97,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/actor/item/common/consumable/item_consumable.h" />
+		<Unit filename="../../../src/common/actor/item/common/currency/item_currency.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/common/currency/item_currency.h" />
 		<Unit filename="../../../src/common/actor/item/common/gem/item_gem.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -118,6 +126,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/actor/item/equipable/item_equipable.h" />
+		<Unit filename="../../../src/common/actor/item/equipable/subweapon/item_subweapon.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/item/equipable/subweapon/item_subweapon.h" />
 		<Unit filename="../../../src/common/actor/item/equipable/weapon/item_weapon.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -127,9 +139,10 @@
 		</Unit>
 		<Unit filename="../../../src/common/actor/item/item.h" />
 		<Unit filename="../../../src/common/actor/item/item_attribute.h" />
-		<Unit filename="../../../src/common/actor/item/item_interface.c">
+		<Unit filename="../../../src/common/actor/item/item_factory.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../src/common/actor/item/item_factory.h" />
 		<Unit filename="../../../src/common/actor/item/item_interface.h" />
 		<Unit filename="../../../src/common/commander/commander.c">
 			<Option compilerVar="CC" />
