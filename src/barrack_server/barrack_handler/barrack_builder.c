@@ -242,6 +242,27 @@ void barrackBuilderCommanderList(
     int commandersCount,
     zmsg_t *replyMsg)
 {
+    #define DEFINE_BarrackBuilderCommanderListCPacket(x)    \
+    typedef struct {                                        \
+        VariableSizePacketHeader variableSizeHeader;        \
+        uint64_t accountId;                                 \
+        uint8_t unk1;                                       \
+        uint8_t commandersCount;                            \
+        uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];     \
+                                                            \
+        uint16_t accountInfoBytesLength;                    \
+                                                            \
+        /* FIXME : Create AccountInfo */                    \
+        uint16_t typeCredits;                               \
+        float creditsAmount;                                \
+        uint16_t typeCredits2;                              \
+        float creditsAmount2;                               \
+        uint16_t typeCredits3;                              \
+        float creditsAmount3;                               \
+                                                            \
+        uint8_t commandersBarrackInfoPacket[x];             \
+    }   BarrackBuilderCommanderListCPacket;
+
     #define DEFINE_CommanderBarrackInfoCPacket(x)     \
         typedef struct {                              \
             CommanderAppearance appearance;           \
@@ -295,34 +316,15 @@ void barrackBuilderCommanderList(
         #pragma pack(push, 1)
         DEFINE_CommanderBarrackInfoCPacket(propertiesSize);
         #pragma pack(pop)
+
         commanderBarrackInfoPacketSize += sizeof(CommanderBarrackInfoCPacket);
     }
 
     // We got the final packet size, allocate replyPacket
-    #define DEFINE_BarrackBuilderCommanderListCPacket(x)    \
-    typedef struct {                                        \
-        VariableSizePacketHeader variableSizeHeader;        \
-        uint64_t accountId;                                 \
-        uint8_t unk1;                                       \
-        uint8_t commandersCount;                            \
-        uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];     \
-                                                            \
-        uint16_t accountInfoBytesLength;                    \
-                                                            \
-        /* FIXME : Create AccountInfo */                    \
-        uint16_t typeCredits;                               \
-        float creditsAmount;                                \
-        uint16_t typeCredits2;                              \
-        float creditsAmount2;                               \
-        uint16_t typeCredits3;                              \
-        float creditsAmount3;                               \
-                                                            \
-        uint8_t commandersBarrackInfoPacket[x];             \
-    }   BarrackBuilderCommanderListCPacket;
-
     #pragma pack(push, 1)
     DEFINE_BarrackBuilderCommanderListCPacket(commanderBarrackInfoPacketSize);
     #pragma pack(pop)
+
     BarrackBuilderCommanderListCPacket replyPacket;
 
     PacketStream packetStream;
@@ -340,6 +342,7 @@ void barrackBuilderCommanderList(
         replyPacket.unk1 = 1; // ICBT - equal to 1 or 4
         replyPacket.commandersCount = commandersCount;
         strncpy(replyPacket.familyName, gameSession->accountSession.familyName, sizeof(replyPacket.familyName));
+
         replyPacket.accountInfoBytesLength = 0x12; // 3 sets
         replyPacket.typeCredits = SWAP_UINT16(0x940e); // 94 0E = Medal (iCoin)
         replyPacket.creditsAmount = gameSession->accountSession.credits;

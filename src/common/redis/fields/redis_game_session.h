@@ -21,60 +21,58 @@
 #include "common/session/session.h"
 
 // Game session
-#define REDIS_SESSION_account_accountName_str        "account_accountName"
-#define REDIS_SESSION_account_sessionKey_str         "account_sessionKey"
-#define REDIS_SESSION_account_privilege_str          "account_privilege"
+#define REDIS_SESSION_account_accountName_str        "accountName"
+#define REDIS_SESSION_account_sessionKey_str         "sessionKey"
+#define REDIS_SESSION_account_privilege_str          "privilege"
 #define REDIS_SESSION_account_commandersCountMax_str "commandersCountMax"
 
-// CommanderInfo session
-#define REDIS_SESSION_commander_mapId_str           "commander_mapId"
-#define REDIS_SESSION_commander_commanderName_str   "commander_commanderName"
-#define REDIS_SESSION_commander_familyName_str      "commander_familyName"
-#define REDIS_SESSION_commander_accountId_str       "commander_accountId"
-#define REDIS_SESSION_commander_classId_str         "commander_classId"
-#define REDIS_SESSION_commander_jobId_str           "commander_jobId"
-#define REDIS_SESSION_commander_gender_str          "commander_gender"
-#define REDIS_SESSION_commander_level_str           "commander_level"
-#define REDIS_SESSION_commander_hairId_str          "commander_hairId"
-#define REDIS_SESSION_commander_pose_str            "commander_pose"
+// Commander session
+#define REDIS_SESSION_commander_mapId_str           "mapId"
+#define REDIS_SESSION_commander_commanderName_str   "commanderName"
+#define REDIS_SESSION_commander_familyName_str      "familyName"
+#define REDIS_SESSION_commander_accountId_str       "accountId"
+#define REDIS_SESSION_commander_classId_str         "classId"
+#define REDIS_SESSION_commander_jobId_str           "jobId"
+#define REDIS_SESSION_commander_gender_str          "gender"
+#define REDIS_SESSION_commander_level_str           "level"
+#define REDIS_SESSION_commander_hairId_str          "hairId"
+#define REDIS_SESSION_commander_pose_str            "pose"
+#define REDIS_SESSION_commander_posX_str            "posX"
+#define REDIS_SESSION_commander_posY_str            "posY"
+#define REDIS_SESSION_commander_posZ_str            "posZ"
+#define REDIS_SESSION_commander_currentXP_str       "currentXP"
+#define REDIS_SESSION_commander_maxXP_str           "maxXP"
+#define REDIS_SESSION_commander_pcId_str            "pcId"
+#define REDIS_SESSION_commander_socialInfoId_str    "socialInfoId"
+#define REDIS_SESSION_commander_commanderId_str     "commanderId"
+#define REDIS_SESSION_commander_currentHP_str       "currentHP"
+#define REDIS_SESSION_commander_maxHP_str           "maxHP"
+#define REDIS_SESSION_commander_currentSP_str       "currentSP"
+#define REDIS_SESSION_commander_maxSP_str           "maxSP"
+#define REDIS_SESSION_commander_currentStamina_str  "currentStamina"
+#define REDIS_SESSION_commander_maxStamina_str      "maxStamina"
 
-// CommanderEquipment
-#define REDIS_SESSION_equipment_head_top_str        "equipment_head_top"
-#define REDIS_SESSION_equipment_head_middle_str     "equipment_head_middle"
-#define REDIS_SESSION_equipment_itemUnk1_str        "equipment_itemUnk1"
-#define REDIS_SESSION_equipment_body_armor_str      "equipment_body_armor"
-#define REDIS_SESSION_equipment_gloves_str          "equipment_gloves"
-#define REDIS_SESSION_equipment_boots_str           "equipment_boots"
-#define REDIS_SESSION_equipment_helmet_str          "equipment_helmet"
-#define REDIS_SESSION_equipment_bracelet_str        "equipment_bracelet"
-#define REDIS_SESSION_equipment_weapon_str          "equipment_weapon"
-#define REDIS_SESSION_equipment_shield_str          "equipment_shield"
-#define REDIS_SESSION_equipment_costume_str         "equipment_costume"
-#define REDIS_SESSION_equipment_itemUnk3_str        "equipment_itemUnk3"
-#define REDIS_SESSION_equipment_itemUnk4_str        "equipment_itemUnk4"
-#define REDIS_SESSION_equipment_itemUnk5_str        "equipment_itemUnk5"
-#define REDIS_SESSION_equipment_leg_armor_str       "equipment_leg_armor"
-#define REDIS_SESSION_equipment_itemUnk6_str        "equipment_itemUnk6"
-#define REDIS_SESSION_equipment_itemUnk7_str        "equipment_itemUnk7"
-#define REDIS_SESSION_equipment_ring_left_str       "equipment_ring_left"
-#define REDIS_SESSION_equipment_ring_right_str      "equipment_ring_right"
-#define REDIS_SESSION_equipment_necklace_str        "equipment_necklace"
-
-// Commander
-#define REDIS_SESSION_commander_posX_str            "info_posX"
-#define REDIS_SESSION_commander_posY_str            "info_posY"
-#define REDIS_SESSION_commander_posZ_str            "info_posZ"
-#define REDIS_SESSION_commander_currentXP_str       "info_currentXP"
-#define REDIS_SESSION_commander_maxXP_str           "info_maxXP"
-#define REDIS_SESSION_commander_pcId_str            "info_pcId"
-#define REDIS_SESSION_commander_socialInfoId_str    "info_socialInfoId"
-#define REDIS_SESSION_commander_commanderId_str     "info_commanderId"
-#define REDIS_SESSION_commander_currentHP_str       "info_currentHP"
-#define REDIS_SESSION_commander_maxHP_str           "info_maxHP"
-#define REDIS_SESSION_commander_currentSP_str       "info_currentSP"
-#define REDIS_SESSION_commander_maxSP_str           "info_maxSP"
-#define REDIS_SESSION_commander_currentStamina_str  "info_currentStamina"
-#define REDIS_SESSION_commander_maxStamina_str      "info_maxStamina"
+// Commander equipment
+#define REDIS_SESSION_equipment_head_top_str        "head_top"
+#define REDIS_SESSION_equipment_head_middle_str     "head_middle"
+#define REDIS_SESSION_equipment_itemUnk1_str        "itemUnk1"
+#define REDIS_SESSION_equipment_body_armor_str      "body_armor"
+#define REDIS_SESSION_equipment_gloves_str          "gloves"
+#define REDIS_SESSION_equipment_boots_str           "boots"
+#define REDIS_SESSION_equipment_helmet_str          "helmet"
+#define REDIS_SESSION_equipment_bracelet_str        "bracelet"
+#define REDIS_SESSION_equipment_weapon_str          "weapon"
+#define REDIS_SESSION_equipment_shield_str          "shield"
+#define REDIS_SESSION_equipment_costume_str         "costume"
+#define REDIS_SESSION_equipment_itemUnk3_str        "itemUnk3"
+#define REDIS_SESSION_equipment_itemUnk4_str        "itemUnk4"
+#define REDIS_SESSION_equipment_itemUnk5_str        "itemUnk5"
+#define REDIS_SESSION_equipment_leg_armor_str       "leg_armor"
+#define REDIS_SESSION_equipment_itemUnk6_str        "itemUnk6"
+#define REDIS_SESSION_equipment_itemUnk7_str        "itemUnk7"
+#define REDIS_SESSION_equipment_ring_left_str       "ring_left"
+#define REDIS_SESSION_equipment_ring_right_str      "ring_right"
+#define REDIS_SESSION_equipment_necklace_str        "necklace"
 
 enum RedisAccountSessionFields {
     // Account Session
@@ -91,7 +89,7 @@ enum RedisGameSessionFields {
     REDIS_GAME_SESSION_account_privilege,
     REDIS_GAME_SESSION_account_commandersCountMax,
 
-    // CommanderInfo Session
+    // Commander Session
     REDIS_GAME_SESSION_commander_mapId,
     REDIS_GAME_SESSION_commander_commanderName,
     REDIS_GAME_SESSION_commander_familyName,
@@ -102,6 +100,20 @@ enum RedisGameSessionFields {
     REDIS_GAME_SESSION_commander_level,
     REDIS_GAME_SESSION_commander_hairId,
     REDIS_GAME_SESSION_commander_pose,
+    REDIS_GAME_SESSION_commander_posX,
+    REDIS_GAME_SESSION_commander_posY,
+    REDIS_GAME_SESSION_commander_posZ,
+    REDIS_GAME_SESSION_commander_currentXP,
+    REDIS_GAME_SESSION_commander_maxXP,
+    REDIS_GAME_SESSION_commander_pcId,
+    REDIS_GAME_SESSION_commander_socialInfoId,
+    REDIS_GAME_SESSION_commander_commanderId,
+    REDIS_GAME_SESSION_commander_currentHP,
+    REDIS_GAME_SESSION_commander_maxHP,
+    REDIS_GAME_SESSION_commander_currentSP,
+    REDIS_GAME_SESSION_commander_maxSP,
+    REDIS_GAME_SESSION_commander_currentStamina,
+    REDIS_GAME_SESSION_commander_maxStamina,
 
     // Equipment Session
     REDIS_GAME_SESSION_equipment_head_top,
@@ -124,22 +136,6 @@ enum RedisGameSessionFields {
     REDIS_GAME_SESSION_equipment_ring_left,
     REDIS_GAME_SESSION_equipment_ring_right,
     REDIS_GAME_SESSION_equipment_necklace,
-
-    // CommanderInfo Info Session
-    REDIS_GAME_SESSION_commander_posX,
-    REDIS_GAME_SESSION_commander_posY,
-    REDIS_GAME_SESSION_commander_posZ,
-    REDIS_GAME_SESSION_commander_currentXP,
-    REDIS_GAME_SESSION_commander_maxXP,
-    REDIS_GAME_SESSION_commander_pcId,
-    REDIS_GAME_SESSION_commander_socialInfoId,
-    REDIS_GAME_SESSION_commander_commanderId,
-    REDIS_GAME_SESSION_commander_currentHP,
-    REDIS_GAME_SESSION_commander_maxHP,
-    REDIS_GAME_SESSION_commander_currentSP,
-    REDIS_GAME_SESSION_commander_maxSP,
-    REDIS_GAME_SESSION_commander_currentStamina,
-    REDIS_GAME_SESSION_commander_maxStamina,
 
 	REDIS_SESSION_COUNT
 };

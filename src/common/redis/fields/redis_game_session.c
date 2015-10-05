@@ -39,7 +39,8 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_account_sessionKey] = REDIS_SESSION_account_sessionKey_str,
     [REDIS_GAME_SESSION_account_privilege] = REDIS_SESSION_account_privilege_str,
     [REDIS_GAME_SESSION_account_commandersCountMax] = REDIS_SESSION_account_commandersCountMax_str,
-    // CommanderInfo session
+
+    // Commander session
     [REDIS_GAME_SESSION_commander_mapId] = REDIS_SESSION_commander_mapId_str,
     [REDIS_GAME_SESSION_commander_commanderName] = REDIS_SESSION_commander_commanderName_str,
     [REDIS_GAME_SESSION_commander_familyName] = REDIS_SESSION_commander_familyName_str,
@@ -50,6 +51,21 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_commander_level] = REDIS_SESSION_commander_level_str,
     [REDIS_GAME_SESSION_commander_hairId] = REDIS_SESSION_commander_hairId_str,
     [REDIS_GAME_SESSION_commander_pose] = REDIS_SESSION_commander_pose_str,
+    [REDIS_GAME_SESSION_commander_posX] = REDIS_SESSION_commander_posX_str,
+    [REDIS_GAME_SESSION_commander_posY] = REDIS_SESSION_commander_posY_str,
+    [REDIS_GAME_SESSION_commander_posZ] = REDIS_SESSION_commander_posZ_str,
+    [REDIS_GAME_SESSION_commander_currentXP] = REDIS_SESSION_commander_currentXP_str,
+    [REDIS_GAME_SESSION_commander_maxXP] = REDIS_SESSION_commander_maxXP_str,
+    [REDIS_GAME_SESSION_commander_pcId] = REDIS_SESSION_commander_pcId_str,
+    [REDIS_GAME_SESSION_commander_socialInfoId] = REDIS_SESSION_commander_socialInfoId_str,
+    [REDIS_GAME_SESSION_commander_commanderId] = REDIS_SESSION_commander_commanderId_str,
+    [REDIS_GAME_SESSION_commander_currentHP] = REDIS_SESSION_commander_currentHP_str,
+    [REDIS_GAME_SESSION_commander_maxHP] = REDIS_SESSION_commander_maxHP_str,
+    [REDIS_GAME_SESSION_commander_currentSP] = REDIS_SESSION_commander_currentSP_str,
+    [REDIS_GAME_SESSION_commander_maxSP] = REDIS_SESSION_commander_maxSP_str,
+    [REDIS_GAME_SESSION_commander_currentStamina] = REDIS_SESSION_commander_currentStamina_str,
+    [REDIS_GAME_SESSION_commander_maxStamina] = REDIS_SESSION_commander_maxStamina_str,
+
     // Equipment session
     [REDIS_GAME_SESSION_equipment_head_top] = REDIS_SESSION_equipment_head_top_str,
     [REDIS_GAME_SESSION_equipment_head_middle] = REDIS_SESSION_equipment_head_middle_str,
@@ -70,22 +86,7 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_equipment_itemUnk7] = REDIS_SESSION_equipment_itemUnk7_str,
     [REDIS_GAME_SESSION_equipment_ring_left] = REDIS_SESSION_equipment_ring_left_str,
     [REDIS_GAME_SESSION_equipment_ring_right] = REDIS_SESSION_equipment_ring_right_str,
-    [REDIS_GAME_SESSION_equipment_necklace] = REDIS_SESSION_equipment_necklace_str,
-    // CommanderInfo Info session
-    [REDIS_GAME_SESSION_commander_posX] = REDIS_SESSION_commander_posX_str,
-    [REDIS_GAME_SESSION_commander_posY] = REDIS_SESSION_commander_posY_str,
-    [REDIS_GAME_SESSION_commander_posZ] = REDIS_SESSION_commander_posZ_str,
-    [REDIS_GAME_SESSION_commander_currentXP] = REDIS_SESSION_commander_currentXP_str,
-    [REDIS_GAME_SESSION_commander_maxXP] = REDIS_SESSION_commander_maxXP_str,
-    [REDIS_GAME_SESSION_commander_pcId] = REDIS_SESSION_commander_pcId_str,
-    [REDIS_GAME_SESSION_commander_socialInfoId] = REDIS_SESSION_commander_socialInfoId_str,
-    [REDIS_GAME_SESSION_commander_commanderId] = REDIS_SESSION_commander_commanderId_str,
-    [REDIS_GAME_SESSION_commander_currentHP] = REDIS_SESSION_commander_currentHP_str,
-    [REDIS_GAME_SESSION_commander_maxHP] = REDIS_SESSION_commander_maxHP_str,
-    [REDIS_GAME_SESSION_commander_currentSP] = REDIS_SESSION_commander_currentSP_str,
-    [REDIS_GAME_SESSION_commander_maxSP] = REDIS_SESSION_commander_maxSP_str,
-    [REDIS_GAME_SESSION_commander_currentStamina] = REDIS_SESSION_commander_currentStamina_str,
-    [REDIS_GAME_SESSION_commander_maxStamina] = REDIS_SESSION_commander_maxStamina_str,
+    [REDIS_GAME_SESSION_equipment_necklace] = REDIS_SESSION_equipment_necklace_str
 };
 
 
@@ -173,6 +174,20 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         " " REDIS_SESSION_commander_level_str
         " " REDIS_SESSION_commander_hairId_str
         " " REDIS_SESSION_commander_pose_str
+        " " REDIS_SESSION_commander_posX_str
+        " " REDIS_SESSION_commander_posY_str
+        " " REDIS_SESSION_commander_posZ_str
+        " " REDIS_SESSION_commander_currentXP_str
+        " " REDIS_SESSION_commander_maxXP_str
+        " " REDIS_SESSION_commander_pcId_str
+        " " REDIS_SESSION_commander_socialInfoId_str
+        " " REDIS_SESSION_commander_commanderId_str
+        " " REDIS_SESSION_commander_currentHP_str
+        " " REDIS_SESSION_commander_maxHP_str
+        " " REDIS_SESSION_commander_currentSP_str
+        " " REDIS_SESSION_commander_maxSP_str
+        " " REDIS_SESSION_commander_currentStamina_str
+        " " REDIS_SESSION_commander_maxStamina_str
         // Equipment
         " " REDIS_SESSION_equipment_head_top_str
         " " REDIS_SESSION_equipment_head_middle_str
@@ -194,21 +209,6 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         " " REDIS_SESSION_equipment_ring_left_str
         " " REDIS_SESSION_equipment_ring_right_str
         " " REDIS_SESSION_equipment_necklace_str
-        // CommanderInfo Info
-        " " REDIS_SESSION_commander_posX_str
-        " " REDIS_SESSION_commander_posY_str
-        " " REDIS_SESSION_commander_posZ_str
-        " " REDIS_SESSION_commander_currentXP_str
-        " " REDIS_SESSION_commander_maxXP_str
-        " " REDIS_SESSION_commander_pcId_str
-        " " REDIS_SESSION_commander_socialInfoId_str
-        " " REDIS_SESSION_commander_commanderId_str
-        " " REDIS_SESSION_commander_currentHP_str
-        " " REDIS_SESSION_commander_maxHP_str
-        " " REDIS_SESSION_commander_currentSP_str
-        " " REDIS_SESSION_commander_maxSP_str
-        " " REDIS_SESSION_commander_currentStamina_str
-        " " REDIS_SESSION_commander_maxStamina_str
 
         , key->routerId, key->mapId, key->accountId
     );

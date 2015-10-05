@@ -495,6 +495,9 @@ static PacketHandlerState barrackHandlerBarrackNameChange(
     if (memcmp(&clientPacket->barrackName,
                &session->game.accountSession.familyName,
                sizeof(clientPacket->barrackName)) == 0) {
+        // Consider we've done the changes
+        changeStatus = BC_BARRACKNAME_CHANGE_OK;
+        status = PACKET_HANDLER_UPDATE_SESSION;
         goto cleanup;
     }
 
