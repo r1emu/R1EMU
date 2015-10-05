@@ -55,3 +55,10 @@ bool actorInit(Actor *self, ActorId_t uid) {
 void actorGenKey(ActorId_t uid, ActorKey key) {
     snprintf(key, ACTOR_KEY_SIZE, "%I64x", uid);
 }
+
+void actorPrint(Actor *self) {
+    PRINT_STRUCTURE {
+        dbg("=== Actor %p ===", self);
+        dbg("UID = %llx", self->uid);
+    }
+}

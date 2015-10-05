@@ -76,3 +76,7 @@ inline float *itemQuestGetCooldown(ItemQuest *self) { return self->cooldown; }
 size_t itemQuestGetPropertiesCPacketSize(ItemQuest *self);
 void itemQuestGetPropertiesCPacket(ItemQuest *self, PacketStream *stream);
 
+/**
+ * Debugging
+ */
+void itemQuestPrint(ItemQuest *self);

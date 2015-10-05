@@ -73,3 +73,8 @@ inline float *itemConsumableGetCooldown(ItemConsumable *self) { return self->coo
  */
 size_t itemConsumableGetPropertiesCPacketSize(ItemConsumable *self);
 void itemConsumableGetPropertiesCPacket(ItemConsumable *self, PacketStream *stream);
+
+/**
+ * Debugging
+ */
+void itemConsumablePrint(ItemConsumable *self);

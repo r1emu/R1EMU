@@ -63,3 +63,13 @@ size_t itemCurrencyGetPropertiesCPacketSize(ItemCurrency *self) {
 void itemCurrencyGetPropertiesCPacket(ItemCurrency *self, PacketStream *stream) {
     propertyFloatGetCPacket(ITEM_CURRENCY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
+
+void itemCurrencyPrint(ItemCurrency *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemCurrency %p ===", self);
+        if (self->cooldown) {
+            dbg("cooldown = %f", *self->cooldown);
+        }
+        itemPrint(&self->item);
+    }
+}

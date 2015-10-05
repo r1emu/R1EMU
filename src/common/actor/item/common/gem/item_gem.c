@@ -73,3 +73,19 @@ void itemGemGetPropertiesCPacket(ItemGem *self, PacketStream *stream) {
     propertyFloatGetCPacket(ITEM_GEM_PROPERTY_ID_ITEM_EXP, self->itemExp, stream);
     propertyFloatGetCPacket(ITEM_GEM_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
+
+void itemGemPrint(ItemGem *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemGem %p ===", self);
+        if (self->level) {
+            dbg("level = %f", *self->level);
+        }
+        if (self->itemExp) {
+            dbg("itemExp = %f", *self->itemExp);
+        }
+        if (self->cooldown) {
+            dbg("cooldown = %f", *self->cooldown);
+        }
+        itemPrint(&self->item);
+    }
+}

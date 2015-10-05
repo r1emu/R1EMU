@@ -80,3 +80,7 @@ inline float *itemGemGetCooldown(ItemGem *self) { return self->cooldown; }
 size_t itemGemGetPropertiesCPacketSize(ItemGem *self);
 void itemGemGetPropertiesCPacket(ItemGem *self, PacketStream *stream);
 
+/**
+ * Debugging
+ */
+void itemGemPrint(ItemGem *self);

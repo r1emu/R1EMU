@@ -76,3 +76,7 @@ inline float *itemCurrencyGetCooldown(ItemCurrency *self) { return self->cooldow
 size_t itemCurrencyGetPropertiesCPacketSize(ItemCurrency *self);
 void itemCurrencyGetPropertiesCPacket(ItemCurrency *self, PacketStream *stream);
 
+/**
+ * Debugging
+ */
+void itemCurrencyPrint(ItemCurrency *self);

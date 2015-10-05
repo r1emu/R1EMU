@@ -82,3 +82,7 @@ inline float *itemCardGetItemExp(ItemCard *self) { return self->itemExp; }
 size_t itemCardGetPropertiesCPacketSize(ItemCard *self);
 void itemCardGetPropertiesCPacket(ItemCard *self, PacketStream *stream);
 
+/**
+ * Debugging
+ */
+void itemCardPrint(ItemCard *self);

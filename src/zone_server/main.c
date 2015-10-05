@@ -29,7 +29,7 @@
 int main (int argc, char **argv)
 {
     if (argc <= 1) {
-        info("Please launch GlobalServer instead of ZoneServer. (argc=%d)", argc);
+        info("Please launch global_server instead of zone_server. (argc=%d)", argc);
         exit (0);
     }
 

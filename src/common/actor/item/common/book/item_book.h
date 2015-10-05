@@ -76,3 +76,7 @@ inline float *itemBookGetCooldown(ItemBook *self) { return self->cooldown; }
 size_t itemBookGetPropertiesCPacketSize(ItemBook *self);
 void itemBookGetPropertiesCPacket(ItemBook *self, PacketStream *stream);
 
+/**
+ * Debugging
+ */
+void itemBookPrint(ItemBook *self);

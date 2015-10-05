@@ -79,3 +79,7 @@ inline float *itemAccessoryGetCooldown(ItemAccessory *self) { return self->coold
 size_t itemAccessoryGetPropertiesCPacketSize(ItemAccessory *self);
 void itemAccessoryGetPropertiesCPacket(ItemAccessory *self, PacketStream *stream);
 
+/**
+ * Debugging
+ */
+void itemAccessoryPrint(ItemAccessory *self);

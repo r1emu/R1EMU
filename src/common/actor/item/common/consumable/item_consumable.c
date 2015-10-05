@@ -65,3 +65,13 @@ void itemConsumableGetPropertiesCPacket(ItemConsumable *self, PacketStream *stre
 
     propertyFloatGetCPacket(ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
+
+void itemConsumablePrint(ItemConsumable *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemConsumable %p ===", self);
+        if (self->cooldown) {
+            dbg("cooldown = %f", *self->cooldown);
+        }
+        itemPrint(&self->item);
+    }
+}

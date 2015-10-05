@@ -65,3 +65,13 @@ size_t itemBookGetPropertiesCPacketSize(ItemBook *self) {
 void itemBookGetPropertiesCPacket(ItemBook *self, PacketStream *stream) {
     propertyFloatGetCPacket(ITEM_BOOK_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
+
+void itemBookPrint(ItemBook *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemBook %p ===", self);
+        if (self->cooldown) {
+            dbg("Cooldown = %f", *self->cooldown);
+        }
+        itemPrint(&self->item);
+    }
+}

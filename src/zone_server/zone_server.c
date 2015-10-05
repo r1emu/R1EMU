@@ -18,6 +18,7 @@
 #include "zone_handler/admin_cmd.h"
 #include "common/server/server.h"
 #include "common/db/db.h"
+#include "common/actor/item/item_factory.h"
 
 /**
  * @brief ZoneServer is the representation of the zone server system
@@ -55,7 +56,10 @@ bool zoneServerInit(ZoneServer *self, Server *server) {
     uint16_t routerId = serverGetRouterId(server);
 
     // Initialize dbSession
-    dbInfoInit(&dbInfo, routerId, "dbSession");
+    if (!(dbInfoInit(&dbInfo, routerId, "dbSession"))) {
+        error("Cannot initialize dbInfo.");
+        return false;
+    }
     if (!(self->dbSession = dbNew(&dbInfo))) {
         error("Cannot allocate a dbSession.");
         return false;
@@ -72,6 +76,12 @@ bool zoneServerStart(ZoneServer *self) {
     // Start dbSession
     if (!(dbStart(self->dbSession))) {
         error("Cannot start sessions db.");
+        return false;
+    }
+
+    // Initialize itemFactory
+    if (!(itemFactoryStart(serverGetMySQLInfo(self->server)))) {
+        error("Cannot initialize item factory.");
         return false;
     }
 

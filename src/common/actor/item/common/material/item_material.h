@@ -76,3 +76,7 @@ inline float *itemMaterialGetCooldown(ItemMaterial *self) { return self->cooldow
 size_t itemMaterialGetPropertiesCPacketSize(ItemMaterial *self);
 void itemMaterialGetPropertiesCPacket(ItemMaterial *self, PacketStream *stream);
 
+/**
+ * Debugging
+ */
+void itemMaterialPrint(ItemMaterial *self);

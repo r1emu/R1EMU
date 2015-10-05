@@ -73,3 +73,16 @@ void itemSubWeaponGetPropertiesCPacket(ItemSubWeapon *self, PacketStream *stream
     propertyFloatGetCPacket(ITEM_SUBWEAPON_PROPERTY_ID_PET_POSITION, self->petPosition, stream);
     propertyFloatGetCPacket(ITEM_SUBWEAPON_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
+
+void itemSubWeaponPrint(ItemSubWeapon *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemSubWeapon %p ===", self);
+        if (self->petPosition) {
+            dbg("petPosition = %f", *self->petPosition);
+        }
+        if (self->cooldown) {
+            dbg("cooldown = %f", *self->cooldown);
+        }
+        itemEquipablePrint(&self->equipable);
+    }
+}

@@ -88,3 +88,30 @@ void itemArmorGetPropertiesCPacket(ItemArmor *self, PacketStream *stream) {
     propertyStringGetCPacket(ITEM_ARMOR_PROPERTY_ID_CUSTOM_NAME, self->customName, stream);
     propertyStringGetCPacket(ITEM_ARMOR_PROPERTY_ID_MAKER, self->maker, stream);
 }
+
+void itemArmorPrint(ItemArmor *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemArmor %p ===", self);
+
+        if (self->def) {
+            dbg("def = %f", *self->def);
+        }
+        if (self->cooldown) {
+            dbg("cooldown = %f", *self->cooldown);
+        }
+        if (self->reinforce) {
+            dbg("reinforce = %f", *self->reinforce);
+        }
+        if (self->memo) {
+            dbg("memo = %s", self->memo);
+        }
+        if (self->customName) {
+            dbg("customName = %s", self->customName);
+        }
+        if (self->maker) {
+            dbg("maker = %s", self->maker);
+        }
+
+        itemEquipablePrint(&self->equipable);
+    }
+}

@@ -25,6 +25,7 @@
 // ------ Structure declaration -------
 zmutex_t *mutex = NULL;
 FILE *_output = NULL;
+int dbgTabulations = -1;
 
 // ------ Static declaration -------
 
@@ -71,6 +72,10 @@ void _dbg(int level, char *format, ...) {
     }
 
     zmutex_lock(mutex);
+
+    for (int i = 0; i < dbgTabulations; i++) {
+        fprintf(_output, "  ");
+    }
 
     switch (level) {
         #ifdef WIN32

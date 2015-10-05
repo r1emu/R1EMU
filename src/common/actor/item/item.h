@@ -23,6 +23,7 @@
 #include "common/property/property.h"
 #include "common/actor/actor.h"
 #include "common/packet/packet_stream.h"
+#include "common/static_data/fields/item_data.h"
 
 // ---------- Defines -------------
 
@@ -58,6 +59,7 @@ typedef struct {
     ItemId_t id;
     ItemAmount_t amount;
     ItemCategory category;
+    ItemData *data;
 } Item;
 
 /**
@@ -109,3 +111,9 @@ inline ItemCategory itemGetCategory(Item *self) { return self->category; }
  */
 size_t itemGetPropertiesCPacketSize(Item *self);
 void itemPropertiesGetCPacket(Item *self, PacketStream *stream);
+
+/**
+ * Debugging
+ */
+void itemPrint(Item *self);
+void itemChildPrint(Item *self);

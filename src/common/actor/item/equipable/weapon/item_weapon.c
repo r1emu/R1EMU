@@ -77,3 +77,20 @@ void itemWeaponGetPropertiesCPacket(ItemWeapon *self, PacketStream *stream) {
     propertyFloatGetCPacket(ITEM_WEAPON_PROPERTY_ID_MINATK, self->minAtk, stream);
     propertyFloatGetCPacket(ITEM_WEAPON_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
+
+void itemWeaponPrint(ItemWeapon *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemWeapon %p ===", self);
+
+        if (self->maxAtk) {
+            dbg("maxAtk = %f", *self->maxAtk);
+        }
+        if (self->minAtk) {
+            dbg("minAtk = %f", *self->minAtk);
+        }
+        if (self->cooldown) {
+            dbg("cooldown = %f", *self->cooldown);
+        }
+        itemEquipablePrint(&self->equipable);
+    }
+}

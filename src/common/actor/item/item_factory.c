@@ -13,6 +13,9 @@
 
 #include "item_factory.h"
 #include "common/actor/actor_factory.h"
+#include "common/mysql/fields/mysql_item_data.h"
+#include "common/static_data/static_data.h"
+
 // Items categories
 #include "common/actor/item/common/consumable/item_consumable.h"
 #include "common/actor/item/common/quest/item_quest.h"
@@ -26,9 +29,32 @@
 #include "common/actor/item/equipable/subweapon/item_subweapon.h"
 #include "common/actor/item/equipable/accessory/item_accessory.h"
 
-struct ItemFactory {
-} itemFactory = {
-};
+static struct ItemFactory {
+    MySQL *sql;
+    StaticData *itemDatabase;
+} self = {0};
+
+bool itemFactoryStart(MySQLInfo *sqlInfo) {
+
+    if (!(self.sql = mySqlNew(sqlInfo))) {
+        error("Cannot start MySQL.");
+        return false;
+    }
+
+    if (!(mySqlConnect(self.sql))) {
+        error("Cannot connect to the SQL.");
+        return false;
+    }
+
+    if (!(mySqlBuildItemDataDb(self.sql, &self.itemDatabase))) {
+        error("Cannot start item static data database.");
+        return false;
+    }
+
+    staticDataLock(self.itemDatabase);
+
+    return true;
+}
 
 // TODO : ItemId_t should be enough to know the correct category
 // Once StaticData is available, link them together
@@ -68,17 +94,26 @@ Item *itemFactoryCreate(ItemCategory category, ItemId_t id, ItemAmount_t amount)
     return item;
 }
 
-bool itemFactoryInit(Item *item, ItemCategory category, ItemId_t id, ItemAmount_t amount) {
+bool itemFactoryInit(Item *newItem, ItemCategory category, ItemId_t id, ItemAmount_t amount) {
+
+    Actor actor;
+    Item item;
 
     // Initialize a unique actor
-    if (!(actorFactoryInit(&item->actor))) {
+    if (!(actorFactoryInit(&actor))) {
         error("Cannot initialize a new actor.");
         return false;
     }
 
     // Initialize the item
-    if (!(itemInit(item, &item->actor, category, id, amount))) {
+    if (!(itemInit(&item, &actor, category, id, amount))) {
         error("Cannot create a new item '%d'.", id);
+        return false;
+    }
+
+    // Get static data related to the item
+    if (!(staticDataGet(self.itemDatabase, id, &item.data))) {
+        error("Cannot retrieve static data for object id '%d'", id);
         return false;
     }
 
@@ -86,88 +121,88 @@ bool itemFactoryInit(Item *item, ItemCategory category, ItemId_t id, ItemAmount_
     switch (category) {
 
         case ITEM_CAT_CONSUMABLE : {
-            ItemConsumable *consumable = (ItemConsumable *) item;
-            if (!(itemConsumableInit(consumable, item))) {
+            ItemConsumable *consumable = (ItemConsumable *) newItem;
+            if (!(itemConsumableInit(consumable, &item))) {
                 error("Cannot initialize a consumable item.");
                 return false;
             }
             break;
         }
         case ITEM_CAT_ARMOR      : {
-            ItemArmor *armor = (ItemArmor *) item;
-            if (!(itemArmorInit(armor, item))) {
+            ItemArmor *armor = (ItemArmor *) newItem;
+            if (!(itemArmorInit(armor, &item))) {
                 error("Cannot initialize a armor item.");
                 return false;
             }
             break;
         }
         case ITEM_CAT_QUEST      : {
-            ItemQuest *quest = (ItemQuest *) item;
-            if (!(itemQuestInit(quest, item))) {
+            ItemQuest *quest = (ItemQuest *) newItem;
+            if (!(itemQuestInit(quest, &item))) {
                 error("Cannot initialize a quest item.");
                 return false;
             }
             break;
         }
         case ITEM_CAT_BOOK       : {
-            ItemBook *book = (ItemBook *) item;
-            if (!(itemBookInit(book, item))) {
+            ItemBook *book = (ItemBook *) newItem;
+            if (!(itemBookInit(book, &item))) {
                 error("Cannot initialize a book item.");
                 return false;
             }
             break;
         }
         case ITEM_CAT_MATERIAL   : {
-            ItemMaterial *material = (ItemMaterial *) item;
-            if (!(itemMaterialInit(material, item))) {
+            ItemMaterial *material = (ItemMaterial *) newItem;
+            if (!(itemMaterialInit(material, &item))) {
                 error("Cannot initialize a material item.");
                 return false;
             }
             break;
         }
         case ITEM_CAT_GEM        : {
-            ItemGem *gem = (ItemGem *) item;
-            if (!(itemGemInit(gem, item))) {
+            ItemGem *gem = (ItemGem *) newItem;
+            if (!(itemGemInit(gem, &item))) {
                 error("Cannot initialize a gem item.");
                 return false;
             }
             break;
         }
         case ITEM_CAT_WEAPON     : {
-            ItemWeapon *weapon = (ItemWeapon *) item;
-            if (!(itemWeaponInit(weapon, item))) {
+            ItemWeapon *weapon = (ItemWeapon *) newItem;
+            if (!(itemWeaponInit(weapon, &item))) {
                 error("Cannot initialize a weapon item.");
                 return false;
             }
             break;
         }
         case ITEM_CAT_CARD       : {
-            ItemCard *card = (ItemCard *) item;
-            if (!(itemCardInit(card, item))) {
+            ItemCard *card = (ItemCard *) newItem;
+            if (!(itemCardInit(card, &item))) {
                 error("Cannot initialize a card item.");
                 return false;
             }
             break;
         }
         case ITEM_CAT_ACCESSORY  : {
-            ItemAccessory *accessory = (ItemAccessory *) item;
-            if (!(itemAccessoryInit(accessory, item))) {
+            ItemAccessory *accessory = (ItemAccessory *) newItem;
+            if (!(itemAccessoryInit(accessory, &item))) {
                 error("Cannot initialize a accessory item.");
                 return false;
             }
             break;
         }
         case ITEM_CAT_SUBWEAPON  : {
-            ItemSubWeapon *subweapon = (ItemSubWeapon *) item;
-            if (!(itemSubWeaponInit(subweapon, item))) {
+            ItemSubWeapon *subweapon = (ItemSubWeapon *) newItem;
+            if (!(itemSubWeaponInit(subweapon, &item))) {
                 error("Cannot initialize a subweapon item.");
                 return false;
             }
             break;
         }
         case ITEM_CAT_CURRENCY   : {
-            ItemCurrency *currency = (ItemCurrency *) item;
-            if (!(itemCurrencyInit(currency, item))) {
+            ItemCurrency *currency = (ItemCurrency *) newItem;
+            if (!(itemCurrencyInit(currency, &item))) {
                 error("Cannot initialize a currency item.");
                 return false;
             }

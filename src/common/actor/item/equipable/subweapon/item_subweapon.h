@@ -75,3 +75,8 @@ void itemSubWeaponGetPropertiesCPacket(ItemSubWeapon *self, PacketStream *stream
  */
 inline float *itemSubWeaponGetPetPosition(ItemSubWeapon *self) { return self->petPosition; }
 inline float *itemSubWeaponGetCooldown(ItemSubWeapon *self) { return self->cooldown; }
+
+/**
+ * Debugging
+ */
+void itemSubWeaponPrint(ItemSubWeapon *self);

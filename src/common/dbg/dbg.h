@@ -116,6 +116,10 @@ typedef enum {
 	#define special(format, ...)
 #endif
 
+/** Structure dissection debug function. */
+#define PRINT_STRUCTURE \
+    for (int __disassDbg = 0; dbgTabulations += 1, __disassDbg == 0; dbgTabulations -= 1, __disassDbg = 1)
+
 /** Info level debug function. Not a debug information */
 #define info(format, ...)                                          \
     dbg_ex(DBG_LEVEL_INFO, stdout, format "\n", ##__VA_ARGS__)
@@ -177,3 +181,6 @@ void printTrace(void);
 void crashHandler(int sig, siginfo_t *siginfo, void *_context);
 
 #endif // WIN32
+
+// print tabulations
+extern int dbgTabulations;

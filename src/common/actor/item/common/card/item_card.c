@@ -73,3 +73,19 @@ void itemCardGetPropertiesCPacket(ItemCard *self, PacketStream *stream) {
     propertyFloatGetCPacket(ITEM_CARD_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
     propertyFloatGetCPacket(ITEM_CARD_PROPERTY_ID_ITEM_EXP, self->itemExp, stream);
 }
+
+void itemCardPrint(ItemCard *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemCard %p ===", self);
+        if (self->level) {
+            dbg("level = %f", *self->level);
+        }
+        if (self->cooldown) {
+            dbg("cooldown = %f", *self->cooldown);
+        }
+        if (self->itemExp) {
+            dbg("itemExp = %f", *self->itemExp);
+        }
+        itemPrint(&self->item);
+    }
+}

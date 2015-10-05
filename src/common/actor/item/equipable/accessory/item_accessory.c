@@ -70,3 +70,16 @@ void itemAccessoryGetPropertiesCPacket(ItemAccessory *self, PacketStream *stream
     propertyFloatGetCPacket(ITEM_ACCESSORY_PROPERTY_ID_PR, self->pr, stream);
     propertyFloatGetCPacket(ITEM_ACCESSORY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
+
+void itemAccessoryPrint(ItemAccessory *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemAccessory %p ===", self);
+        if (self->pr) {
+            dbg("pr = %f", *self->pr);
+        }
+        if (self->cooldown) {
+            dbg("cooldown = %f", *self->cooldown);
+        }
+        itemEquipablePrint(&self->equipable);
+    }
+}

@@ -78,3 +78,8 @@ void itemWeaponGetPropertiesCPacket(ItemWeapon *self, PacketStream *stream);
 inline float *itemWeaponGetMaxAtk(ItemWeapon *self) { return self->maxAtk; }
 inline float *itemWeaponGetMinAtk(ItemWeapon *self) { return self->minAtk; }
 inline float *itemWeaponGetCooldown(ItemWeapon *self) { return self->cooldown; }
+
+/**
+ * Debugging
+ */
+void itemWeaponPrint(ItemWeapon *self);

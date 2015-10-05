@@ -27,7 +27,7 @@
 typedef uint8_t StaticDataKey[sizeof(StaticDataId) + 1];
 
 /**
- * @brief
+ * @brief StaticData is a database of items that is loaded at startup and locked when it is finished.
  */
 struct StaticData {
     char *name;

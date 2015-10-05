@@ -63,3 +63,13 @@ size_t itemMaterialGetPropertiesCPacketSize(ItemMaterial *self) {
 void itemMaterialGetPropertiesCPacket(ItemMaterial *self, PacketStream *stream) {
     propertyFloatGetCPacket(ITEM_MATERIAL_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
+
+void itemMaterialPrint(ItemMaterial *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemMaterial %p ===", self);
+        if (self->cooldown) {
+            dbg("cooldown = %f", *self->cooldown);
+        }
+        itemPrint(&self->item);
+    }
+}

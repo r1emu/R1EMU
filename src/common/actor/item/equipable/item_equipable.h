@@ -83,3 +83,8 @@ void itemEquipableDestroy(ItemEquipable **self);
  * Getters & Setters
  */
 inline int itemEquipableGetSlot(ItemEquipable *self) { return self->slot; }
+
+/**
+ * Debugging
+ */
+void itemEquipablePrint(ItemEquipable *self);

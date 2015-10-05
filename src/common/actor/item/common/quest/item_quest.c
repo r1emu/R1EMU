@@ -63,3 +63,13 @@ size_t itemQuestGetPropertiesCPacketSize(ItemQuest *self) {
 void itemQuestGetPropertiesCPacket(ItemQuest *self, PacketStream *stream) {
     propertyFloatGetCPacket(ITEM_QUEST_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
+
+void itemQuestPrint(ItemQuest *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemQuest %p ===", self);
+        if (self->cooldown) {
+            dbg("cooldown = %f", *self->cooldown);
+        }
+        itemPrint(&self->item);
+    }
+}

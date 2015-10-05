@@ -54,3 +54,11 @@ void itemEquipableDestroy(ItemEquipable **_self) {
         *_self = NULL;
     }
 }
+
+void itemEquipablePrint(ItemEquipable *self) {
+    PRINT_STRUCTURE {
+        dbg("=== ItemEquipable %p ===", self);
+        dbg("slot = %d", self->slot);
+        itemPrint(&self->item);
+    }
+}

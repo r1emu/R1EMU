@@ -111,5 +111,35 @@ void itemPropertiesGetCPacket(Item *self, PacketStream *stream) {
 
         case ITEM_CAT_COUNT      : error("Unexpected item category."); break;
     }
+}
 
+void itemPrint(Item *self) {
+    PRINT_STRUCTURE {
+        dbg("=== Item %p ===", self);
+        dbg("ItemID = %d (%#x)", self->id, self->id);
+        dbg("Amount = %d (%#x)", self->amount, self->amount);
+        dbg("Category = %d (%#x)", self->category, self->category);
+        actorPrint(&self->actor);
+        itemDataPrint(self->data);
+    }
+}
+
+void itemChildPrint(Item *self) {
+
+    switch (self->category) {
+
+        case ITEM_CAT_CONSUMABLE : itemConsumablePrint((ItemConsumable *) self); break;
+        case ITEM_CAT_ARMOR      : itemArmorPrint((ItemArmor *) self); break;
+        case ITEM_CAT_QUEST      : itemQuestPrint((ItemQuest *) self); break;
+        case ITEM_CAT_BOOK       : itemBookPrint((ItemBook *) self); break;
+        case ITEM_CAT_MATERIAL   : itemMaterialPrint((ItemMaterial *) self); break;
+        case ITEM_CAT_GEM        : itemGemPrint((ItemGem *) self); break;
+        case ITEM_CAT_WEAPON     : itemWeaponPrint((ItemWeapon *) self); break;
+        case ITEM_CAT_CARD       : itemCardPrint((ItemCard *) self); break;
+        case ITEM_CAT_ACCESSORY  : itemAccessoryPrint((ItemAccessory *) self); break;
+        case ITEM_CAT_SUBWEAPON  : itemSubWeaponPrint((ItemSubWeapon *) self); break;
+        case ITEM_CAT_CURRENCY   : itemCurrencyPrint((ItemCurrency *) self); break;
+
+        case ITEM_CAT_COUNT      : error("Unexpected item category."); break;
+    }
 }

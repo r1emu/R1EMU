@@ -94,3 +94,8 @@ inline float *itemArmorGetReinforce(ItemArmor *self) { return self->reinforce; }
 inline char *itemArmorGetMemo(ItemArmor *self) { return self->memo; }
 inline char *itemArmorGetCustomName(ItemArmor *self) { return self->customName; }
 inline char *itemArmorGetMaker(ItemArmor *self) { return self->maker; }
+
+/**
+ * Debugging
+ */
+void itemArmorPrint(ItemArmor *self);

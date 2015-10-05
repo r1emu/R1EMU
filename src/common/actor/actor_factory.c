@@ -13,9 +13,9 @@
 
 #include "actor_factory.h"
 
-struct ActorFactory {
+static struct ActorFactory {
     uint64_t id;
-} actorFactory = {
+} self = {
     .id = 0
 };
 
@@ -39,11 +39,11 @@ Actor *actorFactoryCreate() {
 
 bool actorFactoryInit(Actor *actor) {
 
-    if (!(actorInit(actor, actorFactory.id))) {
+    if (!(actorInit(actor, self.id))) {
         error("Cannot initialize a new actor.");
         return false;
     }
 
-    actorFactory.id++;
+    self.id++;
     return true;
 }

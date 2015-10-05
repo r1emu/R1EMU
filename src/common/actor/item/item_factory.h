@@ -21,6 +21,7 @@
 // ---------- Includes ------------
 #include "R1EMU.h"
 #include "item.h"
+#include "common/mysql/mysql.h"
 
 // ---------- Defines -------------
 
@@ -30,3 +31,4 @@
 // ----------- Functions ------------
 Item *itemFactoryCreate(ItemCategory category, ItemId_t id, ItemAmount_t amount);
 bool itemFactoryInit(Item *item, ItemCategory category, ItemId_t id, ItemAmount_t amount);
+bool itemFactoryStart(MySQLInfo *sqlInfo);

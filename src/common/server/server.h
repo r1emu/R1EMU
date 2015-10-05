@@ -85,9 +85,16 @@ bool serverCreateProcess(ServerInfo *info, char *executableName);
 /**
  * @brief Get the routerId of the Server
  * @param self A pointer to an allocated Server.
- * @return The Router ID.
+ * @return The server ID.
  */
 uint16_t serverGetRouterId(Server *self);
+
+/**
+ * @brief Get the MySQL information of the Server
+ * @param self A pointer to an allocated Server.
+ * @return The server MySQL information.
+ */
+MySQLInfo *serverGetMySQLInfo(Server *self);
 
 /**
  * @brief Free an allocated Server structure.

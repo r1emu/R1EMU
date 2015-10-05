@@ -226,6 +226,10 @@ serverGetRouterId (
     return self->info.routerInfo.routerId;
 }
 
+MySQLInfo *serverGetMySQLInfo(Server *self) {
+    return &self->info.routerInfo.sqlInfo;
+}
+
 void
 serverFree (
     Server *self

@@ -67,4 +67,5 @@ inline ActorId_t actorGetUId(void *_self) {
 }
 
 void actorGenKey(ActorId_t uid, ActorKey key);
+void actorPrint(Actor *self);
 
