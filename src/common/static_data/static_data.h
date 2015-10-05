@@ -76,3 +76,5 @@ void staticDataDestroy(StaticData **self);
  * @param self A pointer to an allocated StaticData.
  */
 void staticDataFree(StaticData *self);
+
+void staticDataDebug(StaticData *self, void (*debugFunction)(void *object));

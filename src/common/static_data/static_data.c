@@ -75,6 +75,12 @@ static void staticDataGenKey(StaticData *self, StaticDataId id, StaticDataKey ke
     snprintf(key, (sizeof(id) * 2) + 1, "%llx", id);
 }
 
+void staticDataDebug(StaticData *self, void (*debugFunction)(void *object)) {
+    for (void *object = zhash_first(self->hashtable); object != NULL; object = zhash_next(self->hashtable)) {
+        debugFunction(object);
+    }
+}
+
 bool staticDataAdd(StaticData *self, StaticDataId id, void *object) {
 
     if (self->locked) {
