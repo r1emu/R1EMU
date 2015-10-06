@@ -64,7 +64,7 @@ bool dbClientInit(DbClient *self, DbClientInfo *startInfo) {
     return true;
 }
 
-DbClientInfo *dbClientInfoNew(char *name, uint16_t routerId) {
+DbClientInfo *dbClientInfoNew(char *name, RouterId_t routerId) {
     DbClientInfo *self;
 
     if ((self = malloc(sizeof(DbClientInfo))) == NULL) {
@@ -80,7 +80,7 @@ DbClientInfo *dbClientInfoNew(char *name, uint16_t routerId) {
     return self;
 }
 
-bool dbClientInfoInit(DbClientInfo *self, char *name, uint16_t routerId) {
+bool dbClientInfoInit(DbClientInfo *self, char *name, RouterId_t routerId) {
     memset(self, 0, sizeof(DbClientInfo));
 
     self->name = strdup(name);

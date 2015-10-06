@@ -43,7 +43,7 @@ bool socialEventServerOnDisconnect (
     zsock_t *eventServer,
     Redis *redis,
     MySQL *mysql,
-    uint16_t routerId,
+    RouterId_t routerId,
     uint8_t *sessionKeyStr
 ) {
     // Flush the Redis session of the client

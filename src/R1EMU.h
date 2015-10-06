@@ -52,3 +52,8 @@ typedef enum {
     SERVER_TYPE_SOCIAL,
     SERVER_TYPE_ZONE
 } ServerType;
+
+// Global types
+typedef uint16_t MapId_t;
+typedef uint16_t RouterId_t;
+typedef uint8_t GameMode_t;

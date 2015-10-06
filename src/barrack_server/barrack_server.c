@@ -51,7 +51,7 @@ bool barrackServerInit(BarrackServer *self, Server *server) {
     DbInfo dbInfo;
 
     self->server = server;
-    uint16_t routerId = serverGetRouterId(server);
+    RouterId_t routerId = serverGetRouterId(server);
 
     // Initialize dbSession
     dbInfoInit(&dbInfo, routerId, "dbSession");

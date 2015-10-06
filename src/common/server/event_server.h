@@ -80,7 +80,7 @@ typedef enum EventType {
 } EventType;
 
 typedef struct {
-    uint16_t routerId;
+    RouterId_t routerId;
     uint16_t workersCount;
     RedisInfo redisInfo;
 } EventServerInfo;
@@ -180,7 +180,7 @@ bool eventServerUnlinkClients(EventServer *self, GraphNode *node1, GraphNode *no
  */
 bool eventServerInfoInit(
     EventServerInfo *self,
-    uint16_t routerId,
+    RouterId_t routerId,
     uint16_t workersCount,
     char *redisHostname,
     int redisPort);
@@ -233,7 +233,7 @@ uint16_t eventServerGetRouterId(EventServer *self);
  */
 bool eventServerGetGameSessionBySocketId(
     EventServer *self,
-    uint16_t routerId,
+    RouterId_t routerId,
     uint8_t *socketId,
     GameSession *gameSession);
 
@@ -262,7 +262,7 @@ GraphNode *eventServerGetClientNode(EventServer *self, uint8_t *socketId);
 zlist_t *
 eventServerRedisGetClientsWithinRange(
     EventServer *self,
-    uint16_t mapId,
+    MapId_t mapId,
     uint8_t *ignoredSessionKey,
     PositionXZ *position,
     float range

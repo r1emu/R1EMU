@@ -34,14 +34,14 @@ typedef struct Session Session;
  * @brief Allocate a new Session structure.
  * @return A pointer to an allocated Session, or NULL if an error occurred.
  */
-Session *sessionNew (uint16_t routerId, uint8_t *sessionKey);
+Session *sessionNew (RouterId_t routerId, uint8_t *sessionKey);
 
 /**
  * @brief Initialize an allocated Session structure.
  * @param self An allocated Session to initialize.
  * @return true on success, false otherwise.
  */
-bool sessionInit(Session *self, uint16_t routerId, uint8_t *sessionKey);
+bool sessionInit(Session *self, RouterId_t routerId, uint8_t *sessionKey);
 
 /**
  * @brief Free an allocated Session structure and nullify the content of the pointer.

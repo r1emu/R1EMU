@@ -31,10 +31,10 @@ struct SocketSession {
     uint64_t accountId;
 
     // the router ID handling the client socket
-    uint16_t routerId;
+    RouterId_t routerId;
 
     // the map Id of the commander currently played
-    uint16_t mapId;
+    MapId_t mapId;
 
     // session Redis key
     uint8_t sessionKey[SOCKET_SESSION_ID_SIZE];
@@ -54,7 +54,7 @@ typedef struct SocketSession SocketSession;
 SocketSession *socketSessionNew(
     uint64_t accountId,
     uint16_t serverId,
-    uint16_t mapId,
+    MapId_t mapId,
     uint8_t *socketId,
     bool authenticated);
 
@@ -67,7 +67,7 @@ bool socketSessionInit(
     SocketSession *self,
     uint64_t accountId,
     uint16_t serverId,
-    uint16_t mapId,
+    MapId_t mapId,
     uint8_t *socketId,
     bool authenticated);
 

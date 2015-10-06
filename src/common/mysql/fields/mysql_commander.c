@@ -107,8 +107,6 @@ bool mySqlGetCommanders(MySQL *self, char *familyName, Commander **commanders) {
         curCommander->currentStamina = 25000; /** TODO : Get currentStamina from MYSQL */
         curCommander->maxStamina = curCommander->currentStamina; /** TODO : Get maxStamina from MYSQL */
         curCommander->mapId = strtol(row[MYSQL_COMMANDER_map_id], NULL, 10);
-        curCommander->isDeleted = strtol(row[MYSQL_COMMANDER_is_deleted], NULL, 10);
-        curCommander->timeDeleted = strtol(row[MYSQL_COMMANDER_time_deleted], NULL, 10);
 
         // load equipped items
         for (int i = 0; i < EQSLOT_COUNT; i++) {
@@ -162,8 +160,10 @@ bool mySqlCommanderUpdate(MySQL *self, CommanderId_t commanderId, Commander *com
 	char query[MAX_QUERY_SIZE] = "UPDATE commanders SET ";
 
 	for (MySqlCommanderEnumField field = 0; field < MYSQL_COMMANDER_COUNT; field++) {
-        // Exceptions : don't update commander id
-        if (field == MYSQL_COMMANDER_commander_id) {
+        // Exceptions :
+        if (field == MYSQL_COMMANDER_commander_id
+         || field == MYSQL_COMMANDER_is_deleted
+         || field == MYSQL_COMMANDER_time_deleted) {
             continue;
         }
 
@@ -183,10 +183,8 @@ bool mySqlCommanderUpdate(MySQL *self, CommanderId_t commanderId, Commander *com
     );
 
     if (mySqlQuery(self, query,
-        commander->isDeleted ? 'y' : 'n',
         commander->accountId,
         commander->commanderName,
-        commander->timeDeleted,
         commander->level,
         commander->currentXP,
         commander->gender,
@@ -256,10 +254,8 @@ bool mySqlCommanderInsert(MySQL *self, Commander *commander) {
 
     // Insert a new commander
     if (mySqlQuery(self, query,
-        commander->isDeleted ? 'y' : 'n',
         commander->accountId,
         commander->commanderName,
-        commander->timeDeleted,
         commander->level,
         commander->currentXP,
         commander->gender,

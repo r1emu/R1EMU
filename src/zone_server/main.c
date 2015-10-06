@@ -50,7 +50,7 @@ int main (int argc, char **argv)
     #endif
 
     // === Read the command line arguments ===
-    uint16_t routerId = atoi(*++argv);
+    RouterId_t routerId = atoi(*++argv);
     char *routerIp = *++argv;
     int port = atoi(*++argv);
     uint16_t workersCount = atoi(*++argv);

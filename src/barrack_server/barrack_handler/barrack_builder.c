@@ -80,9 +80,9 @@ void barrackBuilderStartGameOk(
     uint32_t zoneServerId,
     uint32_t zoneServerIp,
     uint32_t zoneServerPort,
-    uint16_t mapId,
+    MapId_t mapId,
     uint8_t commanderListId,
-    uint64_t socialInfoId,
+    SocialInfoId_t socialInfoId,
     uint8_t isSingleMap,
     zmsg_t *replyMsg)
 {
@@ -94,7 +94,7 @@ void barrackBuilderStartGameOk(
         uint32_t zoneServerPort;
         uint32_t mapId;
         uint8_t commanderListId;
-        uint64_t socialInfoId;
+        SocialInfoId_t socialInfoId;
         uint8_t isSingleMap;
         uint8_t unk1;
     } replyPacket;
@@ -266,9 +266,9 @@ void barrackBuilderCommanderList(
     #define DEFINE_CommanderBarrackInfoCPacket(x)     \
         typedef struct {                              \
             CommanderAppearanceCPacket appearance;           \
-            uint64_t socialInfoId;                    \
+            SocialInfoId_t socialInfoId;                    \
             uint16_t commanderPosition;               \
-            uint16_t mapId;                           \
+            MapId_t mapId;                            \
             uint32_t unk4;                            \
             uint32_t unk5;                            \
             uint32_t maxXP;                           \
@@ -294,9 +294,9 @@ void barrackBuilderCommanderList(
 
         // Get properties size
         size_t propertiesSize = 0;
-        for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
+        for (int eqSlot = 0; eqSlot < EQSLOT_COUNT; eqSlot++) {
 
-            Item *item = (Item *) inventory->equippedItems[eqSlotIndex];
+            Item *item = (Item *) inventory->equippedItems[eqSlot];
 
             // Get property size
             size_t propSize = item ? itemGetPropertiesCPacketSize(item) : 0;
@@ -307,7 +307,7 @@ void barrackBuilderCommanderList(
             #pragma pack(pop)
 
             propertiesSize += sizeof(PropertyCPacket);
-            propertySizeAllCommanders[commanderIndex][eqSlotIndex] = propSize;
+            propertySizeAllCommanders[commanderIndex][eqSlot] = propSize;
         }
 
         propertiesSizeAllCommanders[commanderIndex] = propertiesSize;
@@ -395,13 +395,13 @@ void barrackBuilderCommanderList(
             size_t offset = offsetof(CommanderBarrackInfoCPacket, propertiesPacket);
             packetStreamAddOffset(&packetStream, offset);
 
-            for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
+            for (int eqSlot = 0; eqSlot < EQSLOT_COUNT; eqSlot++) {
 
-                Item *item = (Item *) inventory->equippedItems[eqSlotIndex];
+                Item *item = (Item *) inventory->equippedItems[eqSlot];
 
                 if (item) {
                     // get property size
-                    size_t propSize = propertySizeAllCommanders[commanderIndex][eqSlotIndex];
+                    size_t propSize = propertySizeAllCommanders[commanderIndex][eqSlot];
 
                     // Define PropertyPacket current structure
                     #pragma pack(push, 1)
@@ -444,7 +444,7 @@ void barrackBuilderPetInformation(zmsg_t *replyMsg) {
     }
 }
 
-void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg) {
+void barrackBuilderZoneTraffics(MapId_t mapId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     typedef struct {
         uint16_t zoneListId;
@@ -454,7 +454,7 @@ void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg) {
 
     #pragma pack(push, 1)
     typedef struct {
-        uint16_t mapId;
+        MapId_t mapId;
         uint16_t zoneServerCount;
         // SingleZoneTraffic zones[]; // variable length array
     }   SingleMapTraffic;
@@ -478,7 +478,7 @@ void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg) {
 	int *zoneServerCounts = alloca(sizeof(*zoneServerCounts) * mapAvailableCount);
 
     // array of mapId for each map
-    int *mapsId = alloca(sizeof(*mapsId) * mapAvailableCount);
+    MapId_t *mapsId = alloca(sizeof(*mapsId) * mapAvailableCount);
 
     // fill the arrays here
     for (int mapIndex = 0; mapIndex < mapAvailableCount; mapIndex++) {
@@ -577,9 +577,9 @@ void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount
     struct {
         ServerPacketHeader header;
         CommanderAppearanceCPacket appearance;
-        uint64_t socialInfoId;
+        SocialInfoId_t socialInfoId;
         uint16_t commanderPosition;
-        uint16_t mapId;
+        MapId_t mapId;
         uint32_t unk4;
         uint32_t unk5;
         uint32_t maxXP;

@@ -240,7 +240,7 @@ bool workerInit (Worker *self, WorkerInfo *workerInfo) {
 bool workerInfoInit (
     WorkerInfo *self,
     uint16_t workerId,
-    uint16_t routerId,
+    RouterId_t routerId,
     ServerType serverType,
     char *globalServerIp,
     int globalServerPort,

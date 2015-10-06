@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file social_event_server.h
+ * @file skill.h
  * @brief
  *
  *
@@ -20,27 +20,42 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
-#include "common/server/event_server.h"
-#include "common/server/game_event.h"
-#include "social_handler/social_event_handler.h"
 
 // ---------- Defines -------------
 
+
 // ------ Structure declaration -------
+typedef uint32_t SkillId_t;
+typedef uint32_t SkillLevel_t;
+
+typedef struct {
+
+} Skill;
 
 // ----------- Functions ------------
-/**
- * @brief Process the social events received from the workers
- */
-bool socialEventServerProcess(EventServer *self, EventType type, void *eventData);
 
 /**
- * @brief Event handler when a client disconnects
+ * Allocate a new Skill structure.
+ * @return A pointer to an allocated Skill, or NULL if an error occured.
  */
-bool socialEventServerOnDisconnect (
-    zsock_t *eventServer,
-    Redis *redis,
-    MySQL *mysql,
-    RouterId_t routerId,
-    uint8_t *sessionKeyStr
-);
+Skill *skillNew(void);
+
+/**
+ * Initialize an allocated Skill structure.
+ * @param self An allocated Skill to initialize.
+ * @return true on success, false otherwise.
+ */
+bool skillInit(Skill *self);
+
+/**
+ * Free an allocated Skill structure.
+ * @param self A pointer to an allocated Skill.
+ */
+void skillFree(Skill *self);
+
+/**
+ * Free an allocated Skill structure and nullify the content of the pointer.
+ * @param self A pointer to an allocated Skill.
+ */
+void skillDestroy(Skill **self);
+

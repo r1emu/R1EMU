@@ -53,7 +53,7 @@ bool zoneServerInit(ZoneServer *self, Server *server) {
     DbInfo dbInfo;
 
     self->server = server;
-    uint16_t routerId = serverGetRouterId(server);
+    RouterId_t routerId = serverGetRouterId(server);
 
     // Initialize dbSession
     if (!(dbInfoInit(&dbInfo, routerId, "dbSession"))) {

@@ -76,7 +76,7 @@ bool dbSetHeritage(Db *self, void *heritage, DbProcessMsgHandler handler) {
     return true;
 }
 
-DbInfo *dbInfoNew(uint16_t routerId, char *dbName) {
+DbInfo *dbInfoNew(RouterId_t routerId, char *dbName) {
 
     DbInfo *self;
 
@@ -93,7 +93,7 @@ DbInfo *dbInfoNew(uint16_t routerId, char *dbName) {
     return self;
 }
 
-bool dbInfoInit(DbInfo *self, uint16_t routerId, char *dbName) {
+bool dbInfoInit(DbInfo *self, RouterId_t routerId, char *dbName) {
 
     memset(self, 0, sizeof(DbInfo));
 

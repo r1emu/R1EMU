@@ -33,7 +33,10 @@ typedef ActorId_t CommanderId_t;
 typedef ActorId_t AccountId_t;
 typedef ActorId_t SocialInfoId_t;
 typedef uint32_t PcId_t;
-typedef uint16_t MapId_t;
+typedef uint32_t Xp_t;
+typedef uint32_t Hp_t;
+typedef uint16_t Sp_t;
+typedef uint32_t Stamina_t;
 
 /**
  * @brief CommanderEquipmentCPacket is the structure of a commander equipment client packet.
@@ -91,42 +94,36 @@ typedef struct CommanderAppearanceCPacket
  */
 typedef struct
 {
-    // Appearance
+    /** Appearance */
     uint8_t commanderName[COMMANDER_NAME_SIZE+1];
     uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
-
-    ActorId_t accountId;
-    CommanderClassId_t classId;
-    CommanderJobId_t jobId;
     CommanderGender_t gender;
-    CommanderLevel_t level;
     CommanderHairId_t hairId;
     CommanderPose_t pose;
-
-    Inventory inventory;
-
     PositionXYZ pos;
+    CommanderClassId_t classId;
+    CommanderJobId_t jobId;
 
-    uint32_t currentXP;
-    uint32_t maxXP;
-
+    /** Identificators */
+    ActorId_t accountId;
     PcId_t pcId;
     SocialInfoId_t socialInfoId;
     CommanderId_t commanderId;
-
-    uint32_t currentHP;
-    uint32_t maxHP;
-
-    uint16_t currentSP;
-    uint16_t maxSP;
-
-    uint32_t currentStamina;
-    uint32_t maxStamina;
-
     MapId_t mapId;
 
-    bool isDeleted;
-    uint32_t timeDeleted;
+    /** Stats */
+    CommanderLevel_t level;
+    Xp_t currentXP;
+    Xp_t maxXP;
+    Hp_t currentHP;
+    Hp_t maxHP;
+    Sp_t currentSP;
+    Sp_t maxSP;
+    Stamina_t currentStamina;
+    Stamina_t maxStamina;
+
+    /** Commander inventory */
+    Inventory inventory;
 
 } Commander;
 

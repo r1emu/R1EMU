@@ -268,7 +268,7 @@ void adminCmdSetStamina(Worker *self, Session *session, char *args, zmsg_t *repl
             info("Wrong number of arguments, must be 1.");
         }
         else {
-            uint32_t stamina = atoi(arg[0]) * 1000;
+            Stamina_t stamina = atoi(arg[0]) * 1000;
             info("Setting stamina to %d.", stamina);
             session->game.commanderSession.currentCommander->currentStamina = stamina;
             zoneBuilderStamina(stamina, replyMsg);
@@ -293,7 +293,7 @@ void adminCmdSetSP(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
             info("Wrong number of arguments, must be 1.");
         }
         else {
-            uint32_t sp = atoi(arg[0]);
+            Sp_t sp = atoi(arg[0]);
             info("Setting SP to %d.", sp);
             session->game.commanderSession.currentCommander->currentSP = sp;
             zoneBuilderUpdateSP(session->game.commanderSession.currentCommander->pcId, sp, replyMsg);
@@ -318,7 +318,7 @@ void adminCmdSetLevel(Worker *self, Session *session, char *args, zmsg_t *replyM
             info("Wrong number of arguments, must be 1.");
         }
         else {
-            uint32_t level = atoi(arg[0]);
+            CommanderLevel_t level = atoi(arg[0]);
             info("Setting level to %d.", level);
             session->game.commanderSession.currentCommander->level = level;
             zoneBuilderPCLevelUp(session->game.commanderSession.currentCommander->pcId, level, replyMsg);

@@ -330,7 +330,7 @@ cleanup:
     return result;
 }
 
-bool redisGetGameSessionBySocketId(Redis *self, uint16_t routerId, uint8_t *sessionKey, GameSession *gameSession) {
+bool redisGetGameSessionBySocketId(Redis *self, RouterId_t routerId, uint8_t *sessionKey, GameSession *gameSession) {
 
     SocketSession socketSession;
     RedisSocketSessionKey socketKey = {
@@ -579,7 +579,7 @@ cleanup:
 
 zlist_t *redisGetClientsWithinDistance(
     Redis *self,
-    uint16_t routerId, uint16_t mapId,
+    RouterId_t routerId, MapId_t mapId,
     PositionXZ *center,
     float range,
     char *ignoredSessionKey

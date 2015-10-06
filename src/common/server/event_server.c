@@ -148,7 +148,7 @@ bool graphNodeClientInit (GraphNodeClient *self) {
 }
 
 bool eventServerInfoInit (EventServerInfo *self,
-    uint16_t routerId,
+    RouterId_t routerId,
     uint16_t workersCount,
     char *redisHostname,
     int redisPort
@@ -202,7 +202,7 @@ EventServer_handleEvent (
 bool
 eventServerGetGameSessionBySocketId (
     EventServer *self,
-    uint16_t routerId,
+    RouterId_t routerId,
     uint8_t *socketId,
     GameSession *gameSession
 ) {
@@ -385,7 +385,7 @@ eventServerGetRouterId (
 zlist_t *
 eventServerRedisGetClientsWithinRange(
     EventServer *self,
-    uint16_t mapId,
+    MapId_t mapId,
     uint8_t *ignoredSessionKey,
     PositionXZ *position,
     float range

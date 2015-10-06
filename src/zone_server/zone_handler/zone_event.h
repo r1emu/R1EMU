@@ -27,7 +27,7 @@
 // ------ Structure declaration -------
 /** Event data needed for a commander to update position */
 typedef struct {
-    uint16_t mapId;
+    MapId_t mapId;
     Commander commander;
     PositionXYZ newPosition;
 } GameEventUpdatePosition;
@@ -50,7 +50,7 @@ typedef struct {
 
 /** Event data needed for a commander to sit */
 typedef struct {
-    uint32_t pcId;
+    PcId_t pcId;
 } GameEventRestSit;
 
 /** Event data needed for a commander to jump */
@@ -78,25 +78,25 @@ typedef struct {
 
 /** Event data needed for a commander to rotate head */
 typedef struct {
-    uint32_t pcId;
+    PcId_t pcId;
     PositionXZ direction;
 } GameEventHeadRotate;
 
 /** Event data needed for a commander to rotate the body */
 typedef struct {
-    uint32_t pcId;
+    PcId_t pcId;
     PositionXZ direction;
 } GameEventRotate;
 
 /** Event data needed to display in-game player's disconnection  */
 typedef struct {
-    uint32_t pcId;
+    PcId_t pcId;
 } GameEventLeave;
 
 /** Event data needed for a commander to stop moving */
 typedef struct {
-    uint32_t pcId;
-    uint32_t poseId;
+    PcId_t pcId;
+    CommanderPose_t poseId;
     PositionXYZ position;
     PositionXZ direction;
 } GameEventPose;

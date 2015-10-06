@@ -70,9 +70,9 @@ void barrackBuilderStartGameOk(
     uint32_t zoneServerId,
     uint32_t zoneServerIp,
     uint32_t zoneServerPort,
-    uint16_t mapId,
+    MapId_t mapId,
     uint8_t commanderListId,
-    uint64_t socialInfoId,
+    SocialInfoId_t socialInfoId,
     uint8_t isSingleMap,
     zmsg_t *replyMsg
 );
@@ -111,7 +111,7 @@ void barrackBuilderCommanderList(
 /**
  * @brief Build the list of zone servers
  */
-void barrackBuilderZoneTraffics(uint16_t mapId, zmsg_t *replyMsg);
+void barrackBuilderZoneTraffics(MapId_t mapId, zmsg_t *replyMsg);
 
 /**
  * @brief Change the name of the barrack

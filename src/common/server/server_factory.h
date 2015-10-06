@@ -24,7 +24,7 @@
  */
 Server *serverFactoryCreateServer(
     ServerType serverType,
-    uint16_t routerId,
+    RouterId_t routerId,
     char *routerIp,
     int port,
     int workersCount,
@@ -45,7 +45,7 @@ Server *serverFactoryCreateServer(
 bool serverFactoryInitServerInfo(
     ServerInfo *serverInfo,
     ServerType serverType,
-    uint16_t routerId,
+    RouterId_t routerId,
     char *routerIp,
     int port,
     int workersCount,

@@ -26,6 +26,7 @@
  * @brief AccountSessionPrivileges enumerates the different levels of privileges
  *  for an account.
  */
+typedef uint8_t AccountSessionPrivileges_t;
 typedef enum AccountSessionPrivileges {
     ACCOUNT_SESSION_PRIVILEGES_ADMIN   = 0,
     ACCOUNT_SESSION_PRIVILEGES_UNKNOWN = 1,

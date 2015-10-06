@@ -17,15 +17,12 @@
 #include "common/packet/packet.h"
 #include "common/packet/packet_type.h"
 #include "common/packet/packet_stream.h"
-#include "common/commander/commander.h"
-#include "common/commander/inventory.h"
-#include "common/actor/item/item.h"
 
-void zoneBuilderRestSit(uint32_t targetPcId, zmsg_t *replyMsg) {
+void zoneBuilderRestSit(PcId_t targetPcId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
+        PcId_t pcId;
         uint8_t isSit;
     } replyPacket;
     #pragma pack(pop)
@@ -50,7 +47,7 @@ void zoneBuilderItemAdd(Item *item, ItemInventoryIndex_t inventoryIndex, Invento
         VariableSizePacketHeader variableSizeHeader;
         ItemCPacket item;
         uint16_t propertiesSize;
-        uint8_t addType;
+        InventoryAddType_t addType;
         float notificationDelay;
         uint8_t inventoryType;
         uint8_t properties[propertiesSize];
@@ -79,8 +76,8 @@ void zoneBuilderItemAdd(Item *item, ItemInventoryIndex_t inventoryIndex, Invento
 }
 
 void zoneBuilderSkillReady(
-    uint32_t targetPcId,
-    uint32_t skillId,
+    PcId_t targetPcId,
+    SkillId_t skillId,
     PositionXYZ *pos1,
     PositionXYZ *pos2,
     zmsg_t *replyMsg)
@@ -88,8 +85,8 @@ void zoneBuilderSkillReady(
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
-        uint32_t skillId;
+        PcId_t pcId;
+        SkillId_t skillId;
         float unk3;
         uint16_t unk4;
         uint16_t unk5;
@@ -123,8 +120,8 @@ void zoneBuilderPlayAni(zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t unkSchrageId1;
-        uint32_t unkSchrageId2;
+        uint32_t unkId1;
+        uint32_t unkId2;
         uint8_t isUnk1;
         uint8_t isUnk2;
         float timeDelay;
@@ -133,7 +130,7 @@ void zoneBuilderPlayAni(zmsg_t *replyMsg) {
     #pragma pack(pop)
 
     /*
-        4B010000 25182700 0101 00000000 0000803F
+        4B010000 25182700 01 01 00000000 0000803F
     */
     PacketType packetType = ZC_PLAY_ANI;
     CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
@@ -141,8 +138,8 @@ void zoneBuilderPlayAni(zmsg_t *replyMsg) {
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
-        replyPacket.unkSchrageId1 = SWAP_UINT32(0x48010000);
-        replyPacket.unkSchrageId2 = SWAP_UINT32(0x271826);
+        replyPacket.unkId1 = SWAP_UINT32(0x48010000);
+        replyPacket.unkId2 = SWAP_UINT32(0x271826);
         replyPacket.isUnk1 = 1;
         replyPacket.isUnk2 = 1;
         replyPacket.timeDelay = 0;
@@ -151,8 +148,8 @@ void zoneBuilderPlayAni(zmsg_t *replyMsg) {
 }
 
 void zoneBuilderSkillCast(
-    uint32_t targetPcId,
-    uint32_t skillId,
+    PcId_t targetPcId,
+    SkillId_t skillId,
     PositionXYZ *position1,
     PositionXYZ *position2,
     zmsg_t *replyMsg)
@@ -160,7 +157,7 @@ void zoneBuilderSkillCast(
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
+        PcId_t pcId;
         uint16_t unk2;
         uint16_t unk3;
         PositionXYZ position1;
@@ -182,11 +179,11 @@ void zoneBuilderSkillCast(
     }
 }
 
-void zoneBuilderPlaySkillCastAni(uint32_t targetPcId, PositionXYZ *position, zmsg_t *replyMsg) {
+void zoneBuilderPlaySkillCastAni(PcId_t targetPcId, PositionXYZ *position, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
+        PcId_t pcId;
         PositionXYZ position;
         uint16_t unk1;
         uint16_t unk2;
@@ -208,14 +205,14 @@ void zoneBuilderPlaySkillCastAni(uint32_t targetPcId, PositionXYZ *position, zms
     }
 }
 
-void zoneBuilderNormalUnk8(uint32_t targetPcId, zmsg_t *replyMsg) {
+void zoneBuilderNormalUnk8(PcId_t targetPcId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         PacketNormalHeader normalHeader;
-        uint32_t pcId;
+        PcId_t pcId;
         uint32_t unk1;
-        uint32_t skillId;
-        uint32_t skillLevel; // ? not sure
+        SkillId_t skillId;
+        SkillLevel_t skillLevel; // ? not sure
         uint8_t unk2[61];
     } replyPacket;
     #pragma pack(pop)
@@ -237,11 +234,11 @@ void zoneBuilderNormalUnk8(uint32_t targetPcId, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderNormalUnk9(uint32_t targetPcId, zmsg_t *replyMsg) {
+void zoneBuilderNormalUnk9(PcId_t targetPcId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         PacketNormalHeader normalHeader;
-        uint32_t pcId;
+        PcId_t pcId;
         uint8_t unk1;
         uint32_t unk2;
         uint32_t unk3;
@@ -353,41 +350,17 @@ void zoneBuilderJobPts(zmsg_t *replyMsg) {
 }
 
 void zoneBuilderNormalUnk7(
-    uint64_t accountId,
-    uint32_t targetPcId,
+    AccountId_t accountId,
+    PcId_t targetPcId,
     char *familyName,
     char *commanderName,
     zmsg_t *replyMsg)
 {
     #pragma pack(push, 1)
     struct {
-        PacketNormalHeader normalHeader;
-        uint32_t unk1;
-        uint32_t socialId;
-        uint8_t unk2;
-        uint64_t accountId;
-        uint64_t accountId_2;
-        char familyName[COMMANDER_FAMILY_NAME_SIZE];
-        uint32_t unk3[3];
-        uint32_t pcId;
-        char familyName_2[COMMANDER_FAMILY_NAME_SIZE];
-        char commanderName[COMMANDER_NAME_SIZE];
-        uint8_t unk4[48];
+        // not yet implemented
     } replyPacket;
     #pragma pack(pop)
-
-    /*
-        300D     FFFFFFFF 2501     E1000000 0016     00 0000  139D0100 D1A80144 00000000 D1A80144 00000000
-        EAB5ACEC9B90EC9E9000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-        F3D45600 3035E313 FD0309B8 5A730100
-        EAB5ACEC9B90EC9E9000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-        CommanderName
-        43425432000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-        00000000 00040001
-                                          x        y        z
-        00000002 33560000 000000 01000000 00001DC4 00008243 002080C4
-        69000000 77000000 69000000 77000000
-    */
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
@@ -414,14 +387,6 @@ void zoneBuilderNormalUnk7(
             "[11:10:22][           ToSClient:                     dbgBuffer]  00 77 00 00 00                                  | .w...\n"
             , &replyPacket, &memSize
         );
-
-        replyPacket.accountId = accountId;
-        replyPacket.accountId_2 = accountId;
-        replyPacket.pcId = targetPcId;
-
-        strncpy(replyPacket.familyName, familyName, sizeof(replyPacket.familyName));
-        strncpy(replyPacket.familyName_2, familyName, sizeof(replyPacket.familyName_2));
-        strncpy(replyPacket.commanderName, commanderName, sizeof(replyPacket.commanderName));
     }
 }
 
@@ -570,11 +535,11 @@ void zoneBuilderLoginTime(zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderStamina(uint32_t stamina, zmsg_t *replyMsg) {
+void zoneBuilderStamina(Stamina_t stamina, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t stamina;
+        Stamina_t stamina;
     } replyPacket;
     #pragma pack(pop)
 
@@ -588,11 +553,11 @@ void zoneBuilderStamina(uint32_t stamina, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderAddStamina(uint32_t stamina, zmsg_t *replyMsg) {
+void zoneBuilderAddStamina(Stamina_t stamina, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t stamina;
+        Stamina_t stamina;
     } replyPacket;
     #pragma pack(pop)
 
@@ -606,13 +571,13 @@ void zoneBuilderAddStamina(uint32_t stamina, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg) {
+void zoneBuilderUpdateSP(PcId_t targetPcId, Sp_t sp, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
-        uint32_t sp;
-        uint8_t  unk1;
+        PcId_t pcId;
+        Sp_t sp;
+        uint8_t unk1;
     } replyPacket;
     #pragma pack(pop)
 
@@ -622,23 +587,26 @@ void zoneBuilderUpdateSP(uint32_t targetPcID, uint32_t sp, zmsg_t *replyMsg) {
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         replyPacket.header.type = ZC_UPDATE_SP;
-        replyPacket.pcId = targetPcID;
+        replyPacket.pcId = targetPcId;
         replyPacket.sp = sp;
         replyPacket.unk1 = 0;
     }
 }
 
-void zoneBuilderUpdateAllStatus(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, uint16_t sp,
-                                uint16_t maxSp, zmsg_t *replyMsg)
+void zoneBuilderUpdateAllStatus(
+    PcId_t targetPcId,
+    Hp_t currentHp, Hp_t maxHp,
+    Sp_t currentSp, Sp_t maxSp,
+    zmsg_t *replyMsg)
 {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
-        uint32_t hp;
-        uint32_t maxHp;
-        uint16_t sp;
-        uint16_t maxSp;
+        PcId_t pcId;
+        Hp_t currentHp;
+        Hp_t maxHp;
+        Sp_t currentSp;
+        Sp_t maxSp;
         uint32_t unk1; // 01 is most common, but other values (0x09, 0x0A, 0x0B) seem to work
     } replyPacket;
     #pragma pack(pop)
@@ -649,21 +617,21 @@ void zoneBuilderUpdateAllStatus(uint32_t targetPcID, uint32_t hp, uint32_t maxHp
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         replyPacket.header.type = ZC_UPDATE_ALL_STATUS;
-        replyPacket.pcId = targetPcID;
-        replyPacket.hp = hp;
+        replyPacket.pcId = targetPcId;
+        replyPacket.currentHp = currentHp;
         replyPacket.maxHp = maxHp;
-        replyPacket.sp = sp;
+        replyPacket.currentSp = currentSp;
         replyPacket.maxSp = maxSp;
         replyPacket.unk1 = 0x01;
     }
 }
 
-void zoneBuilderPCLevelUp(uint32_t targetPcID, uint32_t level, zmsg_t *replyMsg) {
+void zoneBuilderPCLevelUp(PcId_t targetPcId, CommanderLevel_t level, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
-        uint32_t level;
+        PcId_t pcId;
+        CommanderLevel_t level;
     } replyPacket;
     #pragma pack(pop)
 
@@ -673,18 +641,18 @@ void zoneBuilderPCLevelUp(uint32_t targetPcID, uint32_t level, zmsg_t *replyMsg)
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         replyPacket.header.type = ZC_PC_LEVELUP;
-        replyPacket.pcId = targetPcID;
+        replyPacket.pcId = targetPcId;
         replyPacket.level = level;
     }
 }
 
-void zoneBuilderAddHp(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, zmsg_t *replyMsg) {
+void zoneBuilderAddHp(PcId_t targetPcId, Hp_t currentHp, Hp_t maxHp, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
-        uint32_t hp;
-        uint32_t maxHp; //? not sure
+        PcId_t pcId;
+        Hp_t currentHp;
+        Hp_t maxHp; //? not sure
         uint32_t unk1; // This might be some encoding for the source of the hp?
     } replyPacket;
     #pragma pack(pop)
@@ -695,19 +663,19 @@ void zoneBuilderAddHp(uint32_t targetPcID, uint32_t hp, uint32_t maxHp, zmsg_t *
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         replyPacket.header.type = ZC_ADD_HP;
-        replyPacket.pcId = targetPcID;
-        replyPacket.hp = hp;
+        replyPacket.pcId = targetPcId;
+        replyPacket.currentHp = currentHp;
         replyPacket.maxHp = maxHp;
         replyPacket.unk1 = 1;
     }
 }
 
-void zoneBuilderBuffList(uint32_t targetPcId, zmsg_t *replyMsg) {
+void zoneBuilderBuffList(PcId_t targetPcId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
         uint16_t unk1;
-        uint32_t pcId;
+        PcId_t pcId;
         uint8_t  unk2;
     } replyPacket;
     #pragma pack(pop)
@@ -727,11 +695,11 @@ void zoneBuilderBuffList(uint32_t targetPcId, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderLeave(uint32_t targetPcId, zmsg_t *replyMsg) {
+void zoneBuilderLeave(PcId_t targetPcId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
+        PcId_t pcId;
         uint16_t unk1;
     } replyPacket;
     #pragma pack(pop)
@@ -753,12 +721,12 @@ void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId; // A65F0B00
+        PcId_t pcId; // A65F0B00
         PositionXYZ position; // 00001DC4, 00008243, 002080C4
         float unk1; // 0000803F
         uint32_t unk2; // 00000000
         uint16_t unk3; // 0000
-        uint64_t socialInfoId; // EE2500003C010000
+        SocialInfoId_t socialInfoId; // EE2500003C010000
         uint8_t pose; // 00
         float moveSpeed; // 0000F841
         uint32_t unk5; // 00000000
@@ -917,12 +885,12 @@ void zoneBuilderNormalUnk5(zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderNormalUnk4(uint64_t socialInfoId, zmsg_t *replyMsg) {
+void zoneBuilderNormalUnk4(SocialInfoId_t socialInfoId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         // not yet implemented
         PacketNormalHeader normalHeader;
-        uint64_t socialInfoId;
+        SocialInfoId_t socialInfoId;
     } replyPacket, *memory;
 
    (void) replyPacket;
@@ -1058,12 +1026,12 @@ void zoneBuilderQuickSlotList(zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderCooldownList(uint64_t socialInfoId, zmsg_t *replyMsg) {
+void zoneBuilderCooldownList(SocialInfoId_t socialInfoId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
         uint16_t unk1;
-        uint64_t socialInfoId;
+        SocialInfoId_t socialInfoId;
         uint32_t unk4;
     } replyPacket;
     #pragma pack(pop)
@@ -1080,12 +1048,12 @@ void zoneBuilderCooldownList(uint64_t socialInfoId, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderAbilityList(uint32_t targetPcId, zmsg_t *replyMsg) {
+void zoneBuilderAbilityList(PcId_t targetPcId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         VariableSizePacketHeader variableSizeHeader;
-        uint32_t pcId;
-        uint16_t numberEntries;
+        PcId_t pcId;
+        uint16_t entriesCount;
     } replyPacket;
     #pragma pack(pop)
 
@@ -1102,15 +1070,15 @@ void zoneBuilderAbilityList(uint32_t targetPcId, zmsg_t *replyMsg) {
 
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
         replyPacket.pcId = targetPcId;
-        replyPacket.numberEntries = 0;
+        replyPacket.entriesCount = 0;
     }
 }
 
-void zoneBuilderSkillList(uint32_t targetPcId, zmsg_t *replyMsg) {
+void zoneBuilderSkillList(PcId_t targetPcId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         VariableSizePacketHeader variableSizeHeader;
-        uint32_t pcId;
+        PcId_t pcId;
         uint16_t skillCount;
         Zlib zlibData;
     } replyPacket, *memory;
@@ -1147,7 +1115,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
         uint16_t sizeOfAttributes;               \
         uint16_t unk1;                           \
         ActorId_t uid;                           \
-        uint8_t eqSlotIndex;                     \
+        ItemEquipmentSlot_t eqSlot;              \
         uint8_t unk2;                            \
         uint16_t unk3;                           \
         uint32_t unk4;                           \
@@ -1157,9 +1125,9 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
     size_t itemPropertiesSize[EQSLOT_COUNT];
     size_t itemsPacketSize = 0;
 
-    for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
+    for (int eqSlot = 0; eqSlot < EQSLOT_COUNT; eqSlot++) {
 
-        ItemEquipable *eqItem = inventory->equippedItems[eqSlotIndex];
+        ItemEquipable *eqItem = inventory->equippedItems[eqSlot];
         // get property size
         size_t attrSize = eqItem ? itemGetPropertiesCPacketSize(&eqItem->item) : 0;
 
@@ -1167,7 +1135,7 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
         DEFINE_EquippedItemCPacket(attrSize);
         #pragma pack(pop)
 
-        itemPropertiesSize[eqSlotIndex] = attrSize;
+        itemPropertiesSize[eqSlot] = attrSize;
         itemsPacketSize += sizeof(EquippedItemCPacket);
     }
 
@@ -1192,11 +1160,11 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
         // we want to start writing at the offset of items
         packetStreamAddOffset(&packetStream, offsetof(struct EquipmentListPacket, items));
 
-        for (int eqSlotIndex = 0; eqSlotIndex < EQSLOT_COUNT; eqSlotIndex++) {
+        for (int eqSlot = 0; eqSlot < EQSLOT_COUNT; eqSlot++) {
 
-            ItemEquipable *eqItem = inventory->equippedItems[eqSlotIndex];
+            ItemEquipable *eqItem = inventory->equippedItems[eqSlot];
 
-            size_t attrSize = itemPropertiesSize[eqSlotIndex];
+            size_t attrSize = itemPropertiesSize[eqSlot];
 
             #pragma pack(push, 1)
             DEFINE_EquippedItemCPacket(attrSize);
@@ -1204,11 +1172,11 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
 
             EquippedItemCPacket *eqItemPkt = packetStreamGetCurrentBuffer(&packetStream);
 
-            eqItemPkt->id = eqItem ? itemGetId((Item *) eqItem) : inventoryGetEquipmentEmptySlot(eqSlotIndex);
+            eqItemPkt->id = eqItem ? itemGetId((Item *) eqItem) : inventoryGetEquipmentEmptySlot(eqSlot);
             eqItemPkt->sizeOfAttributes = attrSize;
             eqItemPkt->unk1 = 0;
             eqItemPkt->uid = eqItem ? actorGetUId((Actor *) eqItem) : 0;
-            eqItemPkt->eqSlotIndex = eqSlotIndex;
+            eqItemPkt->eqSlot = eqSlot;
             eqItemPkt->unk2 = 0;
             eqItemPkt->unk3 = 0;
             eqItemPkt->unk4 = 0;
@@ -1255,11 +1223,11 @@ void zoneBuilderStartInfo(zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderSetPos(uint32_t targetPcId, PositionXYZ *position, zmsg_t *replyMsg) {
+void zoneBuilderSetPos(PcId_t targetPcId, PositionXYZ *position, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
+        PcId_t pcId;
         PositionXYZ position;
     } replyPacket;
     #pragma pack(pop)
@@ -1484,11 +1452,11 @@ void zoneBuilderMyPCEnter(PositionXYZ *position, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderMoveSpeed(uint32_t targetPcId, float movementSpeed, zmsg_t *replyMsg) {
+void zoneBuilderMoveSpeed(PcId_t targetPcId, float movementSpeed, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
+        PcId_t pcId;
         float movementSpeed;
         uint32_t unk1;
     } replyPacket;
@@ -1514,16 +1482,16 @@ void zoneBuilderChat(Commander *commander, uint8_t *chatText, zmsg_t *replyMsg) 
     #pragma pack(push, 1)
     struct {
         VariableSizePacketHeader variableSizeHeader;
-        uint32_t pcId;
+        PcId_t pcId;
         uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
         uint8_t commanderName[COMMANDER_NAME_SIZE+1];
         uint8_t unk1;
-        uint16_t jobId;
+        CommanderJobId_t jobId;
         uint32_t unk2;
-        uint8_t gender;
-        uint8_t hairId;
+        CommanderGender_t gender;
+        CommanderHairId_t hairId;
         uint16_t unk3;
-        uint32_t headTop;
+        ItemId_t headTop;
         float displayTime;
         uint8_t chatText[chatTextLen];
     } replyPacket;
@@ -1550,11 +1518,11 @@ void zoneBuilderChat(Commander *commander, uint8_t *chatText, zmsg_t *replyMsg) 
     }
 }
 
-void zoneBuilderJump(uint32_t targetPcId, float height, zmsg_t *replyMsg) {
+void zoneBuilderJump(PcId_t targetPcId, float height, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
+        PcId_t pcId;
         float height;
         uint32_t unk1;
         uint8_t unk2;
@@ -1575,37 +1543,37 @@ void zoneBuilderJump(uint32_t targetPcId, float height, zmsg_t *replyMsg) {
 }
 
 void zoneBuilderConnectOk(
-    uint8_t gameMode,
-    uint8_t accountPrivileges,
+    GameMode_t gameMode,
+    AccountSessionPrivileges_t accountPrivileges,
     Commander *commander,
     zmsg_t *replyMsg)
 {
     #pragma pack(push, 1)
     struct {
         VariableSizePacketHeader variableSizeHeader;
-        uint8_t gameMode; // 0 = NormalMode, 1 = SingleMode
+        GameMode_t gameMode; // 0 = NormalMode, 1 = SingleMode
         uint32_t unk1;
-        uint8_t accountPrivileges;
+        AccountSessionPrivileges_t accountPrivileges;
         uint16_t unk2;
         uint64_t unk3;
         uint8_t markers[3];
         uint8_t passport[41];
-        uint32_t pcId;
+        PcId_t pcId;
         uint32_t unk5;
 
         CommanderAppearanceCPacket appearance;
         PositionXYZ pos;
-        uint32_t currentXP;
-        uint32_t maxXP;
-        uint32_t _pcId;
-        uint64_t socialInfoId;
-        uint64_t commanderId;
-        uint32_t currentHP;
-        uint32_t maxHP;
-        uint16_t currentSP;
-        uint16_t maxSP;
-        uint32_t currentStamina;
-        uint32_t maxStamina;
+        Xp_t currentXP;
+        Xp_t maxXP;
+        PcId_t _pcId;
+        SocialInfoId_t socialInfoId;
+        CommanderId_t commanderId;
+        Hp_t currentHP;
+        Hp_t maxHP;
+        Sp_t currentSP;
+        Sp_t maxSP;
+        Stamina_t currentStamina;
+        Stamina_t maxStamina;
         uint16_t unk6;
         uint16_t unk7;
     } replyPacket;
@@ -1692,104 +1660,26 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
     size_t totalSize = 0;
 
     // Itarate all inventory bags
-    for (int category = 0; category < ITEM_CAT_COUNT; category++) {
+    for (ItemCategory category = 0; category < ITEM_CAT_COUNT; category++) {
 
         // Iterate through all items in this bag
         Item *item = inventoryGetFirstItem(inventory, category);
-        uint8_t inventoryIndex = 0;
+        size_t inventoryIndex = 0;
 
         while (item) {
-
-        size_t attrSize = item ? itemGetPropertiesCPacketSize(item) : 0;
+            size_t attrSize = item ? itemGetPropertiesCPacketSize(item) : 0;
+            itemPropertiesSize[category][inventoryIndex] = attrSize;
 
             #pragma pack(push, 1)
             DEFINE_InventoryItemCPacket(attrSize);
             #pragma pack(pop)
 
-            itemPropertiesSize[category][inventoryIndex] = attrSize;
             totalSize += sizeof(InventoryItemCPacket);
 
             item = inventoryGetNextItem(inventory, category);
             inventoryIndex++;
         }
     }
-
-
-
-    /// VERSION OF THE PACKET, NO COMPRESSED
-    /*
-    #pragma pack(push, 1)
-    struct InventoryListPacket {
-        VariableSizePacketHeader variableSizeHeader;
-        uint32_t inventoryCount;
-        uint16_t compression;
-        uint8_t itemsPacket[totalSize];
-    } replyPacket;
-    #pragma pack(pop)
-
-    PacketType packetType = ZC_ITEM_INVENTORY_LIST;
-    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
-
-    PacketStream packetStream;
-    packetStreamInit(&packetStream, &replyPacket);
-
-    BUILD_REPLY_PACKET(replyPacket, replyMsg)
-    {
-        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
-
-        replyPacket.inventoryCount = inventoryCount;
-        replyPacket.compression = 0;
-
-        // we want to start writing at the offset of commandersBarrackInfoPacket
-        size_t offset = offsetof(struct InventoryListPacket, itemsPacket);
-        packetStreamAddOffset(&packetStream, offset);
-
-        item = inventoryGetFirstItem(inventory);
-        inventoryIndex = -1;
-
-        while (item) {
-
-            inventoryIndex++;
-            size_t attrSize = itemPropertiesSize[inventoryIndex];
-
-            #pragma pack(push, 1)
-            DEFINE_InventoryItemCPacket(attrSize);
-            #pragma pack(pop)
-
-            InventoryItemCPacket *inventoryItemCPacket  = packetStreamGetCurrentBuffer(&packetStream);
-
-            inventoryItemCPacket->itemType = item->itemType;
-            inventoryItemCPacket->sizeOfAttributes = attrSize;
-            inventoryItemCPacket->unkown1 = 0;
-            inventoryItemCPacket->itemId = item ? item->itemId : 0;
-            inventoryItemCPacket->amount = item->amount;
-            inventoryItemCPacket->price = 0;
-            inventoryItemCPacket->inventoryIndex = ITEM_CAT_SIZE * item->itemCategory + item->inventoryIndex;
-            inventoryItemCPacket->unkown2 = 0;
-
-            // fill property buffer
-            size_t offset = offsetof(struct InventoryItemCPacket, properties);
-            packetStreamAddOffset(&packetStream, offset);
-
-            // write in the buffer
-            if (attrSize > 0) {
-                itemPropertiesGetCPacket(item->properties, packetStreamGetCurrentBuffer(&packetStream));
-                // relocate the stream position
-                packetStreamAddOffset(&packetStream, attrSize);
-            }
-
-
-            item = inventoryGetNextItem(inventory);
-        }
-
-    }
-
-    // Debug purposes
-    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
-
-    */
-
-    /// VERSION OF THE PACKET, USING zLIB compression
 
     // Populate packet for Items
     uint8_t itemsPacket[totalSize];
@@ -1798,7 +1688,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
     packetStreamInit(&packetStream, &itemsPacket);
 
     // Itarate all inventory bags
-    for (int category = 0; category < ITEM_CAT_COUNT; category++) {
+    for (ItemCategory category = 0; category < ITEM_CAT_COUNT; category++) {
 
         // Iterate through all items in this bag
         Item *item = inventoryGetFirstItem(inventory, category);
@@ -1816,11 +1706,6 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
             inventoryIndex++;
         }
     }
-
-
-    // Debug purposes
-    buffer_print(&itemsPacket, sizeof(itemsPacket), NULL);
-
 
     #pragma pack(push, 1)
     struct InventoryListPacket {
@@ -1841,13 +1726,10 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
     variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, outPacketSize);
 
     zmsg_add(replyMsg, zframe_new(&replyPacket, outPacketSize));
-
-    // Debug purposes
-    buffer_print(&replyPacket, outPacketSize, NULL);
 }
 
 void zoneBuilderMoveDir(
-    uint32_t targetPcId,
+    PcId_t targetPcId,
     PositionXYZ *position,
     PositionXZ *direction,
     float timestamp,
@@ -1864,7 +1746,7 @@ void zoneBuilderMoveDir(
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
+        PcId_t pcId;
         PositionXYZ position;
         PositionXZ direction;
         uint8_t unk1;
@@ -1891,7 +1773,7 @@ void zoneBuilderMoveDir(
 }
 
 void zoneBuilderPcMoveStop(
-    uint32_t targetPcId,
+    PcId_t targetPcId,
     PositionXYZ *position,
     PositionXZ *direction,
     float timestamp,
@@ -1909,7 +1791,7 @@ void zoneBuilderPcMoveStop(
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
+        PcId_t pcId;
         PositionXYZ position;
         uint8_t unk1;
         PositionXZ direction;
@@ -1931,11 +1813,11 @@ void zoneBuilderPcMoveStop(
     }
 }
 
-void zoneBuilderRotateHead(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg) {
+void zoneBuilderRotateHead(PcId_t pcId, PositionXZ *pos, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
+        PcId_t pcId;
         float unk1; //x?
         float unk2; //z?
     } replyPacket;
@@ -1953,11 +1835,11 @@ void zoneBuilderRotateHead(uint32_t pcId, PositionXZ *pos, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderRotate(uint32_t pcId, PositionXZ *bodyDir, zmsg_t *replyMsg) {
+void zoneBuilderRotate(PcId_t pcId, PositionXZ *bodyDir, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
+        PcId_t pcId;
         PositionXZ bodyDir;
         uint8_t unk3;
         uint8_t unk4;
@@ -1993,13 +1875,13 @@ void zoneBuilderLogout(zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderPose(uint32_t pcId, uint32_t poseId, PositionXYZ *pos, PositionXZ *dir, zmsg_t *replyMsg) {
+void zoneBuilderPose(PcId_t pcId, CommanderPose_t poseId, PositionXYZ *pos, PositionXZ *dir, zmsg_t *replyMsg) {
 
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t pcId;
-        uint32_t poseId;
+        PcId_t pcId;
+        CommanderPose_t poseId;
         PositionXYZ pos;
         PositionXZ dir;
     } replyPacket;
@@ -2045,15 +1927,15 @@ void zoneBuilderChangeCamera(uint8_t mode, PositionXYZ *pos, float fspd, float i
     }
 }
 
-void zoneBuilderItemRemove(Item *item, uint8_t removalType, uint8_t inventoryType, zmsg_t *replyMsg) {
+void zoneBuilderItemRemove(Item *item, InventoryRemoval removalType, InventoryType inventoryType, zmsg_t *replyMsg) {
 
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint64_t uid;
-        uint32_t amount;
-        uint8_t removalType;
-        uint8_t inventoryType;
+        ActorId_t uid;
+        ItemAmount_t amount;
+        InventoryRemoval_t removalType;
+        InventoryType_t inventoryType;
     } replyPacket;
     #pragma pack(pop)
 

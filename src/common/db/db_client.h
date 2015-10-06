@@ -34,7 +34,7 @@ typedef struct DbClient DbClient;
 
 typedef struct DbClientInfo {
     char *name;
-    uint16_t routerId;
+    RouterId_t routerId;
 }   DbClientInfo;
 
 // ----------- Functions ------------
@@ -56,14 +56,14 @@ bool dbClientInit(DbClient *self, DbClientInfo *startInfo);
  * Allocate a new DbClientInfo structure.
  * @return A pointer to an allocated DbClientInfo, or NULL if an error occurred.
  */
-DbClientInfo *dbClientInfoNew(char *name, uint16_t routerId);
+DbClientInfo *dbClientInfoNew(char *name, RouterId_t routerId);
 
 /**
  * Initialize an allocated DbClientInfo structure.
  * @param self An allocated DbClientInfo to initialize.
  * @return true on success, false otherwise.
  */
-bool dbClientInfoInit(DbClientInfo *self, char *name, uint16_t routerId);
+bool dbClientInfoInit(DbClientInfo *self, char *name, RouterId_t routerId);
 
 /**
  * Request value from database by key

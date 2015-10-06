@@ -30,12 +30,22 @@ typedef enum {
     INVENTORY_TYPE_COMMANDER = 0,
     INVENTORY_TYPE_WAREHOUSE = 1,
 }   InventoryType;
+typedef uint8_t InventoryType_t;
+
+typedef enum {
+    INVENTORY_REMOVAL_UNK0 = 0,
+    INVENTORY_REMOVAL_UNK1 = 1,
+    INVENTORY_REMOVAL_UNK2 = 2,
+    INVENTORY_REMOVAL_DESTROYED = 3,
+}   InventoryRemoval;
+typedef uint8_t InventoryRemoval_t;
 
 typedef enum {
     INVENTORY_ADD_UNK0 = 0,
     INVENTORY_ADD_PICKUP = 3,
     INVENTORY_ADD_NOT_NEW = 4,
 }   InventoryAddType;
+typedef uint8_t InventoryAddType_t;
 
 typedef enum {
     EMPTYEQSLOT_NoHat = 2,

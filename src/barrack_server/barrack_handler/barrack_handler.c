@@ -216,7 +216,7 @@ static PacketHandlerState barrackHandlerStartGame(
 
     #pragma pack(push, 1)
     struct {
-        uint16_t routerId;
+        RouterId_t routerId;
         uint8_t commanderIndex;
     } *clientPacket = (void *) packet;
     #pragma pack(pop)

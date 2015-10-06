@@ -139,8 +139,8 @@ enum RedisGameSessionFields {
 };
 
 typedef struct {
-    uint16_t routerId;
-    uint16_t mapId;
+    RouterId_t routerId;
+    MapId_t mapId;
     uint64_t accountId;
 } RedisGameSessionKey;
 
@@ -175,7 +175,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
  * @param[out] gameSession The output gameSession
  * @return true on success, false otherwise
  */
-bool redisGetGameSessionBySocketId(Redis *self, uint16_t routerId, uint8_t *socketId, GameSession *gameSession);
+bool redisGetGameSessionBySocketId(Redis *self, RouterId_t routerId, uint8_t *socketId, GameSession *gameSession);
 
 /**
  * @brief Save an entire GameSession to the Redis server.
@@ -216,7 +216,7 @@ bool redisMoveGameSession(Redis *self, RedisGameSessionKey *from, RedisGameSessi
 zlist_t *redisGetClientsWithinDistance(
     Redis *self,
     uint16_t serverId,
-    uint16_t mapId,
+    MapId_t mapId,
     PositionXZ *position,
     float range,
     char *socketIdNoInclude);

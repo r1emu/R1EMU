@@ -47,6 +47,7 @@ typedef enum {
     EQSLOT_COUNT,
     EQSLOT_NOSLOT,
 } ItemEquipmentSlot;
+typedef uint8_t ItemEquipmentSlot_t;
 
 typedef struct ItemEquipable {
    Item item;

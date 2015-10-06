@@ -64,7 +64,7 @@ typedef enum RouterSendHeader {
 typedef struct Router Router;
 
 typedef struct {
-    uint16_t routerId;
+    RouterId_t routerId;
     char *ip;
     int port;
     int workersCount;
@@ -99,7 +99,7 @@ bool routerInit(Router *self, RouterInfo *info);
  */
 bool routerInfoInit(
     RouterInfo *self,
-    uint16_t routerId,
+    RouterId_t routerId,
     char *ip,
     int port,
     int workersCount,

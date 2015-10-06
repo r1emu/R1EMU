@@ -13,7 +13,7 @@
 
 #include "session.h"
 
-Session *sessionNew (uint16_t routerId, uint8_t *sessionKey) {
+Session *sessionNew (RouterId_t routerId, uint8_t *sessionKey) {
     Session *self;
 
     if ((self = calloc(1, sizeof(Session))) == NULL) {
@@ -29,7 +29,7 @@ Session *sessionNew (uint16_t routerId, uint8_t *sessionKey) {
     return self;
 }
 
-bool sessionInit(Session *self, uint16_t routerId, uint8_t *sessionKey) {
+bool sessionInit(Session *self, RouterId_t routerId, uint8_t *sessionKey) {
 
     // Define a valid socket session
     socketSessionInit(&self->socket,

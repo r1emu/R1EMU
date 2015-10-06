@@ -44,7 +44,7 @@ bool zoneEventServerOnDisconnect (
     zsock_t *eventServer,
     Redis *redis,
     MySQL *mysql,
-    uint16_t routerId,
+    RouterId_t routerId,
     uint8_t *sessionKeyStr
 ) {
     // Get the current game session
@@ -100,7 +100,7 @@ bool zoneEventServerUpdateClientPosition(
     zlist_t *redisClientsAround = NULL;
 
     uint8_t *emitterSk = event->emitterSk;
-    uint16_t mapId = updatePosEvent->mapId;
+    MapId_t mapId = updatePosEvent->mapId;
     Commander *commander = &updatePosEvent->commander;
 
     // Get the clients around

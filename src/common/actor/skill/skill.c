@@ -7,40 +7,44 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file social_event_server.h
- * @brief
- *
- *
- *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
  *          See LICENSE file for further information
  */
 
-#pragma once
+#include "skill.h"
 
-// ---------- Includes ------------
-#include "R1EMU.h"
-#include "common/server/event_server.h"
-#include "common/server/game_event.h"
-#include "social_handler/social_event_handler.h"
+Skill *skillNew(void) {
+    Skill *self;
 
-// ---------- Defines -------------
+    if ((self = malloc(sizeof(Skill))) == NULL) {
+        return NULL;
+    }
 
-// ------ Structure declaration -------
+    if (!skillInit(self)) {
+        skillDestroy(&self);
+        error("Skill failed to initialize.");
+        return NULL;
+    }
 
-// ----------- Functions ------------
-/**
- * @brief Process the social events received from the workers
- */
-bool socialEventServerProcess(EventServer *self, EventType type, void *eventData);
+    return self;
+}
 
-/**
- * @brief Event handler when a client disconnects
- */
-bool socialEventServerOnDisconnect (
-    zsock_t *eventServer,
-    Redis *redis,
-    MySQL *mysql,
-    RouterId_t routerId,
-    uint8_t *sessionKeyStr
-);
+bool skillInit(Skill *self) {
+    memset(self, 0, sizeof(*self));
+
+    return true;
+}
+
+void skillFree(Skill *self) {
+    // TODO
+}
+
+void skillDestroy(Skill **_self) {
+    Skill *self = *_self;
+
+    if (_self && self) {
+        skillFree(self);
+        free(self);
+        *_self = NULL;
+    }
+}

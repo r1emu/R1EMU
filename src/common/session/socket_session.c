@@ -27,8 +27,8 @@
 SocketSession *
 socketSessionNew (
     uint64_t accountId,
-    uint16_t routerId,
-    uint16_t mapId,
+    RouterId_t routerId,
+    MapId_t mapId,
     uint8_t *socketId,
     bool authenticated
 ) {
@@ -52,8 +52,8 @@ bool
 socketSessionInit(
     SocketSession *self,
     uint64_t accountId,
-    uint16_t routerId,
-    uint16_t mapId,
+    RouterId_t routerId,
+    MapId_t mapId,
     uint8_t *sessionKey,
     bool authenticated
 ) {
