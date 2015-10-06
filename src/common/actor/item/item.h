@@ -72,8 +72,17 @@ typedef struct {
     ItemInventoryIndex_t inventoryIndex;
 } ItemCPacket;
 
-// ----------- Functions ------------
+/**
+ * @brief ItemCPacket is the client packet structure of an item
+ */
+typedef struct {
+    ActorSPacket actor;
+    ItemId_t id;
+    ItemAmount_t amount;
+    ItemCategory category;
+} ItemSPacket;
 
+// ----------- Functions ------------
 /**
  * Allocate a new Item structure.
  * @return A pointer to an allocated Item, or NULL if an error occured.

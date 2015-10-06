@@ -61,9 +61,9 @@ void itemGemDestroy(ItemGem **_self) {
 size_t itemGemGetPropertiesCPacketSize(ItemGem *self) {
     size_t size = 0;
 
-    size += propertyFloatGetCPacketSize(); // level
-    size += propertyFloatGetCPacketSize(); // itemExp
-    size += propertyFloatGetCPacketSize(); // cooldown
+    size += propertyFloatGetCPacketSize(self->level); // level
+    size += propertyFloatGetCPacketSize(self->itemExp); // itemExp
+    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
 
     return size;
 }

@@ -13,207 +13,217 @@
 
 #include "mysql_commander.h"
 #include "common/commander/commander.h"
+#include "common/actor/item/item_factory.h"
 
-bool mySqlGetCommanders(MySQL *self, Commander **commanders) {
+static const char *mySqlCommanderStrFields[] = {
+    FOREACH_MYSQL_COMMANDER(GENERATE_STRING)
+};
+
+static const char *mySqlCommanderTypeFields[] = {
+    FOREACH_MYSQL_COMMANDER(GENERATE_TYPE)
+};
+
+bool mySqlCommanderSessionFlush(MySQL *self, CommanderSession *commanderSession) {
+
+    bool status = false;
+
+    Commander *commander = commanderSession->currentCommander;
+    if (!(mySqlCommanderFlush(self, commander))) {
+        error("Cannot flush commander.");
+        goto cleanup;
+    }
+
+    status = true;
+cleanup:
+
+    return status;
+}
+
+bool mySqlCommanderFlush(MySQL *self, Commander *commander) {
+
+    bool status = false;
+    MYSQL_ROW count;
+
+    // flush the commander
+    if (mySqlQuery(self, "SELECT count(*) FROM commanders WHERE commander_id = %u", commander->commanderId)) {
+        error("SQL Error : %s" , mysql_error(self->handle));
+        goto cleanup;
+    }
+
+    count = mysql_fetch_row(self->result);
+
+    if (atoi(count[0]) == 0) {
+        // insert the commander
+        if (!(mySqlCommanderInsert(self, commander))) {
+            error("Cannot insert a new commander.");
+            goto cleanup;
+        }
+    }
+    else {
+        if (!(mySqlCommanderUpdate(self, commander->commanderId, commander))) {
+            error("Cannot update the commander '%llx'.", commander->accountId);
+            goto cleanup;
+        }
+    }
+
+    status = true;
+cleanup:
+
+    return status;
+}
+
+bool mySqlGetCommanders(MySQL *self, char *familyName, Commander **commanders) {
 
     MYSQL_ROW row;
-
-    dbg("mySqlGetCommanders count: %d", mysql_num_rows(self->result));
 
     for (int i = 0; (row = mysql_fetch_row(self->result)); i++) {
 
         Commander *curCommander = commanders[i];
         commanderInit(curCommander);
 
-        curCommander->mapId = strtol(row[MYSQL_COMMANDER_FIELD_map_id], NULL, 10);
-        curCommander->pcId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
-        curCommander->commanderId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
-        curCommander->socialInfoId = strtoll(row[MYSQL_COMMANDER_FIELD_commander_id], NULL, 10);
+        strncpy(curCommander->familyName, familyName, sizeof(curCommander->familyName));
+        strncpy(curCommander->commanderName, row[MYSQL_COMMANDER_commander_name], sizeof(curCommander->commanderName));
+        curCommander->accountId = strtol(row[MYSQL_COMMANDER_account_id], NULL, 10);
+        curCommander->classId = strtol(row[MYSQL_COMMANDER_class_id], NULL, 10);
+        curCommander->jobId = strtol(row[MYSQL_COMMANDER_job_id], NULL, 10);
+        curCommander->gender = strtol(row[MYSQL_COMMANDER_gender], NULL, 10);
+        curCommander->level = strtol(row[MYSQL_COMMANDER_level], NULL, 10);
+        curCommander->hairId = strtol(row[MYSQL_COMMANDER_hair_id], NULL, 10);
+        curCommander->pose = 0; // IDLE
+        curCommander->pos = PositionXYZ_decl(
+            strtof(row[MYSQL_COMMANDER_position_x], NULL),
+            strtof(row[MYSQL_COMMANDER_position_y], NULL),
+            strtof(row[MYSQL_COMMANDER_position_z], NULL)
+        );
+        curCommander->currentXP = strtol(row[MYSQL_COMMANDER_exp], NULL, 10);
+        curCommander->maxXP = 1337; /** TODO : Get max XP from XP tables */
+        curCommander->pcId = rand(); /** TODO : Get unique PCID */
+        curCommander->socialInfoId = strtoll(row[MYSQL_COMMANDER_commander_id], NULL, 10); /** TODO : Get socialInfoId from MYSQL */
+        curCommander->commanderId = strtoll(row[MYSQL_COMMANDER_commander_id], NULL, 10);
+        curCommander->currentHP = strtol(row[MYSQL_COMMANDER_hp], NULL, 10);
+        curCommander->maxHP = curCommander->currentHP + 100; /** TODO : Get maxHP from MYSQL */
+        curCommander->currentSP = strtol(row[MYSQL_COMMANDER_mp], NULL, 10);
+        curCommander->maxSP = curCommander->currentSP + 100; /** TODO : Get maxHP from MYSQL */
+        curCommander->currentStamina = 25000; /** TODO : Get currentStamina from MYSQL */
+        curCommander->maxStamina = curCommander->currentStamina; /** TODO : Get maxStamina from MYSQL */
+        curCommander->mapId = strtol(row[MYSQL_COMMANDER_map_id], NULL, 10);
+        curCommander->isDeleted = strtol(row[MYSQL_COMMANDER_is_deleted], NULL, 10);
+        curCommander->timeDeleted = strtol(row[MYSQL_COMMANDER_time_deleted], NULL, 10);
 
-        CommanderAppearance *appearance = &curCommander->appearance;
-        strncpy(appearance->commanderName, row[MYSQL_COMMANDER_FIELD_commanderName], sizeof(appearance->commanderName));
-        appearance->jobId = strtol(row[MYSQL_COMMANDER_FIELD_job_id], NULL, 10);
-        appearance->classId = strtol(row[MYSQL_COMMANDER_FIELD_class_id], NULL, 10);
-        appearance->hairId = strtol(row[MYSQL_COMMANDER_FIELD_hair_id], NULL, 10);
-        appearance->gender = strtol(row[MYSQL_COMMANDER_FIELD_gender], NULL, 10);
-        appearance->level = strtol(row[MYSQL_COMMANDER_FIELD_level], NULL, 10);
-
-        CommanderEquipment *equipment = &appearance->equipment;
-        equipment->head_top = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_head_top], NULL, 10);
-        equipment->head_middle = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_head_middle], NULL, 10);
-        equipment->itemUnk1 = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_unkown_1], NULL, 10);
-        equipment->body_armor = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_body_armor], NULL, 10);
-        equipment->gloves = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_gloves], NULL, 10);
-        equipment->boots = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_boots], NULL, 10);
-        equipment->helmet = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_helmet], NULL, 10);
-        equipment->bracelet = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_bracelet], NULL, 10);
-        equipment->weapon = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_weapon], NULL, 10);
-        equipment->shield = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_shield], NULL, 10);
-        equipment->costume = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_costume], NULL, 10);
-        equipment->itemUnk3 = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_unkown_3], NULL, 10);
-        equipment->itemUnk4 = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_unkown_4], NULL, 10);
-        equipment->itemUnk5 = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_unkown_5], NULL, 10);
-        equipment->leg_armor = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_leg_armor], NULL, 10);
-        equipment->itemUnk6 = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_unkown_6], NULL, 10);
-        equipment->itemUnk7 = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_unkown_7], NULL, 10);
-        equipment->ring_left = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_ring_left], NULL, 10);
-        equipment->ring_right = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_ring_right], NULL, 10);
-        equipment->necklace = strtol(row[MYSQL_COMMANDER_FIELD_eqslot_necklace], NULL, 10);
-
+        // load equipped items
+        for (int i = 0; i < EQSLOT_COUNT; i++) {
+            MySqlCommanderEnumField field = MYSQL_COMMANDER_eqslot_head_top + i;
+            ItemId_t itemId = strtol(row[field], NULL, 10);
+            curCommander->inventory.equippedItems[i] = (ItemEquipable *) itemFactoryCreate(ITEM_CAT_ARMOR, itemId, 1);
+        }
     }
 
     return true;
 }
 
-bool mySqlRequestCommandersByAccountId(MySQL *self, uint64_t accountId, size_t *_commandersCount) {
+bool mySqlRequestCommandersByAccountId(MySQL *self, uint64_t accountId, size_t *commandersCount) {
 
     bool status = false;
-    size_t commandersCount = 0;
+	char query[MAX_QUERY_SIZE] = "SELECT ";
 
-    // check if current commander exists
-    if (mySqlQuery(self, "SELECT "
-        " "  MYSQL_COMMANDER_FIELD_commander_id_str
-        ", " MYSQL_COMMANDER_FIELD_commanderName_str
-        ", " MYSQL_COMMANDER_FIELD_time_deleted_str
-        ", " MYSQL_COMMANDER_FIELD_level_str
-        ", " MYSQL_COMMANDER_FIELD_exp_str
-        ", " MYSQL_COMMANDER_FIELD_gender_str
-        ", " MYSQL_COMMANDER_FIELD_job_id_str
-        ", " MYSQL_COMMANDER_FIELD_class_id_str
-        ", " MYSQL_COMMANDER_FIELD_hair_id_str
-        ", " MYSQL_COMMANDER_FIELD_map_id_str
-        ", " MYSQL_COMMANDER_FIELD_position_x_str
-        ", " MYSQL_COMMANDER_FIELD_position_y_str
-        ", " MYSQL_COMMANDER_FIELD_position_z_str
-        ", " MYSQL_COMMANDER_FIELD_hp_str
-        ", " MYSQL_COMMANDER_FIELD_mp_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_head_top_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_head_middle_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_1_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_body_armor_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_gloves_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_boots_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_helmet_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_bracelet_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_weapon_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_shield_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_costume_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_3_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_4_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_5_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_leg_armor_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_6_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_7_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_ring_left_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_ring_right_str
-        ", " MYSQL_COMMANDER_FIELD_eqslot_necklace_str
-        " FROM commanders "
-        "WHERE account_id = %llx "
-        "AND is_deleted = 'n' ",
-        accountId))
-    {
+	for (MySqlCommanderEnumField field = 0; field < MYSQL_COMMANDER_COUNT; field++) {
+        snprintf(query, sizeof(query), "%s%s, ", query, mySqlCommanderStrFields[field]);
+        if (field == MYSQL_COMMANDER_COUNT - 1) {
+            // No comma for the last field
+            query[strlen(query) - strlen(", ")] = ' ';
+        }
+	}
+
+	snprintf(query, sizeof(query), "%s FROM commanders ", query);
+	snprintf(query, sizeof(query), "%s WHERE %s = %s AND %s = 'n'", query,
+        mySqlCommanderStrFields[MYSQL_COMMANDER_account_id],
+        mySqlCommanderTypeFields[MYSQL_COMMANDER_account_id],
+        mySqlCommanderStrFields[MYSQL_COMMANDER_is_deleted]
+    );
+
+    // Check if current commander exists
+    if (mySqlQuery(self, query, accountId)) {
         error("SQL Error : %s" , mysql_error(self->handle));
         goto cleanup;
     }
 
-    commandersCount = mysql_num_rows(self->result);
-
-    dbg("commanders found in account %d", commandersCount);
-
-    *_commandersCount = commandersCount;
+    *commandersCount = mysql_num_rows(self->result);
     status = true;
 
 cleanup:
     return status;
 }
 
-bool mySqlCommanderInsert(MySQL *self, uint64_t accountId, Commander *commanderToCreate) {
+bool mySqlCommanderUpdate(MySQL *self, CommanderId_t commanderId, Commander *commander) {
 
     bool status = false;
-    CommanderAppearance *commander = &commanderToCreate->appearance;
 
     // Insert a new commander
-    if (mySqlQuery(self, "INSERT INTO commanders "
-       "SET account_id = '%llx'"
-       ", " MYSQL_COMMANDER_FIELD_commanderName_str " = '%s'"
-       ", " MYSQL_COMMANDER_FIELD_level_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_exp_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_gender_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_job_id_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_class_id_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_hair_id_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_map_id_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_position_x_str " = %f"
-       ", " MYSQL_COMMANDER_FIELD_position_y_str " = %f"
-       ", " MYSQL_COMMANDER_FIELD_position_z_str " = %f"
-       ", " MYSQL_COMMANDER_FIELD_hp_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_mp_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_head_top_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_head_middle_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_1_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_body_armor_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_gloves_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_boots_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_helmet_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_bracelet_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_weapon_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_shield_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_costume_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_3_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_4_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_5_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_leg_armor_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_6_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_unkown_7_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_ring_left_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_ring_right_str " = %d"
-       ", " MYSQL_COMMANDER_FIELD_eqslot_necklace_str " = %d",
+	char query[MAX_QUERY_SIZE] = "UPDATE commanders SET ";
 
-       accountId,
-       commander->commanderName,
-       commander->level,
-       commanderToCreate->maxXP,
-       commander->gender,
-       commander->jobId,
-       commander->classId,
-       commander->hairId,
-       commanderToCreate->mapId,
-       commanderToCreate->pos.x, /// FIXME : Using world pos, and should be barrack pos
-       commanderToCreate->pos.y, /// FIXME : Using world pos, and should be barrack pos
-       commanderToCreate->pos.z, /// FIXME : Using world pos, and should be barrack pos
-       10,
-       10,
-       commander->equipment.head_top,
-       commander->equipment.head_middle,
-       commander->equipment.itemUnk1,
-       commander->equipment.body_armor,
-       commander->equipment.gloves,
-       commander->equipment.boots,
-       commander->equipment.helmet,
-       commander->equipment.bracelet,
-       commander->equipment.weapon,
-       commander->equipment.shield,
-       commander->equipment.costume,
-       commander->equipment.itemUnk3,
-       commander->equipment.itemUnk4,
-       commander->equipment.itemUnk5,
-       commander->equipment.leg_armor,
-       commander->equipment.itemUnk6,
-       commander->equipment.itemUnk7,
-       commander->equipment.ring_left,
-       commander->equipment.ring_right,
-       commander->equipment.necklace))
+	for (MySqlCommanderEnumField field = 0; field < MYSQL_COMMANDER_COUNT; field++) {
+        // Exceptions : don't update commander id
+        if (field == MYSQL_COMMANDER_commander_id) {
+            continue;
+        }
+
+        snprintf(query, sizeof(query), "%s%s = %s, ", query,
+            mySqlCommanderStrFields[field], mySqlCommanderTypeFields[field]);
+
+        if (field == MYSQL_COMMANDER_COUNT - 1) {
+            // No comma for the last field
+            query[strlen(query) - strlen(", ")] = ' ';
+        }
+	}
+
+	snprintf(query, sizeof(query), "%s WHERE %s = %s AND %s = 'n'", query,
+        mySqlCommanderStrFields[MYSQL_COMMANDER_commander_id],
+        mySqlCommanderTypeFields[MYSQL_COMMANDER_commander_id],
+        mySqlCommanderStrFields[MYSQL_COMMANDER_is_deleted]
+    );
+
+    if (mySqlQuery(self, query,
+        commander->isDeleted ? 'y' : 'n',
+        commander->accountId,
+        commander->commanderName,
+        commander->timeDeleted,
+        commander->level,
+        commander->currentXP,
+        commander->gender,
+        commander->jobId,
+        commander->classId,
+        commander->hairId,
+        commander->mapId,
+        commander->pos.x,
+        commander->pos.y,
+        commander->pos.z,
+        commander->currentHP,
+        commander->currentSP,
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT_L]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN1]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BODY_ARMOR]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_GLOVES]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BOOTS]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HELMET]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BRACELET]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_WEAPON]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_SHIELD]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_COSTUME]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN3]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN4]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN5]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_LEG_ARMOR]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN6]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN7]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_LEFT]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_RIGHT]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_NECKLACE]),
+        commanderId))
     {
         error("SQL Error : %s" , mysql_error(self->handle));
         goto cleanup;
     }
-
-    uint64_t commanderId = mysql_insert_id(self->handle);
-
-    commanderToCreate->commanderId = commanderId;
-
-    // TODO : check last insert id
-
 
     status = true;
 
@@ -221,15 +231,91 @@ cleanup:
     return status;
 }
 
-bool MySqlCommanderDelete(MySQL *self, uint64_t commanderId) {
+bool mySqlCommanderInsert(MySQL *self, Commander *commander) {
 
     bool status = false;
 
-// Insert a new commander
-    if (mySqlQuery(self, "DELETE FROM commanders "
-       "WHERE commander_id = '%llu'",
-       commanderId))
+    // Insert a new commander
+	char query[MAX_QUERY_SIZE] = "INSERT INTO commanders SET ";
+
+	for (MySqlCommanderEnumField field = 0; field < MYSQL_COMMANDER_COUNT; field++) {
+
+        // Exceptions :
+        if (field == MYSQL_COMMANDER_commander_id) {
+            continue;
+        }
+
+        snprintf(query, sizeof(query), "%s%s = %s, ", query,
+        mySqlCommanderStrFields[field], mySqlCommanderTypeFields[field]);
+
+        if (field == MYSQL_COMMANDER_COUNT - 1) {
+            // No comma for the last field
+            query[strlen(query) - strlen(", ")] = ' ';
+        }
+	}
+
+    // Insert a new commander
+    if (mySqlQuery(self, query,
+        commander->isDeleted ? 'y' : 'n',
+        commander->accountId,
+        commander->commanderName,
+        commander->timeDeleted,
+        commander->level,
+        commander->currentXP,
+        commander->gender,
+        commander->jobId,
+        commander->classId,
+        commander->hairId,
+        commander->mapId,
+        commander->pos.x,
+        commander->pos.y,
+        commander->pos.z,
+        commander->currentHP,
+        commander->currentSP,
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT_L]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN1]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BODY_ARMOR]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_GLOVES]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BOOTS]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HELMET]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BRACELET]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_WEAPON]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_SHIELD]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_COSTUME]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN3]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN4]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN5]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_LEG_ARMOR]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN6]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN7]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_LEFT]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_RIGHT]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_NECKLACE])))
     {
+        error("SQL Error : %s" , mysql_error(self->handle));
+        goto cleanup;
+    }
+
+    commander->commanderId = mysql_insert_id(self->handle);
+    // TODO : check last insert id
+
+    status = true;
+
+cleanup:
+    return status;
+}
+
+bool MySqlCommanderDelete(MySQL *self, CommanderId_t commanderId) {
+
+    bool status = false;
+	char query[MAX_QUERY_SIZE] = "DELETE FROM commanders";
+
+    snprintf(query, sizeof(query), "%s WHERE %s = %s", query,
+        mySqlCommanderStrFields[MYSQL_COMMANDER_commander_id],
+        mySqlCommanderTypeFields[MYSQL_COMMANDER_commander_id]);
+
+    if (mySqlQuery(self, query, commanderId)) {
         error("SQL Error : %s" , mysql_error(self->handle));
         goto cleanup;
     }

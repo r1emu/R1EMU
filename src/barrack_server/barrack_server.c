@@ -17,6 +17,7 @@
 #include "barrack_server.h"
 #include "common/server/server.h"
 #include "common/db/db.h"
+#include "common/actor/item/item_factory.h"
 
 /**
  * @brief BarrackServer is the representation of the barrack server system
@@ -70,6 +71,12 @@ bool barrackServerStart(BarrackServer *self) {
     // Start dbSession
     if (!(dbStart(self->dbSession))) {
         error("Cannot start sessions db.");
+        return false;
+    }
+
+    // Initialize itemFactory
+    if (!(itemFactoryStart(serverGetMySQLInfo(self->server)))) {
+        error("Cannot initialize item factory.");
         return false;
     }
 

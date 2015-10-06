@@ -61,8 +61,8 @@ void itemAccessoryDestroy(ItemAccessory **_self) {
 
 size_t itemAccessoryGetPropertiesCPacketSize(ItemAccessory *self) {
     size_t size = 0;
-    size += propertyFloatGetCPacketSize(); // pr
-    size += propertyFloatGetCPacketSize(); // cooldown
+    size += propertyFloatGetCPacketSize(self->pr); // pr
+    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
     return size;
 }
 

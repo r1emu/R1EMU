@@ -23,7 +23,7 @@ typedef enum MySQLStatus {
     SQL_ERROR = -1,
 } MySQLStatus;
 
-#define MAX_QUERY_SIZE 1024
+#define MAX_QUERY_SIZE 4096
 
 typedef struct MySQLInfo {
     // the MySQL hostname

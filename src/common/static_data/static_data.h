@@ -77,4 +77,4 @@ void staticDataDestroy(StaticData **self);
  */
 void staticDataFree(StaticData *self);
 
-void staticDataDebug(StaticData *self, void (*debugFunction)(void *object));
+void staticDataDebug(StaticData *self, void (*printer)(void *object));

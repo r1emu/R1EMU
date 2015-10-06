@@ -27,10 +27,19 @@
 typedef uint8_t ActorKey[ACTOR_KEY_SIZE];
 typedef uint64_t ActorId_t;
 
-typedef struct Actor {
+/**
+ * Actor is the representation of a game actor
+ */
+typedef struct {
    ActorId_t uid;
 } Actor;
 
+/**
+ * ActorSPacket is a server packet Actor
+ */
+typedef struct {
+   ActorId_t uid;
+} ActorSPacket;
 
 // ----------- Functions ------------
 /**

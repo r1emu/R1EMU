@@ -18,7 +18,7 @@
 #include "common/server/worker.h"
 #include "common/commander/commander.h"
 #include "common/commander/inventory.h"
-#include "common/actor/item/item.h"
+#include "common/actor/item/item_factory.h"
 #include "common/packet/packet_stream.h"
 #include "common/redis/fields/redis_session.h"
 #include "common/redis/fields/redis_game_session.h"
@@ -571,8 +571,8 @@ static PacketHandlerState barrackHandlerCommanderDestroy(
     }
 
     // Update the session
-    session->game.accountSession.commanders[commanderIndex] = NULL;
-    commanderDestroy(&commanderToDelete);
+    session->game.commanderSession.currentCommander = NULL;
+    commanderDestroy(&session->game.accountSession.commanders[commanderIndex]);
 
     // Build the reply packet
     barrackBuilderCommanderDestroy(commanderIndex + 1, reply);
@@ -619,8 +619,6 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     commanderInit(&newCommander);
     newCommander.mapId = 1002; // FIXME : Start map could be loaded from
 
-    CommanderAppearance *commanderAppearance = &newCommander.appearance;
-
     // Check name
     size_t commanderNameLen = strlen(clientPacket->commanderName);
 
@@ -651,29 +649,29 @@ static PacketHandlerState barrackHandlerCommanderCreate(
             break;
 
         case COMMANDER_JOB_WARRIOR:
-            commanderAppearance->classId = COMMANDER_CLASS_WARRIOR;
+            newCommander.classId = COMMANDER_CLASS_WARRIOR;
             break;
 
         case COMMANDER_JOB_ARCHER:
-            commanderAppearance->classId = COMMANDER_CLASS_ARCHER;
+            newCommander.classId = COMMANDER_CLASS_ARCHER;
             break;
 
         case COMMANDER_JOB_WIZARD:
-            commanderAppearance->classId = COMMANDER_CLASS_WIZARD;
+            newCommander.classId = COMMANDER_CLASS_WIZARD;
             break;
 
         case COMMANDER_JOB_CLERIC:
-            commanderAppearance->classId = COMMANDER_CLASS_CLERIC;
+            newCommander.classId = COMMANDER_CLASS_CLERIC;
             break;
     }
 
-    commanderAppearance->jobId = clientPacket->jobId;
+    newCommander.jobId = clientPacket->jobId;
 
     // Gender
     switch (clientPacket->gender) {
         case COMMANDER_GENDER_MALE:
         case COMMANDER_GENDER_FEMALE:
-            commanderAppearance->gender = clientPacket->gender;
+            newCommander.gender = clientPacket->gender;
             break;
 
         case COMMANDER_GENDER_BOTH:
@@ -685,14 +683,14 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     }
 
     // Name
-    strncpy(commanderAppearance->commanderName, clientPacket->commanderName, sizeof(commanderAppearance->commanderName));
-    strncpy(commanderAppearance->familyName, accountSession->familyName, sizeof(commanderAppearance->familyName));
+    strncpy(newCommander.commanderName, clientPacket->commanderName, sizeof(newCommander.commanderName));
+    strncpy(newCommander.familyName, accountSession->familyName, sizeof(newCommander.familyName));
 
     // AccountID
-    commanderAppearance->accountId = session->socket.accountId;
+    newCommander.accountId = session->socket.accountId;
 
     // Hair type
-    commanderAppearance->hairId = clientPacket->hairId;
+    newCommander.hairId = clientPacket->hairId;
 
     // PCID
     // TODO : check for unicity of the generated pcId
@@ -705,7 +703,110 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     // Position : Center of the barrack
     newCommander.pos = PositionXYZ_decl(19.0, 28.0, 29.0);
 
-    if (!mySqlCommanderInsert(self->sqlConn, session->socket.accountId, &newCommander)) {
+    // Add default equiped items
+    ItemId_t defaultEquipment[][EQSLOT_COUNT] = {
+
+        [COMMANDER_JOB_WARRIOR] = {
+            EMPTYEQSLOT_NoHat, // HAT
+            EMPTYEQSLOT_NoHat, // HAT_L
+            EMPTYEQSLOT_NoOuter, // UNKOWN1
+            531101, // BODY_ARMOR : Light Armor
+            EMPTYEQSLOT_NoGloves, // GLOVES
+            EMPTYEQSLOT_NoBoots,// BOOTS
+            EMPTYEQSLOT_NoHelmet, // HELMET
+            EMPTYEQSLOT_NoArmband, // BRACELET
+            201101, // WEAPON : Old Wooden Club
+            EMPTYEQSLOT_NoWeapon, // SHIELD
+            EMPTYEQSLOT_NoOuter, // COSTUME
+            EMPTYEQSLOT_NoRing, // UNKOWN3
+            EMPTYEQSLOT_NoRing, // UNKOWN4
+            EMPTYEQSLOT_NoOuter, // UNKOWN5
+            521101, // LEG_ARMOR : Light Pants
+            EMPTYEQSLOT_NoRing, // UNKOWN6
+            EMPTYEQSLOT_NoRing, // UNKOWN7
+            EMPTYEQSLOT_NoRing, // RING_LEFT
+            EMPTYEQSLOT_NoRing, // RING_RIGHT
+            EMPTYEQSLOT_NoNeck,// NECKLACE
+        },
+
+        [COMMANDER_JOB_CLERIC] = {
+            EMPTYEQSLOT_NoHat, // HAT
+            EMPTYEQSLOT_NoHat, // HAT_L
+            EMPTYEQSLOT_NoOuter, // UNKOWN1
+            531101, // BODY_ARMOR : Light Armor
+            EMPTYEQSLOT_NoGloves, // GLOVES
+            EMPTYEQSLOT_NoBoots,// BOOTS
+            EMPTYEQSLOT_NoHelmet, // HELMET
+            EMPTYEQSLOT_NoArmband, // BRACELET
+            201101, // WEAPON : Old Wooden Club
+            EMPTYEQSLOT_NoWeapon, // SHIELD
+            EMPTYEQSLOT_NoOuter, // COSTUME
+            EMPTYEQSLOT_NoRing, // UNKOWN3
+            EMPTYEQSLOT_NoRing, // UNKOWN4
+            EMPTYEQSLOT_NoOuter, // UNKOWN5
+            521101, // LEG_ARMOR : Light Pants
+            EMPTYEQSLOT_NoRing, // UNKOWN6
+            EMPTYEQSLOT_NoRing, // UNKOWN7
+            EMPTYEQSLOT_NoRing, // RING_LEFT
+            EMPTYEQSLOT_NoRing, // RING_RIGHT
+            EMPTYEQSLOT_NoNeck,// NECKLACE
+        },
+
+        [COMMANDER_JOB_WIZARD] = {
+            EMPTYEQSLOT_NoHat, // HAT
+            EMPTYEQSLOT_NoHat, // HAT_L
+            EMPTYEQSLOT_NoOuter, // UNKOWN1
+            531101, // BODY_ARMOR : Light Armor
+            EMPTYEQSLOT_NoGloves, // GLOVES
+            EMPTYEQSLOT_NoBoots,// BOOTS
+            EMPTYEQSLOT_NoHelmet, // HELMET
+            EMPTYEQSLOT_NoArmband, // BRACELET
+            201101, // WEAPON : Old Wooden Club
+            EMPTYEQSLOT_NoWeapon, // SHIELD
+            EMPTYEQSLOT_NoOuter, // COSTUME
+            EMPTYEQSLOT_NoRing, // UNKOWN3
+            EMPTYEQSLOT_NoRing, // UNKOWN4
+            EMPTYEQSLOT_NoOuter, // UNKOWN5
+            521101, // LEG_ARMOR : Light Pants
+            EMPTYEQSLOT_NoRing, // UNKOWN6
+            EMPTYEQSLOT_NoRing, // UNKOWN7
+            EMPTYEQSLOT_NoRing, // RING_LEFT
+            EMPTYEQSLOT_NoRing, // RING_RIGHT
+            EMPTYEQSLOT_NoNeck,// NECKLACE
+        },
+
+        [COMMANDER_JOB_ARCHER] = {
+            EMPTYEQSLOT_NoHat, // HAT
+            EMPTYEQSLOT_NoHat, // HAT_L
+            EMPTYEQSLOT_NoOuter, // UNKOWN1
+            531101, // BODY_ARMOR : Light Armor
+            EMPTYEQSLOT_NoGloves, // GLOVES
+            EMPTYEQSLOT_NoBoots,// BOOTS
+            EMPTYEQSLOT_NoHelmet, // HELMET
+            EMPTYEQSLOT_NoArmband, // BRACELET
+            201101, // WEAPON : Old Wooden Club
+            EMPTYEQSLOT_NoWeapon, // SHIELD
+            EMPTYEQSLOT_NoOuter, // COSTUME
+            EMPTYEQSLOT_NoRing, // UNKOWN3
+            EMPTYEQSLOT_NoRing, // UNKOWN4
+            EMPTYEQSLOT_NoOuter, // UNKOWN5
+            521101, // LEG_ARMOR : Light Pants
+            EMPTYEQSLOT_NoRing, // UNKOWN6
+            EMPTYEQSLOT_NoRing, // UNKOWN7
+            EMPTYEQSLOT_NoRing, // RING_LEFT
+            EMPTYEQSLOT_NoRing, // RING_RIGHT
+            EMPTYEQSLOT_NoNeck,// NECKLACE
+        }
+    };
+    for (ItemEquipmentSlot slot = 0; slot < EQSLOT_COUNT; slot++) {
+        newCommander.inventory.equippedItems[slot] = (ItemEquipable *) itemFactoryCreate(
+            ITEM_CAT_WEAPON,
+            defaultEquipment[newCommander.jobId][slot],
+            1
+        );
+    }
+
+    if (!mySqlCommanderInsert(self->sqlConn, &newCommander)) {
         error("Cannot create the commander in the SQL.");
         goto cleanup;
     }
@@ -713,7 +814,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     info("New Commander Created!");
     info("PCID generated : %x", newCommander.pcId);
     info("SocialInfoID generated : %llx", newCommander.socialInfoId);
-    info("accountId %llx", commanderAppearance->accountId);
+    info("accountId %llx", newCommander.accountId);
 
     Commander *dupCommander = NULL;
     if (!(dupCommander = commanderDup(&newCommander))) {

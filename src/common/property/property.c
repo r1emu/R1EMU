@@ -13,11 +13,13 @@
 
 #include "property.h"
 
-size_t propertyFloatGetCPacketSize(void) {
+size_t propertyFloatGetCPacketSize(float *value) {
     size_t size = 0;
 
     // PropertyFloatCPacket is fixed packet size
-    size += sizeof(PropertyFloatCPacket);
+    if (value) {
+        size += sizeof(PropertyFloatCPacket);
+    }
 
     return size;
 }
@@ -26,12 +28,14 @@ size_t propertyStringGetCPacketSize(char *value) {
 
     size_t size = 0;
 
-    size_t valueSize = strlen(value) + 1;
-    #pragma pack(push, 1)
-    DECLARE_PropertyStringCPacket(valueSize);
-    #pragma pack(pop)
+    if (value) {
+        size_t valueSize = strlen(value) + 1;
+        #pragma pack(push, 1)
+        DECLARE_PropertyStringCPacket(valueSize);
+        #pragma pack(pop)
 
-    size += sizeof(PropertyStringCPacket);
+        size += sizeof(PropertyStringCPacket);
+    }
 
     return size;
 }
@@ -52,6 +56,10 @@ void propertyFloatGetCPacket(PropertyId id, float *value, PacketStream *stream) 
 
 
 void propertyStringGetCPacket(PropertyId id, char *value, PacketStream *stream) {
+
+    if (!value) {
+        return;
+    }
 
     size_t valueSize = strlen(value) + 1;
     #pragma pack(push, 1)

@@ -503,19 +503,19 @@ static PacketHandlerState zoneHandlerGameReady(
     items[0].itemId = 1111;
     items[0].itemType = 2;
     items[0].amount = 1;
-    items[0].equipSlot = EQSLOT_HEAD_TOP;
+    items[0].equipSlot = EQSLOT_HAT;
     items[0].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[0]);
-    inventoryEquipItem(inventory, items[0].itemId, EQSLOT_HEAD_TOP);
+    inventoryEquipItem(inventory, items[0].itemId, EQSLOT_HAT);
 
 
     items[1].itemId = 2222;
     items[1].itemType = 2;
     items[1].amount = 1;
-    items[1].equipSlot = EQSLOT_HEAD_MIDDLE;
+    items[1].equipSlot = EQSLOT_HAT_L;
     items[1].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory, &items[1]);
-    inventoryEquipItem(inventory, items[1].itemId, EQSLOT_HEAD_MIDDLE);
+    inventoryEquipItem(inventory, items[1].itemId, EQSLOT_HAT_L);
 
     items[2].itemId = 3333;
     items[2].itemType = 4;
@@ -640,18 +640,18 @@ static PacketHandlerState zoneHandlerGameReady(
     items[17].itemId = 181818;
     items[17].itemType = 9;
     items[17].amount = 1;
-    items[17].equipSlot = EQSLOT_RIGHT_LEFT;
+    items[17].equipSlot = EQSLOT_RING_LEFT;
     items[17].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[17]);
-    inventoryEquipItem(inventory, items[17].itemId, EQSLOT_RIGHT_LEFT);
+    inventoryEquipItem(inventory, items[17].itemId, EQSLOT_RING_LEFT);
 
     items[18].itemId = 191919;
     items[18].itemType = 9;
     items[18].amount = 1;
-    items[18].equipSlot = EQSLOT_RIGHT_RIGHT;
+    items[18].equipSlot = EQSLOT_RING_RIGHT;
     items[18].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
     inventoryAddItem(inventory,  &items[18]);
-    inventoryEquipItem(inventory, items[18].itemId, EQSLOT_RIGHT_RIGHT);
+    inventoryEquipItem(inventory, items[18].itemId, EQSLOT_RING_RIGHT);
 
     items[19].itemId = 202020;
     items[19].itemType = 10;
@@ -765,7 +765,7 @@ static PacketHandlerState zoneHandlerConnect(
     // TODO : Reverse CZ_CONNECT correctly
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_CONNECT);
 
-    GameSession tmpGameSession;
+    GameSession tmpGameSession = {0};
     AccountSession *tmpAccountSession = &tmpGameSession.accountSession;
     CommanderSession *tmpCommanderSession = &tmpGameSession.commanderSession;
 
@@ -839,7 +839,7 @@ static PacketHandlerState zoneHandlerConnect(
 
     // FIXME
     // Set a default position
-    tmpCommanderSession->currentCommander->pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
+    // tmpCommanderSession->currentCommander->pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
 
     // Update the session
     session->game = tmpGameSession;

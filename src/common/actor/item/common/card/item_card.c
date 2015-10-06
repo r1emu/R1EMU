@@ -61,9 +61,9 @@ void itemCardDestroy(ItemCard **_self) {
 size_t itemCardGetPropertiesCPacketSize(ItemCard *self) {
     size_t size = 0;
 
-    size += propertyFloatGetCPacketSize(); // level
-    size += propertyFloatGetCPacketSize(); // cooldown
-    size += propertyFloatGetCPacketSize(); // itemExp
+    size += propertyFloatGetCPacketSize(self->level); // level
+    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
+    size += propertyFloatGetCPacketSize(self->itemExp); // itemExp
 
     return size;
 }

@@ -19,91 +19,62 @@
 #include "mysql_session.h"
 #include "barrack_server/barrack_handler/barrack_builder.h"
 
-#define MYSQL_COMMANDER_FIELD_commander_id_str "commander_id"
-#define MYSQL_COMMANDER_FIELD_commanderName_str "commander_name"
-#define MYSQL_COMMANDER_FIELD_time_deleted_str "time_deleted"
-#define MYSQL_COMMANDER_FIELD_level_str "level"
-#define MYSQL_COMMANDER_FIELD_exp_str "exp"
-#define MYSQL_COMMANDER_FIELD_gender_str "gender"
-#define MYSQL_COMMANDER_FIELD_job_id_str "job_id"
-#define MYSQL_COMMANDER_FIELD_class_id_str "class_id"
-#define MYSQL_COMMANDER_FIELD_hair_id_str "hair_id"
-#define MYSQL_COMMANDER_FIELD_map_id_str "map_id"
-#define MYSQL_COMMANDER_FIELD_position_x_str "position_x"
-#define MYSQL_COMMANDER_FIELD_position_y_str "position_y"
-#define MYSQL_COMMANDER_FIELD_position_z_str "position_z"
-#define MYSQL_COMMANDER_FIELD_hp_str "hp"
-#define MYSQL_COMMANDER_FIELD_mp_str "mp"
-#define MYSQL_COMMANDER_FIELD_eqslot_head_top_str "eqslot_head_top"
-#define MYSQL_COMMANDER_FIELD_eqslot_head_middle_str "eqslot_head_middle"
-#define MYSQL_COMMANDER_FIELD_eqslot_unkown_1_str "eqslot_unkown_1"
-#define MYSQL_COMMANDER_FIELD_eqslot_body_armor_str "eqslot_body_armor"
-#define MYSQL_COMMANDER_FIELD_eqslot_gloves_str "eqslot_gloves"
-#define MYSQL_COMMANDER_FIELD_eqslot_boots_str "eqslot_boots"
-#define MYSQL_COMMANDER_FIELD_eqslot_helmet_str "eqslot_helmet"
-#define MYSQL_COMMANDER_FIELD_eqslot_bracelet_str "eqslot_bracelet"
-#define MYSQL_COMMANDER_FIELD_eqslot_weapon_str "eqslot_weapon"
-#define MYSQL_COMMANDER_FIELD_eqslot_shield_str "eqslot_shield"
-#define MYSQL_COMMANDER_FIELD_eqslot_costume_str "eqslot_costume"
-#define MYSQL_COMMANDER_FIELD_eqslot_unkown_3_str "eqslot_unkown_3"
-#define MYSQL_COMMANDER_FIELD_eqslot_unkown_4_str "eqslot_unkown_4"
-#define MYSQL_COMMANDER_FIELD_eqslot_unkown_5_str "eqslot_unkown_5"
-#define MYSQL_COMMANDER_FIELD_eqslot_leg_armor_str "eqslot_leg_armor"
-#define MYSQL_COMMANDER_FIELD_eqslot_unkown_6_str "eqslot_unkown_6"
-#define MYSQL_COMMANDER_FIELD_eqslot_unkown_7_str "eqslot_unkown_7"
-#define MYSQL_COMMANDER_FIELD_eqslot_ring_left_str "eqslot_ring_left"
-#define MYSQL_COMMANDER_FIELD_eqslot_ring_right_str "eqslot_ring_right"
-#define MYSQL_COMMANDER_FIELD_eqslot_necklace_str "eqslot_necklace"
+#define FOREACH_MYSQL_COMMANDER(GENERATOR)                          \
+    GENERATOR(MYSQL_COMMANDER, commander_id, '%llu')                \
+    GENERATOR(MYSQL_COMMANDER, is_deleted, '%c')                    \
+    GENERATOR(MYSQL_COMMANDER, account_id, '%llu')                  \
+    GENERATOR(MYSQL_COMMANDER, commander_name, '%s')                \
+    GENERATOR(MYSQL_COMMANDER, time_deleted, FROM_UNIXTIME('%u'))   \
+    GENERATOR(MYSQL_COMMANDER, level, '%u')                         \
+    GENERATOR(MYSQL_COMMANDER, exp, '%u')                           \
+    GENERATOR(MYSQL_COMMANDER, gender, '%u')                        \
+    GENERATOR(MYSQL_COMMANDER, job_id, '%u')                        \
+    GENERATOR(MYSQL_COMMANDER, class_id, '%u')                      \
+    GENERATOR(MYSQL_COMMANDER, hair_id, '%u')                       \
+    GENERATOR(MYSQL_COMMANDER, map_id, '%u')                        \
+    GENERATOR(MYSQL_COMMANDER, position_x, '%f')                    \
+    GENERATOR(MYSQL_COMMANDER, position_y, '%f')                    \
+    GENERATOR(MYSQL_COMMANDER, position_z, '%f')                    \
+    GENERATOR(MYSQL_COMMANDER, hp, '%d')                            \
+    GENERATOR(MYSQL_COMMANDER, mp, '%d')                            \
+    GENERATOR(MYSQL_COMMANDER, eqslot_head_top, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_head_middle, '%u')            \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_1, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_body_armor, '%u')             \
+    GENERATOR(MYSQL_COMMANDER, eqslot_gloves, '%u')                 \
+    GENERATOR(MYSQL_COMMANDER, eqslot_boots, '%u')                  \
+    GENERATOR(MYSQL_COMMANDER, eqslot_helmet, '%u')                 \
+    GENERATOR(MYSQL_COMMANDER, eqslot_bracelet, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_weapon, '%u')                 \
+    GENERATOR(MYSQL_COMMANDER, eqslot_shield, '%u')                 \
+    GENERATOR(MYSQL_COMMANDER, eqslot_costume, '%u')                \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_3, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_4, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_5, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_leg_armor, '%u')              \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_6, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_7, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_ring_left, '%u')              \
+    GENERATOR(MYSQL_COMMANDER, eqslot_ring_right, '%u')             \
+    GENERATOR(MYSQL_COMMANDER, eqslot_necklace, '%u')
 
-enum MySqlCommanderFields {
-    MYSQL_COMMANDER_FIELD_commander_id,
-	MYSQL_COMMANDER_FIELD_commanderName,
-	MYSQL_COMMANDER_FIELD_time_deleted,
-	MYSQL_COMMANDER_FIELD_level,
-	MYSQL_COMMANDER_FIELD_exp,
-	MYSQL_COMMANDER_FIELD_gender,
-	MYSQL_COMMANDER_FIELD_job_id,
-	MYSQL_COMMANDER_FIELD_class_id,
-	MYSQL_COMMANDER_FIELD_hair_id,
-	MYSQL_COMMANDER_FIELD_map_id,
-	MYSQL_COMMANDER_FIELD_position_x,
-	MYSQL_COMMANDER_FIELD_position_y,
-	MYSQL_COMMANDER_FIELD_position_z,
-	MYSQL_COMMANDER_FIELD_hp,
-	MYSQL_COMMANDER_FIELD_mp,
-	MYSQL_COMMANDER_FIELD_eqslot_head_top,
-	MYSQL_COMMANDER_FIELD_eqslot_head_middle,
-	MYSQL_COMMANDER_FIELD_eqslot_unkown_1,
-	MYSQL_COMMANDER_FIELD_eqslot_body_armor,
-	MYSQL_COMMANDER_FIELD_eqslot_gloves,
-	MYSQL_COMMANDER_FIELD_eqslot_boots,
-	MYSQL_COMMANDER_FIELD_eqslot_helmet,
-	MYSQL_COMMANDER_FIELD_eqslot_bracelet,
-	MYSQL_COMMANDER_FIELD_eqslot_weapon,
-	MYSQL_COMMANDER_FIELD_eqslot_shield,
-	MYSQL_COMMANDER_FIELD_eqslot_costume,
-	MYSQL_COMMANDER_FIELD_eqslot_unkown_3,
-	MYSQL_COMMANDER_FIELD_eqslot_unkown_4,
-	MYSQL_COMMANDER_FIELD_eqslot_unkown_5,
-	MYSQL_COMMANDER_FIELD_eqslot_leg_armor,
-	MYSQL_COMMANDER_FIELD_eqslot_unkown_6,
-	MYSQL_COMMANDER_FIELD_eqslot_unkown_7,
-	MYSQL_COMMANDER_FIELD_eqslot_ring_left,
-	MYSQL_COMMANDER_FIELD_eqslot_ring_right,
-	MYSQL_COMMANDER_FIELD_eqslot_necklace,
-	MYSQL_COMMANDER_FIELD_COUNT
-} MySqlCommanderFields;
+typedef enum {
+    FOREACH_MYSQL_COMMANDER(GENERATE_ENUM)
+	MYSQL_COMMANDER_COUNT
+} MySqlCommanderEnumField;
 
 /**
  * Request to SQL a set of commanders by the account ID
  */
-bool mySqlRequestCommandersByAccountId(MySQL *self, uint64_t accountId, size_t *_commandersCount);
+bool mySqlRequestCommandersByAccountId(MySQL *self, uint64_t accountId, size_t *commandersCount);
 
 /**
  * Convert SQL results to in memory structures
  */
-bool mySqlGetCommanders(MySQL *self, Commander **commanders);
+bool mySqlGetCommanders(MySQL *self, char *familyName, Commander **commanders);
 
-bool mySqlCommanderInsert(MySQL *self, uint64_t accountId, Commander *commander);
-
-bool MySqlCommanderDelete(MySQL *self, uint64_t commanderId);
+bool mySqlCommanderInsert(MySQL *self, Commander *commander);
+bool mySqlCommanderUpdate(MySQL *self, CommanderId_t commanderId, Commander *commander);
+bool MySqlCommanderDelete(MySQL *self, CommanderId_t commanderId);
+bool mySqlCommanderFlush(MySQL *self, Commander *commander);
+bool mySqlCommanderSessionFlush(MySQL *self, CommanderSession *commanderSession);

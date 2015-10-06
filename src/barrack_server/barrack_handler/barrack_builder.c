@@ -265,7 +265,7 @@ void barrackBuilderCommanderList(
 
     #define DEFINE_CommanderBarrackInfoCPacket(x)     \
         typedef struct {                              \
-            CommanderAppearance appearance;           \
+            CommanderAppearanceCPacket appearance;           \
             uint64_t socialInfoId;                    \
             uint16_t commanderPosition;               \
             uint16_t mapId;                           \
@@ -372,7 +372,10 @@ void barrackBuilderCommanderList(
             CommanderBarrackInfoCPacket *curCommandersBarrackInfoPacket = packetStreamGetCurrentBuffer(&packetStream);
 
             // Fill it
-            curCommandersBarrackInfoPacket->appearance = curCommander->appearance;
+            commanderAppearanceCPacketInit(&curCommandersBarrackInfoPacket->appearance,
+                curCommander->familyName, curCommander->commanderName,
+                curCommander->accountId, curCommander->classId, curCommander->jobId,
+                curCommander->gender, curCommander->level, curCommander->hairId, curCommander->pose);
 
             curCommandersBarrackInfoPacket->socialInfoId = curCommander->socialInfoId; // CharUniqueId?
             curCommandersBarrackInfoPacket->commanderPosition = commanderIndex + 1;
@@ -381,9 +384,7 @@ void barrackBuilderCommanderList(
             curCommandersBarrackInfoPacket->unk5 = 0;
             curCommandersBarrackInfoPacket->maxXP = curCommander->maxXP;
             curCommandersBarrackInfoPacket->unk6 = SWAP_UINT32(0xC01C761C);
-            curCommandersBarrackInfoPacket->pos = PositionXYZ_decl(
-                SWAP_UINT32(0x25e852c1), SWAP_UINT32(0x6519e541), SWAP_UINT32(0x39f4ef42)
-            );
+            curCommandersBarrackInfoPacket->pos = curCommander->pos;
             curCommandersBarrackInfoPacket->dir = PositionXZ_decl(0, 0); // Set direction to face camera.
             curCommandersBarrackInfoPacket->pos2 = curCommandersBarrackInfoPacket->pos;
             curCommandersBarrackInfoPacket->dir2 = curCommandersBarrackInfoPacket->dir;
@@ -571,10 +572,23 @@ void barrackBuilderCommanderDestroy(uint8_t commanderDestroyMask, zmsg_t *replyM
 }
 
 void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount, zmsg_t *replyMsg) {
+
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        CommanderCreatePacket commanderCreate;
+        CommanderAppearanceCPacket appearance;
+        uint64_t socialInfoId;
+        uint16_t commanderPosition;
+        uint16_t mapId;
+        uint32_t unk4;
+        uint32_t unk5;
+        uint32_t maxXP;
+        uint32_t unk6;
+        PositionXYZ pos;
+        PositionXZ dir;
+        PositionXYZ pos2;
+        PositionXZ dir2;
+        uint32_t unk8;
     } replyPacket;
     #pragma pack(pop)
 
@@ -587,18 +601,23 @@ void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
-        replyPacket.commanderCreate.appearance = commander->appearance;
-        replyPacket.commanderCreate.mapId = commander->mapId;
-        replyPacket.commanderCreate.socialInfoId = commander->socialInfoId;
-        replyPacket.commanderCreate.commanderPosition = commandersCount;
-        replyPacket.commanderCreate.unk4 = SWAP_UINT32(0x02000000); // ICBT
-        replyPacket.commanderCreate.unk5 = 0;
-        replyPacket.commanderCreate.maxXP = 0xC; // ICBT ; TODO : Implement EXP table
-        replyPacket.commanderCreate.unk6 = SWAP_UINT32(0xC01C761C); // ICBT
-        replyPacket.commanderCreate.pos = commander->pos;
-        replyPacket.commanderCreate.dir = commanderDir;
-        replyPacket.commanderCreate.pos2 = commander->pos;
-        replyPacket.commanderCreate.dir2 = commanderDir;
+
+        commanderAppearanceCPacketInit(&replyPacket.appearance,
+            commander->familyName, commander->commanderName,
+            commander->accountId, commander->classId, commander->jobId,
+            commander->gender, commander->level, commander->hairId, commander->pose);
+
+        replyPacket.mapId = commander->mapId;
+        replyPacket.socialInfoId = commander->socialInfoId;
+        replyPacket.commanderPosition = commandersCount;
+        replyPacket.unk4 = SWAP_UINT32(0x02000000); // ICBT
+        replyPacket.unk5 = 0;
+        replyPacket.maxXP = 0xC; // ICBT ; TODO : Implement EXP table
+        replyPacket.unk6 = SWAP_UINT32(0xC01C761C); // ICBT
+        replyPacket.pos = commander->pos;
+        replyPacket.dir = commanderDir;
+        replyPacket.pos2 = commander->pos;
+        replyPacket.dir2 = commanderDir;
     }
 
     buffer_print(&replyPacket, sizeof(replyPacket), NULL);

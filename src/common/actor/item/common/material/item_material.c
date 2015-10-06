@@ -55,7 +55,7 @@ void itemMaterialDestroy(ItemMaterial **_self) {
 size_t itemMaterialGetPropertiesCPacketSize(ItemMaterial *self) {
     size_t size = 0;
 
-    size += propertyFloatGetCPacketSize(); // cooldown
+    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
 
     return size;
 }

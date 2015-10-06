@@ -70,9 +70,9 @@ void itemArmorDestroy(ItemArmor **_self) {
 size_t itemArmorGetPropertiesCPacketSize(ItemArmor *self) {
     size_t size = 0;
 
-    size += propertyFloatGetCPacketSize(); // def
-    size += propertyFloatGetCPacketSize(); // cooldown
-    size += propertyFloatGetCPacketSize(); // reinforce
+    size += propertyFloatGetCPacketSize(self->def); // def
+    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
+    size += propertyFloatGetCPacketSize(self->reinforce); // reinforce
     size += propertyStringGetCPacketSize(self->memo); // memo
     size += propertyStringGetCPacketSize(self->customName); // customName
     size += propertyStringGetCPacketSize(self->maker); // maker

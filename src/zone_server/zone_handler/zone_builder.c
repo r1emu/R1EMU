@@ -17,6 +17,7 @@
 #include "common/packet/packet.h"
 #include "common/packet/packet_type.h"
 #include "common/packet/packet_stream.h"
+#include "common/commander/commander.h"
 #include "common/commander/inventory.h"
 #include "common/actor/item/item.h"
 
@@ -772,7 +773,7 @@ void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg) {
         uint32_t titleAchievmentId; // 24B42B1B
         uint32_t unk9; // FFFFFFFF
         uint8_t unk10; // 00
-        CommanderAppearance commander;
+        CommanderAppearanceCPacket appearance;
         uint8_t partyName[48+1]; // "None"
     } replyPacket;
     #pragma pack(pop)
@@ -802,7 +803,10 @@ void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg) {
         replyPacket.titleAchievmentId = SWAP_UINT32(0xA1860100); // ICBT, "Hunter"
         replyPacket.unk9 = -1;
         replyPacket.unk10 = 0;
-        memcpy(&replyPacket.commander, &commander->appearance, sizeof(replyPacket.commander));
+        commanderAppearanceCPacketInit(&replyPacket.appearance,
+            commander->familyName, commander->commanderName,
+            commander->accountId, commander->classId, commander->jobId,
+            commander->gender, commander->level, commander->hairId, commander->pose);
         strncpy(replyPacket.partyName, "None", sizeof(replyPacket.partyName));
     }
 }
@@ -1532,15 +1536,15 @@ void zoneBuilderChat(Commander *commander, uint8_t *chatText, zmsg_t *replyMsg) 
     {
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
         replyPacket.pcId = commander->pcId;
-        memcpy(replyPacket.familyName, commander->appearance.familyName, sizeof(replyPacket.familyName));
-        memcpy(replyPacket.commanderName, commander->appearance.commanderName, sizeof(replyPacket.commanderName));
+        memcpy(replyPacket.familyName, commander->familyName, sizeof(replyPacket.familyName));
+        memcpy(replyPacket.commanderName, commander->commanderName, sizeof(replyPacket.commanderName));
         replyPacket.unk1 = 0x4F;
-        replyPacket.jobId = commander->appearance.jobId;
+        replyPacket.jobId = commander->jobId;
         replyPacket.unk2 = 1;
-        replyPacket.gender = commander->appearance.gender;
-        replyPacket.hairId = commander->appearance.hairId;
+        replyPacket.gender = commander->gender;
+        replyPacket.hairId = commander->hairId;
         replyPacket.unk3 = 0;
-        replyPacket.headTop = commander->appearance.equipment.head_top;
+        replyPacket.headTop = itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT]);
         replyPacket.displayTime = 0;
         memcpy(replyPacket.chatText, chatText, sizeof(replyPacket.chatText));
     }
@@ -1589,7 +1593,7 @@ void zoneBuilderConnectOk(
         uint32_t pcId;
         uint32_t unk5;
 
-        CommanderAppearance appearance;
+        CommanderAppearanceCPacket appearance;
         PositionXYZ pos;
         uint32_t currentXP;
         uint32_t maxXP;
@@ -1623,8 +1627,10 @@ void zoneBuilderConnectOk(
         memcpy(replyPacket.passport, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", sizeof(replyPacket.passport));
         replyPacket.pcId = commander->pcId;
         replyPacket.unk5 = 0; // ICBT
-
-        replyPacket.appearance = commander->appearance;
+        commanderAppearanceCPacketInit(&replyPacket.appearance,
+            commander->familyName, commander->commanderName,
+            commander->accountId, commander->classId, commander->jobId, commander->gender,
+            commander->level, commander->hairId, commander->pose);
         replyPacket.pos = commander->pos;
         replyPacket.currentXP = commander->currentXP;
         replyPacket.maxXP = commander->maxXP;
@@ -1664,6 +1670,19 @@ void zoneBuilderSessionObjects(zmsg_t *replyMsg) {
 }
 
 void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
+
+    #define DEFINE_InventoryItemCPacket(attrSize)             \
+    typedef struct {                                          \
+        ItemId_t itemId;                                      \
+        uint16_t sizeOfAttributes;                            \
+        uint16_t unkown1;                                     \
+        ActorId_t itemUId;                                    \
+        ItemAmount_t amount;                                  \
+        ItemPrice_t price;                                    \
+        ItemInventoryIndex_t inventoryIndex;                  \
+        uint32_t unkown2;                                     \
+        uint8_t properties[attrSize];                         \
+    } InventoryItemCPacket;
 
     // Get inventory count
     size_t inventoryCount = inventoryGetItemsCount(inventory);

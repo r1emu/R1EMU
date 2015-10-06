@@ -65,9 +65,9 @@ void itemWeaponDestroy(ItemWeapon **_self) {
 size_t itemWeaponGetPropertiesCPacketSize(ItemWeapon *self) {
     size_t size = 0;
 
-    size += propertyFloatGetCPacketSize(); // maxAtk
-    size += propertyFloatGetCPacketSize(); // minAtk
-    size += propertyFloatGetCPacketSize(); // cooldown
+    size += propertyFloatGetCPacketSize(self->maxAtk); // maxAtk
+    size += propertyFloatGetCPacketSize(self->minAtk); // minAtk
+    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
 
     return size;
 }

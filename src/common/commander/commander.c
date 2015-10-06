@@ -13,7 +13,7 @@
 
 #include "commander.h"
 
-bool commanderEquipmentInit(CommanderEquipment *equipment) {
+bool commanderEquipmentCPacketInit(CommanderEquipmentCPacket *equipment) {
     equipment->head_top = 2;
     equipment->head_middle = 2;
     equipment->itemUnk1 = 4;
@@ -34,23 +34,6 @@ bool commanderEquipmentInit(CommanderEquipment *equipment) {
     equipment->ring_left = 9;
     equipment->ring_right = 9;
     equipment->necklace = 0xa;
-
-    return true;
-}
-
-bool commanderApparenceInit(CommanderAppearance *commander) {
-    memset(commander, 0, sizeof(*commander));
-
-    commander->accountId = -1;
-    commander->classId = COMMANDER_CLASS_CLERIC;
-    commander->unk4 = SWAP_UINT16(0x2220); // ICBT
-    commander->jobId = COMMANDER_JOB_CLERIC; // Cleric
-    commander->gender = COMMANDER_GENDER_FEMALE; // Female
-    commander->unk5 = 0; // ICBT
-    commander->level = 1;
-    commanderEquipmentInit(&commander->equipment);
-    commander->hairId = 0x10;
-    commander->pose = SWAP_UINT16(0x0000); // Idle (ICBT)
 
     return true;
 }
@@ -88,17 +71,22 @@ Commander *commanderDup(Commander *src) {
 bool commanderInit(Commander *commander) {
     memset(commander, 0, sizeof(*commander));
 
-    if (!(commanderApparenceInit(&commander->appearance))) {
-        error("Cannot initialize commander appearance.");
-        return false;
-    }
+    commander->accountId = -1;
+    commander->socialInfoId = -1;
+    commander->commanderId = -1;
+
+    commander->classId = COMMANDER_CLASS_CLERIC;
+    commander->jobId = COMMANDER_JOB_CLERIC; // Cleric
+    commander->gender = COMMANDER_GENDER_FEMALE; // Female
+
+    commander->level = 1;
+    commander->hairId = 0x10;
+    commander->pose = SWAP_UINT16(0x0000); // Idle (ICBT)
 
     commander->pos = PositionXYZ_decl(27.0, 30.0, 29.0);
     commander->currentXP = 0;
     commander->maxXP = 0xC; // ICBT
     commander->pcId = -1;
-    commander->socialInfoId = -1;
-    commander->commanderId = -1;
     commander->currentHP = 238;
     commander->maxHP = 238;
     commander->currentSP = 105;
@@ -114,7 +102,7 @@ bool commanderInit(Commander *commander) {
     return true;
 }
 
-void commanderEquipmentPrint(CommanderEquipment *equipment) {
+void commanderEquipmentPrint(CommanderEquipmentCPacket *equipment) {
     dbg("head_top = %d (%x)", equipment->head_top, equipment->head_top);
     dbg("head_middle = %d (%x)", equipment->head_middle, equipment->head_middle);
     dbg("itemUnk1 = %d (%x)", equipment->itemUnk1, equipment->itemUnk1);
@@ -137,23 +125,61 @@ void commanderEquipmentPrint(CommanderEquipment *equipment) {
     dbg("necklace = %d (%x)", equipment->necklace, equipment->necklace);
 }
 
-void commanderAppearancePrint(CommanderAppearance *appearance) {
-    dbg("commanderName = %s", appearance->commanderName);
-    dbg("familyName = %s", appearance->familyName);
-    dbg("accountId = %llu (%llx)", appearance->accountId, appearance->accountId);
-    dbg("classId = %d (%x)", appearance->classId, appearance->classId);
-    dbg("unk4 = %d (%x)", appearance->unk4, appearance->unk4);
-    dbg("jobId = %d (%x)", appearance->jobId, appearance->jobId);
-    dbg("gender = %d (%x)", appearance->gender, appearance->gender);
-    dbg("unk5 = %d (%x)", appearance->unk5, appearance->unk5);
-    dbg("level = %d (%x)", appearance->level, appearance->level);
-    commanderEquipmentPrint(&appearance->equipment);
-    dbg("hairId = %d (%x)", appearance->hairId, appearance->hairId);
-    dbg("pose = %d (%x)", appearance->pose, appearance->pose);
+bool commanderAppearanceCPacketInit (
+    CommanderAppearanceCPacket *appearance,
+    char *familyName,
+    char *commanderName,
+    ActorId_t accountId,
+    CommanderClassId_t classId,
+    CommanderJobId_t jobId,
+    CommanderGender_t gender,
+    CommanderLevel_t level,
+    CommanderHairId_t hairId,
+    CommanderPose_t pose)
+{
+    memset(appearance, 0, sizeof(*appearance));
+
+    memcpy(appearance->familyName, familyName, sizeof(appearance->familyName));
+    memcpy(appearance->commanderName, commanderName, sizeof(appearance->commanderName));
+    appearance->accountId = accountId;
+    appearance->classId = classId;
+    appearance->unk4 = SWAP_UINT16(0x2220); // ICBT
+    appearance->jobId = jobId;
+    appearance->gender = gender;
+    appearance->unk5 = 0; // ICBT
+    appearance->level = level;
+    commanderEquipmentCPacketInit(&appearance->equipment);
+    appearance->hairId = hairId;
+    appearance->unk6 = 0;
+    appearance->pose = pose;
+
+    /*
+    appearance->accountId = -1;
+    appearance->classId = COMMANDER_CLASS_CLERIC;
+    appearance->unk4 = SWAP_UINT16(0x2220); // ICBT
+    appearance->jobId = COMMANDER_JOB_CLERIC; // Cleric
+    appearance->gender = COMMANDER_GENDER_FEMALE; // Female
+    appearance->unk5 = 0; // ICBT
+    appearance->level = 1;
+    commanderEquipmentCPacketInit(&appearance->equipment);
+    appearance->hairId = 0x10;
+    appearance->pose = SWAP_UINT16(0x0000); // Idle (ICBT)
+    */
+
+    return true;
 }
 
+
 void commanderPrint(Commander *commander) {
-    commanderAppearancePrint(&commander->appearance);
+    dbg("commanderName = %s", commander->commanderName);
+    dbg("familyName = %s", commander->familyName);
+    dbg("accountId = %llu (%llx)", commander->accountId, commander->accountId);
+    dbg("classId = %d (%x)", commander->classId, commander->classId);
+    dbg("jobId = %d (%x)", commander->jobId, commander->jobId);
+    dbg("gender = %d (%x)", commander->gender, commander->gender);
+    dbg("level = %d (%x)", commander->level, commander->level);
+    dbg("hairId = %d (%x)", commander->hairId, commander->hairId);
+    dbg("pose = %d (%x)", commander->pose, commander->pose);
     dbg("posX = %f %f %f (%x %x %x)",
          commander->pos.x, commander->pos.y, commander->pos.z,
          commander->pos.x, commander->pos.y, commander->pos.z);

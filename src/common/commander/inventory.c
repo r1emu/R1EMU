@@ -222,8 +222,8 @@ uint32_t inventoryGetEquipmentEmptySlot(ItemEquipmentSlot slot) {
     uint32_t value;
 
     switch (slot) {
-        case EQSLOT_HEAD_TOP    : value = EMPTYEQSLOT_NoHat; break;
-        case EQSLOT_HEAD_MIDDLE : value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_HAT    : value = EMPTYEQSLOT_NoHat; break;
+        case EQSLOT_HAT_L : value = EMPTYEQSLOT_NoHat; break;
         case EQSLOT_UNKOWN1     : value = EMPTYEQSLOT_NoOuter; break;
         case EQSLOT_BODY_ARMOR  : value = EMPTYEQSLOT_NoHat; break;
         case EQSLOT_GLOVES      : value = EMPTYEQSLOT_NoGloves; break;
@@ -239,8 +239,8 @@ uint32_t inventoryGetEquipmentEmptySlot(ItemEquipmentSlot slot) {
         case EQSLOT_LEG_ARMOR   : value = EMPTYEQSLOT_NoShirt; break;
         case EQSLOT_UNKOWN6     : value = EMPTYEQSLOT_NoRing; break;
         case EQSLOT_UNKOWN7     : value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_RIGHT_LEFT  : value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_RIGHT_RIGHT : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_RING_LEFT  : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_RING_RIGHT : value = EMPTYEQSLOT_NoRing; break;
         case EQSLOT_NECKLACE    : value = EMPTYEQSLOT_NoNeck; break;
 
         case EQSLOT_NOSLOT      :

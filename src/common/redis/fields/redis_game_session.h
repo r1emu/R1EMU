@@ -53,26 +53,26 @@
 #define REDIS_SESSION_commander_maxStamina_str      "maxStamina"
 
 // Commander equipment
-#define REDIS_SESSION_equipment_head_top_str        "head_top"
-#define REDIS_SESSION_equipment_head_middle_str     "head_middle"
-#define REDIS_SESSION_equipment_itemUnk1_str        "itemUnk1"
-#define REDIS_SESSION_equipment_body_armor_str      "body_armor"
-#define REDIS_SESSION_equipment_gloves_str          "gloves"
-#define REDIS_SESSION_equipment_boots_str           "boots"
-#define REDIS_SESSION_equipment_helmet_str          "helmet"
-#define REDIS_SESSION_equipment_bracelet_str        "bracelet"
-#define REDIS_SESSION_equipment_weapon_str          "weapon"
-#define REDIS_SESSION_equipment_shield_str          "shield"
-#define REDIS_SESSION_equipment_costume_str         "costume"
-#define REDIS_SESSION_equipment_itemUnk3_str        "itemUnk3"
-#define REDIS_SESSION_equipment_itemUnk4_str        "itemUnk4"
-#define REDIS_SESSION_equipment_itemUnk5_str        "itemUnk5"
-#define REDIS_SESSION_equipment_leg_armor_str       "leg_armor"
-#define REDIS_SESSION_equipment_itemUnk6_str        "itemUnk6"
-#define REDIS_SESSION_equipment_itemUnk7_str        "itemUnk7"
-#define REDIS_SESSION_equipment_ring_left_str       "ring_left"
-#define REDIS_SESSION_equipment_ring_right_str      "ring_right"
-#define REDIS_SESSION_equipment_necklace_str        "necklace"
+#define REDIS_SESSION_EQSLOT_HAT_str        "head_top"
+#define REDIS_SESSION_EQSLOT_HAT_L_str     "head_middle"
+#define REDIS_SESSION_EQSLOT_UNKOWN1_str         "itemUnk1"
+#define REDIS_SESSION_EQSLOT_BODY_ARMOR_str      "body_armor"
+#define REDIS_SESSION_EQSLOT_GLOVES_str          "gloves"
+#define REDIS_SESSION_EQSLOT_BOOTS_str           "boots"
+#define REDIS_SESSION_EQSLOT_HELMET_str          "helmet"
+#define REDIS_SESSION_EQSLOT_BRACELET_str        "bracelet"
+#define REDIS_SESSION_EQSLOT_WEAPON_str          "weapon"
+#define REDIS_SESSION_EQSLOT_SHIELD_str          "shield"
+#define REDIS_SESSION_EQSLOT_COSTUME_str         "costume"
+#define REDIS_SESSION_EQSLOT_UNKOWN3_str         "itemUnk3"
+#define REDIS_SESSION_EQSLOT_UNKOWN4_str         "itemUnk4"
+#define REDIS_SESSION_EQSLOT_UNKOWN5_str         "itemUnk5"
+#define REDIS_SESSION_EQSLOT_LEG_ARMOR_str       "leg_armor"
+#define REDIS_SESSION_EQSLOT_UNKOWN6_str         "itemUnk6"
+#define REDIS_SESSION_EQSLOT_UNKOWN7_str         "itemUnk7"
+#define REDIS_SESSION_EQSLOT_RING_LEFT_str       "ring_left"
+#define REDIS_SESSION_EQSLOT_RING_RIGHT_str      "ring_right"
+#define REDIS_SESSION_EQSLOT_NECKLACE_str        "necklace"
 
 enum RedisAccountSessionFields {
     // Account Session
@@ -114,28 +114,26 @@ enum RedisGameSessionFields {
     REDIS_GAME_SESSION_commander_maxSP,
     REDIS_GAME_SESSION_commander_currentStamina,
     REDIS_GAME_SESSION_commander_maxStamina,
-
-    // Equipment Session
-    REDIS_GAME_SESSION_equipment_head_top,
-    REDIS_GAME_SESSION_equipment_head_middle,
-    REDIS_GAME_SESSION_equipment_itemUnk1,
-    REDIS_GAME_SESSION_equipment_body_armor,
-    REDIS_GAME_SESSION_equipment_gloves,
-    REDIS_GAME_SESSION_equipment_boots,
-    REDIS_GAME_SESSION_equipment_helmet,
-    REDIS_GAME_SESSION_equipment_bracelet,
-    REDIS_GAME_SESSION_equipment_weapon,
-    REDIS_GAME_SESSION_equipment_shield,
-    REDIS_GAME_SESSION_equipment_costume,
-    REDIS_GAME_SESSION_equipment_itemUnk3,
-    REDIS_GAME_SESSION_equipment_itemUnk4,
-    REDIS_GAME_SESSION_equipment_itemUnk5,
-    REDIS_GAME_SESSION_equipment_leg_armor,
-    REDIS_GAME_SESSION_equipment_itemUnk6,
-    REDIS_GAME_SESSION_equipment_itemUnk7,
-    REDIS_GAME_SESSION_equipment_ring_left,
-    REDIS_GAME_SESSION_equipment_ring_right,
-    REDIS_GAME_SESSION_equipment_necklace,
+    REDIS_GAME_SESSION_EQSLOT_HAT,
+    REDIS_GAME_SESSION_EQSLOT_HAT_L,
+    REDIS_GAME_SESSION_EQSLOT_UNKOWN1,
+    REDIS_GAME_SESSION_EQSLOT_BODY_ARMOR,
+    REDIS_GAME_SESSION_EQSLOT_GLOVES,
+    REDIS_GAME_SESSION_EQSLOT_BOOTS,
+    REDIS_GAME_SESSION_EQSLOT_HELMET,
+    REDIS_GAME_SESSION_EQSLOT_BRACELET,
+    REDIS_GAME_SESSION_EQSLOT_WEAPON,
+    REDIS_GAME_SESSION_EQSLOT_SHIELD,
+    REDIS_GAME_SESSION_EQSLOT_COSTUME,
+    REDIS_GAME_SESSION_EQSLOT_UNKOWN3,
+    REDIS_GAME_SESSION_EQSLOT_UNKOWN4,
+    REDIS_GAME_SESSION_EQSLOT_UNKOWN5,
+    REDIS_GAME_SESSION_EQSLOT_LEG_ARMOR,
+    REDIS_GAME_SESSION_EQSLOT_UNKOWN6,
+    REDIS_GAME_SESSION_EQSLOT_UNKOWN7,
+    REDIS_GAME_SESSION_EQSLOT_RING_LEFT,
+    REDIS_GAME_SESSION_EQSLOT_RING_RIGHT,
+    REDIS_GAME_SESSION_EQSLOT_NECKLACE,
 
 	REDIS_SESSION_COUNT
 };

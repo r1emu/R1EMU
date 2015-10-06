@@ -17,7 +17,7 @@
 #include "common/server/event_handler.h"
 #include "common/redis/fields/redis_session.h"
 #include "common/redis/fields/redis_game_session.h"
-#include "common/mysql/fields/mysql_commander_session.h"
+#include "common/mysql/fields/mysql_commander.h"
 
 bool zoneEventServerProcess(EventServer *self, EventType type, void *eventData) {
 

@@ -63,8 +63,8 @@ void itemSubWeaponDestroy(ItemSubWeapon **_self) {
 size_t itemSubWeaponGetPropertiesCPacketSize(ItemSubWeapon *self) {
     size_t size = 0;
 
-    size += propertyFloatGetCPacketSize(); // petPosition
-    size += propertyFloatGetCPacketSize(); // cooldown
+    size += propertyFloatGetCPacketSize(self->petPosition); // petPosition
+    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
 
     return size;
 }

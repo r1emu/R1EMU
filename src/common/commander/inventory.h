@@ -76,18 +76,15 @@ struct Inventory
     ItemEquipable *equippedItems[EQSLOT_COUNT];
 };
 
-#define DEFINE_InventoryItemCPacket(attrSize)             \
-typedef struct {                                          \
-    ItemId_t itemId;                                      \
-    uint16_t sizeOfAttributes;                            \
-    uint16_t unkown1;                                     \
-    ActorId_t itemUId;                                    \
-    ItemAmount_t amount;                                  \
-    ItemPrice_t price;                                    \
-    ItemInventoryIndex_t inventoryIndex;                  \
-    uint32_t unkown2;                                     \
-    uint8_t properties[attrSize];                         \
-} InventoryItemCPacket;
+typedef struct InventorySPacket
+{
+    size_t equippedItemsCount;
+    ItemSPacket equippedItems[0]; // Size : equippedItemsCount
+
+    size_t itemsCount;
+    ItemSPacket items[0]; // Size : itemsCount
+
+}   InventorySPacket;
 
 // ----------- Functions ------------
 /**

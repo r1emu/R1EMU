@@ -235,7 +235,7 @@ bool dbGetArray(Db *self, zmsg_t *in, zmsg_t *out) {
 
         // lookup if the item exists
         if (!(dbObject = zhash_lookup(self->hashtable, key))) {
-            dbError(self, "Cannot find the object in '%s'.", key);
+            dbError(self, "Cannot find the object '%s'.", key);
             goto cleanup;
         }
 

@@ -23,85 +23,86 @@
 #define COMMANDER_FAMILY_NAME_SIZE 64
 #define COMMANDER_HEIGHT_JUMP 350.0f
 
-#pragma pack(push, 1)
+typedef uint16_t CommanderClassId_t;
+typedef uint16_t CommanderJobId_t;
+typedef uint8_t CommanderGender_t;
+typedef uint8_t CommanderHairId_t;
+typedef uint32_t CommanderLevel_t;
+typedef uint16_t CommanderPose_t;
+typedef ActorId_t CommanderId_t;
+typedef ActorId_t AccountId_t;
+typedef ActorId_t SocialInfoId_t;
+typedef uint32_t PcId_t;
+typedef uint16_t MapId_t;
+
 /**
- * @brief CommanderInfo is the struct of a commander.
+ * @brief CommanderEquipmentCPacket is the structure of a commander equipment client packet.
  */
-typedef struct CommanderEquipment {
-    uint32_t head_top;
-    uint32_t head_middle;
-    uint32_t itemUnk1;
-    uint32_t body_armor;
-    uint32_t gloves;
-    uint32_t boots;
-    uint32_t helmet;
-    uint32_t bracelet;
-    uint32_t weapon;
-    uint32_t shield;
-    uint32_t costume;
-    uint32_t itemUnk3;
-    uint32_t itemUnk4;
-    uint32_t itemUnk5;
-    uint32_t leg_armor;
-    uint32_t itemUnk6;
-    uint32_t itemUnk7;
-    uint32_t ring_left;
-    uint32_t ring_right;
-    uint32_t necklace;
-} CommanderEquipment;
+#pragma pack(push, 1)
+typedef struct CommanderEquipmentCPacket {
+    ItemId_t head_top;
+    ItemId_t head_middle;
+    ItemId_t itemUnk1;
+    ItemId_t body_armor;
+    ItemId_t gloves;
+    ItemId_t boots;
+    ItemId_t helmet;
+    ItemId_t bracelet;
+    ItemId_t weapon;
+    ItemId_t shield;
+    ItemId_t costume;
+    ItemId_t itemUnk3;
+    ItemId_t itemUnk4;
+    ItemId_t itemUnk5;
+    ItemId_t leg_armor;
+    ItemId_t itemUnk6;
+    ItemId_t itemUnk7;
+    ItemId_t ring_left;
+    ItemId_t ring_right;
+    ItemId_t necklace;
+} CommanderEquipmentCPacket;
 #pragma pack(pop)
 
-#pragma pack(push, 1)
 /**
- * @brief CommanderAppearance is the struct of a commander sent to the client
+ * @brief CommanderAppearanceCPacket is the struct of a commander sent to the client
  */
-typedef struct CommanderAppearance
+#pragma pack(push, 1)
+typedef struct CommanderAppearanceCPacket
 {
     uint8_t commanderName[COMMANDER_NAME_SIZE+1];
     uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
     uint8_t unk2[7];
-    uint64_t accountId;
-    uint16_t classId;
+    AccountId_t accountId;
+    CommanderClassId_t classId;
     uint16_t unk4;
-    uint16_t jobId;
-    uint8_t gender;
+    CommanderJobId_t jobId;
+    CommanderGender_t gender;
     uint8_t unk5;
-    uint32_t level;
-    CommanderEquipment equipment;
-    uint8_t hairId;
+    CommanderLevel_t level;
+    CommanderEquipmentCPacket equipment;
+    CommanderHairId_t hairId;
     uint8_t unk6;
-    uint16_t pose;
-} CommanderAppearance;
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-/**
- * Structure of variables needed for BC_COMMANDER_CREATE
- */
-typedef struct CommanderCreatePacket {
-    CommanderAppearance appearance;
-    uint64_t socialInfoId;
-    uint16_t commanderPosition;
-    uint16_t mapId;
-    uint32_t unk4;
-    uint32_t unk5;
-    uint32_t maxXP;
-    uint32_t unk6;
-    PositionXYZ pos;
-    PositionXZ dir;
-    PositionXYZ pos2;
-    PositionXZ dir2;
-    uint32_t unk8;
-} CommanderCreatePacket;
+    CommanderPose_t pose;
+} CommanderAppearanceCPacket;
 #pragma pack(pop)
 
 /**
  * Contains all information about a commander
  */
-#pragma pack(push, 1)
 typedef struct
 {
-    CommanderAppearance appearance;
+    // Appearance
+    uint8_t commanderName[COMMANDER_NAME_SIZE+1];
+    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
+
+    ActorId_t accountId;
+    CommanderClassId_t classId;
+    CommanderJobId_t jobId;
+    CommanderGender_t gender;
+    CommanderLevel_t level;
+    CommanderHairId_t hairId;
+    CommanderPose_t pose;
+
     Inventory inventory;
 
     PositionXYZ pos;
@@ -109,9 +110,9 @@ typedef struct
     uint32_t currentXP;
     uint32_t maxXP;
 
-    uint32_t pcId;
-    uint64_t socialInfoId;
-    uint64_t commanderId;
+    PcId_t pcId;
+    SocialInfoId_t socialInfoId;
+    CommanderId_t commanderId;
 
     uint32_t currentHP;
     uint32_t maxHP;
@@ -122,10 +123,12 @@ typedef struct
     uint32_t currentStamina;
     uint32_t maxStamina;
 
-    uint16_t mapId;
+    MapId_t mapId;
+
+    bool isDeleted;
+    uint32_t timeDeleted;
 
 } Commander;
-#pragma pack(pop)
 
 typedef enum CommanderJobId
 {
@@ -222,14 +225,21 @@ Commander *commanderNew(void);
 bool commanderInit(Commander *commander);
 
 /**
- * @brief Initialize a commander with basic information
- */
-bool commanderApparenceInit(CommanderAppearance *appearance);
-
-/**
  * @brief Print commander basic information
  */
-void commanderAppearancePrint(CommanderAppearance *appearance);
+bool commanderEquipmentCPacketInit(CommanderEquipmentCPacket *equipment);
+bool commanderAppearanceCPacketInit (
+    CommanderAppearanceCPacket *appearance,
+    char *familyName,
+    char *commanderName,
+    ActorId_t accountId,
+    CommanderClassId_t classId,
+    CommanderJobId_t jobId,
+    CommanderGender_t gender,
+    CommanderLevel_t level,
+    CommanderHairId_t hairId,
+    CommanderPose_t pose);
+
 void commanderPrint(Commander *commander);
 
 /**

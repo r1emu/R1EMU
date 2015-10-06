@@ -16,6 +16,7 @@
 #include "redis_game_session.h"
 #include "redis_socket_session.h"
 #include "common/utils/math.h"
+#include "common/actor/item/item_factory.h"
 
 
 // ------ Structure declaration -------
@@ -67,26 +68,26 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_commander_maxStamina] = REDIS_SESSION_commander_maxStamina_str,
 
     // Equipment session
-    [REDIS_GAME_SESSION_equipment_head_top] = REDIS_SESSION_equipment_head_top_str,
-    [REDIS_GAME_SESSION_equipment_head_middle] = REDIS_SESSION_equipment_head_middle_str,
-    [REDIS_GAME_SESSION_equipment_itemUnk1] = REDIS_SESSION_equipment_itemUnk1_str,
-    [REDIS_GAME_SESSION_equipment_body_armor] = REDIS_SESSION_equipment_body_armor_str,
-    [REDIS_GAME_SESSION_equipment_gloves] = REDIS_SESSION_equipment_gloves_str,
-    [REDIS_GAME_SESSION_equipment_boots] = REDIS_SESSION_equipment_boots_str,
-    [REDIS_GAME_SESSION_equipment_helmet] = REDIS_SESSION_equipment_helmet_str,
-    [REDIS_GAME_SESSION_equipment_bracelet] = REDIS_SESSION_equipment_bracelet_str,
-    [REDIS_GAME_SESSION_equipment_weapon] = REDIS_SESSION_equipment_weapon_str,
-    [REDIS_GAME_SESSION_equipment_shield] = REDIS_SESSION_equipment_shield_str,
-    [REDIS_GAME_SESSION_equipment_costume] = REDIS_SESSION_equipment_costume_str,
-    [REDIS_GAME_SESSION_equipment_itemUnk3] = REDIS_SESSION_equipment_itemUnk3_str,
-    [REDIS_GAME_SESSION_equipment_itemUnk4] = REDIS_SESSION_equipment_itemUnk4_str,
-    [REDIS_GAME_SESSION_equipment_itemUnk5] = REDIS_SESSION_equipment_itemUnk5_str,
-    [REDIS_GAME_SESSION_equipment_leg_armor] = REDIS_SESSION_equipment_leg_armor_str,
-    [REDIS_GAME_SESSION_equipment_itemUnk6] = REDIS_SESSION_equipment_itemUnk6_str,
-    [REDIS_GAME_SESSION_equipment_itemUnk7] = REDIS_SESSION_equipment_itemUnk7_str,
-    [REDIS_GAME_SESSION_equipment_ring_left] = REDIS_SESSION_equipment_ring_left_str,
-    [REDIS_GAME_SESSION_equipment_ring_right] = REDIS_SESSION_equipment_ring_right_str,
-    [REDIS_GAME_SESSION_equipment_necklace] = REDIS_SESSION_equipment_necklace_str
+    [REDIS_GAME_SESSION_EQSLOT_HAT] = REDIS_SESSION_EQSLOT_HAT_str,
+    [REDIS_GAME_SESSION_EQSLOT_HAT_L] = REDIS_SESSION_EQSLOT_HAT_L_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKOWN1] = REDIS_SESSION_EQSLOT_UNKOWN1_str,
+    [REDIS_GAME_SESSION_EQSLOT_BODY_ARMOR] = REDIS_SESSION_EQSLOT_BODY_ARMOR_str,
+    [REDIS_GAME_SESSION_EQSLOT_GLOVES] = REDIS_SESSION_EQSLOT_GLOVES_str,
+    [REDIS_GAME_SESSION_EQSLOT_BOOTS] = REDIS_SESSION_EQSLOT_BOOTS_str,
+    [REDIS_GAME_SESSION_EQSLOT_HELMET] = REDIS_SESSION_EQSLOT_HELMET_str,
+    [REDIS_GAME_SESSION_EQSLOT_BRACELET] = REDIS_SESSION_EQSLOT_BRACELET_str,
+    [REDIS_GAME_SESSION_EQSLOT_WEAPON] = REDIS_SESSION_EQSLOT_WEAPON_str,
+    [REDIS_GAME_SESSION_EQSLOT_SHIELD] = REDIS_SESSION_EQSLOT_SHIELD_str,
+    [REDIS_GAME_SESSION_EQSLOT_COSTUME] = REDIS_SESSION_EQSLOT_COSTUME_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKOWN3] = REDIS_SESSION_EQSLOT_UNKOWN3_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKOWN4] = REDIS_SESSION_EQSLOT_UNKOWN4_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKOWN5] = REDIS_SESSION_EQSLOT_UNKOWN5_str,
+    [REDIS_GAME_SESSION_EQSLOT_LEG_ARMOR] = REDIS_SESSION_EQSLOT_LEG_ARMOR_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKOWN6] = REDIS_SESSION_EQSLOT_UNKOWN6_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKOWN7] = REDIS_SESSION_EQSLOT_UNKOWN7_str,
+    [REDIS_GAME_SESSION_EQSLOT_RING_LEFT] = REDIS_SESSION_EQSLOT_RING_LEFT_str,
+    [REDIS_GAME_SESSION_EQSLOT_RING_RIGHT] = REDIS_SESSION_EQSLOT_RING_RIGHT_str,
+    [REDIS_GAME_SESSION_EQSLOT_NECKLACE] = REDIS_SESSION_EQSLOT_NECKLACE_str
 };
 
 
@@ -152,6 +153,8 @@ cleanup:
 
 bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gameSession) {
 
+    memset(gameSession, 0, sizeof(*gameSession));
+
     bool result = false;
     redisReply *reply = NULL;
 
@@ -189,26 +192,26 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         " " REDIS_SESSION_commander_currentStamina_str
         " " REDIS_SESSION_commander_maxStamina_str
         // Equipment
-        " " REDIS_SESSION_equipment_head_top_str
-        " " REDIS_SESSION_equipment_head_middle_str
-        " " REDIS_SESSION_equipment_itemUnk1_str
-        " " REDIS_SESSION_equipment_body_armor_str
-        " " REDIS_SESSION_equipment_gloves_str
-        " " REDIS_SESSION_equipment_boots_str
-        " " REDIS_SESSION_equipment_helmet_str
-        " " REDIS_SESSION_equipment_bracelet_str
-        " " REDIS_SESSION_equipment_weapon_str
-        " " REDIS_SESSION_equipment_shield_str
-        " " REDIS_SESSION_equipment_costume_str
-        " " REDIS_SESSION_equipment_itemUnk3_str
-        " " REDIS_SESSION_equipment_itemUnk4_str
-        " " REDIS_SESSION_equipment_itemUnk5_str
-        " " REDIS_SESSION_equipment_leg_armor_str
-        " " REDIS_SESSION_equipment_itemUnk6_str
-        " " REDIS_SESSION_equipment_itemUnk7_str
-        " " REDIS_SESSION_equipment_ring_left_str
-        " " REDIS_SESSION_equipment_ring_right_str
-        " " REDIS_SESSION_equipment_necklace_str
+        " " REDIS_SESSION_EQSLOT_HAT_str
+        " " REDIS_SESSION_EQSLOT_HAT_L_str
+        " " REDIS_SESSION_EQSLOT_UNKOWN1_str
+        " " REDIS_SESSION_EQSLOT_BODY_ARMOR_str
+        " " REDIS_SESSION_EQSLOT_GLOVES_str
+        " " REDIS_SESSION_EQSLOT_BOOTS_str
+        " " REDIS_SESSION_EQSLOT_HELMET_str
+        " " REDIS_SESSION_EQSLOT_BRACELET_str
+        " " REDIS_SESSION_EQSLOT_WEAPON_str
+        " " REDIS_SESSION_EQSLOT_SHIELD_str
+        " " REDIS_SESSION_EQSLOT_COSTUME_str
+        " " REDIS_SESSION_EQSLOT_UNKOWN3_str
+        " " REDIS_SESSION_EQSLOT_UNKOWN4_str
+        " " REDIS_SESSION_EQSLOT_UNKOWN5_str
+        " " REDIS_SESSION_EQSLOT_LEG_ARMOR_str
+        " " REDIS_SESSION_EQSLOT_UNKOWN6_str
+        " " REDIS_SESSION_EQSLOT_UNKOWN7_str
+        " " REDIS_SESSION_EQSLOT_RING_LEFT_str
+        " " REDIS_SESSION_EQSLOT_RING_RIGHT_str
+        " " REDIS_SESSION_EQSLOT_NECKLACE_str
 
         , key->routerId, key->mapId, key->accountId
     );
@@ -244,27 +247,25 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             }
 
             /// Write the reply to the session
-            CommanderSession *commanderSession = &gameSession->commanderSession;
-            Commander *commander = commanderSession->currentCommander;
-            CommanderAppearance *appearance = &commander->appearance;
-            CommanderEquipment *equipment = &appearance->equipment;
-
             // Account
             COPY_REDIS_GAME_STR(gameSession->accountSession.accountName, account_accountName);
             COPY_REDIS_GAME_STR(gameSession->accountSession.sessionKey, account_sessionKey);
             gameSession->accountSession.privilege = GET_REDIS_GAME_32(account_privilege);
             gameSession->accountSession.commandersCountMax = GET_REDIS_GAME_32(account_commandersCountMax);
 
+            CommanderSession *commanderSession = &gameSession->commanderSession;
+            Commander *commander = commanderSession->currentCommander = commanderNew();
+
             // Commander
-            COPY_REDIS_GAME_STR(appearance->commanderName, commander_commanderName);
-            COPY_REDIS_GAME_STR(appearance->familyName, commander_familyName);
-            appearance->accountId = GET_REDIS_GAME_64(commander_accountId);
-            appearance->classId   = GET_REDIS_GAME_32(commander_classId);
-            appearance->jobId     = GET_REDIS_GAME_32(commander_jobId);
-            appearance->gender    = GET_REDIS_GAME_32(commander_gender);
-            appearance->level     = GET_REDIS_GAME_32(commander_level);
-            appearance->hairId    = GET_REDIS_GAME_32(commander_hairId);
-            appearance->pose      = GET_REDIS_GAME_32(commander_pose);
+            COPY_REDIS_GAME_STR(commander->commanderName, commander_commanderName);
+            COPY_REDIS_GAME_STR(commander->familyName, commander_familyName);
+            commander->accountId = GET_REDIS_GAME_64(commander_accountId);
+            commander->classId   = GET_REDIS_GAME_32(commander_classId);
+            commander->jobId     = GET_REDIS_GAME_32(commander_jobId);
+            commander->gender    = GET_REDIS_GAME_32(commander_gender);
+            commander->level     = GET_REDIS_GAME_32(commander_level);
+            commander->hairId    = GET_REDIS_GAME_32(commander_hairId);
+            commander->pose      = GET_REDIS_GAME_32(commander_pose);
             commander->mapId = GET_REDIS_GAME_32(commander_mapId);
             commander->pos.x = GET_REDIS_GAME_FLOAT(commander_posX);
             commander->pos.y = GET_REDIS_GAME_FLOAT(commander_posY);
@@ -282,26 +283,34 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             commander->maxStamina = GET_REDIS_GAME_32(commander_maxStamina);
 
             // Equipment
-            equipment->head_top    = GET_REDIS_GAME_32(equipment_head_top);
-            equipment->head_middle = GET_REDIS_GAME_32(equipment_head_middle);
-            equipment->itemUnk1    = GET_REDIS_GAME_32(equipment_itemUnk1);
-            equipment->body_armor  = GET_REDIS_GAME_32(equipment_body_armor);
-            equipment->gloves      = GET_REDIS_GAME_32(equipment_gloves);
-            equipment->boots       = GET_REDIS_GAME_32(equipment_boots);
-            equipment->helmet      = GET_REDIS_GAME_32(equipment_helmet);
-            equipment->bracelet    = GET_REDIS_GAME_32(equipment_bracelet);
-            equipment->weapon      = GET_REDIS_GAME_32(equipment_weapon);
-            equipment->shield      = GET_REDIS_GAME_32(equipment_shield);
-            equipment->costume     = GET_REDIS_GAME_32(equipment_costume);
-            equipment->itemUnk3    = GET_REDIS_GAME_32(equipment_itemUnk3);
-            equipment->itemUnk4    = GET_REDIS_GAME_32(equipment_itemUnk4);
-            equipment->itemUnk5    = GET_REDIS_GAME_32(equipment_itemUnk5);
-            equipment->leg_armor   = GET_REDIS_GAME_32(equipment_leg_armor);
-            equipment->itemUnk6    = GET_REDIS_GAME_32(equipment_itemUnk6);
-            equipment->itemUnk7    = GET_REDIS_GAME_32(equipment_itemUnk7);
-            equipment->ring_left   = GET_REDIS_GAME_32(equipment_ring_left);
-            equipment->ring_right  = GET_REDIS_GAME_32(equipment_ring_right);
-            equipment->necklace    = GET_REDIS_GAME_32(equipment_necklace);
+            #define GET_REDIS_EQUIPMENT(x)                                                                     \
+              if (!(commander->inventory.equippedItems[x] = (ItemEquipable *) itemFactoryCreate(               \
+                     ITEM_CAT_ARMOR, GET_REDIS_GAME_32(x), 1)))                                                \
+              {                                                                                                \
+                    error("Cannot get item '%s'", STRINGIFY(x));                                               \
+                    goto cleanup;                                                                              \
+              }                                                                                                \
+
+            GET_REDIS_EQUIPMENT(EQSLOT_HAT);
+            GET_REDIS_EQUIPMENT(EQSLOT_HAT_L);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN1);
+            GET_REDIS_EQUIPMENT(EQSLOT_BODY_ARMOR);
+            GET_REDIS_EQUIPMENT(EQSLOT_GLOVES);
+            GET_REDIS_EQUIPMENT(EQSLOT_BOOTS);
+            GET_REDIS_EQUIPMENT(EQSLOT_HELMET);
+            GET_REDIS_EQUIPMENT(EQSLOT_BRACELET);
+            GET_REDIS_EQUIPMENT(EQSLOT_WEAPON);
+            GET_REDIS_EQUIPMENT(EQSLOT_SHIELD);
+            GET_REDIS_EQUIPMENT(EQSLOT_COSTUME);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN3);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN4);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN5);
+            GET_REDIS_EQUIPMENT(EQSLOT_LEG_ARMOR);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN6);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN7);
+            GET_REDIS_EQUIPMENT(EQSLOT_RING_LEFT);
+            GET_REDIS_EQUIPMENT(EQSLOT_RING_RIGHT);
+            GET_REDIS_EQUIPMENT(EQSLOT_NECKLACE);
         }
         break;
 
@@ -350,12 +359,10 @@ bool redisGetGameSessionBySocketId(Redis *self, uint16_t routerId, uint8_t *sess
 bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *socketId, GameSession *gameSession) {
 
     bool result = true;
-    size_t repliesCount = 4;
+    size_t repliesCount = 3;
     redisReply *replies[repliesCount];
 
     Commander *commander = NULL;
-    CommanderAppearance *appearance = NULL;
-    CommanderEquipment *equipment = NULL;
 
     // Initialize replies
     void *noReply = (void *) -1;
@@ -363,10 +370,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
         replies[i] = noReply;
     }
 
-    if ((commander = gameSession->commanderSession.currentCommander) != NULL) {
-        appearance = &commander->appearance;
-        equipment = &appearance->equipment;
-    }
+    commander = gameSession->commanderSession.currentCommander;
 
     // Account
     replies[0] = redisCommandDbg(self,
@@ -385,7 +389,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
 
     // Commander
     if (commander) {
-        replies[2] = redisCommandDbg(self,
+        replies[1] = redisCommandDbg(self,
             "HMSET zone%x:map%x:acc%llx"
             " " REDIS_SESSION_commander_mapId_str " %x"
             " " REDIS_SESSION_commander_commanderName_str " %s"
@@ -414,15 +418,15 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
             key->routerId, key->mapId, key->accountId,
 
             commander->mapId,
-            CHECK_REDIS_EMPTY_STRING(appearance->commanderName),
-            CHECK_REDIS_EMPTY_STRING(appearance->familyName),
+            CHECK_REDIS_EMPTY_STRING(commander->commanderName),
+            CHECK_REDIS_EMPTY_STRING(commander->familyName),
             key->accountId,
-            appearance->classId,
-            appearance->jobId,
-            appearance->gender,
-            appearance->level,
-            appearance->hairId,
-            appearance->pose,
+            commander->classId,
+            commander->jobId,
+            commander->gender,
+            commander->level,
+            commander->hairId,
+            commander->pose,
             commander->pos.x,
             commander->pos.y,
             commander->pos.z,
@@ -438,55 +442,52 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
             commander->currentStamina,
             commander->maxStamina
         );
-    }
 
-    // Equipment
-    if (equipment) {
-        replies[3] = redisCommandDbg(self,
+        replies[2] = redisCommandDbg(self,
             "HMSET zone%x:map%x:acc%llx"
-            " " REDIS_SESSION_equipment_head_top_str " %x"
-            " " REDIS_SESSION_equipment_head_middle_str " %x"
-            " " REDIS_SESSION_equipment_itemUnk1_str " %x"
-            " " REDIS_SESSION_equipment_body_armor_str " %x"
-            " " REDIS_SESSION_equipment_gloves_str " %x"
-            " " REDIS_SESSION_equipment_boots_str " %x"
-            " " REDIS_SESSION_equipment_helmet_str " %x"
-            " " REDIS_SESSION_equipment_bracelet_str " %x"
-            " " REDIS_SESSION_equipment_weapon_str " %x"
-            " " REDIS_SESSION_equipment_shield_str " %x"
-            " " REDIS_SESSION_equipment_costume_str " %x"
-            " " REDIS_SESSION_equipment_itemUnk3_str " %x"
-            " " REDIS_SESSION_equipment_itemUnk4_str " %x"
-            " " REDIS_SESSION_equipment_itemUnk5_str " %x"
-            " " REDIS_SESSION_equipment_leg_armor_str " %x"
-            " " REDIS_SESSION_equipment_itemUnk6_str " %x"
-            " " REDIS_SESSION_equipment_itemUnk7_str " %x"
-            " " REDIS_SESSION_equipment_ring_left_str " %x"
-            " " REDIS_SESSION_equipment_ring_right_str " %x"
-            " " REDIS_SESSION_equipment_necklace_str " %x"
+            " " REDIS_SESSION_EQSLOT_HAT_str " %x"
+            " " REDIS_SESSION_EQSLOT_HAT_L_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKOWN1_str " %x"
+            " " REDIS_SESSION_EQSLOT_BODY_ARMOR_str " %x"
+            " " REDIS_SESSION_EQSLOT_GLOVES_str " %x"
+            " " REDIS_SESSION_EQSLOT_BOOTS_str " %x"
+            " " REDIS_SESSION_EQSLOT_HELMET_str " %x"
+            " " REDIS_SESSION_EQSLOT_BRACELET_str " %x"
+            " " REDIS_SESSION_EQSLOT_WEAPON_str " %x"
+            " " REDIS_SESSION_EQSLOT_SHIELD_str " %x"
+            " " REDIS_SESSION_EQSLOT_COSTUME_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKOWN3_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKOWN4_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKOWN5_str " %x"
+            " " REDIS_SESSION_EQSLOT_LEG_ARMOR_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKOWN6_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKOWN7_str " %x"
+            " " REDIS_SESSION_EQSLOT_RING_LEFT_str " %x"
+            " " REDIS_SESSION_EQSLOT_RING_RIGHT_str " %x"
+            " " REDIS_SESSION_EQSLOT_NECKLACE_str " %x"
             , key->routerId, key->mapId, key->accountId,
 
             // Equipment
-            equipment->head_top,
-            equipment->head_middle,
-            equipment->itemUnk1,
-            equipment->body_armor,
-            equipment->gloves,
-            equipment->boots,
-            equipment->helmet,
-            equipment->bracelet,
-            equipment->weapon,
-            equipment->shield,
-            equipment->costume,
-            equipment->itemUnk3,
-            equipment->itemUnk4,
-            equipment->itemUnk5,
-            equipment->leg_armor,
-            equipment->itemUnk6,
-            equipment->itemUnk7,
-            equipment->ring_left,
-            equipment->ring_right,
-            equipment->necklace
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT_L]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN1]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BODY_ARMOR]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_GLOVES]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BOOTS]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HELMET]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BRACELET]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_WEAPON]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_SHIELD]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_COSTUME]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN3]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN4]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN5]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_LEG_ARMOR]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN6]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN7]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_LEFT]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_RIGHT]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_NECKLACE])
         );
     }
 

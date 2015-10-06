@@ -24,6 +24,12 @@
 #include "zlib.h"
 
 #define STRINGIFY(x) # x
+
+// {Enum, String} association generators
+#define GENERATE_ENUM(PREFIX, ENUM, FORMAT) PREFIX##_##ENUM,
+#define GENERATE_STRING(PREFIX, STRING, FORMAT) #STRING,
+#define GENERATE_TYPE(PREFIX, STRING, FORMAT) #FORMAT,
+
 #ifndef bool
 #define bool char
 #endif

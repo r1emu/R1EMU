@@ -24,8 +24,8 @@
 
 // ------ Structure declaration -------
 typedef enum {
-    EQSLOT_HEAD_TOP = 0,
-    EQSLOT_HEAD_MIDDLE,
+    EQSLOT_HAT = 0,
+    EQSLOT_HAT_L,
     EQSLOT_UNKOWN1,
     EQSLOT_BODY_ARMOR,
     EQSLOT_GLOVES,
@@ -41,8 +41,8 @@ typedef enum {
     EQSLOT_LEG_ARMOR,
     EQSLOT_UNKOWN6,
     EQSLOT_UNKOWN7,
-    EQSLOT_RIGHT_LEFT,
-    EQSLOT_RIGHT_RIGHT,
+    EQSLOT_RING_LEFT,
+    EQSLOT_RING_RIGHT,
     EQSLOT_NECKLACE,
     EQSLOT_COUNT,
     EQSLOT_NOSLOT,

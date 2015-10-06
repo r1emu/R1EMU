@@ -70,13 +70,13 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
     commanderInit(&fakePc);
 
     fakePc.pos = session->game.commanderSession.currentCommander->pos;
-    fakePc.appearance.accountId = r1emuGenerateRandom64(&self->seed);
+    fakePc.accountId = r1emuGenerateRandom64(&self->seed);
     fakePc.socialInfoId = r1emuGenerateRandom64(&self->seed);
     fakePc.pcId = r1emuGenerateRandom(&self->seed);
     fakePc.commanderId = r1emuGenerateRandom64(&self->seed);
-    snprintf(fakePc.appearance.familyName, sizeof(fakePc.appearance.familyName), "PcID_%x", fakePc.pcId);
-    snprintf(fakePc.appearance.commanderName, sizeof(fakePc.appearance.commanderName),
-        "AccountID_%llx", fakePc.appearance.accountId);
+    snprintf(fakePc.familyName, sizeof(fakePc.familyName), "PcID_%x", fakePc.pcId);
+    snprintf(fakePc.commanderName, sizeof(fakePc.commanderName),
+        "AccountID_%llx", fakePc.accountId);
 
     // register the fake socket session
     SocketSession fakeSocketSession;
@@ -85,7 +85,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
     socketSessionGenSessionKey((uint8_t *)&sessionKey, sessionKeyStr);
     sprintf(sessionKeyStr, "%.08x", sessionKey);
-    socketSessionInit(&fakeSocketSession, fakePc.appearance.accountId, self->info.routerId, session->socket.mapId,
+    socketSessionInit(&fakeSocketSession, fakePc.accountId, self->info.routerId, session->socket.mapId,
         sessionKeyStr, true);
 
     RedisSocketSessionKey socketKey = {
@@ -108,7 +108,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
     redisUpdateGameSession(self->redis, &gameKey, sessionKeyStr, &fakeGameSession);
     info("Fake PC spawned.(SocketID=%s, SocialID=%I64x, AccID=%I64x, PcID=%x, CommID=%I64x)",
-         sessionKeyStr, fakePc.socialInfoId, fakePc.appearance.accountId, fakePc.pcId, fakePc.commanderId);
+         sessionKeyStr, fakePc.socialInfoId, fakePc.accountId, fakePc.pcId, fakePc.commanderId);
 
     GameEventEnterPc event = {
         .updatePosEvent = {
@@ -320,7 +320,7 @@ void adminCmdSetLevel(Worker *self, Session *session, char *args, zmsg_t *replyM
         else {
             uint32_t level = atoi(arg[0]);
             info("Setting level to %d.", level);
-            session->game.commanderSession.currentCommander->appearance.level = level;
+            session->game.commanderSession.currentCommander->level = level;
             zoneBuilderPCLevelUp(session->game.commanderSession.currentCommander->pcId, level, replyMsg);
         }
         free(arg);

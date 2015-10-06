@@ -33,7 +33,7 @@ bool mySqlLoadAccountCommanders(MySQL *self, AccountSession *accountSession, uin
     }
 
     // Write commanders array from SQL result
-    if (!(mySqlGetCommanders(self, accountSession->commanders))) {
+    if (!(mySqlGetCommanders(self, accountSession->familyName, accountSession->commanders))) {
         error("Cannot get commanders by accountId = %llx", accountId);
         goto cleanup;
     }

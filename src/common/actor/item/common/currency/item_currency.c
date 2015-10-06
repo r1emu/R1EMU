@@ -55,7 +55,7 @@ void itemCurrencyDestroy(ItemCurrency **_self) {
 size_t itemCurrencyGetPropertiesCPacketSize(ItemCurrency *self) {
     size_t size = 0;
 
-    size += propertyFloatGetCPacketSize(); // cooldown
+    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
 
     return size;
 }

@@ -60,7 +60,7 @@ typedef struct {                               \
 
 // ----------- Functions ------------
 
-size_t propertyFloatGetCPacketSize(void);
+size_t propertyFloatGetCPacketSize(float *value);
 void propertyFloatGetCPacket(PropertyId id, float *value, PacketStream *stream);
 
 size_t propertyStringGetCPacketSize(char *value);

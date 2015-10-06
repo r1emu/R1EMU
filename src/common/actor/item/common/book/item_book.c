@@ -57,7 +57,7 @@ void itemBookDestroy(ItemBook **_self) {
 size_t itemBookGetPropertiesCPacketSize(ItemBook *self) {
     size_t size = 0;
 
-    size += propertyFloatGetCPacketSize(); // cooldown
+    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
 
     return size;
 }
