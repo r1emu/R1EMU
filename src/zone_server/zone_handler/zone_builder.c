@@ -1707,15 +1707,37 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
         while (item) {
             size_t attrSize = itemPropertiesSize[category][inventoryIndex];
 
+            #pragma pack(push, 1)
+            DEFINE_InventoryItemCPacket(attrSize);
+            #pragma pack(pop)
+
+            InventoryItemCPacket *inventoryItemPacket = packetStreamGetCurrentBuffer(&packetStream);
+
+            inventoryItemPacket->itemId = itemGetId(item);
+            inventoryItemPacket->sizeOfAttributes = attrSize;
+            inventoryItemPacket->unkown1 = 0;
+            inventoryItemPacket->itemUId = actorGetUId(item);
+            inventoryItemPacket->amount = itemGetAmount(item);
+            inventoryItemPacket->price = 0;
+            inventoryItemPacket->inventoryIndex = inventoryGetBagIndexByActorId(inventory, itemGetCategory(item), actorGetUId(item));
+            inventoryItemPacket->unkown2 = 0;
+
+            // fill attribute buffer
+            size_t offset = offsetof(InventoryItemCPacket, properties);
+            packetStreamAddOffset(&packetStream, offset);
+
             // write in the buffer
             if (attrSize > 0) {
                 itemPropertiesGetCPacket(item, &packetStream);
+                packetStreamAddOffset(&packetStream, attrSize);
             }
 
             item = inventoryGetNextItem(inventory, category);
             inventoryIndex++;
         }
     }
+
+    buffer_print(&itemsPacket, sizeof(itemsPacket), NULL);
 
     #pragma pack(push, 1)
     struct InventoryListPacket {
