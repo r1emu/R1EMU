@@ -1163,7 +1163,6 @@ void zoneBuilderItemEquipList(Inventory *inventory, zmsg_t *replyMsg) {
     CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
-
     {
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
 
@@ -1653,12 +1652,12 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
     typedef struct {                                          \
         ItemId_t itemId;                                      \
         uint16_t sizeOfAttributes;                            \
-        uint16_t unkown1;                                     \
+        uint16_t unknown1;                                     \
         ActorId_t itemUId;                                    \
         ItemAmount_t amount;                                  \
         ItemPrice_t price;                                    \
         ItemInventoryIndex_t inventoryIndex;                  \
-        uint32_t unkown2;                                     \
+        uint32_t unknown2;                                     \
         uint8_t properties[attrSize];                         \
     } InventoryItemCPacket;
 
@@ -1695,16 +1694,18 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
     uint8_t itemsPacket[totalSize];
 
     PacketStream packetStream;
-    packetStreamInit(&packetStream, &itemsPacket);
+    packetStreamInit(&packetStream, itemsPacket);
 
     // Itarate all inventory bags
     for (ItemCategory category = 0; category < ITEM_CAT_COUNT; category++) {
 
         // Iterate through all items in this bag
-        Item *item = inventoryGetFirstItem(inventory, category);
-        uint8_t inventoryIndex = 0;
+        size_t inventoryIndex = 0;
 
-        while (item) {
+        for (Item *item = inventoryGetFirstItem(inventory, category);
+             item != NULL;
+             item = inventoryGetNextItem(inventory, category))
+        {
             size_t attrSize = itemPropertiesSize[category][inventoryIndex];
 
             #pragma pack(push, 1)
@@ -1715,12 +1716,12 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
 
             inventoryItemPacket->itemId = itemGetId(item);
             inventoryItemPacket->sizeOfAttributes = attrSize;
-            inventoryItemPacket->unkown1 = 0;
+            inventoryItemPacket->unknown1 = 0x4242;
             inventoryItemPacket->itemUId = actorGetUId(item);
             inventoryItemPacket->amount = itemGetAmount(item);
-            inventoryItemPacket->price = 0;
+            inventoryItemPacket->price = 0x13371337;
             inventoryItemPacket->inventoryIndex = inventoryGetBagIndexByActorId(inventory, itemGetCategory(item), actorGetUId(item));
-            inventoryItemPacket->unkown2 = 0;
+            inventoryItemPacket->unknown2 = 0x41414141;
 
             // fill attribute buffer
             size_t offset = offsetof(InventoryItemCPacket, properties);
@@ -1729,15 +1730,11 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
             // write in the buffer
             if (attrSize > 0) {
                 itemPropertiesGetCPacket(item, &packetStream);
-                packetStreamAddOffset(&packetStream, attrSize);
             }
 
-            item = inventoryGetNextItem(inventory, category);
             inventoryIndex++;
         }
     }
-
-    buffer_print(&itemsPacket, sizeof(itemsPacket), NULL);
 
     #pragma pack(push, 1)
     struct InventoryListPacket {
@@ -1753,7 +1750,7 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
     replyPacket.inventoryCount = inventoryCount;
 
     // compress content of packek (items)
-    zlibCompress(&replyPacket.zlibData, &itemsPacket, sizeof(itemsPacket));
+    zlibCompress(&replyPacket.zlibData, itemsPacket, sizeof(itemsPacket));
     size_t outPacketSize = ZLIB_GET_COMPRESSED_PACKET_SIZE(&replyPacket.zlibData, sizeof(replyPacket));
     variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, outPacketSize);
 

@@ -436,36 +436,6 @@ static PacketHandlerState zoneHandlerGameReady(
     // CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_GAME_READY);
     Commander *commander = session->game.commanderSession.currentCommander;
 
-    /// TESTING PURPOSES
-
-    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
-
-
-    Item *items[20];
-
-    items[0] = itemFactoryCreate(645001, 5003);
-    inventoryAddItem(inventory, items[0]);
-
-    items[1] = itemFactoryCreate(640026, 5);
-    inventoryAddItem(inventory, items[1]);
-
-
-    //items[2].equipSlot = EQSLOT_BODY_ARMOR;
-    //items[2].properties = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
-    /*
-    actor = actorNew(3333);
-    itemInit(&items[2], actor, ITEM_CAT_ARMOR, 531102, 1);
-    inventoryAddItem(inventory, &items[2]);
-
-    actor = actorNew(4444);
-    itemInit(&items[3], actor, ITEM_CAT_ARMOR, 531101, 1);
-    inventoryAddItem(inventory, &items[3]);
-    */
-
-    inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
-    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
-
-    zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
     zoneBuilderSessionObjects(replyMsg);
     zoneBuilderOptionList(replyMsg);
     zoneBuilderSkillmapList(replyMsg);
@@ -479,7 +449,29 @@ static PacketHandlerState zoneHandlerGameReady(
     zoneBuilderGuestPageMap(replyMsg);
     zoneBuilderStartInfo(replyMsg);
 
+    /// TESTING PURPOSES
+    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
+    Item *items[20];
+    items[0] = itemFactoryCreate(645001, 5003);
+    inventoryAddItem(inventory, items[0]);
+    items[1] = itemFactoryCreate(640026, 5);
+    inventoryAddItem(inventory, items[1]);
+    //items[2].equipSlot = EQSLOT_BODY_ARMOR;
+    //items[2].properties = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    /*
+    actor = actorNew(3333);
+    itemInit(&items[2], actor, ITEM_CAT_ARMOR, 531102, 1);
+    inventoryAddItem(inventory, &items[2]);
+
+    actor = actorNew(4444);
+    itemInit(&items[3], actor, ITEM_CAT_ARMOR, 531101, 1);
+    inventoryAddItem(inventory, &items[3]);
+    */
+    inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
+    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
     zoneBuilderItemEquipList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
+    zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
+
     // zoneBuilderSkillList(commander->pcId, replyMsg);
     zoneBuilderAbilityList(commander->pcId, replyMsg);
     zoneBuilderCooldownList(commander->socialInfoId, replyMsg);
