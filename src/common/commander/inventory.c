@@ -292,11 +292,11 @@ int inventoryGetBagIndexByActorId(Inventory *self, ItemCategory category, ActorI
 
     dbg("inventoryGetBagIndexByActorId(), %d, %d", category, actorId);
 
-    Item *tmpItem;
-    tmpItem = zlist_first(self->bags[category]);
+    zlist_t *bag = self->bags[category];
 
     int index = 1;
-    while (tmpItem) {
+
+    for (Item *tmpItem = zlist_first(bag); tmpItem != NULL; tmpItem = zlist_next(bag)) {
         dbg("[%d] item: [%d]", index, itemGetId(tmpItem));
 
         if (actorId == actorGetUId(tmpItem)) {
@@ -304,7 +304,6 @@ int inventoryGetBagIndexByActorId(Inventory *self, ItemCategory category, ActorI
             break;
         }
 
-        tmpItem = zlist_next(self->bags[category]);
         index++;
     }
 

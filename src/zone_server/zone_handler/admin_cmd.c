@@ -123,14 +123,14 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
 
-    uint32_t itemType = strtol(args, &args, 10);
+    ItemId_t itemId = strtol(args, &args, 10);
     args++;
-    uint32_t amount = strtol(args, &args, 10);
+    ItemAmount_t amount = strtol(args, &args, 10);
     amount = amount ? amount : 1;
 
     Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
 
-    Item *newItem = itemFactoryCreate(itemType, amount);
+    Item *newItem = itemFactoryCreate(itemId, amount);
     inventoryAddItem(inventory, newItem);
 
     ItemCategory itemCategory = itemGetCategory(newItem);
