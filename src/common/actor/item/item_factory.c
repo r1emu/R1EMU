@@ -13,7 +13,8 @@
 
 #include "item_factory.h"
 #include "common/actor/actor_factory.h"
-#include "common/mysql/fields/mysql_item_data.h"
+#include "common/mysql/fields/mysql_item_equip_data.h"
+#include "common/mysql/fields/mysql_item_common_data.h"
 #include "common/static_data/static_data.h"
 
 // Items categories
@@ -31,8 +32,82 @@
 
 static struct ItemFactory {
     MySQL *sql;
-    StaticData *itemDatabase;
+    StaticData *itemCommonDatabase;
+    StaticData *itemEquipDatabase;
+    zhash_t *categoryEquipTable;
+    zhash_t *categoryCommonTable;
+    ItemCategory *categories;
 } self = {0};
+
+static bool itemFactoryInitCategories(void) {
+
+    if (!(self.categories = malloc(sizeof(*self.categories) * ITEM_CAT_COUNT))) {
+        error("Cannot allocate categories.");
+        return false;
+    }
+
+    for (ItemCategory cat = 0; cat < ITEM_CAT_COUNT; cat++) {
+        self.categories[cat] = cat;
+    }
+
+    return true;
+}
+
+static bool itemFactoryInitCategoryEquipTable(void) {
+
+    bool status = false;
+
+    if (!(self.categoryEquipTable = zhash_new())) {
+        error("Cannot allocate category table.");
+        goto cleanup;
+    }
+
+    if ((zhash_insert(self.categoryEquipTable, "Armor", &self.categories[ITEM_CAT_ARMOR]) != 0)
+    ||  (zhash_insert(self.categoryEquipTable, "Helmet", &self.categories[ITEM_CAT_ARMOR]) != 0)
+    ||  (zhash_insert(self.categoryEquipTable, "Weapon", &self.categories[ITEM_CAT_WEAPON]) != 0)
+    ||  (zhash_insert(self.categoryEquipTable, "Armband", &self.categories[ITEM_CAT_ARMOR]) != 0)
+    ||  (zhash_insert(self.categoryEquipTable, "SubWeapon", &self.categories[ITEM_CAT_SUBWEAPON]) != 0))
+    {
+        error("Cannot insert new category in table.");
+        goto cleanup;
+    }
+
+    status = true;
+cleanup:
+    if (!status) {
+        zhash_destroy(&self.categoryEquipTable);
+    }
+
+    return status;
+}
+
+static bool itemFactoryInitCategoryCommonTable(void) {
+
+    bool status = false;
+
+    if (!(self.categoryCommonTable = zhash_new())) {
+        error("Cannot allocate category table.");
+        goto cleanup;
+    }
+
+    if ((zhash_insert(self.categoryCommonTable, "Consume", &self.categories[ITEM_CAT_CONSUMABLE]) != 0)
+    ||  (zhash_insert(self.categoryCommonTable, "Equip", &self.categories[ITEM_CAT_ARMOR]) != 0)
+    ||  (zhash_insert(self.categoryCommonTable, "Etc", &self.categories[ITEM_CAT_ACCESSORY]) != 0)
+    ||  (zhash_insert(self.categoryCommonTable, "Quest", &self.categories[ITEM_CAT_QUEST]) != 0)
+    ||  (zhash_insert(self.categoryCommonTable, "Unused", &self.categories[ITEM_CAT_CURRENCY]) != 0))
+    {
+        error("Cannot insert new category in table.");
+        goto cleanup;
+    }
+
+    status = true;
+cleanup:
+    if (!status) {
+        zhash_destroy(&self.categoryCommonTable);
+    }
+
+    return status;
+}
 
 bool itemFactoryStart(MySQLInfo *sqlInfo) {
 
@@ -46,22 +121,104 @@ bool itemFactoryStart(MySQLInfo *sqlInfo) {
         return false;
     }
 
-    if (!(mySqlBuildItemDataDb(self.sql, &self.itemDatabase))) {
-        error("Cannot start item static data database.");
+    if (!(itemFactoryInitCategories())) {
+        error("Cannot initialize factory categories.");
         return false;
     }
 
-    staticDataLock(self.itemDatabase);
+    if (!(mySqlBuildItemEquipDataDb(self.sql, &self.itemEquipDatabase))) {
+        error("Cannot start equipable item static database.");
+        return false;
+    }
+
+    if (!(mySqlBuildItemCommonDataDb(self.sql, &self.itemCommonDatabase))) {
+        error("Cannot start common item static database.");
+        return false;
+    }
+
+    if (!(itemFactoryInitCategoryEquipTable())) {
+        error("Cannot initialize category equip table");
+        return false;
+    }
+
+    if (!(itemFactoryInitCategoryCommonTable())) {
+        error("Cannot initialize category common table");
+        return false;
+    }
+
+    staticDataLock(self.itemEquipDatabase);
+    staticDataLock(self.itemCommonDatabase);
+
+    return true;
+}
+
+bool itemFactoryGetCategoryFromId(
+    ItemId_t id,
+    ItemCommonData *commonData,
+    ItemEquipData *equipData,
+    ItemCategory *_category)
+{
+    ItemCategory *category = NULL;
+
+    /**
+     * We might want to refactor this function once we got a full item database
+     */
+    if (!commonData) {
+        // This information is maybe contained in equipData
+        if (!equipData) {
+            error("Cannot get category for id '%d'", id);
+            return false;
+        }
+
+        if (!(category = zhash_lookup(self.categoryEquipTable, equipData->GroupName))) {
+            error("Cannot get the category for the groupName '%s'", equipData->GroupName);
+            return false;
+        }
+    }
+    else {
+        if (!(strcmp(commonData->ItemType, "Equip"))) {
+            // Equipment item, find out more information
+            if (equipData) {
+                if (!(category = zhash_lookup(self.categoryEquipTable, equipData->GroupName))) {
+                    error("Cannot get the category for the groupName '%s'", equipData->GroupName);
+                    return false;
+                }
+            } else {
+                warning("Guess : '%d' = 'Armor'", id);
+                category = &self.categories[ITEM_CAT_ARMOR];
+            }
+        } else {
+            if (!(category = zhash_lookup(self.categoryCommonTable, commonData->ItemType))) {
+                error("Cannot get the category for the ItemType '%s'", commonData->ItemType);
+                return false;
+            }
+        }
+    }
+
+    *_category = *category;
 
     return true;
 }
 
 // TODO : ItemId_t should be enough to know the correct category
 // Once StaticData is available, link them together
-Item *itemFactoryCreate(ItemCategory category, ItemId_t id, ItemAmount_t amount) {
+Item *itemFactoryCreate(ItemId_t id, ItemAmount_t amount) {
 
     Item *item = NULL;
     size_t itemSize = 0;
+
+    ItemCategory category;
+    ItemCommonData *commonData = NULL;
+    ItemEquipData *equipData = NULL;
+
+    // Get static data related to the item
+    staticDataGet(self.itemCommonDatabase, id, &commonData, false);
+    staticDataGet(self.itemEquipDatabase, id, &equipData, false);
+
+    if (!(itemFactoryGetCategoryFromId(id, commonData, equipData, &category))) {
+        error("Cannot get category from ID '%d'", id);
+        return NULL;
+    }
 
     switch (category) {
 
@@ -85,7 +242,7 @@ Item *itemFactoryCreate(ItemCategory category, ItemId_t id, ItemAmount_t amount)
         return NULL;
     }
 
-    if (!(itemFactoryInit(item, category, id, amount))) {
+    if (!(itemFactoryInit(item, category, commonData, equipData, id, amount))) {
         error("Cannot initialize a new item.");
         free(item);
         return NULL;
@@ -94,8 +251,14 @@ Item *itemFactoryCreate(ItemCategory category, ItemId_t id, ItemAmount_t amount)
     return item;
 }
 
-bool itemFactoryInit(Item *newItem, ItemCategory category, ItemId_t id, ItemAmount_t amount) {
-
+bool itemFactoryInit(
+    Item *newItem,
+    ItemCategory category,
+    ItemCommonData *commonData,
+    ItemEquipData *equipData,
+    ItemId_t id,
+    ItemAmount_t amount)
+{
     Actor actor;
     Item item;
 
@@ -111,11 +274,8 @@ bool itemFactoryInit(Item *newItem, ItemCategory category, ItemId_t id, ItemAmou
         return false;
     }
 
-    // Get static data related to the item
-    if (!(staticDataGet(self.itemDatabase, id, &item.data))) {
-        error("Cannot retrieve static data for object id '%d'", id);
-        return false;
-    }
+    // Get common static data related to the item
+    item.commonData = commonData;
 
     // Initialize the child class
     switch (category) {

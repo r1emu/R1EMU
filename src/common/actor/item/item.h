@@ -23,7 +23,7 @@
 #include "common/property/property.h"
 #include "common/actor/actor.h"
 #include "common/packet/packet_stream.h"
-#include "common/static_data/fields/item_data.h"
+#include "common/static_data/fields/item_common_data.h"
 
 // ---------- Defines -------------
 
@@ -59,7 +59,7 @@ typedef struct {
     ItemId_t id;
     ItemAmount_t amount;
     ItemCategory category;
-    ItemData *data;
+    ItemCommonData *commonData;
 } Item;
 
 /**

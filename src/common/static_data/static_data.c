@@ -99,7 +99,7 @@ bool staticDataAdd(StaticData *self, StaticDataId id, void *object) {
     return true;
 }
 
-bool staticDataGet(StaticData *self, StaticDataId id, void *_out) {
+bool staticDataGet(StaticData *self, StaticDataId id, void *_out, bool emitError) {
 
     void **out = _out;
 
@@ -113,7 +113,9 @@ bool staticDataGet(StaticData *self, StaticDataId id, void *_out) {
 
     void *object = NULL;
     if (!(object = zhash_lookup(self->hashtable, key))) {
-        sdError(self, "Cannot find the static data for object '%s'", key);
+        if (emitError) {
+            sdError(self, "Cannot find the static data for object '%s'", key);
+        }
         return false;
     }
 

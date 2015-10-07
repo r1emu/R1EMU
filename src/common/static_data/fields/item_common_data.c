@@ -11,41 +11,50 @@
  *          See LICENSE file for further information
  */
 
-#include "skill.h"
+#include "item_common_data.h"
 
-Skill *skillNew(Actor *actor) {
-    Skill *self;
+ItemCommonData *itemCommonDataNew(MYSQL_ROW row) {
+    ItemCommonData *self;
 
-    if ((self = malloc(sizeof(Skill))) == NULL) {
+    if ((self = malloc(sizeof(ItemCommonData))) == NULL) {
         return NULL;
     }
 
-    if (!skillInit(self, actor)) {
-        skillDestroy(&self);
-        error("Skill failed to initialize.");
+    if (!itemCommonDataInit(self, row)) {
+        itemCommonDataDestroy(&self);
+        error("ItemCommonData failed to initialize.");
         return NULL;
     }
 
     return self;
 }
 
-bool skillInit(Skill *self, Actor *actor) {
+bool itemCommonDataInit(ItemCommonData *self, MYSQL_ROW row) {
     memset(self, 0, sizeof(*self));
 
-    self->actor = *actor;
+    int index = 0;
+
+    self->ClassID = strtol(row[index++], NULL, 10);
+    self->ItemType = strdup(row[index++]);
 
     return true;
 }
 
-void skillFree(Skill *self) {
-    // TODO
+void itemCommonDataFree(ItemCommonData *self) {
+    free(self->ItemType);
 }
 
-void skillDestroy(Skill **_self) {
-    Skill *self = *_self;
+void itemCommonDataPrint(ItemCommonData *self) {
+    dbg("==== ItemEquipData %p ====", self);
+    dbg("ClassID = %d", self->ClassID);
+    dbg("ItemType = %s", self->ItemType);
+}
+
+void itemCommonDataDestroy(ItemCommonData **_self) {
+    ItemCommonData *self = *_self;
 
     if (_self && self) {
-        skillFree(self);
+        itemCommonDataFree(self);
         free(self);
         *_self = NULL;
     }

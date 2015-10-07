@@ -7,42 +7,46 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file item_factory.h
- * @brief
- *
- *
- *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
  *          See LICENSE file for further information
  */
 
-#pragma once
+#include "npc.h"
 
-// ---------- Includes ------------
-#include "R1EMU.h"
-#include "item.h"
-#include "common/mysql/mysql.h"
-#include "common/static_data/fields/item_common_data.h"
-#include "common/static_data/fields/item_equip_data.h"
+Npc *npcNew(Actor *actor) {
+    Npc *self;
 
-// ---------- Defines -------------
+    if ((self = malloc(sizeof(Npc))) == NULL) {
+        return NULL;
+    }
 
+    if (!npcInit(self, actor)) {
+        npcDestroy(&self);
+        error("Npc failed to initialize.");
+        return NULL;
+    }
 
-// ------ Structure declaration -------
+    return self;
+}
 
-// ----------- Functions ------------
-Item *itemFactoryCreate(ItemId_t id, ItemAmount_t amount);
-bool itemFactoryInit(
-    Item *newItem,
-    ItemCategory category,
-    ItemCommonData *commonData,
-    ItemEquipData *equipData,
-    ItemId_t id,
-    ItemAmount_t amount);
-bool itemFactoryStart(MySQLInfo *sqlInfo);
+bool npcInit(Npc *self, Actor *actor) {
+    memset(self, 0, sizeof(*self));
 
-bool itemFactoryGetCategoryFromId(
-    ItemId_t id,
-    ItemCommonData *commonData,
-    ItemEquipData *equipData,
-    ItemCategory *category);
+    self->actor = *actor;
+
+    return true;
+}
+
+void npcFree(Npc *self) {
+    // TODO
+}
+
+void npcDestroy(Npc **_self) {
+    Npc *self = *_self;
+
+    if (_self && self) {
+        npcFree(self);
+        free(self);
+        *_self = NULL;
+    }
+}

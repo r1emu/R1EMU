@@ -529,8 +529,8 @@ static PacketHandlerState zoneHandlerGameReady(
     // zoneBuilderBuffList(commander->appearance.pcId, replyMsg);
 
     // add NPC at the start screen
-    // zoneBuilderEnterMonster(replyMsg);
-    // zoneBuilderFaction(replyMsg);
+    zoneBuilderEnterMonster(replyMsg);
+    zoneBuilderFaction(replyMsg);
 
     /*
     zoneBuilderNormalUnk6(
@@ -546,9 +546,9 @@ static PacketHandlerState zoneHandlerGameReady(
         replyMsg
     );
 
-    ZoneBuilder_jobPts(replyMsg);
+    zoneBuilderJobPts(replyMsg);
     zoneBuilderNormalUnk9(session->game.commanderSession.currentCommander->appearance.pcId, replyMsg);
-    ZoneBuilder_addonMsg(replyMsg);
+    zoneBuilderAddonMsg(replyMsg);
     */
 
     zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander->pcId, 31.0f, replyMsg);

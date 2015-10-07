@@ -20,8 +20,7 @@
 #include "common/mysql/mysql.h"
 #include "common/static_data/static_data.h"
 
-
 /**
  * @brief Build a StaticData
  */
-bool mySqlBuildItemDataDb(MySQL *self, StaticData **_db);
+bool mySqlBuildItemCommonDataDb(MySQL *self, StaticData **_db);

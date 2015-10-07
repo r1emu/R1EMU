@@ -285,7 +285,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             // Equipment
             #define GET_REDIS_EQUIPMENT(x)                                                                     \
               if (!(commander->inventory.equippedItems[x] = (ItemEquipable *) itemFactoryCreate(               \
-                     ITEM_CAT_ARMOR, GET_REDIS_GAME_32(x), 1)))                                                \
+                     GET_REDIS_GAME_32(x), 1)))                                                                \
               {                                                                                                \
                     error("Cannot get item '%s'", STRINGIFY(x));                                               \
                     goto cleanup;                                                                              \

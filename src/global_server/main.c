@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     GlobalServerInfo info;
 
     // force the initialization of the CZMQ layer here.
-    if (!(zsys_init ())) {
+    if (!(zsys_init())) {
         error("Cannot init CZMQ.");
         goto cleanup;
     }

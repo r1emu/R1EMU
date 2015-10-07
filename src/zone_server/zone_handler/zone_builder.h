@@ -24,6 +24,7 @@
 #include "common/commander/inventory.h"
 #include "common/actor/item/item.h"
 #include "common/actor/skill/skill.h"
+#include "common/actor/npc/npc.h"
 
 typedef enum PacketTypeZoneNormal {
     ZC_NORMAL_UNKNOWN_1 = 0x11,

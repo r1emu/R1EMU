@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file item_factory.h
+ * @file npc.h
  * @brief
  *
  *
@@ -20,29 +20,43 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
-#include "item.h"
-#include "common/mysql/mysql.h"
-#include "common/static_data/fields/item_common_data.h"
-#include "common/static_data/fields/item_equip_data.h"
+#include "common/actor/actor.h"
 
 // ---------- Defines -------------
 
 
 // ------ Structure declaration -------
+typedef uint32_t NpcId_t;
+
+typedef struct {
+    Actor actor;
+    NpcId_t id;
+} Npc;
 
 // ----------- Functions ------------
-Item *itemFactoryCreate(ItemId_t id, ItemAmount_t amount);
-bool itemFactoryInit(
-    Item *newItem,
-    ItemCategory category,
-    ItemCommonData *commonData,
-    ItemEquipData *equipData,
-    ItemId_t id,
-    ItemAmount_t amount);
-bool itemFactoryStart(MySQLInfo *sqlInfo);
 
-bool itemFactoryGetCategoryFromId(
-    ItemId_t id,
-    ItemCommonData *commonData,
-    ItemEquipData *equipData,
-    ItemCategory *category);
+/**
+ * Allocate a new Npc structure.
+ * @return A pointer to an allocated Npc, or NULL if an error occured.
+ */
+Npc *npcNew(Actor *actor);
+
+/**
+ * Initialize an allocated Npc structure.
+ * @param self An allocated Npc to initialize.
+ * @return true on success, false otherwise.
+ */
+bool npcInit(Npc *self, Actor *actor);
+
+/**
+ * Free an allocated Npc structure.
+ * @param self A pointer to an allocated Npc.
+ */
+void npcFree(Npc *self);
+
+/**
+ * Free an allocated Npc structure and nullify the content of the pointer.
+ * @param self A pointer to an allocated Npc.
+ */
+void npcDestroy(Npc **self);
+

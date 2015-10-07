@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file skill.h
+ * @file item_common_data.h
  * @brief
  *
  *
@@ -20,43 +20,49 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
-#include "common/actor/actor.h"
 
 // ---------- Defines -------------
 
 
 // ------ Structure declaration -------
-typedef uint32_t SkillId_t;
-typedef uint32_t SkillLevel_t;
+/**
+ * @brief ItemCommonData contains static data about common items
+ */
+typedef struct
+{
+    int ClassID;
+    char *ItemType;
 
-typedef struct {
-    Actor actor;
-} Skill;
+}   ItemCommonData;
 
 // ----------- Functions ------------
 
 /**
- * Allocate a new Skill structure.
- * @return A pointer to an allocated Skill, or NULL if an error occured.
+ * Allocate a new ItemCommonData structure.
+ * @return A pointer to an allocated ItemCommonData, or NULL if an error occured.
  */
-Skill *skillNew(Actor *actor);
+ItemCommonData *itemCommonDataNew(MYSQL_ROW row);
 
 /**
- * Initialize an allocated Skill structure.
- * @param self An allocated Skill to initialize.
+ * Initialize an allocated ItemCommonData structure.
+ * @param self An allocated ItemCommonData to initialize.
  * @return true on success, false otherwise.
  */
-bool skillInit(Skill *self, Actor *actor);
+bool itemCommonDataInit(ItemCommonData *self, MYSQL_ROW row);
 
 /**
- * Free an allocated Skill structure.
- * @param self A pointer to an allocated Skill.
+ * Free an allocated ItemCommonData structure.
+ * @param self A pointer to an allocated ItemCommonData.
  */
-void skillFree(Skill *self);
+void itemCommonDataFree(ItemCommonData *self);
 
 /**
- * Free an allocated Skill structure and nullify the content of the pointer.
- * @param self A pointer to an allocated Skill.
+ * Free an allocated ItemCommonData structure and nullify the content of the pointer.
+ * @param self A pointer to an allocated ItemCommonData.
  */
-void skillDestroy(Skill **self);
+void itemCommonDataDestroy(ItemCommonData **self);
 
+/**
+ * Print a common item staic data
+ */
+void itemCommonDataPrint(ItemCommonData *self);

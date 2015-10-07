@@ -800,7 +800,6 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     };
     for (ItemEquipmentSlot slot = 0; slot < EQSLOT_COUNT; slot++) {
         newCommander.inventory.equippedItems[slot] = (ItemEquipable *) itemFactoryCreate(
-            ITEM_CAT_WEAPON,
             defaultEquipment[newCommander.jobId][slot],
             1
         );

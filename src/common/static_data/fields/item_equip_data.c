@@ -16,29 +16,29 @@
  */
 
 // ---------- Includes ------------
-#include "item_data.h"
-#include "common/mysql/fields/mysql_item_data.h"
+#include "item_equip_data.h"
+#include "common/mysql/fields/mysql_item_equip_data.h"
 
-ItemData *itemDataNew(MYSQL_ROW row) {
+ItemEquipData *itemEquipDataNew(MYSQL_ROW row) {
 
-    ItemData *self;
+    ItemEquipData *self;
 
-    if ((self = malloc(sizeof(ItemData))) == NULL) {
+    if ((self = malloc(sizeof(ItemEquipData))) == NULL) {
         return NULL;
     }
 
-    if (!itemDataInit(self, row)) {
-        itemDataDestroy(&self);
-        error("ItemData failed to initialize.");
+    if (!itemEquipDataInit(self, row)) {
+        itemEquipDataDestroy(&self);
+        error("ItemEquipData failed to initialize.");
         return NULL;
     }
 
     return self;
 }
 
-bool itemDataInit(ItemData *self, MYSQL_ROW row) {
+bool itemEquipDataInit(ItemEquipData *self, MYSQL_ROW row) {
 
-    memset(self, 0, sizeof(ItemData));
+    memset(self, 0, sizeof(ItemEquipData));
 
     int index = 0;
 
@@ -186,8 +186,8 @@ bool itemDataInit(ItemData *self, MYSQL_ROW row) {
     return true;
 }
 
-void itemDataPrint(ItemData *self) {
-    dbg("==== ItemData %p ====", self);
+void itemEquipDataPrint(ItemEquipData *self) {
+    dbg("==== ItemEquipData %p ====", self);
     dbg("ClassID = %d", self->ClassID);
     dbg("Weight = %d", self->Weight);
     dbg("PR = %d", self->PR);
@@ -329,14 +329,44 @@ void itemDataPrint(ItemData *self) {
     dbg("DefaultEqpSlot = '%s'", self->DefaultEqpSlot);
 }
 
-void itemDataFree(ItemData *self) {
+void itemEquipDataFree(ItemEquipData *self) {
+    free(self->ClassName);
+    free(self->Name);
+    free(self->ItemType);
+    free(self->Journal);
+    free(self->GroupName);
+    free(self->EquipGroup);
+    free(self->EquipXpGroup);
+    free(self->ToolTipScp);
+    free(self->BasicTooltipProp);
+    free(self->TooltipImage);
+    free(self->Icon);
+    free(self->ReqToolTip);
+    free(self->Desc);
+    free(self->Destroyable);
+    free(self->ShopTrade);
+    free(self->UserTrade);
+    free(self->DropStyle);
+    free(self->Usable);
+    free(self->Consumable);
+    free(self->UseTx);
+    free(self->ClassType);
+    free(self->ClassType2);
+    free(self->Attribute);
+    free(self->AttackType);
+    free(self->Material);
+    free(self->UseJob);
+    free(self->UseGender);
+    free(self->DBLHand);
+    free(self->EqpType);
+    free(self->DefaultEqpSlot);
 }
 
-void itemDataDestroy(ItemData **_self) {
-    ItemData *self = *_self;
+void itemEquipDataDestroy(ItemEquipData **_self) {
+    ItemEquipData *self = *_self;
 
     if (_self && self) {
-        itemDataFree(self);
+        itemEquipDataFree(self);
         free(self);
         *_self = NULL;
     }

@@ -436,6 +436,8 @@ void zoneBuilderFaction(zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         // not yet implemented
+        NpcId_t npcId;
+        uint32_t unk1;
     } replyPacket;
 
    (void) replyPacket;
@@ -469,15 +471,15 @@ void zoneBuilderEnterMonster(zmsg_t *replyMsg) {
     {
         size_t memSize;
         void *memory = dumpToMem(
-            "[11:10:22][           ToSClient:                     dbgBuffer]  BF 0B FF FF FF FF 84 00 48 01 00 00 00 40 23 C4 | ........H....@#.\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  A7 69 82 43 00 40 6E C4 46 0B 51 32 00 00 80 BF | .i.C.@n.F.Q2....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  02 00 21 00 00 00 21 00 00 00 00 00 00 00 00 00 | ..!...!.........\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  30 4E 00 00 58 02 00 00 21 00 00 00 00 00 69 6F | 0N..X...!.....io\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  01 00 00 00 00 00 80 3F 00 00 00 00 08 00 00 00 | .......?........\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  28 00 00 00 06 00 0A 00 EA B2 BD EA B3 84 EB B3 |(...............\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  91 00 01 00 00 11 00 53 49 41 55 5F 46 52 4F 4E | .......SIAU_FRON\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  5F 4E 50 43 5F 30 31 00 01 00 00 01 00 00 07 00 | _NPC_01.........\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 A0 42                                     | ...B\n"
+            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  BF 0B FF FF FF FF 84 00 48 01 00 00 00 40 23 C4 | ........H....@#.\n"
+            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  A7 69 82 43 00 40 6E C4 46 0B 51 32 00 00 80 BF | .i.C.@n.F.Q2....\n"
+            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  02 00 21 00 00 00 21 00 00 00 00 00 00 00 00 00 | ..!...!.........\n"
+            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  30 4E 00 00 58 02 00 00 21 00 00 00 00 00 69 6F | 0N..X...!.....io\n"
+            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  01 00 00 00 00 00 80 3F 00 00 00 00 08 00 00 00 | .......?........\n"
+            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  28 00 00 00 06 00 0A 00 EA B2 BD EA B3 84 EB B3 | ................\n"
+            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  91 00 01 00 00 11 00 53 49 41 55 5F 46 52 4F 4E | .......SIAU_FRON\n"
+            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  5F 4E 50 43 5F 30 31 00 01 00 00 01 00 00 07 00 | _NPC_01.........\n"
+            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  00 00 A0 42                                     | ...B\n"
             , NULL, &memSize
         );
 

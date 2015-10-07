@@ -120,7 +120,7 @@ void itemPrint(Item *self) {
         dbg("Amount = %d (%#x)", self->amount, self->amount);
         dbg("Category = %d (%#x)", self->category, self->category);
         actorPrint(&self->actor);
-        itemDataPrint(self->data);
+        itemCommonDataPrint(self->commonData);
     }
 }
 

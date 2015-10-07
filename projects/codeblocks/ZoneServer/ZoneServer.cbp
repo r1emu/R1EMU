@@ -144,6 +144,14 @@
 		</Unit>
 		<Unit filename="../../../src/common/actor/item/item_factory.h" />
 		<Unit filename="../../../src/common/actor/item/item_interface.h" />
+		<Unit filename="../../../src/common/actor/npc/npc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/npc/npc.h" />
+		<Unit filename="../../../src/common/actor/skill/skill.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/actor/skill/skill.h" />
 		<Unit filename="../../../src/common/commander/commander.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -201,10 +209,15 @@
 		</Unit>
 		<Unit filename="../../../src/common/mysql/fields/mysql_commander.h" />
 		<Unit filename="../../../src/common/mysql/fields/mysql_commander_session.h" />
-		<Unit filename="../../../src/common/mysql/fields/mysql_item_data.c">
+		<Unit filename="../../../src/common/mysql/fields/mysql_item_common_data.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../src/common/mysql/fields/mysql_item_common_data.h" />
 		<Unit filename="../../../src/common/mysql/fields/mysql_item_data.h" />
+		<Unit filename="../../../src/common/mysql/fields/mysql_item_equip_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/mysql/fields/mysql_item_equip_data.h" />
 		<Unit filename="../../../src/common/mysql/fields/mysql_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -301,10 +314,15 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/session/socket_session.h" />
-		<Unit filename="../../../src/common/static_data/fields/item_data.c">
+		<Unit filename="../../../src/common/static_data/fields/item_common_data.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../src/common/static_data/fields/item_common_data.h" />
 		<Unit filename="../../../src/common/static_data/fields/item_data.h" />
+		<Unit filename="../../../src/common/static_data/fields/item_equip_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/static_data/fields/item_equip_data.h" />
 		<Unit filename="../../../src/common/static_data/static_data.c">
 			<Option compilerVar="CC" />
 		</Unit>

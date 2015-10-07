@@ -52,7 +52,7 @@ bool staticDataAdd(StaticData *self, StaticDataId id, void *item);
  * @param id The object ID
  * @param out A pointer to the result object
  */
-bool staticDataGet(StaticData *self, StaticDataId id, void *out);
+bool staticDataGet(StaticData *self, StaticDataId id, void *_out, bool emitError);
 
 /**
  * @brief Lock a StaticData so it cannot be written again (read only)

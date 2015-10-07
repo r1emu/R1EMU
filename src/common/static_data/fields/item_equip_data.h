@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file item_data.h
+ * @file item_equip_data.h
  * @brief
  *
  * @license GNU GENERAL PUBLIC LICENSE - Version 2, June 1991
@@ -20,7 +20,7 @@
 #include "R1EMU.h"
 
 // Type definition
-typedef struct ItemData {
+typedef struct ItemEquipData {
     int ClassID;
     int Weight;
     int PR;
@@ -160,38 +160,38 @@ typedef struct ItemData {
     char *DBLHand;
     char *EqpType;
     char *DefaultEqpSlot;
-}   ItemData;
+}   ItemEquipData;
 
 // Functions
 /**
- * @brief Allocate a new ItemData structure.
+ * @brief Allocate a new ItemEquipData structure.
  * @param row The row of the item in the SQL query
- * @return A pointer to an allocated ItemData.
+ * @return A pointer to an allocated ItemEquipData.
  */
-ItemData *itemDataNew(MYSQL_ROW row);
+ItemEquipData *itemEquipDataNew(MYSQL_ROW row);
 
 /**
- * @brief Initialize an allocated ItemData structure.
- * @param self An allocated ItemData to initialize.
+ * @brief Initialize an allocated ItemEquipData structure.
+ * @param self An allocated ItemEquipData to initialize.
  * @param row The row of the item in the SQL query
  * @return true on success, false otherwise.
  */
-bool itemDataInit(ItemData *self, MYSQL_ROW row);
+bool itemEquipDataInit(ItemEquipData *self, MYSQL_ROW row);
 
 /**
- * @brief Prints a ItemData structure.
- * @param self An allocated ItemData
+ * @brief Prints a ItemEquipData structure.
+ * @param self An allocated ItemEquipData
  */
-void itemDataPrint(ItemData *self);
+void itemEquipDataPrint(ItemEquipData *self);
 
 /**
- * @brief Free an allocated ItemData structure and nullify the content of the pointer.
- * @param self A pointer to an allocated ItemData.
+ * @brief Free an allocated ItemEquipData structure and nullify the content of the pointer.
+ * @param self A pointer to an allocated ItemEquipData.
  */
-void itemDataDestroy(ItemData **self);
+void itemEquipDataDestroy(ItemEquipData **self);
 
 /**
- * @brief Free an allocated ItemData structure
- * @param self A pointer to an allocated ItemData.
+ * @brief Free an allocated ItemEquipData structure
+ * @param self A pointer to an allocated ItemEquipData.
  */
-void itemDataFree(ItemData *self);
+void itemEquipDataFree(ItemEquipData *self);
