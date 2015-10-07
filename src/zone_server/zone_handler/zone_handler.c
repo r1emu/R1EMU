@@ -472,7 +472,7 @@ static PacketHandlerState zoneHandlerGameReady(
     zoneBuilderItemEquipList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
     zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
 
-    // zoneBuilderSkillList(commander->pcId, replyMsg);
+    zoneBuilderSkillList(commander->pcId, replyMsg);
     zoneBuilderAbilityList(commander->pcId, replyMsg);
     zoneBuilderCooldownList(commander->socialInfoId, replyMsg);
 

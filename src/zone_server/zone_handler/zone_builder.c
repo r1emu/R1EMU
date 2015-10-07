@@ -783,9 +783,9 @@ void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderObjectProperty(uint64_t actorId, zmsg_t *replyMsg) {
+void zoneBuilderObjectProperty(ActorId_t actorId, zmsg_t *replyMsg) {
 
-    int propsSize = 10;
+    size_t propsSize = 10;
 
     #pragma pack(push, 1)
     typedef struct TempProp {
@@ -826,8 +826,6 @@ void zoneBuilderObjectProperty(uint64_t actorId, zmsg_t *replyMsg) {
     props[9].propId = SWAP_UINT16(0x2911); // MHP
     props[9].value = 238;
 
-
-
     #pragma pack(push, 1)
     struct {
         // not yet implemented
@@ -844,7 +842,7 @@ void zoneBuilderObjectProperty(uint64_t actorId, zmsg_t *replyMsg) {
     {
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
         replyPacket.actorId = actorId;
-        for (int i = 0; i < propsSize; i++) {
+        for (size_t i = 0; i < propsSize; i++) {
             replyPacket.properties[i] = props[i];
         }
     }
@@ -1098,8 +1096,33 @@ void zoneBuilderSkillList(PcId_t targetPcId, zmsg_t *replyMsg) {
     {
         size_t memSize;
         memory = dumpToMem(
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  33 0C FF FF FF FF 14 00 A6 5F 0B 00 00 00 8D FA | 3........_......\n"
-            "[03:07:36][main.c:56 in CNetUsr__PacketHandler_1]  02 00 03 00                                     | ....\n"
+			"[03:10:49][main.c:30 in writePacketToFile]  33 0C FF FF FF FF AE 01 FE 89 0E 00 08 00 8D FA | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  9C 01 AD D2 3B 48 03 41 14 05 D0 9B 8F 1A 41 C8 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  2A 1A B4 10 62 21 96 06 2C 2C 44 F6 47 8C 85 D6 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  7E AA D8 5A 58 4B 0A 59 24 22 B6 22 56 29 B6 8A | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  BF D6 10 41 88 62 B5 60 A3 29 2D C4 42 04 AD D2 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  28 08 0A BE 79 A3 EE 92 C9 4A 0A A7 78 CC 0E 24 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  1C EE 7D 9B A3 31 CC 45 80 E3 12 B0 8E 28 E4 79 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  8E 5D 24 01 47 3F 4D 22 BF 9A 3B A3 3B 50 A5 E9 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  59 15 BE D7 68 E6 CD 6E 4D BC 4F F0 9C A6 E9 18 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  8F F4 5E B0 EF 69 3A BA C9 EF 29 9E 9D 3C 17 79 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  5E F3 3F 2C D0 DD D1 EF F8 BE C4 EF CB FC B2 B7 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  15 41 19 C0 11 79 36 B0 46 37 71 A4 C7 35 C8 E3 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  F6 E4 AE E8 57 AE 21 54 8E 2E 54 29 5B A8 3C 4B | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  A8 1A AC 1A B4 7C 95 CB 2A A0 B5 6A D6 6A 56 C1 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  50 55 EF 2B C0 3E 39 CA AC 62 12 86 C6 00 91 92 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  66 92 CA 28 CD 08 95 66 FE 95 55 31 A0 FA 8F AC | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  5E FB 3A B0 43 98 43 56 FD 74 F7 C9 DD 65 84 2A | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  FF C2 AA 0C AB C2 B2 DA 55 54 61 59 F5 DB CD 59 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  C9 06 2B B6 68 B0 90 95 0D 56 E7 E3 AC B2 03 59 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  D5 BB 64 56 DC A0 33 15 68 50 DD AB 34 37 A8 29 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  AA B0 BD 4A 9B AD 55 40 70 AF 6E 0B 51 6C 53 56 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  07 AC 1A 91 15 22 11 17 0D 4A D5 79 D6 DF 2B 55 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  25 B7 3D A1 A8 C2 B2 72 8D 76 54 93 C3 51 14 C9 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  62 06 B2 F2 E8 FB 57 F5 70 C2 0D CA 6D 0F 53 5D | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  9A FE B6 FF BD 57 9E B2 ED B2 C1 01 D1 A0 51 FA | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  6E F0 ED 29 C2 2A 8B 55 E3 B4 E7 E2 F4 FA 59 35 | \n"
+			"[03:10:49][main.c:30 in writePacketToFile]  EA 6D A8 6E DA 56 7D 84 A8 6A 56 B0 C1 2F       | \n"
           , NULL, &memSize
         );
         memory->pcId = targetPcId;
