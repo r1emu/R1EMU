@@ -22,6 +22,7 @@
 #include "common/commander/inventory.h"
 #include "common/mysql/fields/mysql_commander.h"
 #include "common/mysql/fields/mysql_account_session.h"
+#include "common/actor/item/item_factory.h"
 
 /** Connect to the zone server */
 static PacketHandlerState zoneHandlerConnect        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
@@ -436,51 +437,34 @@ static PacketHandlerState zoneHandlerGameReady(
     Commander *commander = session->game.commanderSession.currentCommander;
 
     /// TESTING PURPOSES
-    /*
+
     Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
 
-    Item items[20];
-    items[0].itemId = 1111;
-    items[0].itemType = 645001;
-    items[0].amount = 5003;
-    items[0].itemCategory = ITEM_CAT_CONSUMABLE;
-    items[0].inventoryIndex = 1;
-    //items[0].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
-    inventoryAddItem(inventory, &items[0]);
 
-    items[1].itemId = 2222;
-    items[1].itemType = 640026;
-    items[1].amount = 5;
-    items[1].itemCategory = ITEM_CAT_CONSUMABLE;
-    items[1].inventoryIndex = 2;
-    //items[1].properties = itemPropertiesNew(0, 0, NULL, NULL, NULL, 0, 0);
-    inventoryAddItem(inventory, &items[1]);
+    Item *items[20];
+
+    items[0] = itemFactoryCreate(645001, 5003);
+    inventoryAddItem(inventory, items[0]);
+
+    items[1] = itemFactoryCreate(640026, 5);
+    inventoryAddItem(inventory, items[1]);
 
 
-    items[2].itemId = 3333;
-    items[2].itemType = 531102;
-    items[2].amount = 1;
-    items[2].itemCategory = ITEM_CAT_ARMOR;
     //items[2].equipSlot = EQSLOT_BODY_ARMOR;
     //items[2].properties = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    /*
+    actor = actorNew(3333);
+    itemInit(&items[2], actor, ITEM_CAT_ARMOR, 531102, 1);
     inventoryAddItem(inventory, &items[2]);
 
-    items[3].itemId = 4444;
-    items[3].itemType = 531101;
-    items[3].amount = 1;
-    items[3].itemCategory = ITEM_CAT_ARMOR;
-    //items[3].equipSlot = EQSLOT_BODY_ARMOR;
-    //items[3].properties = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
+    actor = actorNew(4444);
+    itemInit(&items[3], actor, ITEM_CAT_ARMOR, 531101, 1);
     inventoryAddItem(inventory, &items[3]);
-
+    */
 
     inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
     inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
 
-    inventoryRemoveItem(inventory, &items[1]);
-
-    inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
-    */
     zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
     zoneBuilderSessionObjects(replyMsg);
     zoneBuilderOptionList(replyMsg);
@@ -509,7 +493,7 @@ static PacketHandlerState zoneHandlerGameReady(
     zoneBuilderNormalUnk5(replyMsg);
 
     zoneBuilderStartGame(1.0, 0.0, 0.0, 0.0, replyMsg);
-    // zoneBuilderObjectProperty(replyMsg);
+    zoneBuilderObjectProperty(commander->socialInfoId, replyMsg);
     // zoneBuilderStamina(replyMsg);
     zoneBuilderLoginTime(replyMsg);
 

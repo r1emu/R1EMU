@@ -73,6 +73,8 @@ void zoneBuilderItemAdd(Item *item, ItemInventoryIndex_t inventoryIndex, Invento
         packetStreamInit(&packetStream, replyPacket.properties);
         itemPropertiesGetCPacket(item, &packetStream);
     }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }
 
 void zoneBuilderSkillReady(
@@ -781,64 +783,70 @@ void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderObjectProperty(zmsg_t *replyMsg) {
+void zoneBuilderObjectProperty(uint64_t actorId, zmsg_t *replyMsg) {
+
+    int propsSize = 10;
+
+    #pragma pack(push, 1)
+    typedef struct TempProp {
+        uint16_t propId;
+        float value;
+    } tempProp;
+    #pragma pack(pop)
+
+    tempProp props[propsSize];
+
+    props[0].propId = SWAP_UINT16(0x8E10); // Lv
+    props[0].value = 10;
+
+    props[1].propId = SWAP_UINT16(0xA910); // MSPD (movement speed)
+    props[1].value = 31;
+
+    props[2].propId = SWAP_UINT16(0xAD10); // DEX
+    props[2].value = 0;
+
+    props[3].propId = SWAP_UINT16(0x9410); // MNA
+    props[3].value = 3;
+
+    props[4].propId = SWAP_UINT16(0xAB10); // INT
+    props[4].value = 4;
+
+    props[5].propId = SWAP_UINT16(0x9210); // CON
+    props[5].value = 7;
+
+    props[6].propId = SWAP_UINT16(0xAA10); // STR
+    props[6].value = 6;
+
+    props[7].propId = SWAP_UINT16(0x8311); // LUCK
+    props[7].value = 1;
+
+    props[8].propId = SWAP_UINT16(0x3311); // MSP
+    props[8].value = 121;
+
+    props[9].propId = SWAP_UINT16(0x2911); // MHP
+    props[9].value = 238;
+
+
+
     #pragma pack(push, 1)
     struct {
         // not yet implemented
+        VariableSizePacketHeader variableSizeHeader;
+        ActorId_t actorId;
+        tempProp properties[propsSize];
     } replyPacket;
-   (void) replyPacket;
     #pragma pack(pop)
 
-    // PacketType packetType = ZC_OBJECT_PROPERTY;
-    // CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
-    // BUILD_REPLY_PACKET(replyPacket, replyMsg)
-    {
-        size_t memSize;
-        void *memory = dumpToMem(
-            "[11:10:22][           ToSClient:                     dbgBuffer]  63 0C FF FF FF FF 7A 02 04 06 00 00 74 9F 01 00 | c.....z.....t...\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  6C 03 00 00 80 3F AB 17 00 58 9D 45 AC 17 00 00 | l....?...X.E....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  96 43 20 04 00 50 C3 46 62 04 00 40 9C 46 71 03 | .C ..P.Fb..@.Fq.\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 F8 41 48 17 00 00 40 40 49 17 00 00 00 41 | ...AH...@@I....A\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  99 04 00 00 80 40 9A 04 00 00 E0 40 9C 04 00 00 | .....@.....@....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  C0 40 E8 03 00 00 80 3F 84 03 00 00 00 00 95 04 | .@.....?........\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 80 3F 9D 04 00 00 E0 40 4B 11 00 00 80 40 | ...?.....@K....@\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  4A 11 00 00 80 40 96 04 00 00 40 40 9F 04 00 00 | J....@....@@....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  40 40 AA 04 00 00 00 00 90 04 00 00 00 00 A7 04 | @@..............\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 D2 42 A8 04 00 00 EE 42 BF 03 00 00 00 00 | ...B.....B......\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  BE 03 00 00 00 00 B9 03 00 00 00 00 B8 03 00 00 | ................\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 B6 03 00 00 00 00 A5 04 00 00 00 41 98 04 | .............A..\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 80 40 79 04 00 00 00 00 9E 04 00 00 C0 40 | ...@y..........@\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  83 03 00 00 00 00 92 04 00 00 80 40 93 04 00 00 | ...........@....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 A6 04 00 00 E0 40 72 17 00 00 80 40 69 11 | .......@r....@i.\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 B3 04 00 00 00 00 47 15 00 00 00 00 | ..........G.....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  AC 04 00 00 00 00 AD 04 00 00 00 00 AE 04 00 00 | ................\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 56 04 00 00 00 00 53 04 00 00 00 00 A1 03 | ..V.....S.......\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 D5 1E 00 00 00 00 8D 17 00 00 00 00 | ................\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  DD 1E 00 00 00 00 97 03 00 00 00 00 C3 03 00 00 | ................\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 A6 18 00 00 00 00 C1 03 00 00 00 00 C4 03 | ................\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 9B 03 00 00 00 00 98 03 00 00 00 00 | ................\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  96 03 00 00 00 00 A0 03 00 00 00 00 9F 03 00 00 | ................\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 9D 03 00 00 00 00 A1 18 00 00 00 00 A0 18 | ................\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 B2 04 00 00 00 00 7D 03 00 00 00 00 | ..........}.....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  7E 03 00 00 80 3F 7F 03 08 00 43 68 61 72 34 5F | ~....?....Char4_\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  31 00 94 04 00 00 FA 43 CB 03 00 00 00 00 9A 03 | 1......C........\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 09 04 00 00 00 00 52 17 00 00 00 00 | ..........R.....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  29 04 00 00 00 00 08 04 00 00 00 00 51 17 00 00 | )...........Q...\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 26 04 00 00 00 00 FC 03 00 00 00 00 F3 03 | ..&.............\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 F1 03 00 40 1C 45 EF 03 00 00 00 00 | .......@.E......\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  EE 03 00 00 7A 43 ED 03 00 40 9C 45 EC 03 00 00 | ....zC...@.E....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  C8 42 E9 03 00 00 7A 43 EA 03 00 00 00 00 E2 03 | .B....zC........\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 00 04 00 00 80 3F FE 03 00 00 00 00 | .........?......\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  E5 03 00 00 AF 43 C7 03 00 00 00 00 C9 03 00 00 | .....C..........\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 40 C6 03 45 76 F4 3F C5 03 00 00 80 3F 73 17 | .@..Ev.?.....?s.\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 74 17 00 00 C0 40 70 17 00 00 C0 40 | ....t....@p....@\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  71 17 00 00 40 41 6E 17 00 00 30 41 6D 04 00 00 | q...@An...0Am...\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 68 04 00 00 20 42 66 04 00 00 02 43 65 04 | ..h... Bf....Ce.\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 92 17 00 00 7A 44                   | ........zD\n"
-            , NULL, &memSize
-        );
+    PacketType packetType = ZC_OBJECT_PROPERTY;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
 
-        zmsg_add(replyMsg, zframe_new(memory, memSize));
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
+        replyPacket.actorId = actorId;
+        for (int i = 0; i < propsSize; i++) {
+            replyPacket.properties[i] = props[i];
+        }
     }
 }
 

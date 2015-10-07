@@ -194,7 +194,7 @@ void zoneBuilderAddHp(PcId_t targetPcId, uint32_t hp, uint32_t maxHp, zmsg_t *re
 /**
  * @brief @unknown
  */
-void zoneBuilderObjectProperty(zmsg_t *replyMsg);
+void zoneBuilderObjectProperty(ActorId_t actorId, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown

@@ -286,6 +286,31 @@ bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2) {
     return true;
 }
 
+int inventoryGetBagIndexByActorId(Inventory *self, ItemCategory category, ActorId_t actorId) {
+
+    int bagIndex = -1;
+
+    dbg("inventoryGetBagIndexByActorId(), %d, %d", category, actorId);
+
+    Item *tmpItem;
+    tmpItem = zlist_first(self->bags[category]);
+
+    int index = 1;
+    while (tmpItem) {
+        dbg("[%d] item: [%d]", index, itemGetId(tmpItem));
+
+        if (actorId == actorGetUId(tmpItem)) {
+            bagIndex = (5000 * category) + index;
+            break;
+        }
+
+        tmpItem = zlist_next(self->bags[category]);
+        index++;
+    }
+
+    return bagIndex;
+}
+
 
 void inventoryPrintEquipment(Inventory *self) {
 

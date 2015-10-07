@@ -36,6 +36,7 @@ typedef uint32_t ItemPrice_t;
 typedef uint32_t ItemInventoryIndex_t;
 
 /** Item categories */
+/*
 typedef enum {
     ITEM_CAT_CONSUMABLE,
     ITEM_CAT_ARMOR,
@@ -48,6 +49,26 @@ typedef enum {
     ITEM_CAT_ACCESSORY,
     ITEM_CAT_SUBWEAPON,
     ITEM_CAT_CURRENCY,
+    ITEM_CAT_COUNT,
+}   ItemCategory;
+*/
+
+typedef enum {
+    ITEM_CAT_WEAPON = 1,
+    ITEM_CAT_ARMOR = 2,
+    ITEM_CAT_SUBWEAPON = 3,
+    ITEM_CAT_COSTUME = 4,
+    ITEM_CAT_ACCESSORY = 5,
+    ITEM_CAT_CONSUMABLE = 6,
+    ITEM_CAT_GEM = 7,
+    ITEM_CAT_MATERIAL = 8,
+    ITEM_CAT_CARD = 9,
+    ITEM_CAT_COLLECTION = 10,
+    ITEM_CAT_BOOK = 11,
+    ITEM_CAT_QUEST = 12,
+    ITEM_CAT_PETWEAPON = 13,
+    ITEM_CAT_PETARMOR = 14,
+    ITEM_CAT_CURRENCY = 15,
     ITEM_CAT_COUNT,
 }   ItemCategory;
 
@@ -67,9 +88,9 @@ typedef struct {
  */
 typedef struct {
     ActorId_t uid;
-    ItemId_t id;
     ItemAmount_t amount;
     ItemInventoryIndex_t inventoryIndex;
+    ItemId_t id;
 } ItemCPacket;
 
 /**

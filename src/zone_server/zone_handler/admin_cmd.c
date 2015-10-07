@@ -15,6 +15,7 @@
 #include "common/commander/commander.h"
 #include "common/commander/inventory.h"
 #include "common/actor/item/item.h"
+#include "common/actor/item/item_factory.h"
 #include "common/redis/fields/redis_game_session.h"
 #include "common/redis/fields/redis_socket_session.h"
 #include "common/session/session.h"
@@ -122,7 +123,6 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
 
-    /*
     uint32_t itemType = strtol(args, &args, 10);
     args++;
     uint32_t amount = strtol(args, &args, 10);
@@ -130,25 +130,18 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
     Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
 
-    uint32_t itemPosition = inventoryGetItemsCount(inventory) + 1;
+    Item *newItem = itemFactoryCreate(itemType, amount);
+    inventoryAddItem(inventory, newItem);
 
-    dbg("item position: %d", itemPosition);
+    ItemCategory itemCategory = itemGetCategory(newItem);
+    ActorId_t actorId = actorGetUId(newItem);
 
-    Item newItem;
-        TODO : Rework
+    dbg("itemCategory %d", itemCategory);
 
-    itemInit(&newItem,
-        r1emuGenerateRandom64(&self->seed),
-        itemType,
-        amount,
-        ITEM_CAT_SIZE * ITEM_CAT_CONSUMABLE + itemPosition
-    );
-    itemAddAttribute(&newItem, ITEM_ATTRIBUTE_ID_DURABILITY, (float[]) {4200});
+    ItemInventoryIndex_t inventoryIndex = inventoryGetBagIndexByActorId(inventory, itemCategory, actorId);
 
-    inventoryAddItem(inventory, &newItem);
-
-    zoneBuilderItemAdd(&newItem, INVENTORY_ADD_PICKUP, replyMsg);
-    */
+    dbg("inventoryIndex %d", inventoryIndex);
+    zoneBuilderItemAdd(newItem, inventoryIndex, INVENTORY_ADD_PICKUP, replyMsg);
 }
 
 void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
