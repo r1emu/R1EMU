@@ -7,7 +7,7 @@
  *   ██║  ██║  ██║ ███████╗ ██║ ╚═╝ ██║ ╚██████╔╝
  *   ╚═╝  ╚═╝  ╚═╝ ╚══════╝ ╚═╝     ╚═╝  ╚═════╝
  *
- * @file item_property.h
+ * @file property.h
  * @brief
  *
  *
@@ -27,7 +27,7 @@
 
 // ------ Structure declaration -------
 /** Property client/server ID size */
-typedef uint16_t PropertyId;
+typedef uint16_t PropertyId_t;
 
 /** Property formats */
 typedef enum {
@@ -45,7 +45,7 @@ typedef struct {                               \
 /** Float property server/client compatible packet structure */
 #pragma pack(push, 1)
 typedef struct {
-    PropertyId id;
+    PropertyId_t id;
     float value;
 } PropertyFloatCPacket;
 #pragma pack(pop)
@@ -53,7 +53,7 @@ typedef struct {
 /** String property server/client compatible packet structure */
 #define DECLARE_PropertyStringCPacket(x)       \
 typedef struct {                               \
-    PropertyId id;                             \
+    PropertyId_t id;                             \
     uint16_t size;                             \
     uint8_t  value[x];                         \
 } PropertyStringCPacket;
@@ -61,7 +61,7 @@ typedef struct {                               \
 // ----------- Functions ------------
 
 size_t propertyFloatGetCPacketSize(float *value);
-void propertyFloatGetCPacket(PropertyId id, float *value, PacketStream *stream);
+void propertyFloatGetCPacket(PropertyId_t id, float *value, PacketStream *stream);
 
 size_t propertyStringGetCPacketSize(char *value);
-void propertyStringGetCPacket(PropertyId id, char *value, PacketStream *stream);
+void propertyStringGetCPacket(PropertyId_t id, char *value, PacketStream *stream);

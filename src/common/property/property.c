@@ -40,7 +40,7 @@ size_t propertyStringGetCPacketSize(char *value) {
     return size;
 }
 
-void propertyFloatGetCPacket(PropertyId id, float *value, PacketStream *stream) {
+void propertyFloatGetCPacket(PropertyId_t id, float *value, PacketStream *stream) {
 
     if (!value) {
         return;
@@ -55,7 +55,7 @@ void propertyFloatGetCPacket(PropertyId id, float *value, PacketStream *stream) 
 }
 
 
-void propertyStringGetCPacket(PropertyId id, char *value, PacketStream *stream) {
+void propertyStringGetCPacket(PropertyId_t id, char *value, PacketStream *stream) {
 
     if (!value) {
         return;
