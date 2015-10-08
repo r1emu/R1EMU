@@ -36,23 +36,6 @@ typedef uint32_t ItemPrice_t;
 typedef uint32_t ItemInventoryIndex_t;
 
 /** Item categories */
-/*
-typedef enum {
-    ITEM_CAT_CONSUMABLE,
-    ITEM_CAT_ARMOR,
-    ITEM_CAT_QUEST,
-    ITEM_CAT_BOOK,
-    ITEM_CAT_MATERIAL,
-    ITEM_CAT_GEM,
-    ITEM_CAT_WEAPON,
-    ITEM_CAT_CARD,
-    ITEM_CAT_ACCESSORY,
-    ITEM_CAT_SUBWEAPON,
-    ITEM_CAT_CURRENCY,
-    ITEM_CAT_COUNT,
-}   ItemCategory;
-*/
-
 typedef enum {
     ITEM_CAT_WEAPON = 1,
     ITEM_CAT_ARMOR = 2,
