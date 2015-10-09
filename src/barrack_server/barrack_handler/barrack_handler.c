@@ -382,6 +382,41 @@ static PacketHandlerState barrackHandlerStartBarrack(
     // Update session
     session->game.accountSession = tmpAccountSession;
 
+
+        /// TESTING PURPOSES
+    Inventory *inventory = &tmpAccountSession.commanders[0]->inventory;
+    Item *items[20];
+    items[0] = itemFactoryCreate(645001, 5003);
+    inventoryAddItem(inventory, items[0]);
+    items[1] = itemFactoryCreate(640026, 5);
+    inventoryAddItem(inventory, items[1]);
+
+    items[2] = itemFactoryCreate(531101, 1);
+    inventoryAddItem(inventory, items[2]);
+
+    items[3] = itemFactoryCreate(531152, 1);
+    inventoryAddItem(inventory, items[3]);
+
+    items[4] = itemFactoryCreate(531151, 1);
+    inventoryAddItem(inventory, items[4]);
+
+    items[5] = itemFactoryCreate(511151, 1);
+    inventoryAddItem(inventory, items[5]);
+
+    dbg("Pringing initial items (consumable and armor)");
+    dbg("Inventory count: %d", inventoryGetItemsCount(inventory));
+    inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
+    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
+
+    dbg("Equiping first item in ARMOR BAG (531101)");
+    inventoryEquipItem(inventory, actorGetUId(items[2]), EQSLOT_BODY_ARMOR);
+    dbg("Inventory count: %d", inventoryGetItemsCount(inventory));
+    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
+    dbg("Equiping first item in ARMOR BAG (531152)");
+    inventoryEquipItem(inventory, actorGetUId(items[3]), EQSLOT_BODY_ARMOR);
+    dbg("Inventory count: %d", inventoryGetItemsCount(inventory));
+    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
+
     /*
     Inventory *inventory = &tmpAccountSession.commanders[0]->inventory;
 

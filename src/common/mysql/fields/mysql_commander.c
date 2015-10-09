@@ -109,11 +109,13 @@ bool mySqlGetCommanders(MySQL *self, char *familyName, Commander **commanders) {
         curCommander->mapId = strtol(row[MYSQL_COMMANDER_map_id], NULL, 10);
 
         // load equipped items
+
         for (int i = 0; i < EQSLOT_COUNT; i++) {
             MySqlCommanderEnumField field = MYSQL_COMMANDER_eqslot_head_top + i;
             ItemId_t itemId = strtol(row[field], NULL, 10);
             curCommander->inventory.equippedItems[i] = (ItemEquipable *) itemFactoryCreate(itemId, 1);
         }
+
     }
 
     return true;
