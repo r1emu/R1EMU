@@ -340,7 +340,7 @@ workerGetOrCreateSessionObject(Worker *self, uint8_t *sessionKey, DbObject **_ob
     Session *session = NULL;
 
     if (!(dbClientGetObject(self->dbSession, &object))) {
-        // Not an error
+        // Not an error : It means the session hasn't been created yet (new client)
         info("Cannot get the session object, create a new one.");
     }
 
@@ -427,7 +427,7 @@ workerBuildReply(
     status = true;
 
 cleanup:
-    dbObjectDestroy(&sessionObject);
+    // dbObjectDestroy(&sessionObject);
     return status;
 }
 

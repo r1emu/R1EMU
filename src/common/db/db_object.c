@@ -16,7 +16,7 @@
 DbObject *dbObjectNew(size_t dataSize, void *data, bool sharedMemory) {
     DbObject *self;
 
-    if ((self = malloc(sizeof_struct_member(DbObject, dataSize) + dataSize)) == NULL) {
+    if ((self = malloc(sizeof(DbObject))) == NULL) {
         return NULL;
     }
 
@@ -33,14 +33,14 @@ bool dbObjectInit(DbObject *self, size_t dataSize, void *data, bool sharedMemory
 
     bool status = false;
 
-    memset(self, 0, sizeof(DbObject));
+    memset(self, 0, sizeof(*self));
 
     self->dataSize = dataSize;
     self->sharedMemory = sharedMemory;
 
     if (!sharedMemory) {
         // allocate memory for a copy
-        if (!(self->data = malloc (dataSize))) {
+        if (!(self->data = malloc(dataSize))) {
             error("Cannot allocate data (size = %d)", dataSize);
             goto cleanup;
         }

@@ -84,6 +84,7 @@ typedef struct {
     ItemId_t id;
     ItemAmount_t amount;
     ItemCategory category;
+    ItemInventoryIndex_t inventoryIndex;
 } ItemSPacket;
 
 // ----------- Functions ------------

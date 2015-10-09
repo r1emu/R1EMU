@@ -158,7 +158,7 @@ redisReply *redisCommandDbg(Redis *self, char * format, ...) {
         vsnprintf(buffer, sizeof(buffer), format, args);
     va_end(args);
 
-    special("%s", buffer);
+    //special("%s", buffer);
     return redisCommand(self->context, buffer);
 }
 
