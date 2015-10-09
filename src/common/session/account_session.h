@@ -34,10 +34,7 @@ typedef enum AccountSessionPrivileges {
     ACCOUNT_SESSION_PRIVILEGES_PLAYER  = 3
 }   AccountSessionPrivileges;
 
-/**
- * @brief
- */
-struct AccountSession {
+typedef struct AccountSession {
     // The account login
     uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
 
@@ -58,9 +55,28 @@ struct AccountSession {
     // Array of commanders in the barrack
     Commander **commanders;
     size_t commandersCountMax;
-};
+} AccountSession;
 
-typedef struct AccountSession AccountSession;
+typedef struct {
+    // The account login
+    uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
+    uint8_t sessionKey[SOCKET_SESSION_ID_SIZE];
+    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
+
+    // Account privilege level
+    AccountSessionPrivileges privilege;
+
+    uint64_t accountId;
+    bool isBanned;
+    time_t timeBanned;
+    float credits;
+    time_t timeLastLogin;
+    uint32_t barrackType;
+
+    // Array of commanders in the barrack
+    size_t commandersCount;
+    CommanderSPacket commanders[0];
+} AccountSessionSPacket;
 
 /**
  * @brief Allocate a new AccountSession structure.

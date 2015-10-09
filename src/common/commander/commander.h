@@ -127,6 +127,41 @@ typedef struct
 
 } Commander;
 
+typedef struct
+{
+    /** Appearance */
+    uint8_t commanderName[COMMANDER_NAME_SIZE+1];
+    uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
+    CommanderGender_t gender;
+    CommanderHairId_t hairId;
+    CommanderPose_t pose;
+    PositionXYZ pos;
+    CommanderClassId_t classId;
+    CommanderJobId_t jobId;
+
+    /** Identificators */
+    ActorId_t accountId;
+    PcId_t pcId;
+    SocialInfoId_t socialInfoId;
+    CommanderId_t commanderId;
+    MapId_t mapId;
+
+    /** Stats */
+    CommanderLevel_t level;
+    Xp_t currentXP;
+    Xp_t maxXP;
+    Hp_t currentHP;
+    Hp_t maxHP;
+    Sp_t currentSP;
+    Sp_t maxSP;
+    Stamina_t currentStamina;
+    Stamina_t maxStamina;
+
+    /** Commander inventory */
+    InventorySPacket inventory[0];
+
+} CommanderSPacket;
+
 typedef enum CommanderJobId
 {
     COMMANDER_JOB_WARRIOR = 1001,
