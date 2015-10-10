@@ -73,30 +73,22 @@ void inventoryDestroy(Inventory **_self) {
     }
 }
 
-ItemHandler *itemHandlerNew(Item *item) {
-     ItemHandler *self = malloc(sizeof(ItemHandler));
-     *self = item;
-     return self;
-}
-
-bool inventoryAddItem(Inventory *self, ItemHandler itemToAdd) {
+bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
     ItemCategory itemCategory = itemGetCategory(itemToAdd);
     ActorId_t actorId = actorGetUId(itemToAdd);
 
-    ItemHandler *itemHandler = itemHandlerNew(itemToAdd);
+    ItemHandle *itemHandle = itemHandleNew(itemToAdd);
 
     ActorKey actorKey;
     actorGenKey(actorId, actorKey);
 
-    if (zhash_insert(self->items, actorKey, itemHandler) != 0) {
+    if (zhash_insert(self->items, actorKey, itemHandle) != 0) {
         error("Cannot insert the item '%s' in the hashtable.", actorKey);
         return false;
     }
 
-
-
-    if (zlist_append(self->bags[itemCategory], itemHandler) != 0) {
+    if (zlist_append(self->bags[itemCategory], itemHandle) != 0) {
         error("Cannot push item into the category bag in inventory");
         return false;
     }
@@ -104,7 +96,7 @@ bool inventoryAddItem(Inventory *self, ItemHandler itemToAdd) {
     return true;
 }
 
-bool inventoryRemoveItem(Inventory *self, ItemHandler itemToRemove) {
+bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
 
     ActorId_t actorId = actorGetUId(itemToRemove);
     ItemCategory itemCategory = itemGetCategory(itemToRemove);
@@ -112,12 +104,13 @@ bool inventoryRemoveItem(Inventory *self, ItemHandler itemToRemove) {
     ActorKey actorKey;
     actorGenKey(actorId, actorKey);
 
-    ItemHandler *itemHandler = zhash_lookup(self->items, actorKey);
+    ItemHandle *itemHandle = zhash_lookup(self->items, actorKey);
 
-    zlist_remove(self->bags[itemCategory], itemHandler);
+    zlist_remove(self->bags[itemCategory], itemHandle);
     zhash_delete(self->items, actorKey);
 
-    /// TODO: how to destroy the ItemHandler
+    /// TODO: how to destroy the ItemHandle
+    itemHandleDestroy(&itemHandle);
 
     return true;
 }
@@ -127,21 +120,21 @@ void itemGenActorKey(Item *self, ActorKey actorKey) {
     actorGenKey(actorId, actorKey);
 }
 
-bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, ItemHandler *itemHandler) {
+bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, ItemHandle *itemHandle) {
 
-    ItemHandler *item = NULL;
+    ItemHandle *item = NULL;
 
     ActorKey actorKey;
     actorGenKey(actorId, actorKey);
 
-    *itemHandler = NULL;
+    *itemHandle = NULL;
 
     if (!(item = zhash_lookup(self->items, actorKey))) {
         error("Cannot find the item '%s' in the inventory.", actorKey);
         return false;
     }
 
-    *itemHandler = *item;
+    *itemHandle = *item;
 
     return true;
 }
@@ -152,19 +145,19 @@ size_t inventoryGetItemsCount(Inventory *self) {
 
 Item *inventoryGetFirstItem(Inventory *self, ItemCategory category) {
     inventoryPrintBag(self, category);
-    ItemHandler *itemHandler = zlist_first(self->bags[category]);
-    if (itemHandler == NULL) {
+    ItemHandle *itemHandle = zlist_first(self->bags[category]);
+    if (itemHandle == NULL) {
         return NULL;
     }
-    return *itemHandler;
+    return *itemHandle;
 }
 
 Item *inventoryGetNextItem(Inventory *self, ItemCategory category) {
-    ItemHandler *itemHandler = zlist_next(self->bags[category]);
-    if (itemHandler == NULL) {
+    ItemHandle *itemHandle = zlist_next(self->bags[category]);
+    if (itemHandle == NULL) {
         return NULL;
     }
-    return *itemHandler;
+    return *itemHandle;
 }
 
 bool inventoryUnequipItem(Inventory *self, ItemEquipmentSlot eqSlot) {
@@ -288,21 +281,21 @@ bool inventorySwapItems(Inventory *self, ActorId_t actorId1, ActorId_t actorId2)
     ActorKey actorKey;
 
     actorGenKey(actorId1, actorKey);
-    ItemHandler *item1Handler = zhash_lookup(self->items, actorKey);
+    ItemHandle *item1Handle = zhash_lookup(self->items, actorKey);
 
     actorGenKey(actorId2, actorKey);
-    ItemHandler *item2Handler = zhash_lookup(self->items, actorKey);
+    ItemHandle *item2Handle = zhash_lookup(self->items, actorKey);
 
 
-    if (itemGetCategory(*item1Handler) != itemGetCategory(*item2Handler)) {
+    if (itemGetCategory(*item1Handle) != itemGetCategory(*item2Handle)) {
         error("Items to swap are from different bags");
         return false;
     }
 
-    ItemHandler tempItemHandler = *item1Handler;
+    ItemHandle tempItemHandle = *item1Handle;
 
-    *item1Handler = *item2Handler;
-    *item2Handler = tempItemHandler;
+    *item1Handle = *item2Handle;
+    *item2Handle = tempItemHandle;
 
     return true;
 }
@@ -310,20 +303,21 @@ bool inventorySwapItems(Inventory *self, ActorId_t actorId1, ActorId_t actorId2)
 int inventoryGetBagIndexByActorId(Inventory *self, ItemCategory category, ActorId_t actorId) {
 
     int bagIndex = -1;
+    int index = 1;
 
     zlist_t *bag = self->bags[category];
 
-    int index = 1;
+    for (ItemHandle *itemHandle = zlist_first(bag); itemHandle != NULL; itemHandle = zlist_next(bag)) {
+        Item *currentItem = *itemHandle;
 
-    for (ItemHandler *itemHandler = zlist_first(bag); itemHandler != NULL; itemHandler = zlist_next(bag)) {
-
-        if (actorId == actorGetUId(*itemHandler)) {
+        if (actorId == actorGetUId(currentItem)) {
             bagIndex = (5000 * category) + index;
             break;
         }
 
         index++;
     }
+
     return bagIndex;
 }
 
@@ -358,14 +352,18 @@ void inventoryPrintBag(Inventory *self, ItemCategory category) {
     dbg("Printing Inventory bag[%d], size: %d", category, zlist_size(self->bags[category]));
 
     int index = 0;
-    for (ItemHandler *itemHandler = zlist_first(self->bags[category]); itemHandler != NULL; itemHandler = zlist_next(self->bags[category])) {
-        dbg("[%d] item: [%d]", index, itemGetId(*itemHandler));
+    zlist_t *bag = self->bags[category];
+
+    for (ItemHandle *itemHandle = zlist_first(bag); itemHandle != NULL; itemHandle = zlist_next(bag)) {
+        Item *currentItem = *itemHandle;
+        dbg("[%d] item: [%d]", index, itemGetId(currentItem));
         index++;
     }
 
     if (index == 0) {
         dbg("-- Bag [%d] is empty --", category);
     }
+
     dbg("------------------------------------");
 
 }

@@ -75,7 +75,6 @@ typedef enum {
 // ------ Structure declaration -------
 
 typedef struct Inventory Inventory;
-typedef Item* ItemHandler;
 
 /**
  * @brief Inventory contains
