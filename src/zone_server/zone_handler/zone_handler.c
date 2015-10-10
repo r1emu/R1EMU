@@ -468,7 +468,7 @@ static PacketHandlerState zoneHandlerGameReady(
     inventoryAddItem(inventory, &items[3]);
     */
     inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
-    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
+    //inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
     zoneBuilderItemEquipList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
     zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
 
@@ -860,32 +860,29 @@ static PacketHandlerState zoneHandlerSwapEtcInvChangeIndex(
     #pragma pack(push, 1)
     struct {
         uint8_t inventoryType;
-        uint64_t itemId1;
+        uint64_t actorId1;
         uint32_t inventoryIndex1;
-        uint64_t itemId2;
+        uint64_t actorId2;
         uint32_t inventoryIndex2;
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
 
+    dbg("Swaping items");
+    dbg("actorId1 %d", clientPacket->actorId1);
+    dbg("inventoryIndex1 %d", clientPacket->inventoryIndex1);
+    dbg("actorId2 %d", clientPacket->actorId2);
+    dbg("inventoryIndex2 %d", clientPacket->inventoryIndex2);
+
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_SWAP_ETC_INV_CHANGE_INDEX);
+
+    if (clientPacket->inventoryIndex1 == clientPacket->inventoryIndex2) {
+        return PACKET_HANDLER_ERROR;
+    }
 
     // Delete item from inventory
     Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
 
-    Item *item1;
-    Item *item2;
-
-    if (!inventoryGetItemByActorId(inventory, clientPacket->itemId1, &item1)) {
-        error("Item1 not found in inventory");
-        return PACKET_HANDLER_ERROR;
-    }
-
-    if (!inventoryGetItemByActorId(inventory, clientPacket->itemId2, &item2)) {
-        error("Item2 not found in inventory");
-        return PACKET_HANDLER_ERROR;
-    }
-
-    if (!inventorySwapItems(inventory, &item1, &item2)) {
+    if (!inventorySwapItems(inventory, clientPacket->actorId1, clientPacket->actorId2)) {
         error("Error when swapping items in inventory");
         return PACKET_HANDLER_ERROR;
     }

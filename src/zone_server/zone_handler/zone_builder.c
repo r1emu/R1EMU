@@ -1739,12 +1739,12 @@ void zoneBuilderItemInventoryList(Inventory *inventory, zmsg_t *replyMsg) {
 
             inventoryItemPacket->itemId = itemGetId(item);
             inventoryItemPacket->sizeOfAttributes = attrSize;
-            inventoryItemPacket->unknown1 = 0x4242;
+            inventoryItemPacket->unknown1 = 0;
             inventoryItemPacket->itemUId = actorGetUId(item);
             inventoryItemPacket->amount = itemGetAmount(item);
-            inventoryItemPacket->price = 0x13371337;
+            inventoryItemPacket->price = 0;
             inventoryItemPacket->inventoryIndex = inventoryGetBagIndexByActorId(inventory, itemGetCategory(item), actorGetUId(item));
-            inventoryItemPacket->unknown2 = 0x41414141;
+            inventoryItemPacket->unknown2 = 0;
 
             // fill attribute buffer
             size_t offset = offsetof(InventoryItemCPacket, properties);

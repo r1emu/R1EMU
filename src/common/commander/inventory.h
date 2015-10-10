@@ -75,6 +75,7 @@ typedef enum {
 // ------ Structure declaration -------
 
 typedef struct Inventory Inventory;
+typedef Item* ItemHandler;
 
 /**
  * @brief Inventory contains
@@ -145,7 +146,7 @@ void inventoryPrintEquipment(Inventory *self);
 uint32_t inventoryGetEquipmentEmptySlot(ItemEquipmentSlot slot);
 void inventoryPrintBag(Inventory *self, ItemCategory category);
 bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, Item **_item);
-bool inventorySwapItems(Inventory *self, Item **_item1, Item **_item2);
+bool inventorySwapItems(Inventory *self, ActorId_t actorId1, ActorId_t actorId2);
 void itemGenActorKey(Item *self, ActorKey key);
 int inventoryGetBagIndexByActorId(Inventory *self, ItemCategory category, ActorId_t actorId);
 
