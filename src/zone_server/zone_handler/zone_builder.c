@@ -2110,3 +2110,31 @@ void zoneBuilderSkillRangeCircle(Skill skill, zmsg_t *replyMsg) {
         */
     }
 }
+
+void zoneBuilderSkillRangeDbg(Skill skill, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint16_t unk1;
+        float unk2;
+        PositionXYZ position;
+        PositionXZ direction;
+        float unkowns[6];
+    } replyPacket;
+   (void) replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_SKILL_RANGE_DBG;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+        /// TODO
+        /*
+        replyPacket.unk1 = 0;
+        replyPacket.unk2 = 0;
+        */
+    }
+
+}
