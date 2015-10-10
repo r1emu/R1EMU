@@ -70,6 +70,33 @@ void itemDestroy(Item **_self) {
     }
 }
 
+ItemHandle *itemHandleNew(Item *item) {
+     ItemHandle *self = NULL;
+
+     if (!(self = malloc(sizeof(ItemHandle)))) {
+        error("Cannot allocate a new item handle.");
+        return NULL;
+     }
+
+     *self = item;
+     return self;
+}
+
+void itemHandleFree(ItemHandle *self) {
+    Item *item = *self;
+    itemDestroy(&item);
+}
+
+void itemHandleDestroy(ItemHandle **_self) {
+    ItemHandle *self = *_self;
+
+    if (_self && self) {
+        itemHandleFree(self);
+        free(self);
+        *_self = NULL;
+    }
+}
+
 size_t itemGetPropertiesCPacketSize(Item *self) {
     size_t size = 0;
 

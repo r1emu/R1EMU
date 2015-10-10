@@ -65,6 +65,7 @@ typedef struct {
     ItemCategory category;
     ItemCommonData *commonData;
 } Item;
+typedef Item* ItemHandle;
 
 /**
  * @brief ItemCPacket is the client packet structure of an item
@@ -131,3 +132,8 @@ void itemPropertiesGetCPacket(Item *self, PacketStream *stream);
  */
 void itemPrint(Item *self);
 void itemChildPrint(Item *self);
+
+
+ItemHandle *itemHandleNew(Item *item);
+void itemHandleFree(ItemHandle *self);
+void itemHandleDestroy(ItemHandle **_self);
