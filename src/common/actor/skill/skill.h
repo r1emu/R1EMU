@@ -31,6 +31,8 @@ typedef uint32_t SkillLevel_t;
 
 typedef struct {
     Actor actor;
+    SkillId_t id;
+    SkillLevel_t level;
 } Skill;
 
 // ----------- Functions ------------

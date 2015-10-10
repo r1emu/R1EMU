@@ -503,19 +503,23 @@ void zoneBuilderSkillAdd(zmsg_t *replyMsg) {
     {
         size_t memSize;
         void *memory = dumpToMem(
-            "[11:10:22][           ToSClient:                     dbgBuffer]  32 0C FF FF FF FF A2 00 00 00 00 00 00 00 00 00 | 2...............\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 00 00 00 00 00 00 03 00 00 00 78 00 | ..............x.\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  6C F5 00 00 00 00 00 00 1C F5 55 01 00 00 80 3F | l.........U....?\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  48 01 00 00 96 43 46 01 00 00 00 00 4C 01 00 00 | H....CF.....L...\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  C8 42 4E 01 00 00 0C 42 4F 01 00 00 60 41 76 01 | .BN....BO...`Av.\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 62 01 00 00 0C 42 75 01 00 00 00 00 | ....b....Bu.....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  71 01 00 00 00 00 70 01 00 00 80 3F 9B 01 00 00 | q.....p....?....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 9D 01 00 00 00 00 A8 01 00 00 40 40 C6 01 | ............@@..\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00 00 00 C7 01 00 00 80 3F C8 01 00 00 00 00 | .........?......\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  DF 18 00 00 00 00 D4 01 00 00 A0 42 D2 01 00 00 | ...........B....\n"
-            "[11:10:22][           ToSClient:                     dbgBuffer]  00 00                                           | ..\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  34 0C FF FF FF FF A2 00 01 01 00 00 00 00 00 00 | 4...............\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  00 00 8F 72 07 00 46 01 00 00 41 9C 00 00 78 00 | ...r..F...A...x.\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  CC D1 00 00 00 00 54 49 34 D0 BF 0F 00 00 80 3F | ......TI4......?\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  B4 0F 00 E0 AB 46 B8 0F 00 00 00 00 B7 0F 00 00 | .....F..........\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  C8 42 B5 0F 00 00 00 00 BE 0F 00 00 60 41 09 10 | .B...........A..\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  00 00 40 41 33 10 00 00 00 00 3D 10 00 00 80 40 | ...A3.....=.....\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  E4 0F 00 00 7A 43 DE 0F 00 00 80 3F 41 10 00 00 | ....zC......A...\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  00 00 16 10 00 00 00 00 06 10 00 00 C8 42 58 10 | .............BX.\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 CB 0F 00 00 00 00 57 10 00 00 80 3F | ..........W.....\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  DA 0F 00 00 1C 42 59 10 00 40 9C 45 5A 10 00 00 | .....BY..@.EZ...\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  80 3F                                           | ..\n"
+            // ZC_JOB_PTS // Add Skill Points (last 00 00 are the amount of points)
+            //"[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  1B 0D FF FF FF FF A1 0F FF 00                 | ..\n"
             , NULL, &memSize
         );
+
+        buffer_print(memory, memSize, NULL);
 
         zmsg_add(replyMsg, zframe_new(memory, memSize));
     }
@@ -581,7 +585,8 @@ void zoneBuilderUpdateSP(PcId_t targetPcId, Sp_t sp, zmsg_t *replyMsg) {
         ServerPacketHeader header;
         PcId_t pcId;
         Sp_t sp;
-        uint8_t unk1;
+        uint16_t unk1;
+        uint8_t unk2;
     } replyPacket;
     #pragma pack(pop)
 
@@ -594,6 +599,7 @@ void zoneBuilderUpdateSP(PcId_t targetPcId, Sp_t sp, zmsg_t *replyMsg) {
         replyPacket.pcId = targetPcId;
         replyPacket.sp = sp;
         replyPacket.unk1 = 0;
+        replyPacket.unk2 = 0;
     }
 }
 
@@ -2002,4 +2008,27 @@ void zoneBuilderItemRemove(Item *item, InventoryRemoval removalType, InventoryTy
         replyPacket.removalType = removalType;
         replyPacket.inventoryType = inventoryType;
     }
+}
+
+void zoneBuilderJobPoints(CommanderJobId_t jobId, uint16_t points, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        CommanderJobId_t jobId;
+        uint16_t points;
+    } replyPacket;
+   (void) replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_JOB_PTS;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+        replyPacket.jobId = jobId;
+        replyPacket.points = points;
+    }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }

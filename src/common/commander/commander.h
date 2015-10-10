@@ -18,6 +18,7 @@
 
 #include "R1EMU.h"
 #include "inventory.h"
+#include "skills_manager.h"
 
 #define COMMANDER_NAME_SIZE 64
 #define COMMANDER_FAMILY_NAME_SIZE 64
@@ -124,6 +125,8 @@ typedef struct
 
     /** Commander inventory */
     Inventory inventory;
+    /** Commander inventory */
+    SkillsManager skillsManager;
 
 } Commander;
 

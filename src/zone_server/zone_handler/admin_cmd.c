@@ -36,12 +36,14 @@ bool adminCmdInit(void) {
     zhash_insert(adminCommands, "spawn",          adminCmdSpawnPc);
     zhash_insert(adminCommands, "jump",           adminCmdJump);
     zhash_insert(adminCommands, "additem",        adminCmdAddItem);
+    zhash_insert(adminCommands, "addskill",       adminCmdAddSkill);
     zhash_insert(adminCommands, "test",           adminCmdTest);
     zhash_insert(adminCommands, "where",          adminCmdWhere);
     zhash_insert(adminCommands, "changeCamera",   adminCmdChangeCamera);
     zhash_insert(adminCommands, "setStamina",     adminCmdSetStamina);
     zhash_insert(adminCommands, "setSP",          adminCmdSetSP);
     zhash_insert(adminCommands, "setLevel",       adminCmdSetLevel);
+    zhash_insert(adminCommands, "setJobPoints",   adminCmdSetJobPoints);
 
     return true;
 }
@@ -142,6 +144,31 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
     dbg("inventoryIndex %d", inventoryIndex);
     zoneBuilderItemAdd(newItem, inventoryIndex, INVENTORY_ADD_PICKUP, replyMsg);
+}
+
+void adminCmdAddSkill(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+
+    SkillId_t skillId = strtol(args, &args, 10);
+    args++;
+    SkillLevel_t level = strtol(args, &args, 10);
+    level = level ? level : 1;
+
+    SkillsManager *skillsManager = &session->game.commanderSession.currentCommander->skillsManager;
+
+    /*
+    Item *newItem = itemFactoryCreate(itemId, amount);
+    skillsManagerAddskill(skillsManager, newItem);
+
+    ItemCategory itemCategory = itemGetCategory(newItem);
+    ActorId_t actorId = actorGetUId(newItem);
+
+    dbg("itemCategory %d", itemCategory);
+
+    ItemInventoryIndex_t inventoryIndex = inventoryGetBagIndexByActorId(inventory, itemCategory, actorId);
+
+    dbg("inventoryIndex %d", inventoryIndex);
+    */
+    zoneBuilderSkillAdd(replyMsg);
 }
 
 void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
@@ -315,6 +342,31 @@ void adminCmdSetLevel(Worker *self, Session *session, char *args, zmsg_t *replyM
             info("Setting level to %d.", level);
             session->game.commanderSession.currentCommander->level = level;
             zoneBuilderPCLevelUp(session->game.commanderSession.currentCommander->pcId, level, replyMsg);
+        }
+        free(arg);
+    }
+}
+
+void adminCmdSetJobPoints(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    if (strlen (args) == 0) {
+        info("Set job points needs a argument!");
+    }
+    else {
+        char **arg;
+        int argc;
+
+        info("Set job points with argument: %s", args);
+        arg = strSplit(args, ' ');
+        argc = 0;
+        while (arg[++argc] != NULL);
+        if (argc != 2) {
+            info("Wrong number of arguments, must be 2.");
+        }
+        else {
+            CommanderJobId_t jobId = atoi(arg[0]);
+            uint16_t points = atoi(arg[1]);
+            info("Setting job %d, points to to %d.", jobId, points);
+            zoneBuilderJobPoints(jobId, points, replyMsg);
         }
         free(arg);
     }

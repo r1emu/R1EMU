@@ -72,6 +72,8 @@ static PacketHandlerState zoneHandlerDashRun        (Worker *self, Session *sess
 static PacketHandlerState zoneHandlerItemDelete        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On commander delete item */
 static PacketHandlerState zoneHandlerSwapEtcInvChangeIndex        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+/** On commander learn skills */
+static PacketHandlerState zoneHandlerReqNormalTxNumArg        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 
 /**
  * @brief zoneHandlers is a global table containing all the zone handlers.
@@ -104,6 +106,7 @@ const PacketHandler zoneHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CZ_DASHRUN, zoneHandlerDashRun),
     REGISTER_PACKET_HANDLER(CZ_ITEM_DELETE, zoneHandlerItemDelete),
     REGISTER_PACKET_HANDLER(CZ_SWAP_ETC_INV_CHANGE_INDEX, zoneHandlerSwapEtcInvChangeIndex),
+    REGISTER_PACKET_HANDLER(CZ_REQ_NORMAL_TX_NUMARG, zoneHandlerReqNormalTxNumArg),
 
     #undef REGISTER_PACKET_HANDLER
 };
@@ -890,6 +893,42 @@ static PacketHandlerState zoneHandlerSwapEtcInvChangeIndex(
     // No packet in return?
 
     return PACKET_HANDLER_OK;
+}
+
+static PacketHandlerState zoneHandlerReqNormalTxNumArg(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *replyMsg)
+{
+    #pragma pack(push, 1)
+    struct {
+        uint16_t unk1;
+        uint16_t unk2;
+        uint32_t maxLevel; // ??
+        uint32_t classId;
+        uint32_t skill1Level;
+        uint32_t skill2Level;
+        uint32_t skill3Level;
+        uint32_t skill4Level;
+    } *clientPacket = (void *) packet;
+    #pragma pack(pop)
+
+    dbg("unk1 %d", clientPacket->unk1);
+    dbg("unk2 %d", clientPacket->unk2);
+    dbg("maxLevel %d", clientPacket->maxLevel);
+    dbg("classId %d", clientPacket->classId);
+    dbg("skill1Level %d", clientPacket->skill1Level);
+    dbg("skill2Level %d", clientPacket->skill2Level);
+    dbg("skill3Level %d", clientPacket->skill3Level);
+    dbg("skill4Level %d", clientPacket->skill4Level);
+
+    zoneBuilderJobPoints(4001, 1, replyMsg);
+    zoneBuilderSkillAdd(replyMsg);
+
+    return PACKET_HANDLER_OK;
+
 }
 
 

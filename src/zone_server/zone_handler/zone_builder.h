@@ -414,3 +414,8 @@ void zoneBuilderPose(PcId_t pcId, CommanderPose_t poseId, PositionXYZ *pos, Posi
  * Remove an item from a commander
  */
 void zoneBuilderItemRemove(Item *item, InventoryRemoval removalType, InventoryType inventoryType, zmsg_t *replyMsg);
+
+/**
+ * Set commander's Job Points
+ */
+void zoneBuilderJobPoints(CommanderJobId_t jobId, uint16_t points, zmsg_t *replyMsg);

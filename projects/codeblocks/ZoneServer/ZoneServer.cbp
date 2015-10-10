@@ -160,6 +160,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../src/common/commander/inventory.h" />
+		<Unit filename="../../../src/common/commander/skills_manager.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../src/common/commander/skills_manager.h" />
 		<Unit filename="../../../src/common/crypto/bf/bf_ecb.c">
 			<Option compilerVar="CC" />
 		</Unit>

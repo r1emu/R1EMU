@@ -99,6 +99,11 @@ bool commanderInit(Commander *commander) {
         return false;
     }
 
+    if (!(skillsManagerInit(&commander->skillsManager))) {
+        error("Cannot initialize inventory.");
+        return false;
+    }
+
     return true;
 }
 

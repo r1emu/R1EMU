@@ -42,6 +42,12 @@ void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
 
 /**
+ * @brief : Add any skill in the commander skillManager
+ *          /addSkill <skillId> <level>
+ */
+void adminCmdAddSkill(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+
+/**
  * @brief : A test command
  *          /test
  */
@@ -76,3 +82,9 @@ void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *re
  * @brief : Set player level
  */
  void adminCmdSetLevel(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+
+  /**
+ * @brief : Set player level
+ */
+ void adminCmdSetJobPoints(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+
