@@ -2029,6 +2029,59 @@ void zoneBuilderJobPoints(CommanderJobId_t jobId, uint16_t points, zmsg_t *reply
         replyPacket.jobId = jobId;
         replyPacket.points = points;
     }
+}
 
-    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
+
+void zoneBuilderSkillRangeFan(Skill skill, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint8_t unk1;
+        uint8_t unk2;
+        PositionXYZ position;
+        PositionXZ direction;
+        float unk3;
+        float unk4;
+    } replyPacket;
+   (void) replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_SKILL_RANGE_FAN;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+        /// TODO
+        /*
+        replyPacket.unk1 = 0;
+        replyPacket.unk2 = 0;
+        */
+    }
+}
+
+void zoneBuilderSkillRangeSquare(Skill skill, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint32_t unk1;
+        PositionXYZ position1;
+        PositionXYZ position2;
+        float unk2;
+    } replyPacket;
+   (void) replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_SKILL_RANGE_SQUARE;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+        /// TODO
+        /*
+        replyPacket.unk1 = 0;
+        replyPacket.unk2 = 0;
+        */
+    }
 }
