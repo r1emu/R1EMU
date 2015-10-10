@@ -31,52 +31,77 @@ add_library(zone_handlers STATIC ${ZONEHANDLERS_SRC})
 target_link_libraries(zone_handlers common)
 
 set(COMMON_SRC
-    ${ROOT_PATH}/common/commander/commander.c
-    ${ROOT_PATH}/common/commander/inventory.c
-    ${ROOT_PATH}/common/crypto/bf/bf_ecb.c
-    ${ROOT_PATH}/common/crypto/bf/bf_enc.c
-    ${ROOT_PATH}/common/crypto/bf/bf_skey.c
-    ${ROOT_PATH}/common/crypto/crypto.c
-    ${ROOT_PATH}/common/db/db_client.c
-    ${ROOT_PATH}/common/db/db_object.c
-    ${ROOT_PATH}/common/db/db.c
-    ${ROOT_PATH}/common/dbg/dbg.c
-    ${ROOT_PATH}/common/graph/graph.c
-    ${ROOT_PATH}/common/item/item.c
-    ${ROOT_PATH}/common/item/item_attribute.c
-    ${ROOT_PATH}/common/mysql/fields/mysql_session.c
-    ${ROOT_PATH}/common/mysql/fields/mysql_account_session.c
-    ${ROOT_PATH}/common/mysql/fields/mysql_commander_session.c
-    ${ROOT_PATH}/common/mysql/fields/mysql_commander.c
-    ${ROOT_PATH}/common/mysql/mysql.c
+    ${ROOT_PATH}/common/actor/actor_factory.c
+    ${ROOT_PATH}/common/actor/npc/npc.c
+    ${ROOT_PATH}/common/actor/skill/skill.c
+    ${ROOT_PATH}/common/actor/actor.c
+    ${ROOT_PATH}/common/actor/item/item.c
+    ${ROOT_PATH}/common/actor/item/item_factory.c
+    ${ROOT_PATH}/common/actor/item/equipable/accessory/item_accessory.c
+    ${ROOT_PATH}/common/actor/item/equipable/armor/item_armor.c
+    ${ROOT_PATH}/common/actor/item/equipable/item_equipable.c
+    ${ROOT_PATH}/common/actor/item/equipable/weapon/item_weapon.c
+    ${ROOT_PATH}/common/actor/item/equipable/subweapon/item_subweapon.c
+    ${ROOT_PATH}/common/actor/item/common/gem/item_gem.c
+    ${ROOT_PATH}/common/actor/item/common/currency/item_currency.c
+    ${ROOT_PATH}/common/actor/item/common/card/item_card.c
+    ${ROOT_PATH}/common/actor/item/common/material/item_material.c
+    ${ROOT_PATH}/common/actor/item/common/consumable/item_consumable.c
+    ${ROOT_PATH}/common/actor/item/common/quest/item_quest.c
+    ${ROOT_PATH}/common/actor/item/common/book/item_book.c
+    ${ROOT_PATH}/common/property/property.c
     ${ROOT_PATH}/common/packet/packet.c
-    ${ROOT_PATH}/common/packet/packet_stream.c
     ${ROOT_PATH}/common/packet/packet_type.c
-    ${ROOT_PATH}/common/redis/fields/redis_game_session.c
-    ${ROOT_PATH}/common/redis/fields/redis_session.c
-    ${ROOT_PATH}/common/redis/fields/redis_socket_session.c
-    ${ROOT_PATH}/common/redis/redis.c
-    ${ROOT_PATH}/common/server/event_handler.c
-    ${ROOT_PATH}/common/server/event_server.c
-    ${ROOT_PATH}/common/server/router.c
-    ${ROOT_PATH}/common/server/router_monitor.c
-    ${ROOT_PATH}/common/server/server.c
-    ${ROOT_PATH}/common/server/server_factory.c
-    ${ROOT_PATH}/common/server/worker.c
-    ${ROOT_PATH}/common/session/account_session.c
-    ${ROOT_PATH}/common/session/barrack_session.c
-    ${ROOT_PATH}/common/session/commander_session.c
-    ${ROOT_PATH}/common/session/game_session.c
-    ${ROOT_PATH}/common/session/session.c
-    ${ROOT_PATH}/common/session/socket_session.c
-    ${ROOT_PATH}/common/utils/math.c
-    ${ROOT_PATH}/common/utils/memory.c
+    ${ROOT_PATH}/common/packet/packet_stream.c
+    ${ROOT_PATH}/common/graph/graph.c
+    ${ROOT_PATH}/common/static_data/fields/item_equip_data.c
+    ${ROOT_PATH}/common/static_data/fields/item_common_data.c
+    ${ROOT_PATH}/common/static_data/static_data.c
+    ${ROOT_PATH}/common/utils/time.c
     ${ROOT_PATH}/common/utils/position.c
+    ${ROOT_PATH}/common/utils/math.c
     ${ROOT_PATH}/common/utils/random.c
     ${ROOT_PATH}/common/utils/string.c
-    ${ROOT_PATH}/common/utils/time.c
-    ${ROOT_PATH}/common/utils/utils.c
+    ${ROOT_PATH}/common/utils/memory.c
     ${ROOT_PATH}/common/utils/zlib.c
+    ${ROOT_PATH}/common/utils/utils.c
+    ${ROOT_PATH}/common/mysql/mysql.c
+    ${ROOT_PATH}/common/mysql/fields/mysql_session.c
+    ${ROOT_PATH}/common/mysql/fields/mysql_item_common_data.c
+    ${ROOT_PATH}/common/mysql/fields/mysql_commander.c
+    ${ROOT_PATH}/common/mysql/fields/mysql_item_equip_data.c
+    ${ROOT_PATH}/common/mysql/fields/mysql_account_session.c
+    ${ROOT_PATH}/common/server/server.c
+    ${ROOT_PATH}/common/server/game_event.c
+    ${ROOT_PATH}/common/server/event_server.c
+    ${ROOT_PATH}/common/server/event_handler.c
+    ${ROOT_PATH}/common/server/router_monitor.c
+    ${ROOT_PATH}/common/server/worker.c
+    ${ROOT_PATH}/common/server/router.c
+    ${ROOT_PATH}/common/server/server_factory.c
+    ${ROOT_PATH}/common/commander/inventory.c
+    ${ROOT_PATH}/common/commander/skillsManager.c
+    ${ROOT_PATH}/common/commander/skills_manager.c
+    ${ROOT_PATH}/common/commander/commander.c
+    ${ROOT_PATH}/common/crypto/crypto.c
+    ${ROOT_PATH}/common/crypto/bf/bf_cbc.c
+    ${ROOT_PATH}/common/crypto/bf/bf_enc.c
+    ${ROOT_PATH}/common/crypto/bf/bf_skey.c
+    ${ROOT_PATH}/common/crypto/bf/bf_ecb.c
+    ${ROOT_PATH}/common/session/session.c
+    ${ROOT_PATH}/common/session/game_session.c
+    ${ROOT_PATH}/common/session/account_session.c
+    ${ROOT_PATH}/common/session/commander_session.c
+    ${ROOT_PATH}/common/session/socket_session.c
+    ${ROOT_PATH}/common/session/barrack_session.c
+    ${ROOT_PATH}/common/dbg/dbg.c
+    ${ROOT_PATH}/common/redis/redis.c
+    ${ROOT_PATH}/common/redis/fields/redis_session.c
+    ${ROOT_PATH}/common/redis/fields/redis_game_session.c
+    ${ROOT_PATH}/common/redis/fields/redis_socket_session.c
+    ${ROOT_PATH}/common/db/db.c
+    ${ROOT_PATH}/common/db/db_object.c
+    ${ROOT_PATH}/common/db/db_client.c
 )
 add_library(common STATIC ${COMMON_SRC})
 target_link_libraries(common z zone_handlers)
