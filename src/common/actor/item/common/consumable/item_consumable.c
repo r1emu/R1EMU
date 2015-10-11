@@ -55,15 +55,22 @@ void itemConsumableDestroy(ItemConsumable **_self) {
 
 size_t itemConsumableGetPropertiesCPacketSize(ItemConsumable *self) {
     size_t size = 0;
-
     size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
-
     return size;
 }
 
 void itemConsumableGetPropertiesCPacket(ItemConsumable *self, PacketStream *stream) {
-
     propertyFloatGetCPacket(ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+size_t itemConsumableGetPropertiesSPacketSize(ItemConsumable *self) {
+    size_t size = 0;
+    size += propertyFloatGetSPacketSize(self->cooldown); // cooldown
+    return size;
+}
+
+void itemConsumableGetPropertiesSPacket(ItemConsumable *self, PacketStream *stream) {
+    propertyFloatGetSPacket(ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
 
 void itemConsumablePrint(ItemConsumable *self) {

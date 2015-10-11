@@ -40,6 +40,33 @@ size_t propertyStringGetCPacketSize(char *value) {
     return size;
 }
 
+size_t propertyFloatGetSPacketSize(float *value) {
+    size_t size = 0;
+
+    // PropertyFloatSPacket is fixed packet size
+    if (value) {
+        size += sizeof(PropertyFloatSPacket);
+    }
+
+    return size;
+}
+
+size_t propertyStringGetSPacketSize(char *value) {
+
+    size_t size = 0;
+
+    if (value) {
+        size_t valueSize = strlen(value) + 1;
+        #pragma pack(push, 1)
+        DECLARE_PropertyStringSPacket(valueSize);
+        #pragma pack(pop)
+
+        size += sizeof(PropertyStringSPacket);
+    }
+
+    return size;
+}
+
 void propertyFloatGetCPacket(PropertyId_t id, float *value, PacketStream *stream) {
 
     if (!value) {
@@ -54,7 +81,6 @@ void propertyFloatGetCPacket(PropertyId_t id, float *value, PacketStream *stream
     packetStreamAppend(stream, &packet, sizeof(packet));
 }
 
-
 void propertyStringGetCPacket(PropertyId_t id, char *value, PacketStream *stream) {
 
     if (!value) {
@@ -67,6 +93,39 @@ void propertyStringGetCPacket(PropertyId_t id, char *value, PacketStream *stream
     #pragma pack(pop)
 
     PropertyStringCPacket packet;
+    packet.id = id;
+    packet.size = valueSize;
+    strncpy(packet.value, value, valueSize);
+
+    packetStreamAppend(stream, &packet, sizeof(packet));
+}
+
+void propertyFloatGetSPacket(PropertyId_t id, float *value, PacketStream *stream) {
+
+    if (!value) {
+        return;
+    }
+
+    PropertyFloatSPacket packet = {
+        .id = id,
+        .value = *value
+    };
+
+    packetStreamAppend(stream, &packet, sizeof(packet));
+}
+
+void propertyStringGetSPacket(PropertyId_t id, char *value, PacketStream *stream) {
+
+    if (!value) {
+        return;
+    }
+
+    size_t valueSize = strlen(value) + 1;
+    #pragma pack(push, 1)
+    DECLARE_PropertyStringSPacket(valueSize);
+    #pragma pack(pop)
+
+    PropertyStringSPacket packet;
     packet.id = id;
     packet.size = valueSize;
     strncpy(packet.value, value, valueSize);

@@ -146,3 +146,69 @@ void accountSessionDestroy(AccountSession **_self) {
 void accountSessionFree (AccountSession *self) {
     free(self);
 }
+
+
+
+
+size_t accountSessionGetPacketSize(AccountSession *self) {
+    size_t packetSize = 0;
+
+    packetSize += sizeof(AccountSessionSPacket);
+
+    for (size_t i = 0; i < self->commandersCountMax; i++) {
+        if (self->commanders[i] != NULL) {
+            // packetSize += commanderGetPacketSize(self->commanders[i]);
+        }
+    }
+
+    return packetSize;
+}
+
+void accountSessionSerialize(AccountSession *self, PacketStream *stream) {
+
+    packetStreamIn(stream, self->accountName);
+    packetStreamIn(stream, self->familyName);
+    packetStreamIn(stream, self->sessionKey);
+    packetStreamIn(stream, &self->privilege);
+    packetStreamIn(stream, &self->isBanned);
+    packetStreamIn(stream, &self->timeBanned);
+    packetStreamIn(stream, &self->credits);
+    packetStreamIn(stream, &self->timeLastLogin);
+    packetStreamIn(stream, &self->barrackType);
+    packetStreamIn(stream, &self->commandersCountMax);
+
+    size_t commandersCount = accountSessionGetCommandersCount(self);
+    packetStreamIn(stream, &commandersCount);
+
+    for (size_t i = 0; i < self->commandersCountMax; i++) {
+        if (self->commanders[i] != NULL) {
+            // commanderSerialize(self->commanders[i], stream);
+        }
+    }
+}
+
+bool accountSessionUnserialize(AccountSession *self, PacketStream *stream) {
+
+    packetStreamOut(stream, self->accountName);
+    packetStreamOut(stream, self->familyName);
+    packetStreamOut(stream, self->sessionKey);
+    packetStreamOut(stream, &self->privilege);
+    packetStreamOut(stream, &self->isBanned);
+    packetStreamOut(stream, &self->timeBanned);
+    packetStreamOut(stream, &self->credits);
+    packetStreamOut(stream, &self->timeLastLogin);
+    packetStreamOut(stream, &self->barrackType);
+    packetStreamOut(stream, &self->commandersCountMax);
+
+    size_t commandersCount;
+    packetStreamOut(stream, &commandersCount);
+
+    for (size_t i = 0; i < commandersCount; i++) {
+        //if (!(commanderUnserialize(self->commanders[i], stream))) {
+        //    error("Cannot unserialize the commander %d.", i);
+        //    return false;
+        //}
+    }
+
+    return true;
+}

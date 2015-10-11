@@ -28,6 +28,11 @@
 
 // ------ Structure declaration -------
 enum {
+    ITEM_CONSUMABLE_PROPERTY_COOLDOWN,
+    ITEM_CONSUMABLE_PROPERTY_COUNT
+};
+
+enum {
     ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN = 3750
 };
 
@@ -35,6 +40,11 @@ typedef struct {
     Item item;
     float *cooldown;
 }   ItemConsumable;
+
+typedef struct {
+    ItemSPacket item;
+    uint8_t properties[0]; // PropertySPacket properties[ITEM_CONSUMABLE_PROPERTY_COUNT];
+}   ItemConsumableSPacket;
 
 // ----------- Functions ------------
 
@@ -73,6 +83,8 @@ inline float *itemConsumableGetCooldown(ItemConsumable *self) { return self->coo
  */
 size_t itemConsumableGetPropertiesCPacketSize(ItemConsumable *self);
 void itemConsumableGetPropertiesCPacket(ItemConsumable *self, PacketStream *stream);
+size_t itemConsumableGetPropertiesSPacketSize(ItemConsumable *self);
+void itemConsumableGetPropertiesSPacket(ItemConsumable *self, PacketStream *stream);
 
 /**
  * Debugging

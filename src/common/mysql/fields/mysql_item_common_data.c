@@ -25,7 +25,7 @@ static bool mySqlRequestItemsCommonData(MySQL *self, size_t *rowsCount) {
 
     bool status = false;
 
-    if (mySqlQuery(self, "SELECT ClassID, ItemType FROM ies_items_all")) {
+    if (mySqlQuery(self, "SELECT ClassID, ItemType FROM items_all")) {
         error("SQL Error : %s" , mysql_error(self->handle));
         goto cleanup;
     }

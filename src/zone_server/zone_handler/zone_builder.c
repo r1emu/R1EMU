@@ -2010,12 +2010,12 @@ void zoneBuilderItemRemove(Item *item, InventoryRemoval removalType, InventoryTy
     }
 }
 
-void zoneBuilderJobPoints(CommanderJobId_t jobId, uint16_t points, zmsg_t *replyMsg) {
+void zoneBuilderJobPoints(CommanderJobId_t jobId, CommanderJobPoints_t points, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
         CommanderJobId_t jobId;
-        uint16_t points;
+        CommanderJobPoints_t points;
     } replyPacket;
    (void) replyPacket;
     #pragma pack(pop)

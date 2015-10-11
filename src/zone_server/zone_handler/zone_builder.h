@@ -418,4 +418,4 @@ void zoneBuilderItemRemove(Item *item, InventoryRemoval removalType, InventoryTy
 /**
  * Set commander's Job Points
  */
-void zoneBuilderJobPoints(CommanderJobId_t jobId, uint16_t points, zmsg_t *replyMsg);
+void zoneBuilderJobPoints(CommanderJobId_t jobId, CommanderJobPoints_t points, zmsg_t *replyMsg);
