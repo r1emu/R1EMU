@@ -242,7 +242,7 @@ static PacketHandlerState zoneHandlerSkillGround(
     dir.x = -0.0;
     dir.z = 0.0;
 
-    zoneBuilderNormalUnk10(
+    zoneBuilderNormalUnk10_56(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
         &clientPacket->pos1,
@@ -264,7 +264,7 @@ static PacketHandlerState zoneHandlerSkillGround(
 
     dbg("skillPos: %f, %f, %f", skillPos.x, skillPos.y, skillPos.z);
 
-    zoneBuilderNormalUnk10(
+    zoneBuilderNormalUnk10_56(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
         &skillPos,
@@ -273,7 +273,7 @@ static PacketHandlerState zoneHandlerSkillGround(
         replyMsg
     );
 
-    zoneBuilderNormalUnk11(
+    zoneBuilderNormalUnk11_1c(
         session->game.commanderSession.currentCommander->pcId,
         &clientPacket->pos1,
         &clientPacket->direction,

@@ -141,11 +141,11 @@ void zoneBuilderPlayAni(zmsg_t *replyMsg) {
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
         replyPacket.unkId1 = SWAP_UINT32(0x48010000);
-        replyPacket.unkId2 = SWAP_UINT32(0x271826);
-        replyPacket.isUnk1 = 1;
-        replyPacket.isUnk2 = 1;
-        replyPacket.timeDelay = 0;
-        replyPacket.unk5 = SWAP_UINT32(0x0000803F);
+        replyPacket.unkId2 = SWAP_UINT32(0x27182600);
+        replyPacket.isUnk1 = 0;
+        replyPacket.isUnk2 = 0;
+        replyPacket.timeDelay = 0.0;
+        replyPacket.unk5 = 1.0;
     }
 }
 
@@ -261,7 +261,7 @@ void zoneBuilderNormalUnk9(PcId_t targetPcId, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, bool enableSkill, zmsg_t *replyMsg) {
+void zoneBuilderNormalUnk10_56(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, bool enableSkill, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         PacketNormalHeader normalHeader;
@@ -313,8 +313,8 @@ void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *p
         }
         else {
             replyPacket.unk6 = 0;
-            replyPacket.unk7 = 1;
         }
+        replyPacket.unk7 = 0;
 
 
     }
@@ -322,7 +322,7 @@ void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *p
     buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }
 
-void zoneBuilderNormalUnk11(PcId_t targetPcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg) {
+void zoneBuilderNormalUnk11_1c(PcId_t targetPcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         PacketNormalHeader normalHeader;
@@ -364,7 +364,7 @@ void zoneBuilderNormalUnk11(PcId_t targetPcId, PositionXYZ *position, PositionXZ
     buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }
 
-void zoneBuilderNormalUnk12(ActorId_t actorId, zmsg_t *replyMsg) {
+void zoneBuilderNormalUnk12_60(ActorId_t actorId, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         PacketNormalHeader normalHeader;
@@ -384,6 +384,36 @@ void zoneBuilderNormalUnk12(ActorId_t actorId, zmsg_t *replyMsg) {
 
         replyPacket.pcId = actorId;
         replyPacket.unk1 = 1;
+
+    }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
+}
+
+void zoneBuilderNormalUnk13_85(ActorId_t actorId, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        PacketNormalHeader normalHeader;
+        ActorId_t actorId;
+        uint32_t unk1;
+        uint32_t unk2;
+        uint8_t unk3;
+    } replyPacket;
+    #pragma pack(pop)
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        size_t memSize = sizeof(replyPacket);
+        dumpToMem(
+            "[03:07:53][main.c:56 in CNetUsr__PacketHandler_1]  33 0D A6 13 14 03 19 00 85 00 00 00 27 68 01 00 | 3.....9......_..\n"
+            "[03:07:53][main.c:56 in CNetUsr__PacketHandler_1]  66 EA 00 00 01 00 00 00 00                      | ...w.....j...tv.\n"
+          , &replyPacket, &memSize
+        );
+
+        replyPacket.actorId = actorId;
+        replyPacket.unk1 = SWAP_UINT32(0x66EA0000);
+        replyPacket.unk2 = 1;
+        replyPacket.unk3 = 0;
 
     }
 
@@ -2317,6 +2347,47 @@ void zoneBuilderSkillMeleeGround(PcId_t pcId, SkillId_t skillId, PositionXYZ *po
         replyPacket.unk8 = SWAP_UINT32(0x0B0E1900);
         replyPacket.position = *position;
         replyPacket.unk9 = 0;
+
+    }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
+}
+
+void zoneBuilderBuffAdd(PcId_t pcId, Commander *commander, zmsg_t *replyMsg) {
+
+    int commanderNameSize;
+
+    commanderNameSize = strlen(commander->commanderName) + 1;
+
+    #pragma pack(push, 1)
+    struct {
+        VariableSizePacketHeader variableSizeHeader;
+        PcId_t pcId;
+        uint32_t unk0;
+        uint64_t unk1;
+        uint64_t unk2;
+        uint16_t commanderNameSize;
+        uint8_t commanderName[commanderNameSize];
+        PcId_t pcId2;
+        uint32_t unkId1;
+    } replyPacket;
+    #pragma pack(pop)
+
+
+    PacketType packetType = ZC_BUFF_ADD;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
+        replyPacket.pcId = pcId;
+        replyPacket.unk0 = SWAP_UINT32(0xFF030000);
+        replyPacket.unk1 = 1;
+        replyPacket.unk1 = 1;
+        replyPacket.commanderNameSize = commanderNameSize;
+        memcpy(&replyPacket.commanderName, &commander->commanderName, commanderNameSize);
+        replyPacket.pcId2 = pcId;
+        replyPacket.unkId1 = SWAP_UINT32(0xE6200500);
 
     }
 

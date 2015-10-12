@@ -318,13 +318,13 @@ void adminCmdSetSP(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
             session->game.commanderSession.currentCommander->currentSP = sp;
             zoneBuilderUpdateSP(session->game.commanderSession.currentCommander->pcId, sp, replyMsg);
 
-            ActorId_t actorId = SWAP_UINT32(0x27680100);
+            ActorId_t actorId = SWAP_UINT32(0x21680100);
             SkillId_t skillId = 40001;
             PositionXZ pos;
             pos.x = 0;
             pos.z = 0;
-            zoneBuilderNormalUnk12(actorId, replyMsg);
-            zoneBuilderNormalUnk10(
+            /*
+            zoneBuilderNormalUnk10_56(
                 session->game.commanderSession.currentCommander->pcId,
                 skillId,
                 &session->game.commanderSession.currentCommander->pos,
@@ -332,6 +332,11 @@ void adminCmdSetSP(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
                 false,
                 replyMsg
             );
+            zoneBuilderNormalUnk13_85(session->game.commanderSession.currentCommander->pcId, replyMsg);
+            */
+
+            //zoneBuilderNormalUnk12_60(actorId, replyMsg);
+            zoneBuilderBuffAdd(session->game.commanderSession.currentCommander->pcId, session->game.commanderSession.currentCommander, replyMsg);
         }
         free(arg);
     }

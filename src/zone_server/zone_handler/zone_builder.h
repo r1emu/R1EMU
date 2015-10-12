@@ -90,17 +90,22 @@ void zoneBuilderNormalUnk9( PcId_t targetPcId, zmsg_t *replyMsg);
 /**
  * @brief @unknown
  */
-void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, bool enableSkill, zmsg_t *replyMsg);
+void zoneBuilderNormalUnk10_56(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, bool enableSkill, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown
  */
-void zoneBuilderNormalUnk11(PcId_t targetPcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
+void zoneBuilderNormalUnk11_1c(PcId_t targetPcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown
  */
-void zoneBuilderNormalUnk12(ActorId_t actorId, zmsg_t *replyMsg);
+void zoneBuilderNormalUnk12_60(ActorId_t actorId, zmsg_t *replyMsg);
+
+/**
+ * @brief @unknown
+ */
+void zoneBuilderNormalUnk13_85(ActorId_t actorId, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown
@@ -437,3 +442,4 @@ void zoneBuilderJobPoints(CommanderJobId_t jobId, CommanderJobPoints_t points, z
 
 void zoneBuilderSkillRangeFan(PcId_t pcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
 void zoneBuilderSkillMeleeGround(PcId_t pcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
+void zoneBuilderBuffAdd(PcId_t pcId, Commander *commander, zmsg_t *replyMsg);
