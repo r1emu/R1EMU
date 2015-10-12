@@ -102,19 +102,17 @@ size_t itemGetPropertiesCPacketSize(Item *self) {
 
     switch (self->category) {
 
-        case ITEM_CAT_CONSUMABLE : size += itemConsumableGetPropertiesSPacketSize((ItemConsumable *) self); break;
-        /*
-        case ITEM_CAT_ARMOR      : size += itemArmorGetPropertiesSPacketSize((ItemArmor *) self); break;
-        case ITEM_CAT_QUEST      : size += itemQuestGetPropertiesSPacketSize((ItemQuest *) self); break;
-        case ITEM_CAT_BOOK       : size += itemBookGetPropertiesSPacketSize((ItemBook *) self); break;
-        case ITEM_CAT_MATERIAL   : size += itemMaterialGetPropertiesSPacketSize((ItemMaterial *) self); break;
-        case ITEM_CAT_GEM        : size += itemGemGetPropertiesSPacketSize((ItemGem *) self); break;
-        case ITEM_CAT_WEAPON     : size += itemWeaponGetPropertiesSPacketSize((ItemWeapon *) self); break;
-        case ITEM_CAT_CARD       : size += itemCardGetPropertiesSPacketSize((ItemCard *) self); break;
-        case ITEM_CAT_ACCESSORY  : size += itemAccessoryGetPropertiesSPacketSize((ItemAccessory *) self); break;
-        case ITEM_CAT_SUBWEAPON  : size += itemSubWeaponGetPropertiesSPacketSize((ItemSubWeapon *) self); break;
-        case ITEM_CAT_CURRENCY   : size += itemCurrencyGetPropertiesSPacketSize((ItemCurrency *) self); break;
-        */
+        case ITEM_CAT_CONSUMABLE : size += itemConsumableGetPropertiesCPacketSize((ItemConsumable *) self); break;
+        case ITEM_CAT_ARMOR      : size += itemArmorGetPropertiesCPacketSize((ItemArmor *) self); break;
+        case ITEM_CAT_QUEST      : size += itemQuestGetPropertiesCPacketSize((ItemQuest *) self); break;
+        case ITEM_CAT_BOOK       : size += itemBookGetPropertiesCPacketSize((ItemBook *) self); break;
+        case ITEM_CAT_MATERIAL   : size += itemMaterialGetPropertiesCPacketSize((ItemMaterial *) self); break;
+        case ITEM_CAT_GEM        : size += itemGemGetPropertiesCPacketSize((ItemGem *) self); break;
+        case ITEM_CAT_WEAPON     : size += itemWeaponGetPropertiesCPacketSize((ItemWeapon *) self); break;
+        case ITEM_CAT_CARD       : size += itemCardGetPropertiesCPacketSize((ItemCard *) self); break;
+        case ITEM_CAT_ACCESSORY  : size += itemAccessoryGetPropertiesCPacketSize((ItemAccessory *) self); break;
+        case ITEM_CAT_SUBWEAPON  : size += itemSubWeaponGetPropertiesCPacketSize((ItemSubWeapon *) self); break;
+        case ITEM_CAT_CURRENCY   : size += itemCurrencyGetPropertiesCPacketSize((ItemCurrency *) self); break;
 
         case ITEM_CAT_COUNT      : error("Unexpected item category."); break;
     }
