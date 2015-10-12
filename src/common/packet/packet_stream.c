@@ -54,6 +54,11 @@ void packetStreamAddOffset(PacketStream *self, unsigned int offset) {
     self->position += offset;
 }
 
+void packetStreamGet(PacketStream *self, void *data, size_t dataSize) {
+    memcpy(data, &self->buffer[self->position], dataSize);
+    self->position += dataSize;
+}
+
 void packetStreamDestroy(PacketStream **_self) {
     PacketStream *self = *_self;
 

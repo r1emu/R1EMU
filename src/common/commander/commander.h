@@ -26,6 +26,7 @@
 
 typedef uint16_t CommanderClassId_t;
 typedef uint16_t CommanderJobId_t;
+typedef uint16_t CommanderJobPoints_t;
 typedef uint8_t CommanderGender_t;
 typedef uint8_t CommanderHairId_t;
 typedef uint32_t CommanderLevel_t;
