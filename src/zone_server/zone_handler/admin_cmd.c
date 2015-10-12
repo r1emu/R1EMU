@@ -44,6 +44,7 @@ bool adminCmdInit(void) {
     zhash_insert(adminCommands, "setSP",          adminCmdSetSP);
     zhash_insert(adminCommands, "setLevel",       adminCmdSetLevel);
     zhash_insert(adminCommands, "setJobPoints",   adminCmdSetJobPoints);
+    zhash_insert(adminCommands, "setSpeed",       adminCmdSetSpeed);
 
     return true;
 }
@@ -64,6 +65,11 @@ void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *repl
     }
 
     handler(self, session, command + strlen (commandName) + 1, replyMsg);
+}
+
+void adminCmdSetSpeed(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    int speed = strtol(args, &args, 10);
+    zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander->pcId, speed, replyMsg);
 }
 
 void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
