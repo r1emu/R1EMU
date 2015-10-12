@@ -274,8 +274,8 @@ void zoneBuilderNormalUnk10_56(PcId_t targetPcId, SkillId_t skillId, PositionXYZ
         uint32_t unk3;
         uint32_t unk4;
         uint32_t unk5;
-        uint8_t unk6;
-        uint32_t unk7;
+        uint8_t appearFlag;
+        uint32_t unk7; // Animation state
         uint32_t unk8;
         uint32_t unk9;
         uint32_t unk10;
@@ -309,12 +309,13 @@ void zoneBuilderNormalUnk10_56(PcId_t targetPcId, SkillId_t skillId, PositionXYZ
         replyPacket.unk4 = SWAP_UINT32(0x0000A041);
         replyPacket.unk5 = SWAP_UINT32(0x21680100);
         if (enableSkill) {
-            replyPacket.unk6 = 1;
+            replyPacket.appearFlag = 1;
         }
         else {
-            replyPacket.unk6 = 0;
+            replyPacket.appearFlag = 0;
+            replyPacket.unk7 = 1; // Make animation (or effect)
         }
-        replyPacket.unk7 = 0;
+
 
 
     }
@@ -2388,6 +2389,39 @@ void zoneBuilderBuffAdd(PcId_t pcId, Commander *commander, zmsg_t *replyMsg) {
         memcpy(&replyPacket.commanderName, &commander->commanderName, commanderNameSize);
         replyPacket.pcId2 = pcId;
         replyPacket.unkId1 = SWAP_UINT32(0xE6200500);
+
+    }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
+}
+
+void zoneBuilderHealInfo(PcId_t pcId, uint32_t amountHealed, uint32_t maxHP, zmsg_t *replyMsg) {
+
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        PcId_t pcId;
+        uint32_t amountHealed;
+        uint32_t maxHP;
+        uint32_t unk1;
+        uint32_t unk2;
+        uint32_t unk3;
+    } replyPacket;
+    #pragma pack(pop)
+
+
+    PacketType packetType = ZC_HEAL_INFO;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+        replyPacket.pcId = pcId;
+        replyPacket.amountHealed = amountHealed;
+        replyPacket.maxHP = maxHP;
+        replyPacket.unk1 = 1;
+        replyPacket.unk1 = 0;
+        replyPacket.unk1 = 0;
 
     }
 

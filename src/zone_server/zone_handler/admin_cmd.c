@@ -318,12 +318,34 @@ void adminCmdSetSP(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
             session->game.commanderSession.currentCommander->currentSP = sp;
             zoneBuilderUpdateSP(session->game.commanderSession.currentCommander->pcId, sp, replyMsg);
 
+
+            /// TESTING PURPOSES , to test HEAL SKILL
             ActorId_t actorId = SWAP_UINT32(0x21680100);
             SkillId_t skillId = 40001;
             PositionXZ pos;
             pos.x = 0;
             pos.z = 0;
-            /*
+
+            int AmountHealed = 10;
+            session->game.commanderSession.currentCommander->currentHP += AmountHealed;
+
+            // Heal info
+            zoneBuilderHealInfo(session->game.commanderSession.currentCommander->pcId,
+                AmountHealed,
+                session->game.commanderSession.currentCommander->maxHP, replyMsg);
+            // Update stats
+            zoneBuilderUpdateAllStatus(
+                session->game.commanderSession.currentCommander->pcId,
+                session->game.commanderSession.currentCommander->currentHP,
+                session->game.commanderSession.currentCommander->maxHP,
+                session->game.commanderSession.currentCommander->currentSP,
+                session->game.commanderSession.currentCommander->maxSP,
+                replyMsg);
+            // Effect in skill
+            zoneBuilderNormalUnk12_60(actorId, replyMsg);
+            // Effect in Commander
+            zoneBuilderBuffAdd(session->game.commanderSession.currentCommander->pcId, session->game.commanderSession.currentCommander, replyMsg);
+            // Disable skill
             zoneBuilderNormalUnk10_56(
                 session->game.commanderSession.currentCommander->pcId,
                 skillId,
@@ -332,11 +354,7 @@ void adminCmdSetSP(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
                 false,
                 replyMsg
             );
-            zoneBuilderNormalUnk13_85(session->game.commanderSession.currentCommander->pcId, replyMsg);
-            */
-
-            //zoneBuilderNormalUnk12_60(actorId, replyMsg);
-            zoneBuilderBuffAdd(session->game.commanderSession.currentCommander->pcId, session->game.commanderSession.currentCommander, replyMsg);
+            /// END TEST
         }
         free(arg);
     }

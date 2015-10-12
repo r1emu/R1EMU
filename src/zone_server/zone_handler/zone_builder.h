@@ -443,3 +443,4 @@ void zoneBuilderJobPoints(CommanderJobId_t jobId, CommanderJobPoints_t points, z
 void zoneBuilderSkillRangeFan(PcId_t pcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
 void zoneBuilderSkillMeleeGround(PcId_t pcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
 void zoneBuilderBuffAdd(PcId_t pcId, Commander *commander, zmsg_t *replyMsg);
+void zoneBuilderHealInfo(PcId_t pcId, uint32_t amountHealed, uint32_t totalHP, zmsg_t *replyMsg);

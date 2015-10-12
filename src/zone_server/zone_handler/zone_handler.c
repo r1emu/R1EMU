@@ -227,30 +227,13 @@ static PacketHandlerState zoneHandlerSkillGround(
          00 439C0000 00000000 1E43FFC3 1F7CA143 E130D443 1E43FFC3 1F7CA143 E130D443 EF04353F F80435BF 00000000 00 00
     */
 
-    //zoneBuilderPlayAni(replyMsg);
-
-    /*
-    zoneBuilderNormalUnk8(
-        session->game.commanderSession.currentCommander->pcId,
-        replyMsg
-    );
-    */
-
     dbg("position1: %f, %f, %f", clientPacket->pos1.x, clientPacket->pos1.y, clientPacket->pos1.z);
 
     PositionXZ dir;
     dir.x = -0.0;
     dir.z = 0.0;
 
-    zoneBuilderNormalUnk10_56(
-        session->game.commanderSession.currentCommander->pcId,
-        clientPacket->skillId,
-        &clientPacket->pos1,
-        &dir,
-        false,
-        replyMsg
-    );
-
+    // Skill is ready to be casted
     zoneBuilderSkillReady(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
@@ -264,6 +247,7 @@ static PacketHandlerState zoneHandlerSkillGround(
 
     dbg("skillPos: %f, %f, %f", skillPos.x, skillPos.y, skillPos.z);
 
+    // Make the skill appear
     zoneBuilderNormalUnk10_56(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
@@ -273,6 +257,7 @@ static PacketHandlerState zoneHandlerSkillGround(
         replyMsg
     );
 
+    // Unkown
     zoneBuilderNormalUnk11_1c(
         session->game.commanderSession.currentCommander->pcId,
         &clientPacket->pos1,
@@ -280,6 +265,7 @@ static PacketHandlerState zoneHandlerSkillGround(
         replyMsg
     );
 
+    // Set range of effect for this skill? (cone)
     zoneBuilderSkillRangeFan(
         session->game.commanderSession.currentCommander->pcId,
         &clientPacket->pos1,
@@ -287,6 +273,7 @@ static PacketHandlerState zoneHandlerSkillGround(
         replyMsg
     );
 
+    // Dont know.. everything works fine without this packet anyway.
     zoneBuilderSkillMeleeGround(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
