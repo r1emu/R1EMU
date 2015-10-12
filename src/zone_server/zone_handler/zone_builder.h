@@ -90,12 +90,17 @@ void zoneBuilderNormalUnk9( PcId_t targetPcId, zmsg_t *replyMsg);
 /**
  * @brief @unknown
  */
-void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
+void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, bool enableSkill, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown
  */
 void zoneBuilderNormalUnk11(PcId_t targetPcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
+
+/**
+ * @brief @unknown
+ */
+void zoneBuilderNormalUnk12(ActorId_t actorId, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown

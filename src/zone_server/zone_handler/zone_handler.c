@@ -247,6 +247,7 @@ static PacketHandlerState zoneHandlerSkillGround(
         clientPacket->skillId,
         &clientPacket->pos1,
         &dir,
+        false,
         replyMsg
     );
 
@@ -268,6 +269,7 @@ static PacketHandlerState zoneHandlerSkillGround(
         clientPacket->skillId,
         &skillPos,
         &dir,
+        true,
         replyMsg
     );
 

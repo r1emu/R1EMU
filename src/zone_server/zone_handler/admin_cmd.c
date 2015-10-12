@@ -317,6 +317,21 @@ void adminCmdSetSP(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
             info("Setting SP to %d.", sp);
             session->game.commanderSession.currentCommander->currentSP = sp;
             zoneBuilderUpdateSP(session->game.commanderSession.currentCommander->pcId, sp, replyMsg);
+
+            ActorId_t actorId = SWAP_UINT32(0x27680100);
+            SkillId_t skillId = 40001;
+            PositionXZ pos;
+            pos.x = 0;
+            pos.z = 0;
+            zoneBuilderNormalUnk12(actorId, replyMsg);
+            zoneBuilderNormalUnk10(
+                session->game.commanderSession.currentCommander->pcId,
+                skillId,
+                &session->game.commanderSession.currentCommander->pos,
+                &pos,
+                false,
+                replyMsg
+            );
         }
         free(arg);
     }

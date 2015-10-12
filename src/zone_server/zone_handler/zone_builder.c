@@ -261,7 +261,7 @@ void zoneBuilderNormalUnk9(PcId_t targetPcId, zmsg_t *replyMsg) {
     }
 }
 
-void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg) {
+void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, bool enableSkill, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         PacketNormalHeader normalHeader;
@@ -274,14 +274,14 @@ void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *p
         uint32_t unk3;
         uint32_t unk4;
         uint32_t unk5;
-        uint32_t unk6;
+        uint8_t unk6;
         uint32_t unk7;
         uint32_t unk8;
         uint32_t unk9;
         uint32_t unk10;
         uint32_t unk11;
         uint32_t unk12;
-        uint8_t unk13;
+        uint32_t unk13;
 
     } replyPacket;
     #pragma pack(pop)
@@ -308,7 +308,13 @@ void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *p
         replyPacket.unk3 = 0;
         replyPacket.unk4 = SWAP_UINT32(0x0000A041);
         replyPacket.unk5 = SWAP_UINT32(0x21680100);
-        replyPacket.unk6 = 1;
+        if (enableSkill) {
+            replyPacket.unk6 = 1;
+        }
+        else {
+            replyPacket.unk6 = 0;
+            replyPacket.unk7 = 1;
+        }
 
 
     }
@@ -357,6 +363,34 @@ void zoneBuilderNormalUnk11(PcId_t targetPcId, PositionXYZ *position, PositionXZ
 
     buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }
+
+void zoneBuilderNormalUnk12(ActorId_t actorId, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        PacketNormalHeader normalHeader;
+        PcId_t pcId;
+        uint32_t unk1;
+    } replyPacket;
+    #pragma pack(pop)
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        size_t memSize = sizeof(replyPacket);
+        dumpToMem(
+            "[03:07:53][main.c:56 in CNetUsr__PacketHandler_1]  33 0D 7A 1A 14 03 14 00 60 00 00 00 27 68 01 00 | 3.....9......_..\n"
+            "[03:07:53][main.c:56 in CNetUsr__PacketHandler_1]  01 00 00 00                                     | ...w.....j...tv.\n"
+          , &replyPacket, &memSize
+        );
+
+        replyPacket.pcId = actorId;
+        replyPacket.unk1 = 1;
+
+    }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
+}
+
+
 
 void zoneBuilderPartyList(zmsg_t *replyMsg) {
     #pragma pack(push, 1)
