@@ -227,10 +227,26 @@ static PacketHandlerState zoneHandlerSkillGround(
          00 439C0000 00000000 1E43FFC3 1F7CA143 E130D443 1E43FFC3 1F7CA143 E130D443 EF04353F F80435BF 00000000 00 00
     */
 
-    zoneBuilderPlayAni(replyMsg);
+    //zoneBuilderPlayAni(replyMsg);
 
+    /*
     zoneBuilderNormalUnk8(
         session->game.commanderSession.currentCommander->pcId,
+        replyMsg
+    );
+    */
+
+    dbg("position1: %f, %f, %f", clientPacket->pos1.x, clientPacket->pos1.y, clientPacket->pos1.z);
+
+    PositionXZ dir;
+    dir.x = -0.0;
+    dir.z = 0.0;
+
+    zoneBuilderNormalUnk10(
+        session->game.commanderSession.currentCommander->pcId,
+        clientPacket->skillId,
+        &clientPacket->pos1,
+        &dir,
         replyMsg
     );
 
@@ -242,11 +258,16 @@ static PacketHandlerState zoneHandlerSkillGround(
         replyMsg
     );
 
+    PositionXYZ skillPos = clientPacket->pos1;
+    skillPos.z = skillPos.z - 20;
+
+    dbg("skillPos: %f, %f, %f", skillPos.x, skillPos.y, skillPos.z);
+
     zoneBuilderNormalUnk10(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
-        &clientPacket->pos1,
-        &clientPacket->direction,
+        &skillPos,
+        &dir,
         replyMsg
     );
 
