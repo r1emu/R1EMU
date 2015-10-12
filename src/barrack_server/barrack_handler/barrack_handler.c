@@ -652,7 +652,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
 
     Commander newCommander;
     commanderInit(&newCommander);
-    newCommander.mapId = 1002; // FIXME : Start map could be loaded from
+    newCommander.mapId = 1021; // West Siauliai Woods
 
     // Check name
     size_t commanderNameLen = strlen(clientPacket->commanderName);
@@ -735,8 +735,8 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     // TODO : MySQL should generate this ID
     newCommander.socialInfoId = r1emuGenerateRandom64(&self->seed);
 
-    // Position : Center of the barrack
-    newCommander.pos = PositionXYZ_decl(19.0, 28.0, 29.0);
+    // Default West Siauliai Woods start position
+    newCommander.pos = PositionXYZ_decl(-623, 260, -1044);
 
     // Add default equiped items
     ItemId_t defaultEquipment[][EQSLOT_COUNT] = {

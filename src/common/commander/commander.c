@@ -83,7 +83,7 @@ bool commanderInit(Commander *commander) {
     commander->hairId = 0x10;
     commander->pose = SWAP_UINT16(0x0000); // Idle (ICBT)
 
-    commander->pos = PositionXYZ_decl(27.0, 30.0, 29.0);
+    commander->pos = PositionXYZ_decl(-623, 260, -1044); // Default West Siauliai Woods start position
     commander->currentXP = 0;
     commander->maxXP = 0xC; // ICBT
     commander->pcId = -1;
