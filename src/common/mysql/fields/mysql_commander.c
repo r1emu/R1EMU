@@ -112,9 +112,9 @@ bool mySqlGetCommanders(MySQL *self, char *familyName, Commander **commanders) {
         curCommander->socialInfoId = strtoll(row[MYSQL_COMMANDER_commander_id], NULL, 10); /** TODO : Get socialInfoId from MYSQL */
         curCommander->commanderId = strtoll(row[MYSQL_COMMANDER_commander_id], NULL, 10);
         curCommander->currentHP = strtol(row[MYSQL_COMMANDER_hp], NULL, 10);
-        curCommander->maxHP = curCommander->currentHP + 100; /** TODO : Get maxHP from MYSQL */
+        curCommander->maxHP = curCommander->currentHP; /** TODO : Get maxHP from MYSQL */
         curCommander->currentSP = strtol(row[MYSQL_COMMANDER_mp], NULL, 10);
-        curCommander->maxSP = curCommander->currentSP + 100; /** TODO : Get maxHP from MYSQL */
+        curCommander->maxSP = curCommander->currentSP; /** TODO : Get maxHP from MYSQL */
         curCommander->currentStamina = 25000; /** TODO : Get currentStamina from MYSQL */
         curCommander->maxStamina = curCommander->currentStamina; /** TODO : Get maxStamina from MYSQL */
         curCommander->mapId = strtol(row[MYSQL_COMMANDER_map_id], NULL, 10);

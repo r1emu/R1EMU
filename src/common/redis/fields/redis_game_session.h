@@ -40,6 +40,9 @@
 #define REDIS_SESSION_commander_posX_str            "posX"
 #define REDIS_SESSION_commander_posY_str            "posY"
 #define REDIS_SESSION_commander_posZ_str            "posZ"
+#define REDIS_SESSION_commander_barrackPosX_str     "barrackPosX"
+#define REDIS_SESSION_commander_barrackPosY_str     "barrackPosY"
+#define REDIS_SESSION_commander_barrackPosZ_str     "barrackPosZ"
 #define REDIS_SESSION_commander_currentXP_str       "currentXP"
 #define REDIS_SESSION_commander_maxXP_str           "maxXP"
 #define REDIS_SESSION_commander_pcId_str            "pcId"
@@ -103,6 +106,9 @@ enum RedisGameSessionFields {
     REDIS_GAME_SESSION_commander_posX,
     REDIS_GAME_SESSION_commander_posY,
     REDIS_GAME_SESSION_commander_posZ,
+    REDIS_GAME_SESSION_commander_barrackPosX,
+    REDIS_GAME_SESSION_commander_barrackPosY,
+    REDIS_GAME_SESSION_commander_barrackPosZ,
     REDIS_GAME_SESSION_commander_currentXP,
     REDIS_GAME_SESSION_commander_maxXP,
     REDIS_GAME_SESSION_commander_pcId,

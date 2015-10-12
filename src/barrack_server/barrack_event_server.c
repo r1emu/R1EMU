@@ -47,6 +47,8 @@ bool barrackEventServerOnDisconnect (
     RouterId_t routerId,
     uint8_t *sessionKeyStr
 ) {
+    /// TODO : Redirect the query to Worker with a internal packet
+
     // Get the current game session
     GameSession gameSession;
     if (!(redisGetGameSessionBySocketId(redis, routerId, sessionKeyStr, &gameSession))) {
@@ -55,14 +57,10 @@ bool barrackEventServerOnDisconnect (
     }
 
     // Transfer the Redis session to SQL
-    for (size_t i = 0; i < gameSession.accountSession.commandersCountMax; i++) {
-        Commander *commander = gameSession.accountSession.commanders[i];
-        if (commander) {
-            if (!(mySqlCommanderFlush(mysql, commander))) {
-                error("Cannot flush commander.");
-                return false;
-            }
-        }
+    if (!(mySqlCommanderSessionFlush(mysql, &gameSession.commanderSession))) {
+        error ("Cannot flush the redis session '%s' to the SQL.", sessionKeyStr);
+        // return false;
+        // TODO : Should we flush the Redis data in that case ?
     }
 
     // Flush the Redis session of the client
