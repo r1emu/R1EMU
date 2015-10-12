@@ -90,6 +90,16 @@ void zoneBuilderNormalUnk9( PcId_t targetPcId, zmsg_t *replyMsg);
 /**
  * @brief @unknown
  */
+void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
+
+/**
+ * @brief @unknown
+ */
+void zoneBuilderNormalUnk11(PcId_t targetPcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
+
+/**
+ * @brief @unknown
+ */
 void zoneBuilderPartyList(zmsg_t *replyMsg);
 
 /**
@@ -419,3 +429,6 @@ void zoneBuilderItemRemove(Item *item, InventoryRemoval removalType, InventoryTy
  * Set commander's Job Points
  */
 void zoneBuilderJobPoints(CommanderJobId_t jobId, uint16_t points, zmsg_t *replyMsg);
+
+void zoneBuilderSkillRangeFan(PcId_t pcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
+void zoneBuilderSkillMeleeGround(PcId_t pcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);

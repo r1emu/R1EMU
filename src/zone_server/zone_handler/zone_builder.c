@@ -89,7 +89,7 @@ void zoneBuilderSkillReady(
         ServerPacketHeader header;
         PcId_t pcId;
         SkillId_t skillId;
-        float unk3;
+        float unk3; // Level?
         uint16_t unk4;
         uint16_t unk5;
         PositionXYZ pos1;
@@ -259,6 +259,103 @@ void zoneBuilderNormalUnk9(PcId_t targetPcId, zmsg_t *replyMsg) {
 
         replyPacket.pcId = targetPcId;
     }
+}
+
+void zoneBuilderNormalUnk10(PcId_t targetPcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        PacketNormalHeader normalHeader;
+        PcId_t pcId;
+        uint32_t unk1;
+        SkillId_t skillId;
+        uint32_t unk2; // Level?
+        PositionXYZ position;
+        PositionXZ direction;
+        uint32_t unk3;
+        uint32_t unk4;
+        uint32_t unk5;
+        uint32_t unk6;
+        uint32_t unk7;
+        uint32_t unk8;
+        uint32_t unk9;
+        uint32_t unk10;
+        uint32_t unk11;
+        uint32_t unk12;
+        uint8_t unk13;
+
+    } replyPacket;
+    #pragma pack(pop)
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        size_t memSize = sizeof(replyPacket);
+        dumpToMem(
+            "[03:08:45][main.c:56 in CNetUsr__PacketHandler_1]  33 0D FF FF FF FF 59 00 56 00 00 00 00 00 00 00 | 3.....Y.V.......\n"
+            "[03:08:45][main.c:56 in CNetUsr__PacketHandler_1]  11 18 27 00 41 9C 00 00 01 00 00 00 4F DB 87 C4 | ....A.......O...\n"
+            "[03:08:45][main.c:56 in CNetUsr__PacketHandler_1]  74 76 82 43 14 F4 07 C4 FF FF 7F 3F FF 1F B5 B9 | ...C............\n"
+            "[03:08:45][main.c:56 in CNetUsr__PacketHandler_1]  96 68 26 35 01 00 A0 41 66 68 01 00 01 00 00 00 | .h&5............\n"
+            "[03:08:45][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 | ................\n"
+            "[03:08:45][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 00 00 00 00 00                      | .........\n"
+          , &replyPacket, &memSize
+        );
+
+        replyPacket.pcId = targetPcId;
+        replyPacket.unk1 = SWAP_UINT32(0x11182700);
+        replyPacket.skillId = skillId;
+        replyPacket.unk2 = 1;
+        replyPacket.position = *position;
+        replyPacket.direction = *direction;
+        replyPacket.unk3 = 0;
+        replyPacket.unk4 = SWAP_UINT32(0x0000A041);
+        replyPacket.unk5 = SWAP_UINT32(0x21680100);
+        replyPacket.unk6 = 1;
+
+
+    }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
+}
+
+void zoneBuilderNormalUnk11(PcId_t targetPcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        PacketNormalHeader normalHeader;
+        PcId_t pcId;
+        uint8_t unk1;
+        uint32_t unk2;
+        uint32_t unk3;
+        PositionXYZ position;
+        PositionXZ direction;
+        uint32_t unk4;
+        uint32_t unk5;
+        uint32_t unk6;
+    } replyPacket;
+    #pragma pack(pop)
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        size_t memSize = sizeof(replyPacket);
+        dumpToMem(
+            "[03:07:53][main.c:56 in CNetUsr__PacketHandler_1]  33 0D 9F 0E 14 03 39 00 1C 00 00 00 00 00 00 00 | 3.....9......_..\n"
+            "[03:07:53][main.c:56 in CNetUsr__PacketHandler_1]  00 A6 9C 77 04 00 00 00 00 6A E7 1B C4 74 76 82 | ...w.....j...tv.\n"
+            "[03:07:53][main.c:56 in CNetUsr__PacketHandler_1]  43 BB 0E 80 C4 00 00 00 80 FE FF 7F BF 00 00 00 | C...............\n"
+            "[03:07:53][main.c:56 in CNetUsr__PacketHandler_1]  00 00 00 00 00 00 00 00 00                      | .........\n"
+          , &replyPacket, &memSize
+        );
+
+        replyPacket.pcId = targetPcId;
+        replyPacket.unk1 = 0;
+        replyPacket.unk2 = SWAP_UINT32(0xA69C7704);
+        replyPacket.unk3 = 0;
+        replyPacket.position = *position;
+        replyPacket.direction = *direction;
+        replyPacket.unk4 = 0;
+        replyPacket.unk5 = 0;
+        replyPacket.unk6 = 1;
+
+    }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }
 
 void zoneBuilderPartyList(zmsg_t *replyMsg) {
@@ -2032,10 +2129,11 @@ void zoneBuilderJobPoints(CommanderJobId_t jobId, uint16_t points, zmsg_t *reply
 }
 
 
-void zoneBuilderSkillRangeFan(Skill skill, zmsg_t *replyMsg) {
+void zoneBuilderSkillRangeFan(PcId_t pcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
+        PcId_t pcId;
         uint8_t unk1;
         uint8_t unk2;
         PositionXYZ position;
@@ -2053,11 +2151,17 @@ void zoneBuilderSkillRangeFan(Skill skill, zmsg_t *replyMsg) {
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
         /// TODO
-        /*
-        replyPacket.unk1 = 0;
-        replyPacket.unk2 = 0;
-        */
+        replyPacket.pcId = pcId;
+        replyPacket.unk1 = 1;
+        replyPacket.unk2 = 1;
+        replyPacket.position = *position;
+        replyPacket.direction = *direction;
+        replyPacket.unk3 = 0;
+        replyPacket.unk4 = 0.174533;
+
     }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }
 
 void zoneBuilderSkillRangeSquare(Skill skill, zmsg_t *replyMsg) {
@@ -2136,5 +2240,51 @@ void zoneBuilderSkillRangeDbg(Skill skill, zmsg_t *replyMsg) {
         replyPacket.unk2 = 0;
         */
     }
+}
 
+void zoneBuilderSkillMeleeGround(PcId_t pcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        ServerPacketHeader header;
+        uint16_t unk1;
+        uint16_t skillId;
+        uint16_t unk2;
+        PcId_t pcId;
+        PositionXZ direction;
+        uint32_t unk3; // level ?
+        float unk4;
+        float unk5;
+        float unk6;
+        uint32_t unk7;
+        uint32_t unk8;
+        PositionXYZ position;
+        uint16_t unk9;
+    } replyPacket;
+   (void) replyPacket;
+    #pragma pack(pop)
+
+    PacketType packetType = ZC_SKILL_MELEE_GROUND;
+    CHECK_SERVER_PACKET_SIZE(replyPacket, packetType);
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        serverPacketHeaderInit(&replyPacket.header, packetType);
+        /// TODO
+        replyPacket.unk1 = 62;
+        replyPacket.skillId = (uint16_t) skillId;
+        replyPacket.unk2 = 162;
+        replyPacket.pcId = pcId;
+        replyPacket.direction = *direction;
+        replyPacket.unk3 = 1;
+        replyPacket.unk4 = 600;
+        replyPacket.unk5 = 1;
+        replyPacket.unk6 = -1;
+        replyPacket.unk7 = SWAP_UINT32(0x01300B00);
+        replyPacket.unk8 = SWAP_UINT32(0x0B0E1900);
+        replyPacket.position = *position;
+        replyPacket.unk9 = 0;
+
+    }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }

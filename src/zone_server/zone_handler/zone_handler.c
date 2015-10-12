@@ -199,13 +199,22 @@ static PacketHandlerState zoneHandlerSkillGround(
         uint32_t unk2;
         PositionXYZ pos1;
         PositionXYZ pos2;
-        float unk3;
-        uint32_t unk4;
+        PositionXZ direction;
         uint32_t unk5;
         uint8_t unk6;
         uint8_t unk7;
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
+
+    dbg("unk1 %d", clientPacket->unk1);
+    dbg("skillId %d", clientPacket->skillId);
+    dbg("unk2 %d", clientPacket->unk2);
+    dbg("POS1 [%f] [%f] [%f]", clientPacket->pos1.x, clientPacket->pos1.y, clientPacket->pos1.z);
+    dbg("POS2 [%f] [%f] [%f]", clientPacket->pos2.x, clientPacket->pos2.y, clientPacket->pos2.z);
+    dbg("DIRECTION [%f] [%f]", clientPacket->direction.x, clientPacket->direction.z);
+    dbg("unk5 %d", clientPacket->unk5);
+    dbg("unk6 %d", clientPacket->unk6);
+    dbg("unk7 %d", clientPacket->unk7);
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_SKILL_GROUND);
 
@@ -222,6 +231,44 @@ static PacketHandlerState zoneHandlerSkillGround(
 
     zoneBuilderNormalUnk8(
         session->game.commanderSession.currentCommander->pcId,
+        replyMsg
+    );
+
+    zoneBuilderSkillReady(
+        session->game.commanderSession.currentCommander->pcId,
+        clientPacket->skillId,
+        &clientPacket->pos1,
+        &clientPacket->pos2,
+        replyMsg
+    );
+
+    zoneBuilderNormalUnk10(
+        session->game.commanderSession.currentCommander->pcId,
+        clientPacket->skillId,
+        &clientPacket->pos1,
+        &clientPacket->direction,
+        replyMsg
+    );
+
+    zoneBuilderNormalUnk11(
+        session->game.commanderSession.currentCommander->pcId,
+        &clientPacket->pos1,
+        &clientPacket->direction,
+        replyMsg
+    );
+
+    zoneBuilderSkillRangeFan(
+        session->game.commanderSession.currentCommander->pcId,
+        &clientPacket->pos1,
+        &clientPacket->direction,
+        replyMsg
+    );
+
+    zoneBuilderSkillMeleeGround(
+        session->game.commanderSession.currentCommander->pcId,
+        clientPacket->skillId,
+        &clientPacket->pos1,
+        &clientPacket->direction,
         replyMsg
     );
 
