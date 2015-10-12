@@ -95,6 +95,17 @@ bool mySqlGetCommanders(MySQL *self, char *familyName, Commander **commanders) {
             strtof(row[MYSQL_COMMANDER_position_y], NULL),
             strtof(row[MYSQL_COMMANDER_position_z], NULL)
         );
+        curCommander->barrackPos = PositionXYZ_decl(
+            strtof(row[MYSQL_COMMANDER_barrack_position_x], NULL),
+            strtof(row[MYSQL_COMMANDER_barrack_position_y], NULL),
+            strtof(row[MYSQL_COMMANDER_barrack_position_z], NULL)
+        );
+        /*
+        curCommander->dir = PositionXZ_decl(
+            strtof(row[MYSQL_COMMANDER_direction_x], NULL),
+            strtof(row[MYSQL_COMMANDER_direction_y], NULL),
+        );
+        */
         curCommander->currentXP = strtol(row[MYSQL_COMMANDER_exp], NULL, 10);
         curCommander->maxXP = 1337; /** TODO : Get max XP from XP tables */
         curCommander->pcId = rand(); /** TODO : Get unique PCID */
@@ -197,6 +208,9 @@ bool mySqlCommanderUpdate(MySQL *self, CommanderId_t commanderId, Commander *com
         commander->pos.x,
         commander->pos.y,
         commander->pos.z,
+        commander->barrackPos.x,
+        commander->barrackPos.y,
+        commander->barrackPos.z,
         commander->currentHP,
         commander->currentSP,
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT]),
@@ -270,6 +284,9 @@ bool mySqlCommanderInsert(MySQL *self, Commander *commander) {
         commander->pos.x,
         commander->pos.y,
         commander->pos.z,
+        commander->barrackPos.x,
+        commander->barrackPos.y,
+        commander->barrackPos.z,
         commander->currentHP,
         commander->currentSP,
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT]),

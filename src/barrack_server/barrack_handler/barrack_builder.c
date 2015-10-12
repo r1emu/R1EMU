@@ -384,9 +384,8 @@ void barrackBuilderCommanderList(
             curCommandersBarrackInfoPacket->unk5 = 0;
             curCommandersBarrackInfoPacket->maxXP = curCommander->maxXP;
             curCommandersBarrackInfoPacket->unk6 = SWAP_UINT32(0xC01C761C);
-            curCommandersBarrackInfoPacket->pos = curCommander->pos;
-            positionXYZDump(&curCommandersBarrackInfoPacket->pos);
-            curCommandersBarrackInfoPacket->dir = PositionXZ_decl(0, 0); // Set direction to face camera.
+            curCommandersBarrackInfoPacket->pos = curCommander->barrackPos;
+            curCommandersBarrackInfoPacket->dir = curCommander->dir;
             curCommandersBarrackInfoPacket->pos2 = curCommandersBarrackInfoPacket->pos;
             curCommandersBarrackInfoPacket->dir2 = curCommandersBarrackInfoPacket->dir;
             curCommandersBarrackInfoPacket->unk8 = 0;
@@ -616,8 +615,7 @@ void barrackBuilderCommanderCreate(Commander *commander, uint8_t commandersCount
         replyPacket.maxXP = 0xC; // ICBT ; TODO : Implement EXP table
         replyPacket.unk6 = SWAP_UINT32(0xC01C761C); // ICBT
         replyPacket.pos = commander->pos;
-            positionXYZDump(&commander->pos);
-        replyPacket.dir = commanderDir;
+        replyPacket.dir = commander->dir;
         replyPacket.pos2 = commander->pos;
         replyPacket.dir2 = commanderDir;
     }

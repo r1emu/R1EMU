@@ -103,6 +103,8 @@ typedef struct
     CommanderHairId_t hairId;
     CommanderPose_t pose;
     PositionXYZ pos;
+    PositionXYZ barrackPos;
+    PositionXZ dir;
     CommanderClassId_t classId;
     CommanderJobId_t jobId;
 
@@ -126,7 +128,7 @@ typedef struct
 
     /** Commander inventory */
     Inventory inventory;
-    /** Commander inventory */
+    /** Commander skills */
     SkillsManager skillsManager;
 
 } Commander;
@@ -140,6 +142,7 @@ typedef struct
     CommanderHairId_t hairId;
     CommanderPose_t pose;
     PositionXYZ pos;
+    PositionXZ dir;
     CommanderClassId_t classId;
     CommanderJobId_t jobId;
 

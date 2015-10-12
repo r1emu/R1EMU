@@ -342,13 +342,13 @@ static PacketHandlerState barrackHandlerCommanderMove(
 
     // Update session
     session->game.commanderSession.currentCommander = commander;
-    memcpy(&commander->pos, &clientPacket->position, sizeof(PositionXZ));
+    memcpy(&commander->barrackPos, &clientPacket->position, sizeof(PositionXZ));
 
     // Build packet
     barrackBuilderCommanderMoveOk(
         session->socket.accountId,
         clientPacket->commanderIndex,
-        &commander->pos,
+        &commander->barrackPos,
         reply
     );
 
@@ -737,6 +737,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
 
     // Default West Siauliai Woods start position
     newCommander.pos = PositionXYZ_decl(-623, 260, -1044);
+    newCommander.dir = PositionXZ_decl(0.0, 0.0);
 
     // Add default equiped items
     ItemId_t defaultEquipment[][EQSLOT_COUNT] = {

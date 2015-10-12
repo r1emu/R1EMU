@@ -458,6 +458,7 @@ static PacketHandlerState zoneHandlerKeyboardMove(
 
     // update session
     session->game.commanderSession.currentCommander->pos = clientPacket->position;
+    session->game.commanderSession.currentCommander->dir = clientPacket->direction;
 
     // notify the players around
     GameEventCommanderMove event = {
@@ -711,10 +712,6 @@ static PacketHandlerState zoneHandlerConnect(
         error("Cannot move the game session to the current mapId.");
         goto cleanup;
     }
-
-    // FIXME
-    // Set a default position
-    // tmpCommanderSession->currentCommander->pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
 
     // Update the session
     session->game = tmpGameSession;

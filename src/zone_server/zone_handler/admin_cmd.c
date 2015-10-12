@@ -79,6 +79,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
     commanderInit(&fakePc);
 
     fakePc.pos = session->game.commanderSession.currentCommander->pos;
+    fakePc.dir = session->game.commanderSession.currentCommander->dir;
     fakePc.accountId = r1emuGenerateRandom64(&self->seed);
     fakePc.socialInfoId = r1emuGenerateRandom64(&self->seed);
     fakePc.pcId = r1emuGenerateRandom(&self->seed);
@@ -202,6 +203,7 @@ void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) 
             position.z = atof(arg[2]);
             info("z = %.6f", position.z);
             session->game.commanderSession.currentCommander->pos = position;
+            session->game.commanderSession.currentCommander->dir = PositionXZ_decl(0, 0);
             zoneBuilderSetPos(session->game.commanderSession.currentCommander->pcId, &position, replyMsg);
         }
         free(arg);
