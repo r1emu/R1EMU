@@ -35,6 +35,9 @@
     GENERATOR(MYSQL_COMMANDER, position_x, '%f')                    \
     GENERATOR(MYSQL_COMMANDER, position_y, '%f')                    \
     GENERATOR(MYSQL_COMMANDER, position_z, '%f')                    \
+    GENERATOR(MYSQL_COMMANDER, barrack_position_x, '%f')            \
+    GENERATOR(MYSQL_COMMANDER, barrack_position_y, '%f')            \
+    GENERATOR(MYSQL_COMMANDER, barrack_position_z, '%f')            \
     GENERATOR(MYSQL_COMMANDER, hp, '%d')                            \
     GENERATOR(MYSQL_COMMANDER, mp, '%d')                            \
     GENERATOR(MYSQL_COMMANDER, eqslot_head_top, '%u')               \

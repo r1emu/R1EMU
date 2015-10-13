@@ -44,6 +44,7 @@ bool adminCmdInit(void) {
     zhash_insert(adminCommands, "setSP",          adminCmdSetSP);
     zhash_insert(adminCommands, "setLevel",       adminCmdSetLevel);
     zhash_insert(adminCommands, "setJobPoints",   adminCmdSetJobPoints);
+    zhash_insert(adminCommands, "setSpeed",       adminCmdSetSpeed);
 
     return true;
 }
@@ -66,6 +67,11 @@ void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *repl
     handler(self, session, command + strlen (commandName) + 1, replyMsg);
 }
 
+void adminCmdSetSpeed(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
+    int speed = strtol(args, &args, 10);
+    zoneBuilderMoveSpeed(session->game.commanderSession.currentCommander->pcId, speed, replyMsg);
+}
+
 void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
 
     // add a fake commander with a fake account
@@ -73,6 +79,7 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
     commanderInit(&fakePc);
 
     fakePc.pos = session->game.commanderSession.currentCommander->pos;
+    fakePc.dir = session->game.commanderSession.currentCommander->dir;
     fakePc.accountId = r1emuGenerateRandom64(&self->seed);
     fakePc.socialInfoId = r1emuGenerateRandom64(&self->seed);
     fakePc.pcId = r1emuGenerateRandom(&self->seed);
@@ -196,6 +203,7 @@ void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) 
             position.z = atof(arg[2]);
             info("z = %.6f", position.z);
             session->game.commanderSession.currentCommander->pos = position;
+            session->game.commanderSession.currentCommander->dir = PositionXZ_decl(0, 0);
             zoneBuilderSetPos(session->game.commanderSession.currentCommander->pcId, &position, replyMsg);
         }
         free(arg);

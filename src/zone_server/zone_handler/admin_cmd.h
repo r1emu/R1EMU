@@ -65,6 +65,7 @@ void adminCmdWhere(Worker *self, Session *session, char *args, zmsg_t *replyMsg)
 
 /**
  * @brief : Change the camera position
+ *          /changeCamera <x> <y> <z> {<fspd> <ispd>}
  */
 void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
 
@@ -78,13 +79,19 @@ void adminCmdChangeCamera(Worker *self, Session *session, char *args, zmsg_t *re
  */
  void adminCmdSetSP(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
 
- /**
- * @brief : Set player level
+/**
+ * @brief : Set player character level
  */
  void adminCmdSetLevel(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
 
-  /**
- * @brief : Set player level
+/**
+ * @brief : Set player job level
  */
  void adminCmdSetJobPoints(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+
+
+/**
+ * @brief : Set player movement speed
+ */
+ void adminCmdSetSpeed(Worker *self, Session *session, char *args, zmsg_t *replyMsg);
 

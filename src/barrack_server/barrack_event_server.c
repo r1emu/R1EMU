@@ -16,6 +16,8 @@
 #include "barrack_handler/barrack_event_handler.h"
 #include "common/server/event_handler.h"
 #include "common/redis/fields/redis_session.h"
+#include "common/redis/fields/redis_game_session.h"
+#include "common/mysql/fields/mysql_commander.h"
 
 bool barrackEventServerProcess(EventServer *self, EventType type, void *eventData)
 {
@@ -45,6 +47,22 @@ bool barrackEventServerOnDisconnect (
     RouterId_t routerId,
     uint8_t *sessionKeyStr
 ) {
+    /// TODO : Redirect the query to Worker with a internal packet
+
+    // Get the current game session
+    GameSession gameSession;
+    if (!(redisGetGameSessionBySocketId(redis, routerId, sessionKeyStr, &gameSession))) {
+        error("Cannot get game session of '%s'", sessionKeyStr);
+        return false;
+    }
+
+    // Transfer the Redis session to SQL
+    if (!(mySqlCommanderSessionFlush(mysql, &gameSession.commanderSession))) {
+        error ("Cannot flush the redis session '%s' to the SQL.", sessionKeyStr);
+        // return false;
+        // TODO : Should we flush the Redis data in that case ?
+    }
+
     // Flush the Redis session of the client
     RedisSessionKey sessionKey = {
         .socketKey = {

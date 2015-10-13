@@ -450,6 +450,7 @@ static PacketHandlerState zoneHandlerKeyboardMove(
 
     // update session
     session->game.commanderSession.currentCommander->pos = clientPacket->position;
+    session->game.commanderSession.currentCommander->dir = clientPacket->direction;
 
     // notify the players around
     GameEventCommanderMove event = {
@@ -523,15 +524,6 @@ static PacketHandlerState zoneHandlerGameReady(
     inventoryAddItem(inventory, items[1]);
     //items[2].equipSlot = EQSLOT_BODY_ARMOR;
     //items[2].properties = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
-    /*
-    actor = actorNew(3333);
-    itemInit(&items[2], actor, ITEM_CAT_ARMOR, 531102, 1);
-    inventoryAddItem(inventory, &items[2]);
-
-    actor = actorNew(4444);
-    itemInit(&items[3], actor, ITEM_CAT_ARMOR, 531101, 1);
-    inventoryAddItem(inventory, &items[3]);
-    */
     inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
     //inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
     zoneBuilderItemEquipList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
@@ -703,10 +695,6 @@ static PacketHandlerState zoneHandlerConnect(
         error("Cannot move the game session to the current mapId.");
         goto cleanup;
     }
-
-    // FIXME
-    // Set a default position
-    // tmpCommanderSession->currentCommander->pos = PositionXYZ_decl(76.0f, 1.0f, 57.0f);
 
     // Update the session
     session->game = tmpGameSession;

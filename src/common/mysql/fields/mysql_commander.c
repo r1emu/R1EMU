@@ -95,15 +95,26 @@ bool mySqlGetCommanders(MySQL *self, char *familyName, Commander **commanders) {
             strtof(row[MYSQL_COMMANDER_position_y], NULL),
             strtof(row[MYSQL_COMMANDER_position_z], NULL)
         );
+        curCommander->barrackPos = PositionXYZ_decl(
+            strtof(row[MYSQL_COMMANDER_barrack_position_x], NULL),
+            strtof(row[MYSQL_COMMANDER_barrack_position_y], NULL),
+            strtof(row[MYSQL_COMMANDER_barrack_position_z], NULL)
+        );
+        /*
+        curCommander->dir = PositionXZ_decl(
+            strtof(row[MYSQL_COMMANDER_direction_x], NULL),
+            strtof(row[MYSQL_COMMANDER_direction_y], NULL),
+        );
+        */
         curCommander->currentXP = strtol(row[MYSQL_COMMANDER_exp], NULL, 10);
         curCommander->maxXP = 1337; /** TODO : Get max XP from XP tables */
         curCommander->pcId = rand(); /** TODO : Get unique PCID */
         curCommander->socialInfoId = strtoll(row[MYSQL_COMMANDER_commander_id], NULL, 10); /** TODO : Get socialInfoId from MYSQL */
         curCommander->commanderId = strtoll(row[MYSQL_COMMANDER_commander_id], NULL, 10);
         curCommander->currentHP = strtol(row[MYSQL_COMMANDER_hp], NULL, 10);
-        curCommander->maxHP = curCommander->currentHP + 100; /** TODO : Get maxHP from MYSQL */
+        curCommander->maxHP = curCommander->currentHP; /** TODO : Get maxHP from MYSQL */
         curCommander->currentSP = strtol(row[MYSQL_COMMANDER_mp], NULL, 10);
-        curCommander->maxSP = curCommander->currentSP + 100; /** TODO : Get maxHP from MYSQL */
+        curCommander->maxSP = curCommander->currentSP; /** TODO : Get maxHP from MYSQL */
         curCommander->currentStamina = 25000; /** TODO : Get currentStamina from MYSQL */
         curCommander->maxStamina = curCommander->currentStamina; /** TODO : Get maxStamina from MYSQL */
         curCommander->mapId = strtol(row[MYSQL_COMMANDER_map_id], NULL, 10);
@@ -197,6 +208,9 @@ bool mySqlCommanderUpdate(MySQL *self, CommanderId_t commanderId, Commander *com
         commander->pos.x,
         commander->pos.y,
         commander->pos.z,
+        commander->barrackPos.x,
+        commander->barrackPos.y,
+        commander->barrackPos.z,
         commander->currentHP,
         commander->currentSP,
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT]),
@@ -270,6 +284,9 @@ bool mySqlCommanderInsert(MySQL *self, Commander *commander) {
         commander->pos.x,
         commander->pos.y,
         commander->pos.z,
+        commander->barrackPos.x,
+        commander->barrackPos.y,
+        commander->barrackPos.z,
         commander->currentHP,
         commander->currentSP,
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT]),

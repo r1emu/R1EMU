@@ -55,6 +55,9 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_commander_posX] = REDIS_SESSION_commander_posX_str,
     [REDIS_GAME_SESSION_commander_posY] = REDIS_SESSION_commander_posY_str,
     [REDIS_GAME_SESSION_commander_posZ] = REDIS_SESSION_commander_posZ_str,
+    [REDIS_GAME_SESSION_commander_barrackPosX] = REDIS_SESSION_commander_barrackPosX_str,
+    [REDIS_GAME_SESSION_commander_barrackPosY] = REDIS_SESSION_commander_barrackPosY_str,
+    [REDIS_GAME_SESSION_commander_barrackPosZ] = REDIS_SESSION_commander_barrackPosZ_str,
     [REDIS_GAME_SESSION_commander_currentXP] = REDIS_SESSION_commander_currentXP_str,
     [REDIS_GAME_SESSION_commander_maxXP] = REDIS_SESSION_commander_maxXP_str,
     [REDIS_GAME_SESSION_commander_pcId] = REDIS_SESSION_commander_pcId_str,
@@ -180,6 +183,9 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         " " REDIS_SESSION_commander_posX_str
         " " REDIS_SESSION_commander_posY_str
         " " REDIS_SESSION_commander_posZ_str
+        " " REDIS_SESSION_commander_barrackPosX_str
+        " " REDIS_SESSION_commander_barrackPosY_str
+        " " REDIS_SESSION_commander_barrackPosZ_str
         " " REDIS_SESSION_commander_currentXP_str
         " " REDIS_SESSION_commander_maxXP_str
         " " REDIS_SESSION_commander_pcId_str
@@ -270,6 +276,9 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             commander->pos.x = GET_REDIS_GAME_FLOAT(commander_posX);
             commander->pos.y = GET_REDIS_GAME_FLOAT(commander_posY);
             commander->pos.z = GET_REDIS_GAME_FLOAT(commander_posZ);
+            commander->barrackPos.x = GET_REDIS_GAME_FLOAT(commander_barrackPosX);
+            commander->barrackPos.y = GET_REDIS_GAME_FLOAT(commander_barrackPosY);
+            commander->barrackPos.z = GET_REDIS_GAME_FLOAT(commander_barrackPosZ);
             commander->currentXP = GET_REDIS_GAME_32(commander_currentXP);
             commander->maxXP = GET_REDIS_GAME_32(commander_maxXP);
             commander->pcId = GET_REDIS_GAME_32(commander_pcId);
@@ -404,6 +413,9 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
             " " REDIS_SESSION_commander_posX_str " %f"
             " " REDIS_SESSION_commander_posY_str " %f"
             " " REDIS_SESSION_commander_posZ_str " %f"
+            " " REDIS_SESSION_commander_barrackPosX_str " %f"
+            " " REDIS_SESSION_commander_barrackPosY_str " %f"
+            " " REDIS_SESSION_commander_barrackPosZ_str " %f"
             " " REDIS_SESSION_commander_currentXP_str " %x"
             " " REDIS_SESSION_commander_maxXP_str " %x"
             " " REDIS_SESSION_commander_pcId_str " %x"
@@ -430,6 +442,9 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
             commander->pos.x,
             commander->pos.y,
             commander->pos.z,
+            commander->barrackPos.x,
+            commander->barrackPos.y,
+            commander->barrackPos.z,
             commander->currentXP,
             commander->maxXP,
             commander->pcId,

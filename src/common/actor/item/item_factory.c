@@ -186,6 +186,7 @@ bool itemFactoryGetCategoryFromId(
             } else {
                 warning("Guess : '%d' = 'Armor'", id);
                 category = &self.categories[ITEM_CAT_ARMOR];
+                special("Category = %d", *category);
             }
         } else {
             if (!(category = zhash_lookup(self.categoryCommonTable, commonData->ItemType))) {

@@ -8,7 +8,7 @@ DELIMITER $$
 --
 -- Procedimientos
 --
-CREATE DEFINER=`r1emu`@`localhost` PROCEDURE `bSetFamilyName`(IN `accountId` INT, IN `newName` VARCHAR(64))
+CREATE DEFINER=`r1emu`@`localhost` PROCEDURE `bSetFamilyName` (IN `accountId` INT, IN `newName` VARCHAR(64))
     MODIFIES SQL DATA
     COMMENT 'set Family Name'
 BEGIN
@@ -88,6 +88,9 @@ CREATE TABLE IF NOT EXISTS `commanders` (
   `class_id` int(11) NOT NULL,
   `hair_id` int(11) NOT NULL,
   `map_id` int(11) NOT NULL,
+  `barrack_position_x` float NOT NULL,
+  `barrack_position_y` float NOT NULL,
+  `barrack_position_z` float NOT NULL,
   `position_x` float NOT NULL,
   `position_y` float NOT NULL,
   `position_z` float NOT NULL,

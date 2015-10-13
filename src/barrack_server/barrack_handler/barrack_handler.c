@@ -342,13 +342,13 @@ static PacketHandlerState barrackHandlerCommanderMove(
 
     // Update session
     session->game.commanderSession.currentCommander = commander;
-    memcpy(&commander->pos, &clientPacket->position, sizeof(PositionXZ));
+    memcpy(&commander->barrackPos, &clientPacket->position, sizeof(PositionXZ));
 
     // Build packet
     barrackBuilderCommanderMoveOk(
         session->socket.accountId,
         clientPacket->commanderIndex,
-        &commander->pos,
+        &commander->barrackPos,
         reply
     );
 
@@ -382,81 +382,14 @@ static PacketHandlerState barrackHandlerStartBarrack(
     // Update session
     session->game.accountSession = tmpAccountSession;
 
-
-        /// TESTING PURPOSES
+    /// TESTING PURPOSES
     Inventory *inventory = &tmpAccountSession.commanders[0]->inventory;
-    Item *items[20];
-    items[0] = itemFactoryCreate(645001, 5003);
-    inventoryAddItem(inventory, items[0]);
-    items[1] = itemFactoryCreate(640026, 5);
-    inventoryAddItem(inventory, items[1]);
-
-    items[2] = itemFactoryCreate(531101, 1);
-    inventoryAddItem(inventory, items[2]);
-
-    items[3] = itemFactoryCreate(531152, 1);
-    inventoryAddItem(inventory, items[3]);
-
-    items[4] = itemFactoryCreate(531151, 1);
-    inventoryAddItem(inventory, items[4]);
-
-    items[5] = itemFactoryCreate(511151, 1);
-    inventoryAddItem(inventory, items[5]);
-
-    dbg("Pringing initial items (consumable and armor)");
-    dbg("Inventory count: %d", inventoryGetItemsCount(inventory));
-    inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
-    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
-
-    dbg("Equiping first item in ARMOR BAG (531101)");
-    inventoryEquipItem(inventory, actorGetUId(items[2]), EQSLOT_BODY_ARMOR);
-    dbg("Inventory count: %d", inventoryGetItemsCount(inventory));
-    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
-    dbg("Equiping first item in ARMOR BAG (531152)");
-    inventoryEquipItem(inventory, actorGetUId(items[3]), EQSLOT_BODY_ARMOR);
-    dbg("Inventory count: %d", inventoryGetItemsCount(inventory));
-    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
-
-    /*
-    Inventory *inventory = &tmpAccountSession.commanders[0]->inventory;
-
-    Item items[20];
-
-    items[0].actor.uid = 1111;
-    items[0].id = 2;
-    items[0].amount = 1;
-    items[0].category = ITEM_CAT_CONSUMABLE;
-    inventoryAddItem(inventory, &items[0]);
-
-    ItemEquipable equipItem[20];
-
-    equipItem[0].item.actor.uid = 2222;
-    equipItem[0].item.id = 531001;
-    equipItem[0].item.amount = 1;
-    equipItem[0].item.category = ITEM_CAT_ARMOR;
-    inventoryAddItem(inventory, (Item*) &equipItem[0]);
-
-    equipItem[1].item.actor.uid = 3333;
-    equipItem[1].item.id = 666666;
-    equipItem[1].item.amount = 1;
-    equipItem[1].item.category = ITEM_CAT_ARMOR;
-    inventoryAddItem(inventory, (Item*) &equipItem[1]);
-
-    dbg("Inventory count: %d", inventoryGetItemsCount(inventory));
-    dbg("Print inventory");
-    inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
-    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
-
-    inventoryEquipItem(inventory, 2222, EQSLOT_BODY_ARMOR);
-
-    inventoryPrintEquipment(inventory);
-    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
-
-    inventoryEquipItem(inventory, 3333, EQSLOT_BODY_ARMOR);
-
-    inventoryPrintEquipment(inventory);
-    inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
-    */
+    inventoryAddItem(inventory, itemFactoryCreate(645001, 5003));
+    inventoryAddItem(inventory, itemFactoryCreate(640026, 5));
+    inventoryAddItem(inventory, itemFactoryCreate(531101, 1));
+    inventoryAddItem(inventory, itemFactoryCreate(531152, 1));
+    inventoryAddItem(inventory, itemFactoryCreate(531151, 1));
+    inventoryAddItem(inventory, itemFactoryCreate(511151, 1));
 
     // Send the commander list
     barrackBuilderCommanderList(
@@ -488,7 +421,7 @@ static PacketHandlerState barrackHandlerCurrentBarrack(
     //    size pktType  checksum     accountId               float    float    float    float
 
     barrackBuilderPetInformation(reply);
-    barrackBuilderZoneTraffics(1002, reply);
+    barrackBuilderZoneTraffics(1021, reply);
 
     return PACKET_HANDLER_OK;
 }
@@ -652,7 +585,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
 
     Commander newCommander;
     commanderInit(&newCommander);
-    newCommander.mapId = 1002; // FIXME : Start map could be loaded from
+    newCommander.mapId = 1021; // West Siauliai Woods
 
     // Check name
     size_t commanderNameLen = strlen(clientPacket->commanderName);
@@ -735,8 +668,9 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     // TODO : MySQL should generate this ID
     newCommander.socialInfoId = r1emuGenerateRandom64(&self->seed);
 
-    // Position : Center of the barrack
-    newCommander.pos = PositionXYZ_decl(19.0, 28.0, 29.0);
+    // Default West Siauliai Woods start position
+    newCommander.pos = PositionXYZ_decl(-623, 260, -1044);
+    newCommander.dir = PositionXZ_decl(0.0, 0.0);
 
     // Add default equiped items
     ItemId_t defaultEquipment[][EQSLOT_COUNT] = {
