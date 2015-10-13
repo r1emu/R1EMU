@@ -2329,7 +2329,7 @@ void zoneBuilderSkillRangeDbg(Skill skill, zmsg_t *replyMsg) {
         float unk2;
         PositionXYZ position;
         PositionXZ direction;
-        float unkowns[6];
+        float unknowns[6];
     } replyPacket;
    (void) replyPacket;
     #pragma pack(pop)

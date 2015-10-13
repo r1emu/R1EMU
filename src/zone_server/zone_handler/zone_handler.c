@@ -279,7 +279,7 @@ static PacketHandlerState zoneHandlerSkillGround(
         replyMsg
     );
 
-    // Unkown
+    // Unknown
     zoneBuilderNormalUnk11_1c(
         session->game.commanderSession.currentCommander->pcId,
         &clientPacket->pos1,
@@ -1033,7 +1033,7 @@ static PacketHandlerState zoneHandlerDynamicCastingStart(
         replyMsg
     );
 
-    // Unkown
+    // Unknown
     zoneBuilderNormalUnk14_4c(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
@@ -1049,7 +1049,7 @@ static PacketHandlerState zoneHandlerDynamicCastingStart(
         replyMsg
     );
 
-    // Unkown
+    // Unknown
     zoneBuilderNormalUnk11_1c(
         session->game.commanderSession.currentCommander->pcId,
         &session->game.commanderSession.currentCommander->pos,

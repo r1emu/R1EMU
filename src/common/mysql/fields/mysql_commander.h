@@ -42,7 +42,7 @@
     GENERATOR(MYSQL_COMMANDER, mp, '%d')                            \
     GENERATOR(MYSQL_COMMANDER, eqslot_head_top, '%u')               \
     GENERATOR(MYSQL_COMMANDER, eqslot_head_middle, '%u')            \
-    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_1, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unknown_1, '%u')               \
     GENERATOR(MYSQL_COMMANDER, eqslot_body_armor, '%u')             \
     GENERATOR(MYSQL_COMMANDER, eqslot_gloves, '%u')                 \
     GENERATOR(MYSQL_COMMANDER, eqslot_boots, '%u')                  \
@@ -51,12 +51,12 @@
     GENERATOR(MYSQL_COMMANDER, eqslot_weapon, '%u')                 \
     GENERATOR(MYSQL_COMMANDER, eqslot_shield, '%u')                 \
     GENERATOR(MYSQL_COMMANDER, eqslot_costume, '%u')                \
-    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_3, '%u')               \
-    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_4, '%u')               \
-    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_5, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unknown_3, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unknown_4, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unknown_5, '%u')               \
     GENERATOR(MYSQL_COMMANDER, eqslot_leg_armor, '%u')              \
-    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_6, '%u')               \
-    GENERATOR(MYSQL_COMMANDER, eqslot_unkown_7, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unknown_6, '%u')               \
+    GENERATOR(MYSQL_COMMANDER, eqslot_unknown_7, '%u')               \
     GENERATOR(MYSQL_COMMANDER, eqslot_ring_left, '%u')              \
     GENERATOR(MYSQL_COMMANDER, eqslot_ring_right, '%u')             \
     GENERATOR(MYSQL_COMMANDER, eqslot_necklace, '%u')
