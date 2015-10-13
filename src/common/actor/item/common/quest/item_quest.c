@@ -74,7 +74,7 @@ size_t itemQuestGetCPacketSize(ItemQuest *self) {
 
 size_t itemQuestGetSPacketSize(ItemQuest *self) {
     size_t size = 0;
-    size += itemChildGetSPacketSize(&self->item);
+    size += sizeof(ItemQuestSPacket);
     size += propertyFloatGetSPacketSize(self->cooldown);
     return size;
 }
@@ -84,16 +84,11 @@ void itemQuestSerializeCPacket(ItemQuest *self, PacketStream *stream) {
 }
 
 void itemQuestSerializeSPacket(ItemQuest *self, PacketStream *stream) {
-    itemChildSerializeSPacket(&self->item, stream);
     propertyFloatSerializeSPacket(ITEM_QUEST_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
 
 bool itemQuestUnserializeSPacket(ItemQuest *self, PacketStream *stream) {
 
-    if (!(itemChildUnserializeSPacket(&self->item, stream))) {
-        error("Cannot unserialize item packet.");
-        return false;
-    }
     if (!(propertyFloatUnserializeSPacket(ITEM_QUEST_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
         error("Cannot unserialize packet COOLDOWN.");
         return false;

@@ -130,13 +130,6 @@ void inventoryDestroy(Inventory **self);
 bool inventoryAddItem(Inventory *self, Item *itemToAdd);
 bool inventoryRemoveItem(Inventory *self, Item *itemToRemove);
 
-/**
- * Get count (size) of items in inventory
- * @param self A pointer to an allocated Inventory.
- * @return count of items in inventory
- */
-size_t inventoryGetItemsCount(Inventory *self);
-
 Item *inventoryGetFirstItem(Inventory *self, ItemCategory category);
 Item *inventoryGetNextItem(Inventory *self, ItemCategory category);
 
@@ -148,4 +141,25 @@ bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, Item **_item)
 bool inventorySwapItems(Inventory *self, ActorId_t actorId1, ActorId_t actorId2);
 void itemGenActorKey(Item *self, ActorKey key);
 int inventoryGetBagIndexByActorId(Inventory *self, ItemCategory category, ActorId_t actorId);
+
+/**
+ * @brief Get the count of items equipped
+ */
+size_t inventoryGetEquipmentCount(Inventory *self);
+
+/**
+ * Serialization / Unserialization
+ */
+size_t inventoryGetSPacketSize(Inventory *self);
+void inventorySerializeSPacket(Inventory *self, PacketStream *stream);
+bool inventoryUnserializeSPacket(Inventory *self, PacketStream *stream);
+
+/**
+ * Get count of items in inventory
+ * @param self A pointer to an allocated Inventory.
+ * @return count of items in inventory
+ */
+inline size_t inventoryGetItemsCount(Inventory *self) {
+    return zhash_size(self->items);
+}
 

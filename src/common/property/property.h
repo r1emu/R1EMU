@@ -45,7 +45,7 @@ typedef enum {
 typedef struct {                               \
     uint16_t size;                             \
     uint8_t data[x];                           \
-} PropertyCPacket;
+} PropertyCPacket
 
 /** Float property client packet structure */
 #pragma pack(push, 1)
@@ -61,7 +61,7 @@ typedef struct {                               \
     PropertyId_t id;                           \
     uint16_t size;                             \
     uint8_t  value[x];                         \
-} PropertyStringCPacket;
+} PropertyStringCPacket
 
 // ===== Server packet structures =====
 
@@ -70,7 +70,7 @@ typedef struct {                               \
 typedef struct {                               \
     uint16_t size;                             \
     uint8_t data[x];                           \
-} PropertySPacket;
+} PropertySPacket
 
 /** Float property server packet structure */
 #pragma pack(push, 1)
@@ -80,12 +80,19 @@ typedef struct {
 } PropertyFloatSPacket;
 #pragma pack(pop)
 
-/** String property server packet structure */
+/** String property dynamic server packet structure */
 #define DECLARE_PropertyStringSPacket(x)       \
 typedef struct {                               \
     PropertyId_t id;                           \
     uint16_t size;                             \
     uint8_t  value[x];                         \
+} PropertyStringSPacket
+
+/** String property server packet structure */
+typedef struct {
+    PropertyId_t id;
+    uint16_t size;
+    uint8_t  value[0];
 } PropertyStringSPacket;
 
 // ----------- Functions ------------

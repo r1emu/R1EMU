@@ -46,3 +46,5 @@ bool itemFactoryGetCategoryFromId(
     ItemCommonData *commonData,
     ItemEquipData *equipData,
     ItemCategory *category);
+
+void itemFactoryGetStaticData(ItemId_t id, ItemCommonData **commonData, ItemEquipData **equipData);

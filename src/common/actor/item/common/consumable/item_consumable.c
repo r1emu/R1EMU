@@ -75,7 +75,7 @@ size_t itemConsumableGetCPacketSize(ItemConsumable *self) {
 
 size_t itemConsumableGetSPacketSize(ItemConsumable *self) {
     size_t size = 0;
-    size += itemChildGetSPacketSize(&self->item);
+    size += sizeof(ItemConsumableSPacket);
     size += propertyFloatGetSPacketSize(self->cooldown);
     return size;
 }
@@ -85,16 +85,11 @@ void itemConsumableSerializeCPacket(ItemConsumable *self, PacketStream *stream) 
 }
 
 void itemConsumableSerializeSPacket(ItemConsumable *self, PacketStream *stream) {
-    itemChildSerializeSPacket(&self->item, stream);
     propertyFloatSerializeSPacket(ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
 
 bool itemConsumableUnserializeSPacket(ItemConsumable *self, PacketStream *stream) {
 
-    if (!(itemChildUnserializeSPacket(&self->item, stream))) {
-        error("Cannot unserialize item packet.");
-        return false;
-    }
     if (!(propertyFloatUnserializeSPacket(ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
         error("Cannot unserialize packet COOLDOWN.");
         return false;

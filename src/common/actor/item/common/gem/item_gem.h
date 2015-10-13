@@ -47,6 +47,12 @@ typedef struct {
     float *cooldown;
 }   ItemGem;
 
+typedef struct {
+    PropertyFloatSPacket level[0];
+    PropertyFloatSPacket itemExp[0];
+    PropertyFloatSPacket cooldown[0];
+}   ItemGemSPacket;
+
 // ----------- Functions ------------
 
 /**

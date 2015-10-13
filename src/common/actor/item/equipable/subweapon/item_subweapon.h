@@ -44,20 +44,25 @@ typedef struct {
     float *cooldown;
 }   ItemSubWeapon;
 
+typedef struct {
+    PropertyFloatSPacket petPosition[0];
+    PropertyFloatSPacket cooldown[0];
+}   ItemSubWeaponSPacket;
+
 // ----------- Functions ------------
 
 /**
  * Allocate a new ItemSubWeapon structure.
  * @return A pointer to an allocated ItemSubWeapon, or NULL if an error occured.
  */
-ItemSubWeapon *itemSubWeaponNew(Item *item);
+ItemSubWeapon *itemSubWeaponNew(Item *item, ItemEquipData *data);
 
 /**
  * Initialize an allocated ItemSubWeapon structure.
  * @param self An allocated ItemSubWeapon to initialize.
  * @return true on success, false otherwise.
  */
-bool itemSubWeaponInit(ItemSubWeapon *self, Item *item);
+bool itemSubWeaponInit(ItemSubWeapon *self, Item *item, ItemEquipData *data);
 
 /**
  * Free an allocated ItemSubWeapon structure.

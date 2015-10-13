@@ -75,7 +75,7 @@ size_t itemCurrencyGetCPacketSize(ItemCurrency *self) {
 
 size_t itemCurrencyGetSPacketSize(ItemCurrency *self) {
     size_t size = 0;
-    size += itemChildGetSPacketSize(&self->item);
+    size += sizeof(ItemCurrencySPacket);
     size += propertyFloatGetSPacketSize(self->cooldown);
     return size;
 }
@@ -85,16 +85,11 @@ void itemCurrencySerializeCPacket(ItemCurrency *self, PacketStream *stream) {
 }
 
 void itemCurrencySerializeSPacket(ItemCurrency *self, PacketStream *stream) {
-    itemChildSerializeSPacket(&self->item, stream);
     propertyFloatSerializeSPacket(ITEM_CURRENCY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
 
 bool itemCurrencyUnserializeSPacket(ItemCurrency *self, PacketStream *stream) {
 
-    if (!(itemChildUnserializeSPacket(&self->item, stream))) {
-        error("Cannot unserialize item packet.");
-        return false;
-    }
     if (!(propertyFloatUnserializeSPacket(ITEM_CURRENCY_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
         error("Cannot unserialize packet COOLDOWN.");
         return false;

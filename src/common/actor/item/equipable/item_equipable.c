@@ -14,16 +14,17 @@
 #include "item_equipable.h"
 
 // Inlined functions
+extern inline void itemEquipableSetEquipData(ItemEquipable *self, ItemEquipData *data);
 extern inline int itemEquipableGetSlot(ItemEquipable *self);
 
-ItemEquipable *itemEquipableNew(Item *item) {
+ItemEquipable *itemEquipableNew(Item *item, ItemEquipData *data) {
     ItemEquipable *self;
 
     if ((self = malloc(sizeof(ItemEquipable))) == NULL) {
         return NULL;
     }
 
-    if (!itemEquipableInit(self, item)) {
+    if (!itemEquipableInit(self, item, data)) {
         itemEquipableDestroy(&self);
         error("ItemEquipable failed to initialize.");
         return NULL;
@@ -32,11 +33,12 @@ ItemEquipable *itemEquipableNew(Item *item) {
     return self;
 }
 
-bool itemEquipableInit(ItemEquipable *self, Item *item) {
+bool itemEquipableInit(ItemEquipable *self, Item *item, ItemEquipData *data) {
     memset(self, 0, sizeof(*self));
 
     self->item = *item;
     self->slot = EQSLOT_NOSLOT;
+    self->equipData = data;
 
     return true;
 }
@@ -64,23 +66,14 @@ void itemEquipablePrint(ItemEquipable *self) {
 }
 
 size_t itemEquipableGetSPacketSize(ItemEquipable *self) {
-    size_t size = 0;
-    size += itemChildGetSPacketSize(&self->item);
-    size += sizeof(self->slot);
-    return size;
+    return sizeof(ItemEquipableSPacket);
 }
 
 void itemEquipableSerializeSPacket(ItemEquipable *self, PacketStream *stream) {
-    itemChildSerializeSPacket((Item *) self, stream);
     packetStreamIn(stream, &self->slot);
 }
 
 bool itemEquipableUnserializeSPacket(ItemEquipable *self, PacketStream *stream) {
-    if (!(itemChildUnserializeSPacket((Item *) self, stream))) {
-        error("Cannot unserialize item packet.");
-        return false;
-    }
     packetStreamOut(stream, &self->slot);
-
     return true;
 }

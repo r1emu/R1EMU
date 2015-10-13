@@ -19,6 +19,7 @@
 // ---------- Includes -------------
 #include "R1EMU.h"
 #include "common/actor/item/item.h"
+#include "common/static_data/fields/item_equip_data.h"
 
 // ---------- Defines -------------
 
@@ -52,10 +53,10 @@ typedef uint8_t ItemEquipmentSlot_t;
 typedef struct ItemEquipable {
    Item item;
    ItemEquipmentSlot slot;
+   ItemEquipData *equipData;
 } ItemEquipable;
 
 typedef struct {
-    ItemSPacket item;
     ItemEquipmentSlot_t slot;
 } ItemEquipableSPacket;
 
@@ -64,14 +65,14 @@ typedef struct {
  * Allocate a new ItemEquipable structure.
  * @return A pointer to an allocated ItemEquipable, or NULL if an error occured.
  */
-ItemEquipable *itemEquipableNew(Item *item);
+ItemEquipable *itemEquipableNew(Item *item, ItemEquipData *data);
 
 /**
  * Initialize an allocated ItemEquipable structure.
  * @param self An allocated ItemEquipable to initialize.
  * @return true on success, false otherwise.
  */
-bool itemEquipableInit(ItemEquipable *self, Item *item);
+bool itemEquipableInit(ItemEquipable *self, Item *item, ItemEquipData *data);
 
 /**
  * Free an allocated ItemEquipable structure.
@@ -89,6 +90,7 @@ void itemEquipableDestroy(ItemEquipable **self);
  * Getters & Setters
  */
 inline int itemEquipableGetSlot(ItemEquipable *self) { return self->slot; }
+inline void itemEquipableSetEquipData(ItemEquipable *self, ItemEquipData *data) { self->equipData = data; }
 
 /**
  * Serialization / Unserialization

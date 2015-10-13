@@ -12,6 +12,7 @@
  */
 
 #include "item.h"
+#include "common/actor/item/item_factory.h"
 #include "common/actor/item/common/consumable/item_consumable.h"
 #include "common/actor/item/common/quest/item_quest.h"
 #include "common/actor/item/common/material/item_material.h"
@@ -28,15 +29,17 @@
 extern inline ItemId_t itemGetId(Item *self);
 extern inline ItemAmount_t itemGetAmount(Item *self);
 extern inline ItemCategory itemGetCategory(Item *self);
+extern inline void itemSetCommonData(Item *self, ItemCommonData *data);
 
-Item *itemNew(Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount) {
+Item *itemNew(Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount, ItemCommonData *data) {
     Item *self;
 
     if ((self = malloc(sizeof(Item))) == NULL) {
+        error("Cannot allocate a new Item.");
         return NULL;
     }
 
-    if (!itemInit(self, actor, category, id, amount)) {
+    if (!itemInit(self, actor, category, id, amount, data)) {
         itemDestroy(&self);
         error("Item failed to initialize.");
         return NULL;
@@ -45,13 +48,14 @@ Item *itemNew(Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amo
     return self;
 }
 
-bool itemInit(Item *self, Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount) {
+bool itemInit(Item *self, Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount, ItemCommonData *data) {
     memset(self, 0, sizeof(Item));
 
     memcpy(&self->actor, actor, sizeof(self->actor));
     self->category = category;
     self->id = id;
     self->amount = amount;
+    self->commonData = data;
 
     return true;
 }
@@ -176,17 +180,75 @@ size_t itemGetSPacketSize(Item *self) {
 
     switch (self->category) {
 
-        case ITEM_CAT_CONSUMABLE : size += itemConsumableGetSPacketSize((ItemConsumable *) self); break;
-        case ITEM_CAT_ARMOR      : size += itemArmorGetSPacketSize((ItemArmor *) self); break;
-        case ITEM_CAT_QUEST      : size += itemQuestGetSPacketSize((ItemQuest *) self); break;
-        case ITEM_CAT_BOOK       : size += itemBookGetSPacketSize((ItemBook *) self); break;
-        case ITEM_CAT_MATERIAL   : size += itemMaterialGetSPacketSize((ItemMaterial *) self); break;
-        case ITEM_CAT_GEM        : size += itemGemGetSPacketSize((ItemGem *) self); break;
-        case ITEM_CAT_WEAPON     : size += itemWeaponGetSPacketSize((ItemWeapon *) self); break;
-        case ITEM_CAT_CARD       : size += itemCardGetSPacketSize((ItemCard *) self); break;
-        case ITEM_CAT_ACCESSORY  : size += itemAccessoryGetSPacketSize((ItemAccessory *) self); break;
-        case ITEM_CAT_SUBWEAPON  : size += itemSubWeaponGetSPacketSize((ItemSubWeapon *) self); break;
-        case ITEM_CAT_CURRENCY   : size += itemCurrencyGetSPacketSize((ItemCurrency *) self); break;
+        case ITEM_CAT_CONSUMABLE :
+            size += actorGetSPacketSize(&self->actor);
+            size += itemChildGetSPacketSize((Item *) self);
+            size += itemConsumableGetSPacketSize((ItemConsumable *) self);
+        break;
+
+        case ITEM_CAT_ARMOR :
+            size += actorGetSPacketSize(&self->actor);
+            size += itemChildGetSPacketSize((Item *) self);
+            size += itemEquipableGetSPacketSize((ItemEquipable *) self);
+            size += itemArmorGetSPacketSize((ItemArmor *) self);
+        break;
+
+        case ITEM_CAT_QUEST :
+            size += actorGetSPacketSize(&self->actor);
+            size += itemChildGetSPacketSize((Item *) self);
+            size += itemQuestGetSPacketSize((ItemQuest *) self);
+        break;
+
+        case ITEM_CAT_BOOK :
+            size += actorGetSPacketSize(&self->actor);
+            size += itemChildGetSPacketSize((Item *) self);
+            size += itemBookGetSPacketSize((ItemBook *) self);
+        break;
+
+        case ITEM_CAT_MATERIAL :
+            size += actorGetSPacketSize(&self->actor);
+            size += itemChildGetSPacketSize((Item *) self);
+            size += itemMaterialGetSPacketSize((ItemMaterial *) self);
+        break;
+
+        case ITEM_CAT_GEM :
+            size += actorGetSPacketSize(&self->actor);
+            size += itemChildGetSPacketSize((Item *) self);
+            size += itemGemGetSPacketSize((ItemGem *) self);
+        break;
+
+        case ITEM_CAT_WEAPON :
+            size += actorGetSPacketSize(&self->actor);
+            size += itemChildGetSPacketSize((Item *) self);
+            size += itemEquipableGetSPacketSize((ItemEquipable *) self);
+            size += itemWeaponGetSPacketSize((ItemWeapon *) self);
+        break;
+
+        case ITEM_CAT_CARD :
+            size += actorGetSPacketSize(&self->actor);
+            size += itemChildGetSPacketSize((Item *) self);
+            size += itemCardGetSPacketSize((ItemCard *) self);
+        break;
+
+        case ITEM_CAT_ACCESSORY :
+            size += actorGetSPacketSize(&self->actor);
+            size += itemChildGetSPacketSize((Item *) self);
+            size += itemEquipableGetSPacketSize((ItemEquipable *) self);
+            size += itemAccessoryGetSPacketSize((ItemAccessory *) self);
+        break;
+
+        case ITEM_CAT_SUBWEAPON :
+            size += actorGetSPacketSize(&self->actor);
+            size += itemChildGetSPacketSize((Item *) self);
+            size += itemEquipableGetSPacketSize((ItemEquipable *) self);
+            size += itemSubWeaponGetSPacketSize((ItemSubWeapon *) self);
+        break;
+
+        case ITEM_CAT_CURRENCY :
+            size += actorGetSPacketSize(&self->actor);
+            size += itemChildGetSPacketSize((Item *) self);
+            size += itemCurrencyGetSPacketSize((ItemCurrency *) self);
+        break;
 
         case ITEM_CAT_COUNT      : error("Unexpected item category."); break;
     }
@@ -195,71 +257,194 @@ size_t itemGetSPacketSize(Item *self) {
 }
 
 size_t itemChildGetSPacketSize(Item *self) {
-    return sizeof(ItemSPacket);
+    size_t size = 0;
+    size += sizeof(ItemSPacket);
+    return size;
 }
 
-void itemChildSerializeSPacket(Item *self, PacketStream *stream) {
-    actorSerializeSPacket(&self->actor, stream);
+void itemChildSerializeSPacket(Item *self, ItemInventoryIndex_t index, PacketStream *stream) {
     packetStreamIn(stream, &self->id);
     packetStreamIn(stream, &self->amount);
     packetStreamIn(stream, &self->category);
+    packetStreamIn(stream, &index);
 }
 
-bool itemChildUnserializeSPacket(Item *self, PacketStream *stream) {
-
-    if (!(actorUnserializeSPacket(&self->actor, stream))) {
-        error("Cannot unserialize packet.");
-        return false;
-    }
-
+bool itemChildUnserializeSPacket(Item *self, ItemInventoryIndex_t *index, PacketStream *stream) {
     packetStreamOut(stream, &self->id);
     packetStreamOut(stream, &self->amount);
     packetStreamOut(stream, &self->category);
-
+    packetStreamOut(stream, index);
     return true;
 }
 
-void itemSerializeSPacket(Item *self, PacketStream *stream) {
+void itemSerializeSPacket(Item *self, ItemInventoryIndex_t index, PacketStream *stream) {
 
     switch (self->category) {
 
-        case ITEM_CAT_CONSUMABLE : itemConsumableSerializeSPacket((ItemConsumable *) self, stream); break;
-        case ITEM_CAT_ARMOR      : itemArmorSerializeSPacket((ItemArmor *) self, stream); break;
-        case ITEM_CAT_QUEST      : itemQuestSerializeSPacket((ItemQuest *) self, stream); break;
-        case ITEM_CAT_BOOK       : itemBookSerializeSPacket((ItemBook *) self, stream); break;
-        case ITEM_CAT_MATERIAL   : itemMaterialSerializeSPacket((ItemMaterial *) self, stream); break;
-        case ITEM_CAT_GEM        : itemGemSerializeSPacket((ItemGem *) self, stream); break;
-        case ITEM_CAT_WEAPON     : itemWeaponSerializeSPacket((ItemWeapon *) self, stream); break;
-        case ITEM_CAT_CARD       : itemCardSerializeSPacket((ItemCard *) self, stream); break;
-        case ITEM_CAT_ACCESSORY  : itemAccessorySerializeSPacket((ItemAccessory *) self, stream); break;
-        case ITEM_CAT_SUBWEAPON  : itemSubWeaponSerializeSPacket((ItemSubWeapon *) self, stream); break;
-        case ITEM_CAT_CURRENCY   : itemCurrencySerializeSPacket((ItemCurrency *) self, stream); break;
+        case ITEM_CAT_CONSUMABLE :
+            actorSerializeSPacket(&self->actor, stream);
+            itemChildSerializeSPacket((Item *) self, index, stream);
+            itemConsumableSerializeSPacket((ItemConsumable *) self, stream);
+        break;
+
+        case ITEM_CAT_ARMOR :
+            actorSerializeSPacket(&self->actor, stream);
+            itemChildSerializeSPacket((Item *) self, index, stream);
+            itemEquipableSerializeSPacket((ItemEquipable *) self, stream);
+            itemArmorSerializeSPacket((ItemArmor *) self, stream);
+        break;
+
+        case ITEM_CAT_QUEST :
+            actorSerializeSPacket(&self->actor, stream);
+            itemChildSerializeSPacket((Item *) self, index, stream);
+            itemQuestSerializeSPacket((ItemQuest *) self, stream);
+        break;
+
+        case ITEM_CAT_BOOK :
+            actorSerializeSPacket(&self->actor, stream);
+            itemChildSerializeSPacket((Item *) self, index, stream);
+            itemBookSerializeSPacket((ItemBook *) self, stream);
+        break;
+
+        case ITEM_CAT_MATERIAL :
+            actorSerializeSPacket(&self->actor, stream);
+            itemChildSerializeSPacket((Item *) self, index, stream);
+            itemMaterialSerializeSPacket((ItemMaterial *) self, stream);
+        break;
+
+        case ITEM_CAT_GEM :
+            actorSerializeSPacket(&self->actor, stream);
+            itemChildSerializeSPacket((Item *) self, index, stream);
+            itemGemSerializeSPacket((ItemGem *) self, stream);
+        break;
+
+        case ITEM_CAT_WEAPON :
+            actorSerializeSPacket(&self->actor, stream);
+            itemChildSerializeSPacket((Item *) self, index, stream);
+            itemEquipableSerializeSPacket((ItemEquipable *) self, stream);
+            itemWeaponSerializeSPacket((ItemWeapon *) self, stream);
+        break;
+
+        case ITEM_CAT_CARD :
+            actorSerializeSPacket(&self->actor, stream);
+            itemChildSerializeSPacket((Item *) self, index, stream);
+            itemCardSerializeSPacket((ItemCard *) self, stream);
+        break;
+
+        case ITEM_CAT_ACCESSORY :
+            actorSerializeSPacket(&self->actor, stream);
+            itemChildSerializeSPacket((Item *) self, index, stream);
+            itemEquipableSerializeSPacket((ItemEquipable *) self, stream);
+            itemAccessorySerializeSPacket((ItemAccessory *) self, stream);
+        break;
+
+        case ITEM_CAT_SUBWEAPON :
+            actorSerializeSPacket(&self->actor, stream);
+            itemChildSerializeSPacket((Item *) self, index, stream);
+            itemEquipableSerializeSPacket((ItemEquipable *) self, stream);
+            itemSubWeaponSerializeSPacket((ItemSubWeapon *) self, stream);
+        break;
+
+        case ITEM_CAT_CURRENCY :
+            actorSerializeSPacket(&self->actor, stream);
+            itemChildSerializeSPacket((Item *) self, index, stream);
+            itemCurrencySerializeSPacket((ItemCurrency *) self, stream);
+        break;
 
         case ITEM_CAT_COUNT      : error("Unexpected item category."); break;
     }
 }
 
-bool itemUnserializeSPacket(Item *self, PacketStream *stream) {
+bool itemUnserializeSPacket(Item *self, ItemInventoryIndex_t *index, PacketStream *stream) {
 
     bool status = false;
 
-    switch (self->category) {
-        case ITEM_CAT_CONSUMABLE : status = itemConsumableUnserializeSPacket((ItemConsumable *) self, stream); break;
-        case ITEM_CAT_ARMOR      : status = itemArmorUnserializeSPacket((ItemArmor *) self, stream); break;
-        case ITEM_CAT_QUEST      : status = itemQuestUnserializeSPacket((ItemQuest *) self, stream); break;
-        case ITEM_CAT_BOOK       : status = itemBookUnserializeSPacket((ItemBook *) self, stream); break;
-        case ITEM_CAT_MATERIAL   : status = itemMaterialUnserializeSPacket((ItemMaterial *) self, stream); break;
-        case ITEM_CAT_GEM        : status = itemGemUnserializeSPacket((ItemGem *) self, stream); break;
-        case ITEM_CAT_WEAPON     : status = itemWeaponUnserializeSPacket((ItemWeapon *) self, stream); break;
-        case ITEM_CAT_CARD       : status = itemCardUnserializeSPacket((ItemCard *) self, stream); break;
-        case ITEM_CAT_ACCESSORY  : status = itemAccessoryUnserializeSPacket((ItemAccessory *) self, stream); break;
-        case ITEM_CAT_SUBWEAPON  : status = itemSubWeaponUnserializeSPacket((ItemSubWeapon *) self, stream); break;
-        case ITEM_CAT_CURRENCY   : status = itemCurrencyUnserializeSPacket((ItemCurrency *) self, stream); break;
-        case ITEM_CAT_COUNT      : error("Unexpected item category."); break;
+    if (!(actorUnserializeSPacket(&self->actor, stream))) {
+        error("Cannot unserialize actor.");
+        return false;
+    }
+
+    if (!(itemChildUnserializeSPacket((Item *) self, index, stream))) {
+        error("Cannot unserialize item child.");
+        return false;
+    }
+
+    ItemCategory category = self->category;
+
+    // Get static data
+    ItemCommonData *commonData = NULL;
+    ItemEquipData *equipData = NULL;
+    itemFactoryGetStaticData(self->id, &commonData, &equipData);
+
+    itemSetCommonData(self, commonData);
+
+    switch (category) {
+
+        case ITEM_CAT_CONSUMABLE :
+            status = itemConsumableUnserializeSPacket((ItemConsumable *) self, stream);
+        break;
+
+        case ITEM_CAT_ARMOR :
+            status = (
+                    itemEquipableUnserializeSPacket((ItemEquipable *) self, stream)
+                &&  itemArmorUnserializeSPacket((ItemArmor *) self, stream)
+            );
+            itemEquipableSetEquipData((ItemEquipable *) self, equipData);
+        break;
+
+        case ITEM_CAT_QUEST :
+            status = itemQuestUnserializeSPacket((ItemQuest *) self, stream);
+        break;
+
+        case ITEM_CAT_BOOK :
+            status = itemBookUnserializeSPacket((ItemBook *) self, stream);
+        break;
+
+        case ITEM_CAT_MATERIAL :
+            status = itemMaterialUnserializeSPacket((ItemMaterial *) self, stream);
+        break;
+
+        case ITEM_CAT_GEM :
+            status = itemGemUnserializeSPacket((ItemGem *) self, stream);
+        break;
+
+        case ITEM_CAT_WEAPON :
+            status = (
+                    itemEquipableUnserializeSPacket((ItemEquipable *) self, stream)
+                &&  itemWeaponUnserializeSPacket((ItemWeapon *) self, stream)
+            );
+            itemEquipableSetEquipData((ItemEquipable *) self, equipData);
+        break;
+
+        case ITEM_CAT_CARD :
+            status = itemCardUnserializeSPacket((ItemCard *) self, stream);
+        break;
+
+        case ITEM_CAT_ACCESSORY :
+            status = (
+                    itemEquipableUnserializeSPacket((ItemEquipable *) self, stream)
+                &&  itemAccessoryUnserializeSPacket((ItemAccessory *) self, stream)
+            );
+            itemEquipableSetEquipData((ItemEquipable *) self, equipData);
+        break;
+
+        case ITEM_CAT_SUBWEAPON :
+            status = (
+                    itemEquipableUnserializeSPacket((ItemEquipable *) self, stream)
+                &&  itemSubWeaponUnserializeSPacket((ItemSubWeapon *) self, stream)
+            );
+            itemEquipableSetEquipData((ItemEquipable *) self, equipData);
+        break;
+
+        case ITEM_CAT_CURRENCY :
+            status = itemCurrencyUnserializeSPacket((ItemCurrency *) self, stream);
+        break;
+
+        case ITEM_CAT_COUNT      : error("Unexpected item category '%d'.", category); break;
     }
 
     if (!status) {
-        error("Cannot unserialize the packet");
+        error("Cannot unserialize the sub packet item '%x' ('%llx')", self->id, self->actor.uid);
         return false;
     }
 

@@ -45,20 +45,25 @@ typedef struct {
     float *cooldown;
 }   ItemAccessory;
 
+typedef struct {
+    PropertyFloatSPacket pr[0];
+    PropertyFloatSPacket cooldown[0];
+}   ItemAccessorySPacket;
+
 // ----------- Functions ------------
 
 /**
  * Allocate a new ItemAccessory structure.
  * @return A pointer to an allocated ItemAccessory, or NULL if an error occured.
  */
-ItemAccessory *itemAccessoryNew(Item *item);
+ItemAccessory *itemAccessoryNew(Item *item, ItemEquipData *data);
 
 /**
  * Initialize an allocated ItemAccessory structure.
  * @param self An allocated ItemAccessory to initialize.
  * @return true on success, false otherwise.
  */
-bool itemAccessoryInit(ItemAccessory *self, Item *item);
+bool itemAccessoryInit(ItemAccessory *self, Item *item, ItemEquipData *data);
 
 /**
  * Free an allocated ItemAccessory structure.

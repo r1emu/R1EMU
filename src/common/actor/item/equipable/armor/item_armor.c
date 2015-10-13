@@ -23,7 +23,7 @@ ItemArmorId itemArmorIds[] = {
     FOREACH_ITEM_ARMOR(GENERATE_PROPERTY_ASSOC)
 };
 
-ItemArmor *itemArmorNew(Item *item)
+ItemArmor *itemArmorNew(Item *item, ItemEquipData *data)
 {
     ItemArmor *self;
 
@@ -31,7 +31,7 @@ ItemArmor *itemArmorNew(Item *item)
         return NULL;
     }
 
-    if (!itemArmorInit(self, item)) {
+    if (!itemArmorInit(self, item, data)) {
         itemArmorDestroy(&self);
         error("ItemArmor failed to initialize.");
         return NULL;
@@ -40,10 +40,10 @@ ItemArmor *itemArmorNew(Item *item)
     return self;
 }
 
-bool itemArmorInit(ItemArmor *self, Item *item) {
+bool itemArmorInit(ItemArmor *self, Item *item, ItemEquipData *data) {
     memset(self, 0, sizeof(*self));
 
-    if (!(itemEquipableInit(&self->equipable, item))) {
+    if (!(itemEquipableInit(&self->equipable, item, data))) {
         error("Cannot initialize an equipable item.");
         return false;
     }
@@ -111,7 +111,7 @@ size_t itemArmorGetCPacketSize(ItemArmor *self) {
 
 size_t itemArmorGetSPacketSize(ItemArmor *self) {
     size_t size = 0;
-    size += itemEquipableGetSPacketSize(&self->equipable);
+    size += sizeof(ItemArmorSPacket);
     size += propertyFloatGetSPacketSize(self->def);
     size += propertyFloatGetSPacketSize(self->cooldown);
     size += propertyFloatGetSPacketSize(self->reinforce);
@@ -131,7 +131,6 @@ void itemArmorSerializeCPacket(ItemArmor *self, PacketStream *stream) {
 }
 
 void itemArmorSerializeSPacket(ItemArmor *self, PacketStream *stream) {
-    itemEquipableSerializeSPacket(&self->equipable, stream);
     propertyFloatSerializeSPacket(ITEM_ARMOR_PROPERTY_ID_DEF, self->def, stream);
     propertyFloatSerializeSPacket(ITEM_ARMOR_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
     propertyFloatSerializeSPacket(ITEM_ARMOR_PROPERTY_ID_REINFORCE, self->reinforce, stream);
@@ -142,10 +141,6 @@ void itemArmorSerializeSPacket(ItemArmor *self, PacketStream *stream) {
 
 bool itemArmorUnserializeSPacket(ItemArmor *self, PacketStream *stream) {
 
-    if (!(itemEquipableUnserializeSPacket(&self->equipable, stream))) {
-        error("Cannot unserialize equipable packet.");
-        return false;
-    }
     if (!(propertyFloatUnserializeSPacket(ITEM_ARMOR_PROPERTY_ID_DEF, &self->def, stream))) {
         error("Cannot unserialize packet DEF.");
         return false;

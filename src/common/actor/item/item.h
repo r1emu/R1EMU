@@ -71,10 +71,10 @@ typedef Item* ItemHandle;
  * @brief ItemCPacket is the client packet structure of an item
  */
 typedef struct {
-    ActorSPacket actor;
     ItemId_t id;
     ItemAmount_t amount;
     ItemCategory category;
+    ItemInventoryIndex_t index;
 } ItemSPacket;
 
 // ----------- Functions ------------
@@ -82,14 +82,14 @@ typedef struct {
  * Allocate a new Item structure.
  * @return A pointer to an allocated Item, or NULL if an error occured.
  */
-Item *itemNew(Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount);
+Item *itemNew(Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount, ItemCommonData *data);
 
 /**
  * Initialize an allocated Item structure.
  * @param self An allocated Item to initialize.
  * @return true on success, false otherwise.
  */
-bool itemInit(Item *self, Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount);
+bool itemInit(Item *self, Actor *actor, ItemCategory category, ItemId_t id, ItemAmount_t amount, ItemCommonData *data);
 
 /**
  * Free an allocated Item structure.
@@ -109,6 +109,7 @@ void itemDestroy(Item **self);
 inline ItemId_t itemGetId(Item *self) { return self->id; }
 inline ItemAmount_t itemGetAmount(Item *self) { return self->amount; }
 inline ItemCategory itemGetCategory(Item *self) { return self->category; }
+inline void itemSetCommonData(Item *self, ItemCommonData *data) { self->commonData = data; }
 
 /**
  * Serialization / Unserialization
@@ -117,12 +118,12 @@ size_t itemGetCPacketSize(Item *self);
 void itemSerializeCPacket(Item *self, PacketStream *stream);
 
 size_t itemGetSPacketSize(Item *self);
-void itemSerializeSPacket(Item *self, PacketStream *stream);
-bool itemUnserializeSPacket(Item *self, PacketStream *stream);
+void itemSerializeSPacket(Item *self, ItemInventoryIndex_t index, PacketStream *stream);
+bool itemUnserializeSPacket(Item *self, ItemInventoryIndex_t *index, PacketStream *stream);
 
 size_t itemChildGetSPacketSize(Item *self);
-void itemChildSerializeSPacket(Item *self, PacketStream *stream);
-bool itemChildUnserializeSPacket(Item *self, PacketStream *stream);
+void itemChildSerializeSPacket(Item *self, ItemInventoryIndex_t index, PacketStream *stream);
+bool itemChildUnserializeSPacket(Item *self, ItemInventoryIndex_t *index, PacketStream *stream);
 
 /**
  * Debugging

@@ -43,6 +43,10 @@ typedef struct {
     float *cooldown;
 }   ItemCurrency;
 
+typedef struct {
+    PropertyFloatSPacket cooldown[0];
+}   ItemCurrencySPacket;
+
 // ----------- Functions ------------
 
 /**

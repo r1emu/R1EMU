@@ -64,6 +64,7 @@ void packetStreamAddOffset(PacketStream *self, unsigned int offset);
  * @param self An allocated PacketStream
  */
 void *packetStreamGetCurrentBuffer(PacketStream *self);
+void *packetStreamGetBuffer(PacketStream *self);
 
 /**
  * @brief Put data at the end of the stream
@@ -89,3 +90,13 @@ void packetStreamGet(PacketStream *self, void *data, size_t dataSize);
  * @param self A pointer to an allocated PacketStream.
  */
 void packetStreamDestroy(PacketStream **self);
+
+/**
+ * Return the size of bytes written inside the stream
+ */
+size_t packetStreamGetSize(PacketStream *self);
+
+/**
+ * Debugging
+ */
+void packetStreamPrint(PacketStream *self);

@@ -43,6 +43,10 @@ typedef struct {
     float *cooldown;
 }   ItemConsumable;
 
+typedef struct {
+    PropertyFloatSPacket cooldown[0];
+}   ItemConsumableSPacket;
+
 // ----------- Functions ------------
 
 /**

@@ -60,20 +60,30 @@ typedef struct
 
 }   ItemArmor;
 
+typedef struct
+{
+    PropertyFloatSPacket def[0];
+    PropertyFloatSPacket cooldown[0];
+    PropertyFloatSPacket reinforce[0];
+    PropertyStringSPacket memo[0];
+    PropertyStringSPacket customName[0];
+    PropertyStringSPacket maker[0];
+}   ItemArmorSPacket;
+
 // ----------- Functions ------------
 
 /**
  * Allocate a new ItemArmor structure.
  * @return A pointer to an allocated ItemArmor, or NULL if an error occured.
  */
-ItemArmor *itemArmorNew(Item *item);
+ItemArmor *itemArmorNew(Item *item, ItemEquipData *data);
 
 /**
  * Initialize an allocated ItemArmor structure.
  * @param self An allocated ItemArmor to initialize.
  * @return true on success, false otherwise.
  */
-bool itemArmorInit(ItemArmor *self, Item *item);
+bool itemArmorInit(ItemArmor *self, Item *item, ItemEquipData *data);
 
 /**
  * Free an allocated ItemArmor structure.

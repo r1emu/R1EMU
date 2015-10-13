@@ -22,6 +22,7 @@
 
 
 // ------ Extern function implementation -------
+extern inline size_t inventoryGetItemsCount(Inventory *self);
 
 Inventory* inventoryNew(void) {
     Inventory *self;
@@ -137,10 +138,6 @@ bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, ItemHandle *i
     *itemHandle = *item;
 
     return true;
-}
-
-size_t inventoryGetItemsCount(Inventory *self) {
-    return zhash_size(self->items);
 }
 
 Item *inventoryGetFirstItem(Inventory *self, ItemCategory category) {
@@ -366,4 +363,64 @@ void inventoryPrintBag(Inventory *self, ItemCategory category) {
 
     dbg("------------------------------------");
 
+}
+
+size_t inventoryGetEquipmentCount(Inventory *self) {
+    size_t count = 0;
+
+    for (size_t i = 0; i < sizeof_array(self->equippedItems); i++) {
+        if (self->equippedItems[i] != NULL) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+size_t inventoryGetSPacketSize(Inventory *self) {
+    size_t packetSize = 0;
+
+    packetSize += sizeof(InventorySPacket);
+
+    // Get size of equipped items
+    for (size_t i = 0; i < EQSLOT_COUNT; i++) {
+        if (self->equippedItems[i] != NULL) {
+            packetSize += itemGetSPacketSize((Item *) self->equippedItems[i]);
+        }
+    }
+
+    // Get size of inventory items
+    for (Item *item = zhash_first(self->items); item != NULL; item = zhash_next(self->items)) {
+        packetSize += itemGetSPacketSize(item);
+    }
+
+    return packetSize;
+}
+
+void inventorySerializeSPacket(Inventory *self, PacketStream *stream) {
+
+    size_t equipmentCount = inventoryGetEquipmentCount(self);
+
+    packetStreamIn(stream, &equipmentCount);
+
+    // Write equipped items
+    for (ItemEquipmentSlot slot = 0; slot < EQSLOT_COUNT; slot++) {
+        if (self->equippedItems[slot] != NULL) {
+            itemSerializeSPacket((Item *) self->equippedItems[slot], slot, stream);
+        }
+    }
+
+    size_t itemsCount = inventoryGetItemsCount(self);
+    packetStreamIn(stream, &itemsCount);
+
+    // Write inventory items
+    for (Item *item = zhash_first(self->items); item != NULL; item = zhash_next(self->items)) {
+        itemSerializeSPacket(item, -1, stream);
+    }
+}
+
+bool inventoryUnserializeSPacket(Inventory *self, PacketStream *stream) {
+
+
+    return true;
 }

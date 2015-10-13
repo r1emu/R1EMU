@@ -21,14 +21,14 @@ ItemWeaponId itemWeaponIds[] = {
     FOREACH_ITEM_WEAPON(GENERATE_PROPERTY_ASSOC)
 };
 
-ItemWeapon *itemWeaponNew(Item *item) {
+ItemWeapon *itemWeaponNew(Item *item, ItemEquipData *data) {
     ItemWeapon *self;
 
     if ((self = malloc(sizeof(ItemWeapon))) == NULL) {
         return NULL;
     }
 
-    if (!itemWeaponInit(self, item)) {
+    if (!itemWeaponInit(self, item, data)) {
         itemWeaponDestroy(&self);
         error("ItemWeapon failed to initialize.");
         return NULL;
@@ -37,10 +37,10 @@ ItemWeapon *itemWeaponNew(Item *item) {
     return self;
 }
 
-bool itemWeaponInit(ItemWeapon *self, Item *item) {
+bool itemWeaponInit(ItemWeapon *self, Item *item, ItemEquipData *data) {
     memset(self, 0, sizeof(*self));
 
-    if (!(itemEquipableInit(&self->equipable, item))) {
+    if (!(itemEquipableInit(&self->equipable, item, data))) {
         error("Cannot initialize an equipable item.");
         return false;
     }
@@ -92,7 +92,7 @@ size_t itemWeaponGetCPacketSize(ItemWeapon *self) {
 
 size_t itemWeaponGetSPacketSize(ItemWeapon *self) {
     size_t size = 0;
-    size += itemEquipableGetSPacketSize(&self->equipable);
+    size += sizeof(ItemWeaponSPacket);
     size += propertyFloatGetSPacketSize(self->maxAtk);
     size += propertyFloatGetSPacketSize(self->minAtk);
     size += propertyFloatGetSPacketSize(self->cooldown);
@@ -106,7 +106,6 @@ void itemWeaponSerializeCPacket(ItemWeapon *self, PacketStream *stream) {
 }
 
 void itemWeaponSerializeSPacket(ItemWeapon *self, PacketStream *stream) {
-    itemEquipableSerializeSPacket(&self->equipable, stream);
     propertyFloatSerializeSPacket(ITEM_WEAPON_PROPERTY_ID_MAXATK, self->maxAtk, stream);
     propertyFloatSerializeSPacket(ITEM_WEAPON_PROPERTY_ID_MINATK, self->minAtk, stream);
     propertyFloatSerializeSPacket(ITEM_WEAPON_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
@@ -114,10 +113,6 @@ void itemWeaponSerializeSPacket(ItemWeapon *self, PacketStream *stream) {
 
 bool itemWeaponUnserializeSPacket(ItemWeapon *self, PacketStream *stream) {
 
-    if (!(itemEquipableUnserializeSPacket(&self->equipable, stream))) {
-        error("Cannot unserialize equipable packet.");
-        return false;
-    }
     if (!(propertyFloatUnserializeSPacket(ITEM_WEAPON_PROPERTY_ID_MAXATK, &self->maxAtk, stream))) {
         error("Cannot unserialize packet PET_POSITION.");
         return false;

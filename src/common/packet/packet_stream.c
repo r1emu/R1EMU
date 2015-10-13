@@ -50,6 +50,10 @@ void *packetStreamGetCurrentBuffer(PacketStream *self) {
     return &self->buffer[self->position];
 }
 
+void *packetStreamGetBuffer(PacketStream *self) {
+    return self->buffer;
+}
+
 void packetStreamAddOffset(PacketStream *self, unsigned int offset) {
     self->position += offset;
 }
@@ -64,4 +68,12 @@ void packetStreamDestroy(PacketStream **_self) {
 
     free(self);
     *_self = NULL;
+}
+
+size_t packetStreamGetSize(PacketStream *self) {
+    return self->position;
+}
+
+void packetStreamPrint(PacketStream *self) {
+    buffer_print(self->buffer, self->position, "PacketStream : ");
 }

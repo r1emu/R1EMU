@@ -88,7 +88,7 @@ size_t itemGemGetCPacketSize(ItemGem *self) {
 
 size_t itemGemGetSPacketSize(ItemGem *self) {
     size_t size = 0;
-    size += itemChildGetSPacketSize(&self->item);
+    size += sizeof(ItemGemSPacket);
     size += propertyFloatGetSPacketSize(self->level);
     size += propertyFloatGetSPacketSize(self->itemExp);
     size += propertyFloatGetSPacketSize(self->cooldown);
@@ -102,7 +102,6 @@ void itemGemSerializeCPacket(ItemGem *self, PacketStream *stream) {
 }
 
 void itemGemSerializeSPacket(ItemGem *self, PacketStream *stream) {
-    itemChildSerializeSPacket(&self->item, stream);
     propertyFloatSerializeSPacket(ITEM_GEM_PROPERTY_ID_LEVEL, self->level, stream);
     propertyFloatSerializeSPacket(ITEM_GEM_PROPERTY_ID_ITEM_EXP, self->itemExp, stream);
     propertyFloatSerializeSPacket(ITEM_GEM_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
@@ -110,10 +109,6 @@ void itemGemSerializeSPacket(ItemGem *self, PacketStream *stream) {
 
 bool itemGemUnserializeSPacket(ItemGem *self, PacketStream *stream) {
 
-    if (!(itemChildUnserializeSPacket(&self->item, stream))) {
-        error("Cannot unserialize item packet.");
-        return false;
-    }
     if (!(propertyFloatUnserializeSPacket(ITEM_GEM_PROPERTY_ID_LEVEL, &self->level, stream))) {
         error("Cannot unserialize packet LEVEL.");
         return false;

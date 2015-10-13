@@ -88,7 +88,7 @@ size_t itemCardGetCPacketSize(ItemCard *self) {
 
 size_t itemCardGetSPacketSize(ItemCard *self) {
     size_t size = 0;
-    size += itemChildGetSPacketSize(&self->item);
+    size += sizeof(ItemCardSPacket);
     size += propertyFloatGetSPacketSize(self->level);
     size += propertyFloatGetSPacketSize(self->cooldown);
     size += propertyFloatGetSPacketSize(self->itemExp);
@@ -102,7 +102,6 @@ void itemCardSerializeCPacket(ItemCard *self, PacketStream *stream) {
 }
 
 void itemCardSerializeSPacket(ItemCard *self, PacketStream *stream) {
-    itemChildSerializeSPacket(&self->item, stream);
     propertyFloatSerializeSPacket(ITEM_CARD_PROPERTY_ID_LEVEL, self->level, stream);
     propertyFloatSerializeSPacket(ITEM_CARD_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
     propertyFloatSerializeSPacket(ITEM_CARD_PROPERTY_ID_ITEM_EXP, self->itemExp, stream);
@@ -110,10 +109,6 @@ void itemCardSerializeSPacket(ItemCard *self, PacketStream *stream) {
 
 bool itemCardUnserializeSPacket(ItemCard *self, PacketStream *stream) {
 
-    if (!(itemChildUnserializeSPacket(&self->item, stream))) {
-        error("Cannot unserialize item packet.");
-        return false;
-    }
     if (!(propertyFloatUnserializeSPacket(ITEM_CARD_PROPERTY_ID_LEVEL, &self->level, stream))) {
         error("Cannot unserialize packet LEVEL.");
         return false;

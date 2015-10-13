@@ -20,14 +20,14 @@ ItemAccessoryId itemAccessoryIds[] = {
     FOREACH_ITEM_ACCESSORY(GENERATE_PROPERTY_ASSOC)
 };
 
-ItemAccessory *itemAccessoryNew(Item *item) {
+ItemAccessory *itemAccessoryNew(Item *item, ItemEquipData *data) {
     ItemAccessory *self;
 
     if ((self = malloc(sizeof(ItemAccessory))) == NULL) {
         return NULL;
     }
 
-    if (!itemAccessoryInit(self, item)) {
+    if (!itemAccessoryInit(self, item, data)) {
         itemAccessoryDestroy(&self);
         error("ItemAccessory failed to initialize.");
         return NULL;
@@ -36,10 +36,10 @@ ItemAccessory *itemAccessoryNew(Item *item) {
     return self;
 }
 
-bool itemAccessoryInit(ItemAccessory *self, Item *item) {
+bool itemAccessoryInit(ItemAccessory *self, Item *item, ItemEquipData *data) {
     memset(self, 0, sizeof(*self));
 
-    if (!(itemEquipableInit(&self->equipable, item))) {
+    if (!(itemEquipableInit(&self->equipable, item, data))) {
         error("Cannot initialize an equipable item.");
         return false;
     }
@@ -85,7 +85,7 @@ size_t itemAccessoryGetCPacketSize(ItemAccessory *self) {
 
 size_t itemAccessoryGetSPacketSize(ItemAccessory *self) {
     size_t size = 0;
-    size += itemEquipableGetSPacketSize(&self->equipable);
+    size += sizeof(ItemAccessorySPacket);
     size += propertyFloatGetSPacketSize(self->pr);
     size += propertyFloatGetSPacketSize(self->cooldown);
     return size;
@@ -97,17 +97,12 @@ void itemAccessorySerializeCPacket(ItemAccessory *self, PacketStream *stream) {
 }
 
 void itemAccessorySerializeSPacket(ItemAccessory *self, PacketStream *stream) {
-    itemEquipableSerializeSPacket(&self->equipable, stream);
     propertyFloatSerializeSPacket(ITEM_ACCESSORY_PROPERTY_ID_PR, self->pr, stream);
     propertyFloatSerializeSPacket(ITEM_ACCESSORY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
 }
 
 size_t itemAccessoryUnserializeSPacket(ItemAccessory *self, PacketStream *stream) {
 
-    if (!(itemEquipableUnserializeSPacket(&self->equipable, stream))) {
-        error("Cannot unserialize equipable packet.");
-        return false;
-    }
     if (!(propertyFloatUnserializeSPacket(ITEM_ACCESSORY_PROPERTY_ID_PR, &self->cooldown, stream))) {
         error("Cannot unserialize packet PR.");
         return false;

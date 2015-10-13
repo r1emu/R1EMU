@@ -201,6 +201,12 @@ bool itemFactoryGetCategoryFromId(
     return true;
 }
 
+void itemFactoryGetStaticData(ItemId_t id, ItemCommonData **commonData, ItemEquipData **equipData) {
+    // Get static data related to the item
+    staticDataGet(self.itemCommonDatabase, id, commonData, false);
+    staticDataGet(self.itemEquipDatabase, id, equipData, false);
+}
+
 // TODO : ItemId_t should be enough to know the correct category
 // Once StaticData is available, link them together
 Item *itemFactoryCreate(ItemId_t id, ItemAmount_t amount) {
@@ -212,9 +218,7 @@ Item *itemFactoryCreate(ItemId_t id, ItemAmount_t amount) {
     ItemCommonData *commonData = NULL;
     ItemEquipData *equipData = NULL;
 
-    // Get static data related to the item
-    staticDataGet(self.itemCommonDatabase, id, &commonData, false);
-    staticDataGet(self.itemEquipDatabase, id, &equipData, false);
+    itemFactoryGetStaticData(id, &commonData, &equipData);
 
     if (!(itemFactoryGetCategoryFromId(id, commonData, equipData, &category))) {
         error("Cannot get category from ID '%d'", id);
@@ -270,13 +274,10 @@ bool itemFactoryInit(
     }
 
     // Initialize the item
-    if (!(itemInit(&item, &actor, category, id, amount))) {
+    if (!(itemInit(&item, &actor, category, id, amount, commonData))) {
         error("Cannot create a new item '%d'.", id);
         return false;
     }
-
-    // Get common static data related to the item
-    item.commonData = commonData;
 
     // Initialize the child class
     switch (category) {
@@ -291,7 +292,7 @@ bool itemFactoryInit(
         }
         case ITEM_CAT_ARMOR      : {
             ItemArmor *armor = (ItemArmor *) newItem;
-            if (!(itemArmorInit(armor, &item))) {
+            if (!(itemArmorInit(armor, &item, equipData))) {
                 error("Cannot initialize a armor item.");
                 return false;
             }
@@ -331,7 +332,7 @@ bool itemFactoryInit(
         }
         case ITEM_CAT_WEAPON     : {
             ItemWeapon *weapon = (ItemWeapon *) newItem;
-            if (!(itemWeaponInit(weapon, &item))) {
+            if (!(itemWeaponInit(weapon, &item, equipData))) {
                 error("Cannot initialize a weapon item.");
                 return false;
             }
@@ -347,7 +348,7 @@ bool itemFactoryInit(
         }
         case ITEM_CAT_ACCESSORY  : {
             ItemAccessory *accessory = (ItemAccessory *) newItem;
-            if (!(itemAccessoryInit(accessory, &item))) {
+            if (!(itemAccessoryInit(accessory, &item, equipData))) {
                 error("Cannot initialize a accessory item.");
                 return false;
             }
@@ -355,7 +356,7 @@ bool itemFactoryInit(
         }
         case ITEM_CAT_SUBWEAPON  : {
             ItemSubWeapon *subweapon = (ItemSubWeapon *) newItem;
-            if (!(itemSubWeaponInit(subweapon, &item))) {
+            if (!(itemSubWeaponInit(subweapon, &item, equipData))) {
                 error("Cannot initialize a subweapon item.");
                 return false;
             }
