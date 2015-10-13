@@ -216,6 +216,9 @@ static PacketHandlerState zoneHandlerSkillGround(
     dbg("unk6 %d", clientPacket->unk6);
     dbg("unk7 %d", clientPacket->unk7);
 
+    special("Current pos : ");
+    positionXYZDump(&session->game.commanderSession.currentCommander->pos);
+
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CZ_SKILL_GROUND);
 
     /*   CzSkillGroundPacket :
@@ -236,17 +239,11 @@ static PacketHandlerState zoneHandlerSkillGround(
     );
     */
 
-    dbg("position1: %f, %f, %f", clientPacket->pos1.x, clientPacket->pos1.y, clientPacket->pos1.z);
-
-    PositionXZ dir;
-    dir.x = -0.0;
-    dir.z = 0.0;
-
     zoneBuilderNormalUnk10_56(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
         &clientPacket->pos1,
-        &dir,
+        &clientPacket->direction,
         false,
         replyMsg
     );
@@ -260,7 +257,8 @@ static PacketHandlerState zoneHandlerSkillGround(
     );
 
     PositionXYZ skillPos = clientPacket->pos1;
-    skillPos.z = skillPos.z - 20;
+    skillPos.x += clientPacket->direction.x * 20; // 20 = tile size
+    skillPos.z += clientPacket->direction.z * 20;
 
     dbg("skillPos: %f, %f, %f", skillPos.x, skillPos.y, skillPos.z);
 
@@ -268,7 +266,7 @@ static PacketHandlerState zoneHandlerSkillGround(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
         &skillPos,
-        &dir,
+        &clientPacket->direction,
         true,
         replyMsg
     );

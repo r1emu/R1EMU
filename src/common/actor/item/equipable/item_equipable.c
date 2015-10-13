@@ -62,3 +62,25 @@ void itemEquipablePrint(ItemEquipable *self) {
         itemPrint(&self->item);
     }
 }
+
+size_t itemEquipableGetSPacketSize(ItemEquipable *self) {
+    size_t size = 0;
+    size += itemChildGetSPacketSize(&self->item);
+    size += sizeof(self->slot);
+    return size;
+}
+
+void itemEquipableSerializeSPacket(ItemEquipable *self, PacketStream *stream) {
+    itemChildSerializeSPacket((Item *) self, stream);
+    packetStreamIn(stream, &self->slot);
+}
+
+bool itemEquipableUnserializeSPacket(ItemEquipable *self, PacketStream *stream) {
+    if (!(itemChildUnserializeSPacket((Item *) self, stream))) {
+        error("Cannot unserialize item packet.");
+        return false;
+    }
+    packetStreamOut(stream, &self->slot);
+
+    return true;
+}

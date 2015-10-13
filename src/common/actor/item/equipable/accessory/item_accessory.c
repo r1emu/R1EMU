@@ -16,6 +16,10 @@
 extern inline float *itemAccessoryGetPr(ItemAccessory *self);
 extern inline float *itemAccessoryGetCooldown(ItemAccessory *self);
 
+ItemAccessoryId itemAccessoryIds[] = {
+    FOREACH_ITEM_ACCESSORY(GENERATE_PROPERTY_ASSOC)
+};
+
 ItemAccessory *itemAccessoryNew(Item *item) {
     ItemAccessory *self;
 
@@ -59,18 +63,6 @@ void itemAccessoryDestroy(ItemAccessory **_self) {
     }
 }
 
-size_t itemAccessoryGetPropertiesCPacketSize(ItemAccessory *self) {
-    size_t size = 0;
-    size += propertyFloatGetCPacketSize(self->pr); // pr
-    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
-    return size;
-}
-
-void itemAccessoryGetPropertiesCPacket(ItemAccessory *self, PacketStream *stream) {
-    propertyFloatGetCPacket(ITEM_ACCESSORY_PROPERTY_ID_PR, self->pr, stream);
-    propertyFloatGetCPacket(ITEM_ACCESSORY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
-}
-
 void itemAccessoryPrint(ItemAccessory *self) {
     PRINT_STRUCTURE {
         dbg("=== ItemAccessory %p ===", self);
@@ -82,4 +74,48 @@ void itemAccessoryPrint(ItemAccessory *self) {
         }
         itemEquipablePrint(&self->equipable);
     }
+}
+
+size_t itemAccessoryGetCPacketSize(ItemAccessory *self) {
+    size_t size = 0;
+    size += propertyFloatGetCPacketSize(self->pr);
+    size += propertyFloatGetCPacketSize(self->cooldown);
+    return size;
+}
+
+size_t itemAccessoryGetSPacketSize(ItemAccessory *self) {
+    size_t size = 0;
+    size += itemEquipableGetSPacketSize(&self->equipable);
+    size += propertyFloatGetSPacketSize(self->pr);
+    size += propertyFloatGetSPacketSize(self->cooldown);
+    return size;
+}
+
+void itemAccessorySerializeCPacket(ItemAccessory *self, PacketStream *stream) {
+    propertyFloatSerializeCPacket(ITEM_ACCESSORY_PROPERTY_ID_PR, self->pr, stream);
+    propertyFloatSerializeCPacket(ITEM_ACCESSORY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+void itemAccessorySerializeSPacket(ItemAccessory *self, PacketStream *stream) {
+    itemEquipableSerializeSPacket(&self->equipable, stream);
+    propertyFloatSerializeSPacket(ITEM_ACCESSORY_PROPERTY_ID_PR, self->pr, stream);
+    propertyFloatSerializeSPacket(ITEM_ACCESSORY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+size_t itemAccessoryUnserializeSPacket(ItemAccessory *self, PacketStream *stream) {
+
+    if (!(itemEquipableUnserializeSPacket(&self->equipable, stream))) {
+        error("Cannot unserialize equipable packet.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_ACCESSORY_PROPERTY_ID_PR, &self->cooldown, stream))) {
+        error("Cannot unserialize packet PR.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_ACCESSORY_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
+        error("Cannot unserialize packet COOLDOWN.");
+        return false;
+    }
+
+    return true;
 }

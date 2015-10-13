@@ -16,6 +16,10 @@
 extern inline float *itemSubWeaponGetPetPosition(ItemSubWeapon *self);
 extern inline float *itemSubWeaponGetCooldown(ItemSubWeapon *self);
 
+ItemSubWeaponId itemSubWeaponIds[] = {
+    FOREACH_ITEM_SUBWEAPON(GENERATE_PROPERTY_ASSOC)
+};
+
 ItemSubWeapon *itemSubWeaponNew(Item *item) {
     ItemSubWeapon *self;
 
@@ -59,21 +63,6 @@ void itemSubWeaponDestroy(ItemSubWeapon **_self) {
     }
 }
 
-
-size_t itemSubWeaponGetPropertiesCPacketSize(ItemSubWeapon *self) {
-    size_t size = 0;
-
-    size += propertyFloatGetCPacketSize(self->petPosition); // petPosition
-    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
-
-    return size;
-}
-
-void itemSubWeaponGetPropertiesCPacket(ItemSubWeapon *self, PacketStream *stream) {
-    propertyFloatGetCPacket(ITEM_SUBWEAPON_PROPERTY_ID_PET_POSITION, self->petPosition, stream);
-    propertyFloatGetCPacket(ITEM_SUBWEAPON_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
-}
-
 void itemSubWeaponPrint(ItemSubWeapon *self) {
     PRINT_STRUCTURE {
         dbg("=== ItemSubWeapon %p ===", self);
@@ -85,4 +74,48 @@ void itemSubWeaponPrint(ItemSubWeapon *self) {
         }
         itemEquipablePrint(&self->equipable);
     }
+}
+
+size_t itemSubWeaponGetCPacketSize(ItemSubWeapon *self) {
+    size_t size = 0;
+    size += propertyFloatGetCPacketSize(self->petPosition);
+    size += propertyFloatGetCPacketSize(self->cooldown);
+    return size;
+}
+
+size_t itemSubWeaponGetSPacketSize(ItemSubWeapon *self) {
+    size_t size = 0;
+    size += itemEquipableGetSPacketSize(&self->equipable);
+    size += propertyFloatGetSPacketSize(self->petPosition);
+    size += propertyFloatGetSPacketSize(self->cooldown);
+    return size;
+}
+
+void itemSubWeaponSerializeCPacket(ItemSubWeapon *self, PacketStream *stream) {
+    propertyFloatSerializeCPacket(ITEM_SUBWEAPON_PROPERTY_ID_PET_POSITION, self->petPosition, stream);
+    propertyFloatSerializeCPacket(ITEM_SUBWEAPON_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+void itemSubWeaponSerializeSPacket(ItemSubWeapon *self, PacketStream *stream) {
+    itemEquipableSerializeSPacket(&self->equipable, stream);
+    propertyFloatSerializeSPacket(ITEM_SUBWEAPON_PROPERTY_ID_PET_POSITION, self->petPosition, stream);
+    propertyFloatSerializeSPacket(ITEM_SUBWEAPON_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+bool itemSubWeaponUnserializeSPacket(ItemSubWeapon *self, PacketStream *stream) {
+
+    if (!(itemEquipableUnserializeSPacket(&self->equipable, stream))) {
+        error("Cannot unserialize equipable packet.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_SUBWEAPON_PROPERTY_ID_PET_POSITION, &self->petPosition, stream))) {
+        error("Cannot unserialize packet PET_POSITION.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_SUBWEAPON_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
+        error("Cannot unserialize packet COOLDOWN.");
+        return false;
+    }
+
+    return true;
 }

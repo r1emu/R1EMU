@@ -71,3 +71,7 @@ bool mathIsWithin2DCircleDistance(PositionXZ *pos1, PositionXZ *pos2, float dist
  * @brief Print a position in the console
  */
 void positionXYZDump (PositionXYZ *position);
+/**
+ * @brief Print a position in the console
+ */
+void positionXZDump (PositionXZ *position);

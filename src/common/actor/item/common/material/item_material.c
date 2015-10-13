@@ -13,6 +13,10 @@
 
 #include "item_material.h"
 
+ItemMaterialId itemMaterialIds[] = {
+    FOREACH_ITEM_MATERIAL(GENERATE_PROPERTY_ASSOC)
+};
+
 ItemMaterial *itemMaterialNew(Item *item) {
     ItemMaterial *self;
 
@@ -52,18 +56,6 @@ void itemMaterialDestroy(ItemMaterial **_self) {
     }
 }
 
-size_t itemMaterialGetPropertiesCPacketSize(ItemMaterial *self) {
-    size_t size = 0;
-
-    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
-
-    return size;
-}
-
-void itemMaterialGetPropertiesCPacket(ItemMaterial *self, PacketStream *stream) {
-    propertyFloatGetCPacket(ITEM_MATERIAL_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
-}
-
 void itemMaterialPrint(ItemMaterial *self) {
     PRINT_STRUCTURE {
         dbg("=== ItemMaterial %p ===", self);
@@ -72,4 +64,40 @@ void itemMaterialPrint(ItemMaterial *self) {
         }
         itemPrint(&self->item);
     }
+}
+
+size_t itemMaterialGetCPacketSize(ItemMaterial *self) {
+    size_t size = 0;
+    size += propertyFloatGetCPacketSize(self->cooldown);
+    return size;
+}
+
+size_t itemMaterialGetSPacketSize(ItemMaterial *self) {
+    size_t size = 0;
+    size += itemChildGetSPacketSize(&self->item);
+    size += propertyFloatGetSPacketSize(self->cooldown);
+    return size;
+}
+
+void itemMaterialSerializeCPacket(ItemMaterial *self, PacketStream *stream) {
+    propertyFloatSerializeCPacket(ITEM_MATERIAL_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+void itemMaterialSerializeSPacket(ItemMaterial *self, PacketStream *stream) {
+    itemChildSerializeSPacket(&self->item, stream);
+    propertyFloatSerializeSPacket(ITEM_MATERIAL_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+bool itemMaterialUnserializeSPacket(ItemMaterial *self, PacketStream *stream) {
+
+    if (!(itemChildUnserializeSPacket(&self->item, stream))) {
+        error("Cannot unserialize item packet.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_MATERIAL_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
+        error("Cannot unserialize packet COOLDOWN.");
+        return false;
+    }
+
+    return true;
 }

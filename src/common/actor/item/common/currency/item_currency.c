@@ -12,6 +12,11 @@
  */
 
 #include "item_currency.h"
+extern inline float *itemCurrencyGetCooldown(ItemCurrency *self);
+
+ItemCurrencyId itemCurrencyIds[] = {
+    FOREACH_ITEM_CURRENCY(GENERATE_PROPERTY_ASSOC)
+};
 
 ItemCurrency *itemCurrencyNew(Item *item) {
     ItemCurrency *self;
@@ -52,18 +57,6 @@ void itemCurrencyDestroy(ItemCurrency **_self) {
     }
 }
 
-size_t itemCurrencyGetPropertiesCPacketSize(ItemCurrency *self) {
-    size_t size = 0;
-
-    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
-
-    return size;
-}
-
-void itemCurrencyGetPropertiesCPacket(ItemCurrency *self, PacketStream *stream) {
-    propertyFloatGetCPacket(ITEM_CURRENCY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
-}
-
 void itemCurrencyPrint(ItemCurrency *self) {
     PRINT_STRUCTURE {
         dbg("=== ItemCurrency %p ===", self);
@@ -72,4 +65,40 @@ void itemCurrencyPrint(ItemCurrency *self) {
         }
         itemPrint(&self->item);
     }
+}
+
+size_t itemCurrencyGetCPacketSize(ItemCurrency *self) {
+    size_t size = 0;
+    size += propertyFloatGetCPacketSize(self->cooldown);
+    return size;
+}
+
+size_t itemCurrencyGetSPacketSize(ItemCurrency *self) {
+    size_t size = 0;
+    size += itemChildGetSPacketSize(&self->item);
+    size += propertyFloatGetSPacketSize(self->cooldown);
+    return size;
+}
+
+void itemCurrencySerializeCPacket(ItemCurrency *self, PacketStream *stream) {
+    propertyFloatSerializeCPacket(ITEM_CURRENCY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+void itemCurrencySerializeSPacket(ItemCurrency *self, PacketStream *stream) {
+    itemChildSerializeSPacket(&self->item, stream);
+    propertyFloatSerializeSPacket(ITEM_CURRENCY_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+bool itemCurrencyUnserializeSPacket(ItemCurrency *self, PacketStream *stream) {
+
+    if (!(itemChildUnserializeSPacket(&self->item, stream))) {
+        error("Cannot unserialize item packet.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_CURRENCY_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
+        error("Cannot unserialize packet COOLDOWN.");
+        return false;
+    }
+
+    return true;
 }

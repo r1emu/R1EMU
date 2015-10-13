@@ -24,17 +24,24 @@
 #include "common/property/property.h"
 
 // ---------- Defines -------------
+// Define properties ID
+#define FOREACH_ITEM_QUEST(GENERATOR)       \
+    GENERATOR(ITEM_QUEST, COOLDOWN, 3750)
 
+typedef enum {
+    FOREACH_ITEM_QUEST(GENERATE_PROPERTY_ENUM)
+    ITEM_QUEST_PROPERTY_COUNT
+}   ItemQuestProperty;
+
+typedef enum {
+    FOREACH_ITEM_QUEST(GENERATE_PROPERTY_ID)
+}   ItemQuestId;
 
 // ------ Structure declaration -------
 typedef struct {
     Item item;
     float *cooldown;
 }   ItemQuest;
-
-enum {
-    ITEM_QUEST_PROPERTY_ID_COOLDOWN = 3750
-};
 
 // ----------- Functions ------------
 
@@ -73,8 +80,11 @@ inline float *itemQuestGetCooldown(ItemQuest *self) { return self->cooldown; }
 /**
  * Serialization / Unserialization
  */
-size_t itemQuestGetPropertiesCPacketSize(ItemQuest *self);
-void itemQuestGetPropertiesCPacket(ItemQuest *self, PacketStream *stream);
+size_t itemQuestGetCPacketSize(ItemQuest *self);
+size_t itemQuestGetSPacketSize(ItemQuest *self);
+void itemQuestSerializeCPacket(ItemQuest *self, PacketStream *stream);
+void itemQuestSerializeSPacket(ItemQuest *self, PacketStream *stream);
+bool itemQuestUnserializeSPacket(ItemQuest *self, PacketStream *stream);
 
 /**
  * Debugging

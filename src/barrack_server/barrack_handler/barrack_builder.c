@@ -299,7 +299,7 @@ void barrackBuilderCommanderList(
             Item *item = (Item *) inventory->equippedItems[eqSlot];
 
             // Get property size
-            size_t propSize = item ? itemGetPropertiesCPacketSize(item) : 0;
+            size_t propSize = item ? itemGetCPacketSize(item) : 0;
 
             // Define size
             #pragma pack(push, 1)
@@ -417,7 +417,7 @@ void barrackBuilderCommanderList(
                     packetStreamAddOffset(&packetStream, offset);
 
                     // write in the buffer
-                    itemPropertiesGetCPacket((Item *) item, &packetStream);
+                    itemSerializeCPacket((Item *) item, &packetStream);
                 }
             }
 

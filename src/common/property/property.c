@@ -67,7 +67,7 @@ size_t propertyStringGetSPacketSize(char *value) {
     return size;
 }
 
-void propertyFloatGetCPacket(PropertyId_t id, float *value, PacketStream *stream) {
+void propertyFloatSerializeCPacket(PropertyId_t id, float *value, PacketStream *stream) {
 
     if (!value) {
         return;
@@ -78,10 +78,10 @@ void propertyFloatGetCPacket(PropertyId_t id, float *value, PacketStream *stream
         .value = *value
     };
 
-    packetStreamAppend(stream, &packet, sizeof(packet));
+    packetStreamIn(stream, &packet);
 }
 
-void propertyStringGetCPacket(PropertyId_t id, char *value, PacketStream *stream) {
+void propertyStringSerializeCPacket(PropertyId_t id, char *value, PacketStream *stream) {
 
     if (!value) {
         return;
@@ -97,10 +97,10 @@ void propertyStringGetCPacket(PropertyId_t id, char *value, PacketStream *stream
     packet.size = valueSize;
     strncpy(packet.value, value, valueSize);
 
-    packetStreamAppend(stream, &packet, sizeof(packet));
+    packetStreamIn(stream, &packet);
 }
 
-void propertyFloatGetSPacket(PropertyId_t id, float *value, PacketStream *stream) {
+void propertyFloatSerializeSPacket(PropertyId_t id, float *value, PacketStream *stream) {
 
     if (!value) {
         return;
@@ -111,10 +111,10 @@ void propertyFloatGetSPacket(PropertyId_t id, float *value, PacketStream *stream
         .value = *value
     };
 
-    packetStreamAppend(stream, &packet, sizeof(packet));
+    packetStreamIn(stream, &packet);
 }
 
-void propertyStringGetSPacket(PropertyId_t id, char *value, PacketStream *stream) {
+void propertyStringSerializeSPacket(PropertyId_t id, char *value, PacketStream *stream) {
 
     if (!value) {
         return;
@@ -130,6 +130,84 @@ void propertyStringGetSPacket(PropertyId_t id, char *value, PacketStream *stream
     packet.size = valueSize;
     strncpy(packet.value, value, valueSize);
 
-    packetStreamAppend(stream, &packet, sizeof(packet));
+    packetStreamIn(stream, &packet);
 }
 
+bool propertyFloatUnserializeSPacket(PropertyId_t id, float **value, PacketStream *stream) {
+
+    PropertyFloatSPacket *packet = packetStreamGetCurrentBuffer(stream);
+    PropertyFloatSPacket output;
+
+    // Check ID
+    if (packet->id != id) {
+        // The current property has not been found
+        // This is a normal behavior : The property hasn't been serialized
+        return true;
+    }
+
+    // Check memory
+    if (!*value) {
+        // Not allocated yet
+        if (!(*value = malloc(sizeof(float *)))) {
+            error("Cannot allocate a new float property.");
+            return false;
+        }
+    }
+
+    // Extract information from the stream
+    packetStreamOut(stream, &output);
+    **value = output.value;
+
+    return true;
+}
+
+bool propertyStringUnserializeSPacket(PropertyId_t id, char **value, PacketStream *stream) {
+
+    // Check ID and memory space
+    size_t valueSize;
+    {
+        // Declare the structure with a fake size
+        #pragma pack(push, 1)
+        DECLARE_PropertyStringSPacket(0);
+        #pragma pack(pop)
+
+        PropertyStringSPacket *packet = packetStreamGetCurrentBuffer(stream);
+
+        if (packet->id != id) {
+            // The current property has not been found
+            // This is a normal behavior : The property hasn't been serialized
+            return true;
+        }
+
+        valueSize = packet->size;
+    }
+
+    // Redeclare the structure with the correct size
+    #pragma pack(push, 1)
+    DECLARE_PropertyStringSPacket(valueSize);
+    #pragma pack(pop)
+    PropertyStringSPacket *packet = packetStreamGetCurrentBuffer(stream);
+    PropertyStringSPacket output;
+
+    // Check memory space
+    if (!*value) {
+        // Not allocated yet
+        if (!(*value = malloc(valueSize))) {
+            error("Cannot allocate a new float property.");
+            return false;
+        }
+    }
+    else if (strlen(*value) + 1 != packet->size) {
+        // The memory space has changed
+        if (!(*value = realloc(*value, valueSize + 1))) {
+            error("Cannot reallocate a new float property.");
+            return false;
+        }
+    }
+
+    // Extract information from the stream
+    packetStreamOut(stream, &output);
+    strncpy(*value, output.value, valueSize);
+
+    return true;
+}

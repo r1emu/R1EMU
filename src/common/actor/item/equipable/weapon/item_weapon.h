@@ -23,7 +23,20 @@
 #include "common/actor/item/equipable/item_equipable.h"
 
 // ---------- Defines -------------
+// Define properties ID
+#define FOREACH_ITEM_WEAPON(GENERATOR)      \
+    GENERATOR(ITEM_WEAPON, MAXATK , 3796)   \
+    GENERATOR(ITEM_WEAPON, MINATK , 3858)   \
+    GENERATOR(ITEM_WEAPON, COOLDOWN, 3843)
 
+typedef enum {
+    FOREACH_ITEM_WEAPON(GENERATE_PROPERTY_ENUM)
+    ITEM_WEAPON_PROPERTY_COUNT
+}   ItemWeaponProperty;
+
+typedef enum {
+    FOREACH_ITEM_WEAPON(GENERATE_PROPERTY_ID)
+}   ItemWeaponId;
 
 // ------ Structure declaration -------
 typedef struct {
@@ -32,12 +45,6 @@ typedef struct {
     float *minAtk;
     float *cooldown;
 }   ItemWeapon;
-
-enum {
-    ITEM_WEAPON_PROPERTY_ID_MAXATK = 3796,
-    ITEM_WEAPON_PROPERTY_ID_MINATK = 3858,
-    ITEM_WEAPON_PROPERTY_ID_COOLDOWN = 3843
-};
 
 // ----------- Functions ------------
 
@@ -69,8 +76,11 @@ void itemWeaponDestroy(ItemWeapon **self);
 /**
  * Serialization / Unserialization
  */
-size_t itemWeaponGetPropertiesCPacketSize(ItemWeapon *self);
-void itemWeaponGetPropertiesCPacket(ItemWeapon *self, PacketStream *stream);
+size_t itemWeaponGetCPacketSize(ItemWeapon *self);
+size_t itemWeaponGetSPacketSize(ItemWeapon *self);
+void itemWeaponSerializeCPacket(ItemWeapon *self, PacketStream *stream);
+void itemWeaponSerializeSPacket(ItemWeapon *self, PacketStream *stream);
+bool itemWeaponUnserializeSPacket(ItemWeapon *self, PacketStream *stream);
 
 /**
  * Getters and Setters

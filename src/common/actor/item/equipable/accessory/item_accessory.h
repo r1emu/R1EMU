@@ -24,7 +24,19 @@
 #include "common/property/property.h"
 
 // ---------- Defines -------------
+// Define properties ID
+#define FOREACH_ITEM_ACCESSORY(GENERATOR)       \
+    GENERATOR(ITEM_ACCESSORY, PR, 3781)         \
+    GENERATOR(ITEM_ACCESSORY, COOLDOWN, 3843)
 
+typedef enum {
+    FOREACH_ITEM_ACCESSORY(GENERATE_PROPERTY_ENUM)
+    ITEM_ACCESSORY_PROPERTY_COUNT
+}   ItemAccessoryProperty;
+
+typedef enum {
+    FOREACH_ITEM_ACCESSORY(GENERATE_PROPERTY_ID)
+}   ItemAccessoryId;
 
 // ------ Structure declaration -------
 typedef struct {
@@ -32,11 +44,6 @@ typedef struct {
     float *pr;
     float *cooldown;
 }   ItemAccessory;
-
-enum {
-    ITEM_ACCESSORY_PROPERTY_ID_PR = 3781,
-    ITEM_ACCESSORY_PROPERTY_ID_COOLDOWN = 3843
-};
 
 // ----------- Functions ------------
 
@@ -76,8 +83,11 @@ inline float *itemAccessoryGetCooldown(ItemAccessory *self) { return self->coold
 /**
  * Serialization / Unserialization
  */
-size_t itemAccessoryGetPropertiesCPacketSize(ItemAccessory *self);
-void itemAccessoryGetPropertiesCPacket(ItemAccessory *self, PacketStream *stream);
+size_t itemAccessoryGetCPacketSize(ItemAccessory *self);
+size_t itemAccessoryGetSPacketSize(ItemAccessory *self);
+void itemAccessorySerializeCPacket(ItemAccessory *self, PacketStream *stream);
+void itemAccessorySerializeSPacket(ItemAccessory *self, PacketStream *stream);
+size_t itemAccessoryUnserializeSPacket(ItemAccessory *self, PacketStream *stream);
 
 /**
  * Debugging

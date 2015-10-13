@@ -17,6 +17,10 @@ extern inline float *itemWeaponGetMaxAtk(ItemWeapon *self);
 extern inline float *itemWeaponGetMinAtk(ItemWeapon *self);
 extern inline float *itemWeaponGetCooldown(ItemWeapon *self);
 
+ItemWeaponId itemWeaponIds[] = {
+    FOREACH_ITEM_WEAPON(GENERATE_PROPERTY_ASSOC)
+};
+
 ItemWeapon *itemWeaponNew(Item *item) {
     ItemWeapon *self;
 
@@ -61,23 +65,6 @@ void itemWeaponDestroy(ItemWeapon **_self) {
     }
 }
 
-
-size_t itemWeaponGetPropertiesCPacketSize(ItemWeapon *self) {
-    size_t size = 0;
-
-    size += propertyFloatGetCPacketSize(self->maxAtk); // maxAtk
-    size += propertyFloatGetCPacketSize(self->minAtk); // minAtk
-    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
-
-    return size;
-}
-
-void itemWeaponGetPropertiesCPacket(ItemWeapon *self, PacketStream *stream) {
-    propertyFloatGetCPacket(ITEM_WEAPON_PROPERTY_ID_MAXATK, self->maxAtk, stream);
-    propertyFloatGetCPacket(ITEM_WEAPON_PROPERTY_ID_MINATK, self->minAtk, stream);
-    propertyFloatGetCPacket(ITEM_WEAPON_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
-}
-
 void itemWeaponPrint(ItemWeapon *self) {
     PRINT_STRUCTURE {
         dbg("=== ItemWeapon %p ===", self);
@@ -93,4 +80,56 @@ void itemWeaponPrint(ItemWeapon *self) {
         }
         itemEquipablePrint(&self->equipable);
     }
+}
+
+size_t itemWeaponGetCPacketSize(ItemWeapon *self) {
+    size_t size = 0;
+    size += propertyFloatGetCPacketSize(self->maxAtk);
+    size += propertyFloatGetCPacketSize(self->minAtk);
+    size += propertyFloatGetCPacketSize(self->cooldown);
+    return size;
+}
+
+size_t itemWeaponGetSPacketSize(ItemWeapon *self) {
+    size_t size = 0;
+    size += itemEquipableGetSPacketSize(&self->equipable);
+    size += propertyFloatGetSPacketSize(self->maxAtk);
+    size += propertyFloatGetSPacketSize(self->minAtk);
+    size += propertyFloatGetSPacketSize(self->cooldown);
+    return size;
+}
+
+void itemWeaponSerializeCPacket(ItemWeapon *self, PacketStream *stream) {
+    propertyFloatSerializeCPacket(ITEM_WEAPON_PROPERTY_ID_MAXATK, self->maxAtk, stream);
+    propertyFloatSerializeCPacket(ITEM_WEAPON_PROPERTY_ID_MINATK, self->minAtk, stream);
+    propertyFloatSerializeCPacket(ITEM_WEAPON_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+void itemWeaponSerializeSPacket(ItemWeapon *self, PacketStream *stream) {
+    itemEquipableSerializeSPacket(&self->equipable, stream);
+    propertyFloatSerializeSPacket(ITEM_WEAPON_PROPERTY_ID_MAXATK, self->maxAtk, stream);
+    propertyFloatSerializeSPacket(ITEM_WEAPON_PROPERTY_ID_MINATK, self->minAtk, stream);
+    propertyFloatSerializeSPacket(ITEM_WEAPON_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+bool itemWeaponUnserializeSPacket(ItemWeapon *self, PacketStream *stream) {
+
+    if (!(itemEquipableUnserializeSPacket(&self->equipable, stream))) {
+        error("Cannot unserialize equipable packet.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_WEAPON_PROPERTY_ID_MAXATK, &self->maxAtk, stream))) {
+        error("Cannot unserialize packet PET_POSITION.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_WEAPON_PROPERTY_ID_MINATK, &self->minAtk, stream))) {
+        error("Cannot unserialize packet COOLDOWN.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_WEAPON_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
+        error("Cannot unserialize packet COOLDOWN.");
+        return false;
+    }
+
+    return true;
 }

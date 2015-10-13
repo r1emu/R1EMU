@@ -24,17 +24,24 @@
 #include "common/property/property.h"
 
 // ---------- Defines -------------
+// Define properties ID
+#define FOREACH_ITEM_BOOK(GENERATOR)       \
+    GENERATOR(ITEM_BOOK, COOLDOWN, 3750)
 
+typedef enum {
+    FOREACH_ITEM_BOOK(GENERATE_PROPERTY_ENUM)
+    ITEM_BOOK_PROPERTY_COUNT
+}   ItemBookProperty;
+
+typedef enum {
+    FOREACH_ITEM_BOOK(GENERATE_PROPERTY_ID)
+}   ItemBookId;
 
 // ------ Structure declaration -------
 typedef struct {
     Item item;
     float *cooldown;
 }   ItemBook;
-
-enum {
-    ITEM_BOOK_PROPERTY_ID_COOLDOWN = 3750
-};
 
 // ----------- Functions ------------
 
@@ -69,12 +76,14 @@ void itemBookDestroy(ItemBook **self);
  */
 inline float *itemBookGetCooldown(ItemBook *self) { return self->cooldown; }
 
-
 /**
  * Serialization / Unserialization
  */
-size_t itemBookGetPropertiesCPacketSize(ItemBook *self);
-void itemBookGetPropertiesCPacket(ItemBook *self, PacketStream *stream);
+size_t itemBookGetCPacketSize(ItemBook *self);
+size_t itemBookGetSPacketSize(ItemBook *self);
+void itemBookSerializeCPacket(ItemBook *self, PacketStream *stream);
+void itemBookSerializeSPacket(ItemBook *self, PacketStream *stream);
+bool itemBookUnserializeSPacket(ItemBook *self, PacketStream *stream);
 
 /**
  * Debugging

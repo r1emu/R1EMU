@@ -23,6 +23,23 @@
 #include "common/actor/item/equipable/item_equipable.h"
 
 // ---------- Defines -------------
+// Define properties ID
+#define FOREACH_ITEM_ARMOR(GENERATOR)        \
+    GENERATOR(ITEM_ARMOR, DEF, 3792)         \
+    GENERATOR(ITEM_ARMOR, COOLDOWN, 3843)    \
+    GENERATOR(ITEM_ARMOR, REINFORCE, 3852)   \
+    GENERATOR(ITEM_ARMOR, MEMO, 3972)        \
+    GENERATOR(ITEM_ARMOR, CUSTOM_NAME, 3975) \
+    GENERATOR(ITEM_ARMOR, MAKER, 3978)
+
+typedef enum {
+    FOREACH_ITEM_ARMOR(GENERATE_PROPERTY_ENUM)
+    ITEM_ARMOR_PROPERTY_COUNT
+}   ItemArmorProperty;
+
+typedef enum {
+    FOREACH_ITEM_ARMOR(GENERATE_PROPERTY_ID)
+}   ItemArmorId;
 
 
 // ------ Structure declaration -------
@@ -42,15 +59,6 @@ typedef struct
     char *maker;
 
 }   ItemArmor;
-
-enum {
-    ITEM_ARMOR_PROPERTY_ID_DEF = 3792,
-    ITEM_ARMOR_PROPERTY_ID_COOLDOWN = 3843,
-    ITEM_ARMOR_PROPERTY_ID_REINFORCE = 3852,
-    ITEM_ARMOR_PROPERTY_ID_MEMO = 3972,
-    ITEM_ARMOR_PROPERTY_ID_CUSTOM_NAME = 3975,
-    ITEM_ARMOR_PROPERTY_ID_MAKER = 3978
-};
 
 // ----------- Functions ------------
 
@@ -82,8 +90,11 @@ void itemArmorDestroy(ItemArmor **self);
 /**
  * Serialization / Unserialization
  */
-size_t itemArmorGetPropertiesCPacketSize(ItemArmor *self);
-void itemArmorGetPropertiesCPacket(ItemArmor *self, PacketStream *stream);
+size_t itemArmorGetCPacketSize(ItemArmor *self);
+size_t itemArmorGetSPacketSize(ItemArmor *self);
+void itemArmorSerializeCPacket(ItemArmor *self, PacketStream *stream);
+void itemArmorSerializeSPacket(ItemArmor *self, PacketStream *stream);
+bool itemArmorUnserializeSPacket(ItemArmor *self, PacketStream *stream);
 
 /**
  * Getters and Setters

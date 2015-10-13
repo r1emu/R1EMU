@@ -17,6 +17,10 @@ extern inline float *itemCardGetLevel(ItemCard *self);
 extern inline float *itemCardGetCooldown(ItemCard *self);
 extern inline float *itemCardGetItemExp(ItemCard *self);
 
+ItemCardId itemCardIds[] = {
+    FOREACH_ITEM_CARD(GENERATE_PROPERTY_ASSOC)
+};
+
 ItemCard *itemCardNew(Item *item) {
     ItemCard *self;
 
@@ -58,22 +62,6 @@ void itemCardDestroy(ItemCard **_self) {
     }
 }
 
-size_t itemCardGetPropertiesCPacketSize(ItemCard *self) {
-    size_t size = 0;
-
-    size += propertyFloatGetCPacketSize(self->level); // level
-    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
-    size += propertyFloatGetCPacketSize(self->itemExp); // itemExp
-
-    return size;
-}
-
-void itemCardGetPropertiesCPacket(ItemCard *self, PacketStream *stream) {
-    propertyFloatGetCPacket(ITEM_CARD_PROPERTY_ID_LEVEL, self->level, stream);
-    propertyFloatGetCPacket(ITEM_CARD_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
-    propertyFloatGetCPacket(ITEM_CARD_PROPERTY_ID_ITEM_EXP, self->itemExp, stream);
-}
-
 void itemCardPrint(ItemCard *self) {
     PRINT_STRUCTURE {
         dbg("=== ItemCard %p ===", self);
@@ -88,4 +76,56 @@ void itemCardPrint(ItemCard *self) {
         }
         itemPrint(&self->item);
     }
+}
+
+size_t itemCardGetCPacketSize(ItemCard *self) {
+    size_t size = 0;
+    size += propertyFloatGetCPacketSize(self->level);
+    size += propertyFloatGetCPacketSize(self->cooldown);
+    size += propertyFloatGetCPacketSize(self->itemExp);
+    return size;
+}
+
+size_t itemCardGetSPacketSize(ItemCard *self) {
+    size_t size = 0;
+    size += itemChildGetSPacketSize(&self->item);
+    size += propertyFloatGetSPacketSize(self->level);
+    size += propertyFloatGetSPacketSize(self->cooldown);
+    size += propertyFloatGetSPacketSize(self->itemExp);
+    return size;
+}
+
+void itemCardSerializeCPacket(ItemCard *self, PacketStream *stream) {
+    propertyFloatSerializeCPacket(ITEM_CARD_PROPERTY_ID_LEVEL, self->level, stream);
+    propertyFloatSerializeCPacket(ITEM_CARD_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+    propertyFloatSerializeCPacket(ITEM_CARD_PROPERTY_ID_ITEM_EXP, self->itemExp, stream);
+}
+
+void itemCardSerializeSPacket(ItemCard *self, PacketStream *stream) {
+    itemChildSerializeSPacket(&self->item, stream);
+    propertyFloatSerializeSPacket(ITEM_CARD_PROPERTY_ID_LEVEL, self->level, stream);
+    propertyFloatSerializeSPacket(ITEM_CARD_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+    propertyFloatSerializeSPacket(ITEM_CARD_PROPERTY_ID_ITEM_EXP, self->itemExp, stream);
+}
+
+bool itemCardUnserializeSPacket(ItemCard *self, PacketStream *stream) {
+
+    if (!(itemChildUnserializeSPacket(&self->item, stream))) {
+        error("Cannot unserialize item packet.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_CARD_PROPERTY_ID_LEVEL, &self->level, stream))) {
+        error("Cannot unserialize packet LEVEL.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_CARD_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
+        error("Cannot unserialize packet COOLDOWN.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_CARD_PROPERTY_ID_ITEM_EXP, &self->itemExp, stream))) {
+        error("Cannot unserialize packet ITEM_EXP.");
+        return false;
+    }
+
+    return true;
 }

@@ -18,6 +18,7 @@
 
 // ---------- Includes ------------
 #include "R1EMU.h"
+#include "common/packet/packet_stream.h"
 
 // ---------- Defines -------------
 #define ACTOR_KEY_SIZE 17
@@ -78,3 +79,6 @@ inline ActorId_t actorGetUId(void *_self) {
 void actorGenKey(ActorId_t uid, ActorKey key);
 void actorPrint(Actor *self);
 
+size_t actorGetSPacketSize(Actor *self);
+void actorSerializeSPacket(Actor *self, PacketStream *stream);
+bool actorUnserializeSPacket(Actor *self, PacketStream *stream);

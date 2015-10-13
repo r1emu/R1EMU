@@ -23,7 +23,10 @@
 #include "common/packet/packet_stream.h"
 
 // ---------- Defines -------------
-
+// Property generators
+#define GENERATE_PROPERTY_ID(TYPE, NAME, VALUE) TYPE##_PROPERTY_ID_##NAME = VALUE,
+#define GENERATE_PROPERTY_ENUM(TYPE, NAME, VALUE) TYPE##_PROPERTY_##NAME,
+#define GENERATE_PROPERTY_ASSOC(TYPE, NAME, VALUE) [TYPE##_PROPERTY_ID_##NAME] = TYPE##_PROPERTY_##NAME,
 
 // ------ Structure declaration -------
 /** Property client/server ID size */
@@ -88,11 +91,13 @@ typedef struct {                               \
 // ----------- Functions ------------
 
 size_t propertyFloatGetCPacketSize(float *value);
-void propertyFloatGetCPacket(PropertyId_t id, float *value, PacketStream *stream);
 size_t propertyFloatGetSPacketSize(float *value);
-void propertyFloatGetSPacket(PropertyId_t id, float *value, PacketStream *stream);
+void propertyFloatSerializeCPacket(PropertyId_t id, float *value, PacketStream *stream);
+void propertyFloatSerializeSPacket(PropertyId_t id, float *value, PacketStream *stream);
+bool propertyFloatUnserializeSPacket(PropertyId_t id, float **value, PacketStream *stream);
 
 size_t propertyStringGetCPacketSize(char *value);
-void propertyStringGetCPacket(PropertyId_t id, char *value, PacketStream *stream);
 size_t propertyStringGetSPacketSize(char *value);
-void propertyStringGetSPacket(PropertyId_t id, char *value, PacketStream *stream);
+void propertyStringSerializeCPacket(PropertyId_t id, char *value, PacketStream *stream);
+void propertyStringSerializeSPacket(PropertyId_t id, char *value, PacketStream *stream);
+bool propertyStringUnserializeSPacket(PropertyId_t id, char **value, PacketStream *stream);

@@ -54,6 +54,11 @@ typedef struct ItemEquipable {
    ItemEquipmentSlot slot;
 } ItemEquipable;
 
+typedef struct {
+    ItemSPacket item;
+    ItemEquipmentSlot_t slot;
+} ItemEquipableSPacket;
+
 // ----------- Functions ------------
 /**
  * Allocate a new ItemEquipable structure.
@@ -84,6 +89,13 @@ void itemEquipableDestroy(ItemEquipable **self);
  * Getters & Setters
  */
 inline int itemEquipableGetSlot(ItemEquipable *self) { return self->slot; }
+
+/**
+ * Serialization / Unserialization
+ */
+size_t itemEquipableGetSPacketSize(ItemEquipable *self);
+void itemEquipableSerializeSPacket(ItemEquipable *self, PacketStream *stream);
+bool itemEquipableUnserializeSPacket(ItemEquipable *self, PacketStream *stream);
 
 /**
  * Debugging

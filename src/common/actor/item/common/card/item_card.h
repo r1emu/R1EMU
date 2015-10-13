@@ -24,7 +24,20 @@
 #include "common/property/property.h"
 
 // ---------- Defines -------------
+// Define properties ID
+#define FOREACH_ITEM_CARD(GENERATOR)     \
+    GENERATOR(ITEM_CARD, LEVEL, 3779)    \
+    GENERATOR(ITEM_CARD, COOLDOWN, 3750) \
+    GENERATOR(ITEM_CARD, ITEM_EXP, 3768)
 
+typedef enum {
+    FOREACH_ITEM_CARD(GENERATE_PROPERTY_ENUM)
+    ITEM_CARD_PROPERTY_COUNT
+}   ItemCardProperty;
+
+typedef enum {
+    FOREACH_ITEM_CARD(GENERATE_PROPERTY_ID)
+}   ItemCardId;
 
 // ------ Structure declaration -------
 typedef struct {
@@ -33,12 +46,6 @@ typedef struct {
     float *cooldown;
     float *itemExp;
 }   ItemCard;
-
-enum {
-    ITEM_CARD_PROPERTY_ID_LEVEL = 3779,
-    ITEM_CARD_PROPERTY_ID_COOLDOWN = 3750,
-    ITEM_CARD_PROPERTY_ID_ITEM_EXP = 3768
-};
 
 // ----------- Functions ------------
 
@@ -79,8 +86,11 @@ inline float *itemCardGetItemExp(ItemCard *self) { return self->itemExp; }
 /**
  * Serialization / Unserialization
  */
-size_t itemCardGetPropertiesCPacketSize(ItemCard *self);
-void itemCardGetPropertiesCPacket(ItemCard *self, PacketStream *stream);
+size_t itemCardGetCPacketSize(ItemCard *self);
+size_t itemCardGetSPacketSize(ItemCard *self);
+void itemCardSerializeCPacket(ItemCard *self, PacketStream *stream);
+void itemCardSerializeSPacket(ItemCard *self, PacketStream *stream);
+bool itemCardUnserializeSPacket(ItemCard *self, PacketStream *stream);
 
 /**
  * Debugging

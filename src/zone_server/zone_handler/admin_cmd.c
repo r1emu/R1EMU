@@ -132,14 +132,20 @@ void adminCmdSpawnPc(Worker *self, Session *session, char *args, zmsg_t *replyMs
 
 void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {
 
+    Item *newItem = NULL;
+
     ItemId_t itemId = strtol(args, &args, 10);
     args++;
     ItemAmount_t amount = strtol(args, &args, 10);
     amount = amount ? amount : 1;
 
-    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
+    // Create new item
+    if (!(newItem = itemFactoryCreate(itemId, amount))) {
+        error("Item ID = %d is invalid.", itemId);
+        return;
+    }
 
-    Item *newItem = itemFactoryCreate(itemId, amount);
+    Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
     inventoryAddItem(inventory, newItem);
 
     ItemCategory itemCategory = itemGetCategory(newItem);

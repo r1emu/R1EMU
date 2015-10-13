@@ -51,3 +51,7 @@ mathIsWithin2DCircleDistance (
 void positionXYZDump (PositionXYZ *position) {
     dbg ("x = %f / y = %f / z = %f", position->x, position->y, position->z);
 }
+
+void positionXZDump (PositionXZ *position) {
+    dbg ("x = %f / z = %f", position->x, position->z);
+}

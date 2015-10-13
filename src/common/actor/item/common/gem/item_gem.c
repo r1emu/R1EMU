@@ -17,6 +17,10 @@ extern inline float *itemGemGetLevel(ItemGem *self);
 extern inline float *itemGemGetItemExp(ItemGem *self);
 extern inline float *itemGemGetCooldown(ItemGem *self);
 
+ItemGemId itemGemIds[] = {
+    FOREACH_ITEM_GEM(GENERATE_PROPERTY_ASSOC)
+};
+
 ItemGem *itemGemNew(Item *item) {
     ItemGem *self;
 
@@ -58,22 +62,6 @@ void itemGemDestroy(ItemGem **_self) {
     }
 }
 
-size_t itemGemGetPropertiesCPacketSize(ItemGem *self) {
-    size_t size = 0;
-
-    size += propertyFloatGetCPacketSize(self->level); // level
-    size += propertyFloatGetCPacketSize(self->itemExp); // itemExp
-    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
-
-    return size;
-}
-
-void itemGemGetPropertiesCPacket(ItemGem *self, PacketStream *stream) {
-    propertyFloatGetCPacket(ITEM_GEM_PROPERTY_ID_LEVEL, self->level, stream);
-    propertyFloatGetCPacket(ITEM_GEM_PROPERTY_ID_ITEM_EXP, self->itemExp, stream);
-    propertyFloatGetCPacket(ITEM_GEM_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
-}
-
 void itemGemPrint(ItemGem *self) {
     PRINT_STRUCTURE {
         dbg("=== ItemGem %p ===", self);
@@ -88,4 +76,56 @@ void itemGemPrint(ItemGem *self) {
         }
         itemPrint(&self->item);
     }
+}
+
+size_t itemGemGetCPacketSize(ItemGem *self) {
+    size_t size = 0;
+    size += propertyFloatGetCPacketSize(self->level);
+    size += propertyFloatGetCPacketSize(self->itemExp);
+    size += propertyFloatGetCPacketSize(self->cooldown);
+    return size;
+}
+
+size_t itemGemGetSPacketSize(ItemGem *self) {
+    size_t size = 0;
+    size += itemChildGetSPacketSize(&self->item);
+    size += propertyFloatGetSPacketSize(self->level);
+    size += propertyFloatGetSPacketSize(self->itemExp);
+    size += propertyFloatGetSPacketSize(self->cooldown);
+    return size;
+}
+
+void itemGemSerializeCPacket(ItemGem *self, PacketStream *stream) {
+    propertyFloatSerializeCPacket(ITEM_GEM_PROPERTY_ID_LEVEL, self->level, stream);
+    propertyFloatSerializeCPacket(ITEM_GEM_PROPERTY_ID_ITEM_EXP, self->itemExp, stream);
+    propertyFloatSerializeCPacket(ITEM_GEM_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+void itemGemSerializeSPacket(ItemGem *self, PacketStream *stream) {
+    itemChildSerializeSPacket(&self->item, stream);
+    propertyFloatSerializeSPacket(ITEM_GEM_PROPERTY_ID_LEVEL, self->level, stream);
+    propertyFloatSerializeSPacket(ITEM_GEM_PROPERTY_ID_ITEM_EXP, self->itemExp, stream);
+    propertyFloatSerializeSPacket(ITEM_GEM_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+bool itemGemUnserializeSPacket(ItemGem *self, PacketStream *stream) {
+
+    if (!(itemChildUnserializeSPacket(&self->item, stream))) {
+        error("Cannot unserialize item packet.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_GEM_PROPERTY_ID_LEVEL, &self->level, stream))) {
+        error("Cannot unserialize packet LEVEL.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_GEM_PROPERTY_ID_ITEM_EXP, &self->itemExp, stream))) {
+        error("Cannot unserialize packet ITEM_EXP.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_GEM_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
+        error("Cannot unserialize packet COOLDOWN.");
+        return false;
+    }
+
+    return true;
 }

@@ -71,21 +71,10 @@ typedef Item* ItemHandle;
  * @brief ItemCPacket is the client packet structure of an item
  */
 typedef struct {
-    ActorId_t uid;
-    ItemAmount_t amount;
-    ItemInventoryIndex_t inventoryIndex;
-    ItemId_t id;
-} ItemCPacket;
-
-/**
- * @brief ItemCPacket is the client packet structure of an item
- */
-typedef struct {
     ActorSPacket actor;
     ItemId_t id;
     ItemAmount_t amount;
     ItemCategory category;
-    ItemInventoryIndex_t inventoryIndex;
 } ItemSPacket;
 
 // ----------- Functions ------------
@@ -124,8 +113,16 @@ inline ItemCategory itemGetCategory(Item *self) { return self->category; }
 /**
  * Serialization / Unserialization
  */
-size_t itemGetPropertiesCPacketSize(Item *self);
-void itemPropertiesGetCPacket(Item *self, PacketStream *stream);
+size_t itemGetCPacketSize(Item *self);
+void itemSerializeCPacket(Item *self, PacketStream *stream);
+
+size_t itemGetSPacketSize(Item *self);
+void itemSerializeSPacket(Item *self, PacketStream *stream);
+bool itemUnserializeSPacket(Item *self, PacketStream *stream);
+
+size_t itemChildGetSPacketSize(Item *self);
+void itemChildSerializeSPacket(Item *self, PacketStream *stream);
+bool itemChildUnserializeSPacket(Item *self, PacketStream *stream);
 
 /**
  * Debugging

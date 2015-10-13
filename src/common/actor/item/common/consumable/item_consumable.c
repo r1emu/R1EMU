@@ -14,6 +14,10 @@
 #include "item_consumable.h"
 extern inline float *itemConsumableGetCooldown(ItemConsumable *self);
 
+ItemConsumableId itemConsumableIds[] = {
+    FOREACH_ITEM_CONSUMABLE(GENERATE_PROPERTY_ASSOC)
+};
+
 ItemConsumable *itemConsumableNew(Item *item) {
     ItemConsumable *self;
 
@@ -53,26 +57,6 @@ void itemConsumableDestroy(ItemConsumable **_self) {
     }
 }
 
-size_t itemConsumableGetPropertiesCPacketSize(ItemConsumable *self) {
-    size_t size = 0;
-    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
-    return size;
-}
-
-void itemConsumableGetPropertiesCPacket(ItemConsumable *self, PacketStream *stream) {
-    propertyFloatGetCPacket(ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
-}
-
-size_t itemConsumableGetPropertiesSPacketSize(ItemConsumable *self) {
-    size_t size = 0;
-    size += propertyFloatGetSPacketSize(self->cooldown); // cooldown
-    return size;
-}
-
-void itemConsumableGetPropertiesSPacket(ItemConsumable *self, PacketStream *stream) {
-    propertyFloatGetSPacket(ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
-}
-
 void itemConsumablePrint(ItemConsumable *self) {
     PRINT_STRUCTURE {
         dbg("=== ItemConsumable %p ===", self);
@@ -81,4 +65,40 @@ void itemConsumablePrint(ItemConsumable *self) {
         }
         itemPrint(&self->item);
     }
+}
+
+size_t itemConsumableGetCPacketSize(ItemConsumable *self) {
+    size_t size = 0;
+    size += propertyFloatGetCPacketSize(self->cooldown);
+    return size;
+}
+
+size_t itemConsumableGetSPacketSize(ItemConsumable *self) {
+    size_t size = 0;
+    size += itemChildGetSPacketSize(&self->item);
+    size += propertyFloatGetSPacketSize(self->cooldown);
+    return size;
+}
+
+void itemConsumableSerializeCPacket(ItemConsumable *self, PacketStream *stream) {
+    propertyFloatSerializeCPacket(ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+void itemConsumableSerializeSPacket(ItemConsumable *self, PacketStream *stream) {
+    itemChildSerializeSPacket(&self->item, stream);
+    propertyFloatSerializeSPacket(ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+bool itemConsumableUnserializeSPacket(ItemConsumable *self, PacketStream *stream) {
+
+    if (!(itemChildUnserializeSPacket(&self->item, stream))) {
+        error("Cannot unserialize item packet.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
+        error("Cannot unserialize packet COOLDOWN.");
+        return false;
+    }
+
+    return true;
 }

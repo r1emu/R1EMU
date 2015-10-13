@@ -24,7 +24,20 @@
 #include "common/property/property.h"
 
 // ---------- Defines -------------
+// Define properties ID
+#define FOREACH_ITEM_GEM(GENERATOR)       \
+    GENERATOR(ITEM_GEM, LEVEL, 3779)      \
+    GENERATOR(ITEM_GEM, ITEM_EXP, 3768)   \
+    GENERATOR(ITEM_GEM, COOLDOWN, 3843)
 
+typedef enum {
+    FOREACH_ITEM_GEM(GENERATE_PROPERTY_ENUM)
+    ITEM_GEM_PROPERTY_COUNT
+}   ItemGemProperty;
+
+typedef enum {
+    FOREACH_ITEM_GEM(GENERATE_PROPERTY_ID)
+}   ItemGemId;
 
 // ------ Structure declaration -------
 typedef struct {
@@ -33,12 +46,6 @@ typedef struct {
     float *itemExp;
     float *cooldown;
 }   ItemGem;
-
-enum {
-    ITEM_GEM_PROPERTY_ID_LEVEL = 3779,
-    ITEM_GEM_PROPERTY_ID_ITEM_EXP = 3768,
-    ITEM_GEM_PROPERTY_ID_COOLDOWN = 3843
-};
 
 // ----------- Functions ------------
 
@@ -77,8 +84,11 @@ inline float *itemGemGetCooldown(ItemGem *self) { return self->cooldown; }
 /**
  * Serialization / Unserialization
  */
-size_t itemGemGetPropertiesCPacketSize(ItemGem *self);
-void itemGemGetPropertiesCPacket(ItemGem *self, PacketStream *stream);
+size_t itemGemGetCPacketSize(ItemGem *self);
+size_t itemGemGetSPacketSize(ItemGem *self);
+void itemGemSerializeCPacket(ItemGem *self, PacketStream *stream);
+void itemGemSerializeSPacket(ItemGem *self, PacketStream *stream);
+bool itemGemUnserializeSPacket(ItemGem *self, PacketStream *stream);
 
 /**
  * Debugging

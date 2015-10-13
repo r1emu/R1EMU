@@ -24,17 +24,24 @@
 #include "common/property/property.h"
 
 // ---------- Defines -------------
+// Define properties ID
+#define FOREACH_ITEM_CURRENCY(GENERATOR)       \
+    GENERATOR(ITEM_CURRENCY, COOLDOWN, 3750)
 
+typedef enum {
+    FOREACH_ITEM_CURRENCY(GENERATE_PROPERTY_ENUM)
+    ITEM_CURRENCY_PROPERTY_COUNT
+}   ItemCurrencyProperty;
+
+typedef enum {
+    FOREACH_ITEM_CURRENCY(GENERATE_PROPERTY_ID)
+}   ItemCurrencyId;
 
 // ------ Structure declaration -------
 typedef struct {
     Item item;
     float *cooldown;
 }   ItemCurrency;
-
-enum {
-    ITEM_CURRENCY_PROPERTY_ID_COOLDOWN = 3750
-};
 
 // ----------- Functions ------------
 
@@ -63,18 +70,19 @@ void itemCurrencyFree(ItemCurrency *self);
  */
 void itemCurrencyDestroy(ItemCurrency **self);
 
-
 /**
  * Getters & Setters
  */
 inline float *itemCurrencyGetCooldown(ItemCurrency *self) { return self->cooldown; }
 
-
 /**
  * Serialization / Unserialization
  */
-size_t itemCurrencyGetPropertiesCPacketSize(ItemCurrency *self);
-void itemCurrencyGetPropertiesCPacket(ItemCurrency *self, PacketStream *stream);
+size_t itemCurrencyGetCPacketSize(ItemCurrency *self);
+size_t itemCurrencyGetSPacketSize(ItemCurrency *self);
+void itemCurrencySerializeCPacket(ItemCurrency *self, PacketStream *stream);
+void itemCurrencySerializeSPacket(ItemCurrency *self, PacketStream *stream);
+bool itemCurrencyUnserializeSPacket(ItemCurrency *self, PacketStream *stream);
 
 /**
  * Debugging

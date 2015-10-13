@@ -62,3 +62,16 @@ void actorPrint(Actor *self) {
         dbg("UID = %llx", self->uid);
     }
 }
+
+size_t actorGetSPacketSize(Actor *self) {
+    return sizeof(ActorSPacket);
+}
+
+void actorSerializeSPacket(Actor *self, PacketStream *stream) {
+    packetStreamIn(stream, &self->uid);
+}
+
+bool actorUnserializeSPacket(Actor *self, PacketStream *stream) {
+    packetStreamOut(stream, &self->uid);
+    return true;
+}

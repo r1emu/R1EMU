@@ -24,17 +24,24 @@
 #include "common/property/property.h"
 
 // ---------- Defines -------------
+// Define properties ID
+#define FOREACH_ITEM_MATERIAL(GENERATOR)       \
+    GENERATOR(ITEM_MATERIAL, COOLDOWN, 3750)
 
+typedef enum {
+    FOREACH_ITEM_MATERIAL(GENERATE_PROPERTY_ENUM)
+    ITEM_MATERIAL_PROPERTY_COUNT
+}   ItemMaterialProperty;
+
+typedef enum {
+    FOREACH_ITEM_MATERIAL(GENERATE_PROPERTY_ID)
+}   ItemMaterialId;
 
 // ------ Structure declaration -------
 typedef struct {
     Item item;
     float *cooldown;
 }   ItemMaterial;
-
-enum {
-    ITEM_MATERIAL_PROPERTY_ID_COOLDOWN = 3750
-};
 
 // ----------- Functions ------------
 
@@ -73,8 +80,11 @@ inline float *itemMaterialGetCooldown(ItemMaterial *self) { return self->cooldow
 /**
  * Serialization / Unserialization
  */
-size_t itemMaterialGetPropertiesCPacketSize(ItemMaterial *self);
-void itemMaterialGetPropertiesCPacket(ItemMaterial *self, PacketStream *stream);
+size_t itemMaterialGetCPacketSize(ItemMaterial *self);
+size_t itemMaterialGetSPacketSize(ItemMaterial *self);
+void itemMaterialSerializeCPacket(ItemMaterial *self, PacketStream *stream);
+void itemMaterialSerializeSPacket(ItemMaterial *self, PacketStream *stream);
+bool itemMaterialUnserializeSPacket(ItemMaterial *self, PacketStream *stream);
 
 /**
  * Debugging

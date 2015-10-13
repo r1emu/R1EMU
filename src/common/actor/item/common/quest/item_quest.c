@@ -13,6 +13,10 @@
 
 #include "item_quest.h"
 
+ItemQuestId itemQuestIds[] = {
+    FOREACH_ITEM_QUEST(GENERATE_PROPERTY_ASSOC)
+};
+
 ItemQuest *itemQuestNew(Item *item) {
     ItemQuest *self;
 
@@ -52,18 +56,6 @@ void itemQuestDestroy(ItemQuest **_self) {
     }
 }
 
-size_t itemQuestGetPropertiesCPacketSize(ItemQuest *self) {
-    size_t size = 0;
-
-    size += propertyFloatGetCPacketSize(self->cooldown); // cooldown
-
-    return size;
-}
-
-void itemQuestGetPropertiesCPacket(ItemQuest *self, PacketStream *stream) {
-    propertyFloatGetCPacket(ITEM_QUEST_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
-}
-
 void itemQuestPrint(ItemQuest *self) {
     PRINT_STRUCTURE {
         dbg("=== ItemQuest %p ===", self);
@@ -72,4 +64,40 @@ void itemQuestPrint(ItemQuest *self) {
         }
         itemPrint(&self->item);
     }
+}
+
+size_t itemQuestGetCPacketSize(ItemQuest *self) {
+    size_t size = 0;
+    size += propertyFloatGetCPacketSize(self->cooldown);
+    return size;
+}
+
+size_t itemQuestGetSPacketSize(ItemQuest *self) {
+    size_t size = 0;
+    size += itemChildGetSPacketSize(&self->item);
+    size += propertyFloatGetSPacketSize(self->cooldown);
+    return size;
+}
+
+void itemQuestSerializeCPacket(ItemQuest *self, PacketStream *stream) {
+    propertyFloatSerializeCPacket(ITEM_QUEST_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+void itemQuestSerializeSPacket(ItemQuest *self, PacketStream *stream) {
+    itemChildSerializeSPacket(&self->item, stream);
+    propertyFloatSerializeSPacket(ITEM_QUEST_PROPERTY_ID_COOLDOWN, self->cooldown, stream);
+}
+
+bool itemQuestUnserializeSPacket(ItemQuest *self, PacketStream *stream) {
+
+    if (!(itemChildUnserializeSPacket(&self->item, stream))) {
+        error("Cannot unserialize item packet.");
+        return false;
+    }
+    if (!(propertyFloatUnserializeSPacket(ITEM_QUEST_PROPERTY_ID_COOLDOWN, &self->cooldown, stream))) {
+        error("Cannot unserialize packet COOLDOWN.");
+        return false;
+    }
+
+    return true;
 }

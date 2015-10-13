@@ -24,27 +24,24 @@
 #include "common/property/property.h"
 
 // ---------- Defines -------------
+// Define properties ID
+#define FOREACH_ITEM_CONSUMABLE(GENERATOR)       \
+    GENERATOR(ITEM_CONSUMABLE, COOLDOWN, 3750)
 
+typedef enum {
+    FOREACH_ITEM_CONSUMABLE(GENERATE_PROPERTY_ENUM)
+    ITEM_CONSUMABLE_PROPERTY_COUNT
+}   ItemConsumableProperty;
+
+typedef enum {
+    FOREACH_ITEM_CONSUMABLE(GENERATE_PROPERTY_ID)
+}   ItemConsumableId;
 
 // ------ Structure declaration -------
-enum {
-    ITEM_CONSUMABLE_PROPERTY_COOLDOWN,
-    ITEM_CONSUMABLE_PROPERTY_COUNT
-};
-
-enum {
-    ITEM_CONSUMABLE_PROPERTY_ID_COOLDOWN = 3750
-};
-
 typedef struct {
     Item item;
     float *cooldown;
 }   ItemConsumable;
-
-typedef struct {
-    ItemSPacket item;
-    uint8_t properties[0]; // PropertySPacket properties[ITEM_CONSUMABLE_PROPERTY_COUNT];
-}   ItemConsumableSPacket;
 
 // ----------- Functions ------------
 
@@ -81,10 +78,11 @@ inline float *itemConsumableGetCooldown(ItemConsumable *self) { return self->coo
 /**
  * Serialization / Unserialization
  */
-size_t itemConsumableGetPropertiesCPacketSize(ItemConsumable *self);
-void itemConsumableGetPropertiesCPacket(ItemConsumable *self, PacketStream *stream);
-size_t itemConsumableGetPropertiesSPacketSize(ItemConsumable *self);
-void itemConsumableGetPropertiesSPacket(ItemConsumable *self, PacketStream *stream);
+size_t itemConsumableGetCPacketSize(ItemConsumable *self);
+size_t itemConsumableGetSPacketSize(ItemConsumable *self);
+void itemConsumableSerializeSPacket(ItemConsumable *self, PacketStream *stream);
+void itemConsumableSerializeCPacket(ItemConsumable *self, PacketStream *stream);
+bool itemConsumableUnserializeSPacket(ItemConsumable *self, PacketStream *stream);
 
 /**
  * Debugging
