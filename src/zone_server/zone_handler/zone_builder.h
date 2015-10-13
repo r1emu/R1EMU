@@ -441,6 +441,8 @@ void zoneBuilderItemRemove(Item *item, InventoryRemoval removalType, InventoryTy
 void zoneBuilderJobPoints(CommanderJobId_t jobId, CommanderJobPoints_t points, zmsg_t *replyMsg);
 
 void zoneBuilderSkillRangeFan(PcId_t pcId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
+void zoneBuilderSkillRangeSquare(PcId_t pcId, SkillId_t skillId, PositionXYZ *pos1, PositionXYZ *pos2, zmsg_t *replyMsg);
 void zoneBuilderSkillMeleeGround(PcId_t pcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg);
 void zoneBuilderBuffAdd(PcId_t pcId, Commander *commander, zmsg_t *replyMsg);
 void zoneBuilderHealInfo(PcId_t pcId, uint32_t amountHealed, uint32_t totalHP, zmsg_t *replyMsg);
+void zoneBuilderNormalUnk14_4c(PcId_t pcId, SkillId_t skillId, zmsg_t *replyMsg);

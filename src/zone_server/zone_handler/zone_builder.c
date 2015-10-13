@@ -266,7 +266,7 @@ void zoneBuilderNormalUnk10_56(PcId_t targetPcId, SkillId_t skillId, PositionXYZ
     struct {
         PacketNormalHeader normalHeader;
         PcId_t pcId;
-        uint32_t unk1;
+        uint32_t skillEffectId;
         SkillId_t skillId;
         uint32_t unk2; // Level?
         PositionXYZ position;
@@ -300,7 +300,9 @@ void zoneBuilderNormalUnk10_56(PcId_t targetPcId, SkillId_t skillId, PositionXYZ
         );
 
         replyPacket.pcId = targetPcId;
-        replyPacket.unk1 = SWAP_UINT32(0x11182700);
+        //replyPacket.skillEffectId = SWAP_UINT32(0x11182700);
+        replyPacket.skillEffectId = SWAP_UINT32(0x81202700);
+        //replyPacket.skillEffectId = SWAP_UINT32(0x78E70200);
         replyPacket.skillId = skillId;
         replyPacket.unk2 = 1;
         replyPacket.position = *position;
@@ -421,6 +423,31 @@ void zoneBuilderNormalUnk13_85(ActorId_t actorId, zmsg_t *replyMsg) {
     buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }
 
+void zoneBuilderNormalUnk14_4c(PcId_t pcId, SkillId_t skillId, zmsg_t *replyMsg) {
+    #pragma pack(push, 1)
+    struct {
+        PacketNormalHeader normalHeader;
+        PcId_t pcId;
+        SkillId_t skillId;
+    } replyPacket;
+    #pragma pack(pop)
+
+    BUILD_REPLY_PACKET(replyPacket, replyMsg)
+    {
+        size_t memSize = sizeof(replyPacket);
+        dumpToMem(
+            "[03:07:53][main.c:56 in CNetUsr__PacketHandler_1]  33 0D A6 13 14 03 19 00 4C 00 00 00 27 68 01 00 | 3.....9......_..\n"
+            "[03:07:53][main.c:56 in CNetUsr__PacketHandler_1]  66 EA 00 00                                     | ...w.....j...tv.\n"
+          , &replyPacket, &memSize
+        );
+
+        replyPacket.pcId = pcId;
+        replyPacket.skillId = skillId;
+
+    }
+
+    buffer_print(&replyPacket, sizeof(replyPacket), NULL);
+}
 
 
 void zoneBuilderPartyList(zmsg_t *replyMsg) {
@@ -666,7 +693,7 @@ void zoneBuilderSkillAdd(zmsg_t *replyMsg) {
         size_t memSize;
         void *memory = dumpToMem(
             "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  34 0C FF FF FF FF A2 00 01 01 00 00 00 00 00 00 | 4...............\n"
-            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  00 00 8F 72 07 00 46 01 00 00 41 9C 00 00 78 00 | ...r..F...A...x.\n"
+            "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  00 00 8F 72 07 00 46 01 00 00 AA 9C 00 00 78 00 | ...r..F...A...x.\n"
             "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  CC D1 00 00 00 00 54 49 34 D0 BF 0F 00 00 80 3F | ......TI4......?\n"
             "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  B4 0F 00 E0 AB 46 B8 0F 00 00 00 00 B7 0F 00 00 | .....F..........\n"
             "[03:07:52][main.c:56 in CNetUsr__PacketHandler_1]  C8 42 B5 0F 00 00 00 00 BE 0F 00 00 60 41 09 10 | .B...........A..\n"
@@ -2229,11 +2256,12 @@ void zoneBuilderSkillRangeFan(PcId_t pcId, PositionXYZ *position, PositionXZ *di
     buffer_print(&replyPacket, sizeof(replyPacket), NULL);
 }
 
-void zoneBuilderSkillRangeSquare(Skill skill, zmsg_t *replyMsg) {
+void zoneBuilderSkillRangeSquare(PcId_t pcId, SkillId_t skillId, PositionXYZ *pos1, PositionXYZ *pos2, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
         ServerPacketHeader header;
-        uint32_t unk1;
+        uint32_t pcId;
+        uint16_t unk1;
         PositionXYZ position1;
         PositionXYZ position2;
         float unk2;
@@ -2248,10 +2276,11 @@ void zoneBuilderSkillRangeSquare(Skill skill, zmsg_t *replyMsg) {
     {
         serverPacketHeaderInit(&replyPacket.header, packetType);
         /// TODO
-        /*
+        replyPacket.pcId = pcId;
         replyPacket.unk1 = 0;
-        replyPacket.unk2 = 0;
-        */
+        replyPacket.position1 = *pos1;
+        replyPacket.position2 = *pos2;
+        replyPacket.unk2 = 14.0;
     }
 }
 
@@ -2310,8 +2339,7 @@ void zoneBuilderSkillRangeDbg(Skill skill, zmsg_t *replyMsg) {
 void zoneBuilderSkillMeleeGround(PcId_t pcId, SkillId_t skillId, PositionXYZ *position, PositionXZ *direction, zmsg_t *replyMsg) {
     #pragma pack(push, 1)
     struct {
-        ServerPacketHeader header;
-        uint16_t unk1;
+        VariableSizePacketHeader variableSizeHeader;
         uint16_t skillId;
         uint16_t unk2;
         PcId_t pcId;
@@ -2333,9 +2361,8 @@ void zoneBuilderSkillMeleeGround(PcId_t pcId, SkillId_t skillId, PositionXYZ *po
 
     BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
-        serverPacketHeaderInit(&replyPacket.header, packetType);
-        /// TODO
-        replyPacket.unk1 = 62;
+        variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
+        /// TODO - Variable size packet
         replyPacket.skillId = (uint16_t) skillId;
         replyPacket.unk2 = 162;
         replyPacket.pcId = pcId;
@@ -2388,7 +2415,8 @@ void zoneBuilderBuffAdd(PcId_t pcId, Commander *commander, zmsg_t *replyMsg) {
         replyPacket.commanderNameSize = commanderNameSize;
         memcpy(&replyPacket.commanderName, &commander->commanderName, commanderNameSize);
         replyPacket.pcId2 = pcId;
-        replyPacket.unkId1 = SWAP_UINT32(0xE6200500);
+        //replyPacket.unkId1 = SWAP_UINT32(0xE6200500);
+        replyPacket.unkId1 = SWAP_UINT32(0x43910500);
 
     }
 
