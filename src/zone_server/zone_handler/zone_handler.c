@@ -74,6 +74,8 @@ static PacketHandlerState zoneHandlerItemDelete        (Worker *self, Session *s
 static PacketHandlerState zoneHandlerSwapEtcInvChangeIndex        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 /** On commander learn skills */
 static PacketHandlerState zoneHandlerReqNormalTxNumArg        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
+/** On commander execute dynamic skills */
+static PacketHandlerState zoneHandlerDynamicCastingStart        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *replyMsg);
 
 /**
  * @brief zoneHandlers is a global table containing all the zone handlers.
@@ -107,6 +109,7 @@ const PacketHandler zoneHandlers[PACKET_TYPE_COUNT] = {
     REGISTER_PACKET_HANDLER(CZ_ITEM_DELETE, zoneHandlerItemDelete),
     REGISTER_PACKET_HANDLER(CZ_SWAP_ETC_INV_CHANGE_INDEX, zoneHandlerSwapEtcInvChangeIndex),
     REGISTER_PACKET_HANDLER(CZ_REQ_NORMAL_TX_NUMARG, zoneHandlerReqNormalTxNumArg),
+    REGISTER_PACKET_HANDLER(CZ_DYNAMIC_CASTING_START, zoneHandlerDynamicCastingStart),
 
     #undef REGISTER_PACKET_HANDLER
 };
@@ -248,6 +251,10 @@ static PacketHandlerState zoneHandlerSkillGround(
         replyMsg
     );
 
+    // Melstis !
+    // clientPacket->skillId = 40102;
+
+    // Skill is ready to be casted
     zoneBuilderSkillReady(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
@@ -262,6 +269,7 @@ static PacketHandlerState zoneHandlerSkillGround(
 
     dbg("skillPos: %f, %f, %f", skillPos.x, skillPos.y, skillPos.z);
 
+    // Make the skill appear
     zoneBuilderNormalUnk10_56(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
@@ -271,6 +279,7 @@ static PacketHandlerState zoneHandlerSkillGround(
         replyMsg
     );
 
+    // Unkown
     zoneBuilderNormalUnk11_1c(
         session->game.commanderSession.currentCommander->pcId,
         &clientPacket->pos1,
@@ -278,6 +287,7 @@ static PacketHandlerState zoneHandlerSkillGround(
         replyMsg
     );
 
+    // Set range of effect for this skill? (cone)
     zoneBuilderSkillRangeFan(
         session->game.commanderSession.currentCommander->pcId,
         &clientPacket->pos1,
@@ -285,6 +295,7 @@ static PacketHandlerState zoneHandlerSkillGround(
         replyMsg
     );
 
+    // Dont know.. everything works fine without this packet anyway.
     zoneBuilderSkillMeleeGround(
         session->game.commanderSession.currentCommander->pcId,
         clientPacket->skillId,
@@ -986,5 +997,98 @@ static PacketHandlerState zoneHandlerReqNormalTxNumArg(
     return PACKET_HANDLER_OK;
 
 }
+
+static PacketHandlerState zoneHandlerDynamicCastingStart(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *replyMsg)
+{
+    #pragma pack(push, 1)
+    struct {
+        uint32_t skillId;
+        float unk2; // time?
+        uint32_t unk3;
+        uint8_t unk4;
+    } *clientPacket = (void *) packet;
+    #pragma pack(pop)
+
+    dbg("skillId %d", clientPacket->skillId);
+    dbg("unk2 %f", clientPacket->unk2);
+    dbg("unk3 %d", clientPacket->unk3);
+    dbg("unk4 %d", clientPacket->unk4);
+
+    PositionXZ dir;
+
+    dir.x = (float) SWAP_UINT32(0xEF04353F);
+    dir.z = (float) SWAP_UINT32(0xF70435BF);
+
+    // Stop Commander in current position
+    zoneBuilderPcMoveStop(
+        session->game.commanderSession.currentCommander->pcId,
+        &session->game.commanderSession.currentCommander->pos,
+        &dir,
+        0,
+        replyMsg
+    );
+
+    // Unkown
+    zoneBuilderNormalUnk14_4c(
+        session->game.commanderSession.currentCommander->pcId,
+        clientPacket->skillId,
+        replyMsg
+    );
+
+    // Skill is ready to be casted
+    zoneBuilderSkillReady(
+        session->game.commanderSession.currentCommander->pcId,
+        clientPacket->skillId,
+        &session->game.commanderSession.currentCommander->pos,
+        &session->game.commanderSession.currentCommander->pos,
+        replyMsg
+    );
+
+    // Unkown
+    zoneBuilderNormalUnk11_1c(
+        session->game.commanderSession.currentCommander->pcId,
+        &session->game.commanderSession.currentCommander->pos,
+        &dir,
+        replyMsg
+    );
+
+    // Set range of effect for this skill? (cone)
+    zoneBuilderSkillRangeSquare(
+        session->game.commanderSession.currentCommander->pcId,
+        clientPacket->skillId,
+        &session->game.commanderSession.currentCommander->pos,
+        &session->game.commanderSession.currentCommander->pos,
+        replyMsg
+    );
+
+    // Skill melee ground
+    ///
+
+    // Make the skill appear
+    zoneBuilderNormalUnk10_56(
+        session->game.commanderSession.currentCommander->pcId,
+        clientPacket->skillId,
+        &session->game.commanderSession.currentCommander->pos,
+        &dir,
+        true,
+        replyMsg
+    );
+
+    zoneBuilderBuffAdd(
+        session->game.commanderSession.currentCommander->pcId,
+        session->game.commanderSession.currentCommander,
+        replyMsg
+    );
+
+    return PACKET_HANDLER_OK;
+
+}
+
+
 
 
