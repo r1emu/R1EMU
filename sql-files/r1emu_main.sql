@@ -1,5 +1,10 @@
 use r1emu;
 
+DROP PROCEDURE IF EXISTS `bSetFamilyName`;
+DROP TABLE IF EXISTS accounts;
+DROP TABLE IF EXISTS commanders;
+DROP TABLE IF EXISTS items;
+
 --
 -- Database: `r1emu`
 --
@@ -98,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `commanders` (
   `mp` float NOT NULL,
   `eqslot_head_top` int(11) NOT NULL,
   `eqslot_head_middle` int(11) NOT NULL DEFAULT '0',
-  `eqslot_unkown_1` int(11) NOT NULL DEFAULT '0',
+  `eqslot_unknown_1` int(11) NOT NULL DEFAULT '0',
   `eqslot_body_armor` int(11) NOT NULL DEFAULT '0',
   `eqslot_gloves` int(11) NOT NULL DEFAULT '0',
   `eqslot_boots` int(11) NOT NULL DEFAULT '0',
@@ -107,12 +112,12 @@ CREATE TABLE IF NOT EXISTS `commanders` (
   `eqslot_weapon` int(11) NOT NULL DEFAULT '0',
   `eqslot_shield` int(11) NOT NULL DEFAULT '0',
   `eqslot_costume` int(11) NOT NULL DEFAULT '0',
-  `eqslot_unkown_3` int(11) NOT NULL,
-  `eqslot_unkown_4` int(11) NOT NULL DEFAULT '0',
-  `eqslot_unkown_5` int(11) NOT NULL DEFAULT '0',
+  `eqslot_unknown_3` int(11) NOT NULL,
+  `eqslot_unknown_4` int(11) NOT NULL DEFAULT '0',
+  `eqslot_unknown_5` int(11) NOT NULL DEFAULT '0',
   `eqslot_leg_armor` int(11) NOT NULL DEFAULT '0',
-  `eqslot_unkown_6` int(11) NOT NULL DEFAULT '0',
-  `eqslot_unkown_7` int(11) NOT NULL DEFAULT '0',
+  `eqslot_unknown_6` int(11) NOT NULL DEFAULT '0',
+  `eqslot_unknown_7` int(11) NOT NULL DEFAULT '0',
   `eqslot_ring_left` int(11) NOT NULL DEFAULT '0',
   `eqslot_ring_right` int(11) NOT NULL DEFAULT '0',
   `eqslot_necklace` int(11) NOT NULL DEFAULT '0',
