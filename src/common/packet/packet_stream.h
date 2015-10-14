@@ -32,7 +32,12 @@
  */
 struct PacketStream {
     uint8_t *buffer;
+    size_t size;
     unsigned int position;
+
+    // Debug
+    int sizeExcepted;
+    const char *function;
 };
 
 typedef struct PacketStream PacketStream;
@@ -42,7 +47,7 @@ typedef struct PacketStream PacketStream;
  * @param buffer An allocated buffer for the stream. It must be big enough for the stream or it will overflow.
  * @return A pointer to an allocated PacketStream.
  */
-PacketStream *packetStreamNew(void *buffer);
+PacketStream *packetStreamNew(void *buffer, size_t size);
 
 /**
  * @brief Initialize an allocated PacketStream structure.
@@ -50,7 +55,7 @@ PacketStream *packetStreamNew(void *buffer);
  * @param buffer An allocated buffer for the stream. It must be big enough for the stream or it will overflow.
  * @return true on success, false otherwise.
  */
-void packetStreamInit(PacketStream *self, void *buffer);
+void packetStreamInit(PacketStream *self, void *buffer, size_t size);
 
 /**
  * @brief Move the position depending of the offset argument (position = position + offet)
@@ -96,7 +101,19 @@ void packetStreamDestroy(PacketStream **self);
  */
 size_t packetStreamGetSize(PacketStream *self);
 
+#define packetStreamDebugStart(stream, size) \
+    _packetStreamDebugStart(stream, size, __FUNCTION__)
+void _packetStreamDebugStart(PacketStream *self, size_t sizeExcepted, const char *function);
+#define packetStreamDebugEnd(stream) \
+    _packetStreamDebugEnd(stream, __FUNCTION__)
+bool _packetStreamDebugEnd(PacketStream *self, const char *function);
+
 /**
  * Debugging
  */
 void packetStreamPrint(PacketStream *self);
+
+/**
+ * Setters / Getters
+ */
+inline void packetStreamResetPosition(PacketStream *self) { self->position = 0; }

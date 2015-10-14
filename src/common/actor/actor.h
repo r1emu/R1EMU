@@ -38,9 +38,11 @@ typedef struct {
 /**
  * ActorSPacket is a server packet Actor
  */
+#pragma pack(push, 1)
 typedef struct {
    ActorId_t uid;
 } ActorSPacket;
+#pragma pack(pop)
 
 // ----------- Functions ------------
 /**

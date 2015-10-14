@@ -148,7 +148,7 @@ void adminCmdAddItem(Worker *self, Session *session, char *args, zmsg_t *replyMs
     Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
     inventoryAddItem(inventory, newItem);
 
-    ItemCategory itemCategory = itemGetCategory(newItem);
+    ItemCategory_t itemCategory = itemGetCategory(newItem);
     ActorId_t actorId = actorGetUId(newItem);
 
     dbg("itemCategory %d", itemCategory);
@@ -164,6 +164,7 @@ void adminCmdAddSkill(Worker *self, Session *session, char *args, zmsg_t *replyM
     SkillId_t skillId = strtol(args, &args, 10);
     args++;
     SkillLevel_t level = strtol(args, &args, 10);
+    skillId = skillId ? skillId : 40001; // Heal
     level = level ? level : 1;
 
     SkillsManager *skillsManager = &session->game.commanderSession.currentCommander->skillsManager;
@@ -172,7 +173,7 @@ void adminCmdAddSkill(Worker *self, Session *session, char *args, zmsg_t *replyM
     Item *newItem = itemFactoryCreate(itemId, amount);
     skillsManagerAddskill(skillsManager, newItem);
 
-    ItemCategory itemCategory = itemGetCategory(newItem);
+    ItemCategory_t itemCategory = itemGetCategory(newItem);
     ActorId_t actorId = actorGetUId(newItem);
 
     dbg("itemCategory %d", itemCategory);
@@ -181,7 +182,7 @@ void adminCmdAddSkill(Worker *self, Session *session, char *args, zmsg_t *replyM
 
     dbg("inventoryIndex %d", inventoryIndex);
     */
-    zoneBuilderSkillAdd(replyMsg);
+    zoneBuilderSkillAdd(skillId, replyMsg);
 }
 
 void adminCmdJump(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {

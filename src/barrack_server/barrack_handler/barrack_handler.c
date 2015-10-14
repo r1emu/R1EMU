@@ -382,15 +382,6 @@ static PacketHandlerState barrackHandlerStartBarrack(
     // Update session
     session->game.accountSession = tmpAccountSession;
 
-    /// TESTING PURPOSES
-    Inventory *inventory = &tmpAccountSession.commanders[0]->inventory;
-    inventoryAddItem(inventory, itemFactoryCreate(645001, 5003));
-    inventoryAddItem(inventory, itemFactoryCreate(640026, 5));
-    inventoryAddItem(inventory, itemFactoryCreate(531101, 1));
-    inventoryAddItem(inventory, itemFactoryCreate(531152, 1));
-    inventoryAddItem(inventory, itemFactoryCreate(531151, 1));
-    inventoryAddItem(inventory, itemFactoryCreate(511151, 1));
-
     // Send the commander list
     barrackBuilderCommanderList(
         session->socket.accountId,
@@ -678,7 +669,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
         [COMMANDER_JOB_WARRIOR] = {
             EMPTYEQSLOT_NoHat, // HAT
             EMPTYEQSLOT_NoHat, // HAT_L
-            EMPTYEQSLOT_NoOuter, // UNKOWN1
+            EMPTYEQSLOT_NoOuter, // UNKNOWN1
             531101, // BODY_ARMOR : Light Armor
             EMPTYEQSLOT_NoGloves, // GLOVES
             EMPTYEQSLOT_NoBoots,// BOOTS
@@ -687,12 +678,12 @@ static PacketHandlerState barrackHandlerCommanderCreate(
             201101, // WEAPON : Old Wooden Club
             EMPTYEQSLOT_NoWeapon, // SHIELD
             EMPTYEQSLOT_NoOuter, // COSTUME
-            EMPTYEQSLOT_NoRing, // UNKOWN3
-            EMPTYEQSLOT_NoRing, // UNKOWN4
-            EMPTYEQSLOT_NoOuter, // UNKOWN5
+            EMPTYEQSLOT_NoRing, // UNKNOWN3
+            EMPTYEQSLOT_NoRing, // UNKNOWN4
+            EMPTYEQSLOT_NoOuter, // UNKNOWN5
             521101, // LEG_ARMOR : Light Pants
-            EMPTYEQSLOT_NoRing, // UNKOWN6
-            EMPTYEQSLOT_NoRing, // UNKOWN7
+            EMPTYEQSLOT_NoRing, // UNKNOWN6
+            EMPTYEQSLOT_NoRing, // UNKNOWN7
             EMPTYEQSLOT_NoRing, // RING_LEFT
             EMPTYEQSLOT_NoRing, // RING_RIGHT
             EMPTYEQSLOT_NoNeck,// NECKLACE
@@ -701,7 +692,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
         [COMMANDER_JOB_CLERIC] = {
             EMPTYEQSLOT_NoHat, // HAT
             EMPTYEQSLOT_NoHat, // HAT_L
-            EMPTYEQSLOT_NoOuter, // UNKOWN1
+            EMPTYEQSLOT_NoOuter, // UNKNOWN1
             531101, // BODY_ARMOR : Light Armor
             EMPTYEQSLOT_NoGloves, // GLOVES
             EMPTYEQSLOT_NoBoots,// BOOTS
@@ -710,12 +701,12 @@ static PacketHandlerState barrackHandlerCommanderCreate(
             201101, // WEAPON : Old Wooden Club
             EMPTYEQSLOT_NoWeapon, // SHIELD
             EMPTYEQSLOT_NoOuter, // COSTUME
-            EMPTYEQSLOT_NoRing, // UNKOWN3
-            EMPTYEQSLOT_NoRing, // UNKOWN4
-            EMPTYEQSLOT_NoOuter, // UNKOWN5
+            EMPTYEQSLOT_NoRing, // UNKNOWN3
+            EMPTYEQSLOT_NoRing, // UNKNOWN4
+            EMPTYEQSLOT_NoOuter, // UNKNOWN5
             521101, // LEG_ARMOR : Light Pants
-            EMPTYEQSLOT_NoRing, // UNKOWN6
-            EMPTYEQSLOT_NoRing, // UNKOWN7
+            EMPTYEQSLOT_NoRing, // UNKNOWN6
+            EMPTYEQSLOT_NoRing, // UNKNOWN7
             EMPTYEQSLOT_NoRing, // RING_LEFT
             EMPTYEQSLOT_NoRing, // RING_RIGHT
             EMPTYEQSLOT_NoNeck,// NECKLACE
@@ -724,7 +715,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
         [COMMANDER_JOB_WIZARD] = {
             EMPTYEQSLOT_NoHat, // HAT
             EMPTYEQSLOT_NoHat, // HAT_L
-            EMPTYEQSLOT_NoOuter, // UNKOWN1
+            EMPTYEQSLOT_NoOuter, // UNKNOWN1
             531101, // BODY_ARMOR : Light Armor
             EMPTYEQSLOT_NoGloves, // GLOVES
             EMPTYEQSLOT_NoBoots,// BOOTS
@@ -733,12 +724,12 @@ static PacketHandlerState barrackHandlerCommanderCreate(
             201101, // WEAPON : Old Wooden Club
             EMPTYEQSLOT_NoWeapon, // SHIELD
             EMPTYEQSLOT_NoOuter, // COSTUME
-            EMPTYEQSLOT_NoRing, // UNKOWN3
-            EMPTYEQSLOT_NoRing, // UNKOWN4
-            EMPTYEQSLOT_NoOuter, // UNKOWN5
+            EMPTYEQSLOT_NoRing, // UNKNOWN3
+            EMPTYEQSLOT_NoRing, // UNKNOWN4
+            EMPTYEQSLOT_NoOuter, // UNKNOWN5
             521101, // LEG_ARMOR : Light Pants
-            EMPTYEQSLOT_NoRing, // UNKOWN6
-            EMPTYEQSLOT_NoRing, // UNKOWN7
+            EMPTYEQSLOT_NoRing, // UNKNOWN6
+            EMPTYEQSLOT_NoRing, // UNKNOWN7
             EMPTYEQSLOT_NoRing, // RING_LEFT
             EMPTYEQSLOT_NoRing, // RING_RIGHT
             EMPTYEQSLOT_NoNeck,// NECKLACE
@@ -747,7 +738,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
         [COMMANDER_JOB_ARCHER] = {
             EMPTYEQSLOT_NoHat, // HAT
             EMPTYEQSLOT_NoHat, // HAT_L
-            EMPTYEQSLOT_NoOuter, // UNKOWN1
+            EMPTYEQSLOT_NoOuter, // UNKNOWN1
             531101, // BODY_ARMOR : Light Armor
             EMPTYEQSLOT_NoGloves, // GLOVES
             EMPTYEQSLOT_NoBoots,// BOOTS
@@ -756,22 +747,21 @@ static PacketHandlerState barrackHandlerCommanderCreate(
             201101, // WEAPON : Old Wooden Club
             EMPTYEQSLOT_NoWeapon, // SHIELD
             EMPTYEQSLOT_NoOuter, // COSTUME
-            EMPTYEQSLOT_NoRing, // UNKOWN3
-            EMPTYEQSLOT_NoRing, // UNKOWN4
-            EMPTYEQSLOT_NoOuter, // UNKOWN5
+            EMPTYEQSLOT_NoRing, // UNKNOWN3
+            EMPTYEQSLOT_NoRing, // UNKNOWN4
+            EMPTYEQSLOT_NoOuter, // UNKNOWN5
             521101, // LEG_ARMOR : Light Pants
-            EMPTYEQSLOT_NoRing, // UNKOWN6
-            EMPTYEQSLOT_NoRing, // UNKOWN7
+            EMPTYEQSLOT_NoRing, // UNKNOWN6
+            EMPTYEQSLOT_NoRing, // UNKNOWN7
             EMPTYEQSLOT_NoRing, // RING_LEFT
             EMPTYEQSLOT_NoRing, // RING_RIGHT
             EMPTYEQSLOT_NoNeck,// NECKLACE
         }
     };
-    for (ItemEquipmentSlot slot = 0; slot < EQSLOT_COUNT; slot++) {
-        newCommander.inventory.equippedItems[slot] = (ItemEquipable *) itemFactoryCreate(
-            defaultEquipment[newCommander.jobId][slot],
-            1
-        );
+    for (ItemEquipmentSlot_t slot = 0; slot < EQSLOT_COUNT; slot++) {
+        ItemEquipable *itemEq = (ItemEquipable *) itemFactoryCreate(defaultEquipment[newCommander.jobId][slot], 1);
+        itemEq->slot = slot;
+        newCommander.inventory.equippedItems[slot] = itemEq;
     }
 
     if (!mySqlCommanderInsert(self->sqlConn, &newCommander)) {

@@ -133,6 +133,7 @@ typedef struct
 
 } Commander;
 
+#pragma pack(push, 1)
 typedef struct
 {
     /** Appearance */
@@ -168,6 +169,7 @@ typedef struct
     InventorySPacket inventory[0];
 
 } CommanderSPacket;
+#pragma pack(pop)
 
 typedef enum CommanderJobId
 {

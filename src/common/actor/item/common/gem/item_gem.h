@@ -47,11 +47,13 @@ typedef struct {
     float *cooldown;
 }   ItemGem;
 
+#pragma pack(push, 1)
 typedef struct {
     PropertyFloatSPacket level[0];
     PropertyFloatSPacket itemExp[0];
     PropertyFloatSPacket cooldown[0];
 }   ItemGemSPacket;
+#pragma pack(pop)
 
 // ----------- Functions ------------
 

@@ -48,6 +48,10 @@
 #define sizeof_struct_member(struct, member) \
    (sizeof(((struct *)0)->member))
 
+// type of structure member
+#define typeof_struct_member(struct, member) \
+    typeof(((struct *)0)->member)
+
 // quotify a string
 #define QUOTIFY(x) "\"" x "\""
 

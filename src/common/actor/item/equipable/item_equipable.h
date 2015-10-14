@@ -24,10 +24,11 @@
 // ---------- Defines -------------
 
 // ------ Structure declaration -------
-typedef enum {
+typedef uint8_t ItemEquipmentSlot_t;
+enum {
     EQSLOT_HAT = 0,
     EQSLOT_HAT_L,
-    EQSLOT_UNKOWN1,
+    EQSLOT_UNKNOWN1,
     EQSLOT_BODY_ARMOR,
     EQSLOT_GLOVES,
     EQSLOT_BOOTS,
@@ -36,29 +37,30 @@ typedef enum {
     EQSLOT_WEAPON,
     EQSLOT_SHIELD,
     EQSLOT_COSTUME,
-    EQSLOT_UNKOWN3,
-    EQSLOT_UNKOWN4,
-    EQSLOT_UNKOWN5,
+    EQSLOT_UNKNOWN3,
+    EQSLOT_UNKNOWN4,
+    EQSLOT_UNKNOWN5,
     EQSLOT_LEG_ARMOR,
-    EQSLOT_UNKOWN6,
-    EQSLOT_UNKOWN7,
+    EQSLOT_UNKNOWN6,
+    EQSLOT_UNKNOWN7,
     EQSLOT_RING_LEFT,
     EQSLOT_RING_RIGHT,
     EQSLOT_NECKLACE,
     EQSLOT_COUNT,
     EQSLOT_NOSLOT,
-} ItemEquipmentSlot;
-typedef uint8_t ItemEquipmentSlot_t;
+};
 
 typedef struct ItemEquipable {
    Item item;
-   ItemEquipmentSlot slot;
+   ItemEquipmentSlot_t slot;
    ItemEquipData *equipData;
 } ItemEquipable;
 
+#pragma pack(push, 1)
 typedef struct {
     ItemEquipmentSlot_t slot;
 } ItemEquipableSPacket;
+#pragma pack(pop)
 
 // ----------- Functions ------------
 /**

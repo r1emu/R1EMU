@@ -36,7 +36,7 @@ static struct ItemFactory {
     StaticData *itemEquipDatabase;
     zhash_t *categoryEquipTable;
     zhash_t *categoryCommonTable;
-    ItemCategory *categories;
+    ItemCategory_t *categories;
 } self = {0};
 
 static bool itemFactoryInitCategories(void) {
@@ -46,7 +46,7 @@ static bool itemFactoryInitCategories(void) {
         return false;
     }
 
-    for (ItemCategory cat = 0; cat < ITEM_CAT_COUNT; cat++) {
+    for (ItemCategory_t cat = 0; cat < ITEM_CAT_COUNT; cat++) {
         self.categories[cat] = cat;
     }
 
@@ -156,9 +156,9 @@ bool itemFactoryGetCategoryFromId(
     ItemId_t id,
     ItemCommonData *commonData,
     ItemEquipData *equipData,
-    ItemCategory *_category)
+    ItemCategory_t *_category)
 {
-    ItemCategory *category = NULL;
+    ItemCategory_t *category = NULL;
 
     /**
      * We might want to refactor this function once we got a full item database
@@ -184,9 +184,8 @@ bool itemFactoryGetCategoryFromId(
                     return false;
                 }
             } else {
-                warning("Guess : '%d' = 'Armor'", id);
+                warning("ItemID '%d' has not been found in equipData. Guess category 'Armor'", id);
                 category = &self.categories[ITEM_CAT_ARMOR];
-                special("Category = %d", *category);
             }
         } else {
             if (!(category = zhash_lookup(self.categoryCommonTable, commonData->ItemType))) {
@@ -207,14 +206,24 @@ void itemFactoryGetStaticData(ItemId_t id, ItemCommonData **commonData, ItemEqui
     staticDataGet(self.itemEquipDatabase, id, equipData, false);
 }
 
-// TODO : ItemId_t should be enough to know the correct category
-// Once StaticData is available, link them together
+ItemEquipable *itemFactoryCreateEquipable(ItemId_t id, ItemAmount_t amount, ItemEquipmentSlot_t slot) {
+    ItemEquipable *item = NULL;
+
+    if (!(item = (ItemEquipable *) itemFactoryCreate(id, amount))) {
+        error("Cannot create a new item.");
+        return NULL;
+    }
+
+    item->slot = slot;
+    return item;
+}
+
 Item *itemFactoryCreate(ItemId_t id, ItemAmount_t amount) {
 
     Item *item = NULL;
-    size_t itemSize = 0;
+    bool status = false;
 
-    ItemCategory category;
+    ItemCategory_t category;
     ItemCommonData *commonData = NULL;
     ItemEquipData *equipData = NULL;
 
@@ -222,161 +231,27 @@ Item *itemFactoryCreate(ItemId_t id, ItemAmount_t amount) {
 
     if (!(itemFactoryGetCategoryFromId(id, commonData, equipData, &category))) {
         error("Cannot get category from ID '%d'", id);
-        return NULL;
+        goto cleanup;
     }
-
-    switch (category) {
-
-        case ITEM_CAT_CONSUMABLE : itemSize = sizeof(ItemConsumable); break;
-        case ITEM_CAT_ARMOR      : itemSize = sizeof(ItemArmor); break;
-        case ITEM_CAT_QUEST      : itemSize = sizeof(ItemQuest); break;
-        case ITEM_CAT_BOOK       : itemSize = sizeof(ItemBook); break;
-        case ITEM_CAT_MATERIAL   : itemSize = sizeof(ItemMaterial); break;
-        case ITEM_CAT_GEM        : itemSize = sizeof(ItemGem); break;
-        case ITEM_CAT_WEAPON     : itemSize = sizeof(ItemWeapon); break;
-        case ITEM_CAT_CARD       : itemSize = sizeof(ItemCard); break;
-        case ITEM_CAT_ACCESSORY  : itemSize = sizeof(ItemAccessory); break;
-        case ITEM_CAT_SUBWEAPON  : itemSize = sizeof(ItemSubWeapon); break;
-        case ITEM_CAT_CURRENCY   : itemSize = sizeof(ItemCurrency); break;
-
-        case ITEM_CAT_COUNT      : error("Unexpected item category."); return NULL; break;
-    }
-
-    if (!(item = malloc(itemSize))) {
-        error("Cannot allocate a new item.");
-        return NULL;
-    }
-
-    if (!(itemFactoryInit(item, category, commonData, equipData, id, amount))) {
-        error("Cannot initialize a new item.");
-        free(item);
-        return NULL;
-    }
-
-    return item;
-}
-
-bool itemFactoryInit(
-    Item *newItem,
-    ItemCategory category,
-    ItemCommonData *commonData,
-    ItemEquipData *equipData,
-    ItemId_t id,
-    ItemAmount_t amount)
-{
-    Actor actor;
-    Item item;
 
     // Initialize a unique actor
+    Actor actor;
     if (!(actorFactoryInit(&actor))) {
         error("Cannot initialize a new actor.");
-        return false;
+        goto cleanup;
     }
 
-    // Initialize the item
-    if (!(itemInit(&item, &actor, category, id, amount, commonData))) {
-        error("Cannot create a new item '%d'.", id);
-        return false;
+    if (!(item = itemNew(&actor, category, id, amount, commonData, equipData))) {
+        error("Cannot allocate a new item.");
+        goto cleanup;
     }
 
-    // Initialize the child class
-    switch (category) {
+    status = true;
 
-        case ITEM_CAT_CONSUMABLE : {
-            ItemConsumable *consumable = (ItemConsumable *) newItem;
-            if (!(itemConsumableInit(consumable, &item))) {
-                error("Cannot initialize a consumable item.");
-                return false;
-            }
-            break;
-        }
-        case ITEM_CAT_ARMOR      : {
-            ItemArmor *armor = (ItemArmor *) newItem;
-            if (!(itemArmorInit(armor, &item, equipData))) {
-                error("Cannot initialize a armor item.");
-                return false;
-            }
-            break;
-        }
-        case ITEM_CAT_QUEST      : {
-            ItemQuest *quest = (ItemQuest *) newItem;
-            if (!(itemQuestInit(quest, &item))) {
-                error("Cannot initialize a quest item.");
-                return false;
-            }
-            break;
-        }
-        case ITEM_CAT_BOOK       : {
-            ItemBook *book = (ItemBook *) newItem;
-            if (!(itemBookInit(book, &item))) {
-                error("Cannot initialize a book item.");
-                return false;
-            }
-            break;
-        }
-        case ITEM_CAT_MATERIAL   : {
-            ItemMaterial *material = (ItemMaterial *) newItem;
-            if (!(itemMaterialInit(material, &item))) {
-                error("Cannot initialize a material item.");
-                return false;
-            }
-            break;
-        }
-        case ITEM_CAT_GEM        : {
-            ItemGem *gem = (ItemGem *) newItem;
-            if (!(itemGemInit(gem, &item))) {
-                error("Cannot initialize a gem item.");
-                return false;
-            }
-            break;
-        }
-        case ITEM_CAT_WEAPON     : {
-            ItemWeapon *weapon = (ItemWeapon *) newItem;
-            if (!(itemWeaponInit(weapon, &item, equipData))) {
-                error("Cannot initialize a weapon item.");
-                return false;
-            }
-            break;
-        }
-        case ITEM_CAT_CARD       : {
-            ItemCard *card = (ItemCard *) newItem;
-            if (!(itemCardInit(card, &item))) {
-                error("Cannot initialize a card item.");
-                return false;
-            }
-            break;
-        }
-        case ITEM_CAT_ACCESSORY  : {
-            ItemAccessory *accessory = (ItemAccessory *) newItem;
-            if (!(itemAccessoryInit(accessory, &item, equipData))) {
-                error("Cannot initialize a accessory item.");
-                return false;
-            }
-            break;
-        }
-        case ITEM_CAT_SUBWEAPON  : {
-            ItemSubWeapon *subweapon = (ItemSubWeapon *) newItem;
-            if (!(itemSubWeaponInit(subweapon, &item, equipData))) {
-                error("Cannot initialize a subweapon item.");
-                return false;
-            }
-            break;
-        }
-        case ITEM_CAT_CURRENCY   : {
-            ItemCurrency *currency = (ItemCurrency *) newItem;
-            if (!(itemCurrencyInit(currency, &item))) {
-                error("Cannot initialize a currency item.");
-                return false;
-            }
-            break;
-        }
-
-        case ITEM_CAT_COUNT      : {
-            error("Invalid item category");
-            return false;
-            break;
-        }
+cleanup:
+    if (!status) {
+        itemDestroy(&item);
     }
 
-    return true;
+    return status ? item : NULL;
 }

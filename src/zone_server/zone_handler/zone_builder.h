@@ -163,9 +163,9 @@ void zoneBuilderEnterPc(Commander *commander, zmsg_t *replyMsg);
 void zoneBuilderLeave(PcId_t targetPcId, zmsg_t *replyMsg);
 
 /**
- * @brief @unknown
+ * @brief Add a skill in the commander skill list.
  */
-void zoneBuilderSkillAdd(zmsg_t *replyMsg);
+void zoneBuilderSkillAdd(SkillId_t skillId, zmsg_t *replyMsg);
 
 /**
  * @brief @unknown

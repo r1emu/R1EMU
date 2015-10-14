@@ -111,7 +111,9 @@ void propertyFloatSerializeSPacket(PropertyId_t id, float *value, PacketStream *
         .value = *value
     };
 
+    packetStreamDebugStart(stream, propertyFloatGetSPacketSize(value));
     packetStreamIn(stream, &packet);
+    packetStreamDebugEnd(stream);
 }
 
 void propertyStringSerializeSPacket(PropertyId_t id, char *value, PacketStream *stream) {
@@ -130,7 +132,9 @@ void propertyStringSerializeSPacket(PropertyId_t id, char *value, PacketStream *
     packet.size = valueSize;
     strncpy(packet.value, value, valueSize);
 
+    packetStreamDebugStart(stream, propertyStringGetSPacketSize(value));
     packetStreamIn(stream, &packet);
+    packetStreamDebugEnd(stream);
 }
 
 bool propertyFloatUnserializeSPacket(PropertyId_t id, float **value, PacketStream *stream) {
@@ -155,7 +159,10 @@ bool propertyFloatUnserializeSPacket(PropertyId_t id, float **value, PacketStrea
     }
 
     // Extract information from the stream
+    packetStreamDebugStart(stream, propertyFloatGetSPacketSize(*value));
     packetStreamOut(stream, &output);
+    packetStreamDebugEnd(stream);
+
     **value = output.value;
 
     return true;
@@ -206,7 +213,10 @@ bool propertyStringUnserializeSPacket(PropertyId_t id, char **value, PacketStrea
     }
 
     // Extract information from the stream
+    packetStreamDebugStart(stream, propertyStringGetSPacketSize(*value));
     packetStreamOut(stream, &output);
+    packetStreamDebugEnd(stream);
+
     strncpy(*value, output.value, valueSize);
 
     return true;

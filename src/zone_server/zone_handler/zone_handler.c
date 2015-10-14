@@ -532,21 +532,11 @@ static PacketHandlerState zoneHandlerGameReady(
     zoneBuilderGuestPageMap(replyMsg);
     zoneBuilderStartInfo(replyMsg);
 
-    /// TESTING PURPOSES
     Inventory *inventory = &session->game.commanderSession.currentCommander->inventory;
-    Item *items[20];
-    items[0] = itemFactoryCreate(645001, 5003);
-    inventoryAddItem(inventory, items[0]);
-    items[1] = itemFactoryCreate(640026, 5);
-    inventoryAddItem(inventory, items[1]);
-    //items[2].equipSlot = EQSLOT_BODY_ARMOR;
-    //items[2].properties = itemPropertiesNew(4200, 0, NULL, NULL, NULL, 0, 0);
-    inventoryPrintBag(inventory, ITEM_CAT_CONSUMABLE);
-    //inventoryPrintBag(inventory, ITEM_CAT_ARMOR);
-    zoneBuilderItemEquipList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
-    zoneBuilderItemInventoryList(&session->game.commanderSession.currentCommander->inventory, replyMsg);
+    zoneBuilderItemEquipList(inventory, replyMsg);
+    zoneBuilderItemInventoryList(inventory, replyMsg);
 
-    //zoneBuilderSkillList(commander->pcId, replyMsg);
+    zoneBuilderSkillList(commander->pcId, replyMsg);
     zoneBuilderAbilityList(commander->pcId, replyMsg);
     zoneBuilderCooldownList(commander->socialInfoId, replyMsg);
 
@@ -992,7 +982,7 @@ static PacketHandlerState zoneHandlerReqNormalTxNumArg(
     dbg("skill4Level %d", clientPacket->skill4Level);
 
     zoneBuilderJobPoints(4001, 1, replyMsg);
-    zoneBuilderSkillAdd(replyMsg);
+    zoneBuilderSkillAdd(clientPacket->classId, replyMsg);
 
     return PACKET_HANDLER_OK;
 

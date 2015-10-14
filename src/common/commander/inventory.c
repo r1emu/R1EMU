@@ -76,7 +76,7 @@ void inventoryDestroy(Inventory **_self) {
 
 bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 
-    ItemCategory itemCategory = itemGetCategory(itemToAdd);
+    ItemCategory_t itemCategory = itemGetCategory(itemToAdd);
     ActorId_t actorId = actorGetUId(itemToAdd);
 
     ItemHandle *itemHandle = itemHandleNew(itemToAdd);
@@ -89,6 +89,7 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
         return false;
     }
 
+    special ("itemCategory = %d", itemCategory);
     if (zlist_append(self->bags[itemCategory], itemHandle) != 0) {
         error("Cannot push item into the category bag in inventory");
         return false;
@@ -100,7 +101,7 @@ bool inventoryAddItem(Inventory *self, Item *itemToAdd) {
 bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
 
     ActorId_t actorId = actorGetUId(itemToRemove);
-    ItemCategory itemCategory = itemGetCategory(itemToRemove);
+    ItemCategory_t itemCategory = itemGetCategory(itemToRemove);
 
     ActorKey actorKey;
     actorGenKey(actorId, actorKey);
@@ -110,7 +111,6 @@ bool inventoryRemoveItem(Inventory *self, Item *itemToRemove) {
     zlist_remove(self->bags[itemCategory], itemHandle);
     zhash_delete(self->items, actorKey);
 
-    /// TODO: how to destroy the ItemHandle
     itemHandleDestroy(&itemHandle);
 
     return true;
@@ -140,24 +140,21 @@ bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, ItemHandle *i
     return true;
 }
 
-Item *inventoryGetFirstItem(Inventory *self, ItemCategory category) {
-    inventoryPrintBag(self, category);
+Item *inventoryGetFirstItem(Inventory *self, ItemCategory_t category) {
+
     ItemHandle *itemHandle = zlist_first(self->bags[category]);
-    if (itemHandle == NULL) {
-        return NULL;
-    }
-    return *itemHandle;
+
+    return itemHandle ? *itemHandle : NULL;
 }
 
-Item *inventoryGetNextItem(Inventory *self, ItemCategory category) {
+Item *inventoryGetNextItem(Inventory *self, ItemCategory_t category) {
+
     ItemHandle *itemHandle = zlist_next(self->bags[category]);
-    if (itemHandle == NULL) {
-        return NULL;
-    }
-    return *itemHandle;
+
+    return itemHandle ? *itemHandle : NULL;
 }
 
-bool inventoryUnequipItem(Inventory *self, ItemEquipmentSlot eqSlot) {
+bool inventoryUnequipItem(Inventory *self, ItemEquipmentSlot_t eqSlot) {
 
     ItemEquipable *itemToUnequip = self->equippedItems[eqSlot];
 
@@ -173,26 +170,26 @@ bool inventoryUnequipItem(Inventory *self, ItemEquipmentSlot eqSlot) {
     }
 
     // Set slot as free
+    itemToUnequip->slot = EQSLOT_NOSLOT;
     self->equippedItems[eqSlot] = NULL;
 
     // Process unequip events
     /// TODO
 
-
     return true;
 }
 
-bool inventoryEquipItem(Inventory *self, ActorId_t actorId, ItemEquipmentSlot eqSlot) {
+bool inventoryEquipItem(Inventory *self, ActorId_t actorId, ItemEquipmentSlot_t eqSlot) {
 
     ItemEquipable *itemToEquip;
 
     // Get item from inventory
-    if (!inventoryGetItemByActorId(self, actorId, (Item**) &itemToEquip)) {
-        dbg("Can not find item in inventory. ActorId: %d", actorId);
+    if (!inventoryGetItemByActorId(self, actorId, (Item **) &itemToEquip)) {
+        dbg("Can not find item in inventory. ActorId: %llx", actorId);
         return false;
     }
 
-    dbg("Item to equip: %d", itemGetId((Item*)itemToEquip));
+    dbg("Item to equip: %d", itemGetId((Item *) itemToEquip));
 
     // Check if eqSlot is right for the item we want to equip.
     /*
@@ -218,6 +215,7 @@ bool inventoryEquipItem(Inventory *self, ActorId_t actorId, ItemEquipmentSlot eq
 
     // Now we have the slot free to equip this item, and item is not in inventory.
     self->equippedItems[eqSlot] = itemToEquip;
+    itemToEquip->slot = eqSlot;
 
     // Remove from inventory
     if (!inventoryRemoveItem(self, (Item *) itemToEquip)) {
@@ -233,14 +231,14 @@ bool inventoryEquipItem(Inventory *self, ActorId_t actorId, ItemEquipmentSlot eq
     return true;
 }
 
-uint32_t inventoryGetEquipmentEmptySlot(ItemEquipmentSlot slot) {
+uint32_t inventoryGetEquipmentEmptySlot(ItemEquipmentSlot_t slot) {
 
     uint32_t value;
 
     switch (slot) {
         case EQSLOT_HAT         : value = EMPTYEQSLOT_NoHat; break;
         case EQSLOT_HAT_L       : value = EMPTYEQSLOT_NoHat; break;
-        case EQSLOT_UNKOWN1     : value = EMPTYEQSLOT_NoOuter; break;
+        case EQSLOT_UNKNOWN1    : value = EMPTYEQSLOT_NoOuter; break;
         case EQSLOT_BODY_ARMOR  : value = EMPTYEQSLOT_NoHat; break;
         case EQSLOT_GLOVES      : value = EMPTYEQSLOT_NoGloves; break;
         case EQSLOT_BOOTS       : value = EMPTYEQSLOT_NoBoots; break;
@@ -249,12 +247,12 @@ uint32_t inventoryGetEquipmentEmptySlot(ItemEquipmentSlot slot) {
         case EQSLOT_WEAPON      : value = EMPTYEQSLOT_NoWeapon; break;
         case EQSLOT_SHIELD      : value = EMPTYEQSLOT_NoWeapon; break;
         case EQSLOT_COSTUME     : value = EMPTYEQSLOT_NoOuter; break;
-        case EQSLOT_UNKOWN3     : value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_UNKOWN4     : value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_UNKOWN5     : value = EMPTYEQSLOT_NoOuter; break;
+        case EQSLOT_UNKNOWN3    : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKNOWN4    : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKNOWN5    : value = EMPTYEQSLOT_NoOuter; break;
         case EQSLOT_LEG_ARMOR   : value = EMPTYEQSLOT_NoShirt; break;
-        case EQSLOT_UNKOWN6     : value = EMPTYEQSLOT_NoRing; break;
-        case EQSLOT_UNKOWN7     : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKNOWN6    : value = EMPTYEQSLOT_NoRing; break;
+        case EQSLOT_UNKNOWN7    : value = EMPTYEQSLOT_NoRing; break;
         case EQSLOT_RING_LEFT   : value = EMPTYEQSLOT_NoRing; break;
         case EQSLOT_RING_RIGHT  : value = EMPTYEQSLOT_NoRing; break;
         case EQSLOT_NECKLACE    : value = EMPTYEQSLOT_NoNeck; break;
@@ -297,7 +295,7 @@ bool inventorySwapItems(Inventory *self, ActorId_t actorId1, ActorId_t actorId2)
     return true;
 }
 
-int inventoryGetBagIndexByActorId(Inventory *self, ItemCategory category, ActorId_t actorId) {
+int inventoryGetBagIndexByActorId(Inventory *self, ItemCategory_t category, ActorId_t actorId) {
 
     int bagIndex = -1;
     int index = 1;
@@ -344,7 +342,7 @@ void inventoryPrintEquipment(Inventory *self) {
 
 }
 
-void inventoryPrintBag(Inventory *self, ItemCategory category) {
+void inventoryPrintBag(Inventory *self, ItemCategory_t category) {
 
     dbg("Printing Inventory bag[%d], size: %d", category, zlist_size(self->bags[category]));
 
@@ -378,49 +376,107 @@ size_t inventoryGetEquipmentCount(Inventory *self) {
 }
 
 size_t inventoryGetSPacketSize(Inventory *self) {
-    size_t packetSize = 0;
+    size_t size = 0;
 
-    packetSize += sizeof(InventorySPacket);
+    size += sizeof(InventorySPacket);
 
     // Get size of equipped items
     for (size_t i = 0; i < EQSLOT_COUNT; i++) {
         if (self->equippedItems[i] != NULL) {
-            packetSize += itemGetSPacketSize((Item *) self->equippedItems[i]);
+            size += itemGetSPacketSize((Item *) self->equippedItems[i]);
         }
     }
 
-    // Get size of inventory items
-    for (Item *item = zhash_first(self->items); item != NULL; item = zhash_next(self->items)) {
-        packetSize += itemGetSPacketSize(item);
+    // Get size of inventory items in each bag
+    for (ItemCategory_t cat = 0; cat < ITEM_CAT_COUNT; cat++) {
+        zlist_t *bag = self->bags[cat];
+
+        for (ItemHandle *itemHandle = zlist_first(bag); itemHandle != NULL; itemHandle = zlist_next(bag)) {
+            size += itemGetSPacketSize(*itemHandle);
+        }
     }
 
-    return packetSize;
+    return size;
 }
 
 void inventorySerializeSPacket(Inventory *self, PacketStream *stream) {
 
-    size_t equipmentCount = inventoryGetEquipmentCount(self);
+    packetStreamDebugStart(stream, inventoryGetSPacketSize(self));
 
+    typeof_struct_member(InventorySPacket, equipmentCount) equipmentCount;
+    equipmentCount = inventoryGetEquipmentCount(self);
     packetStreamIn(stream, &equipmentCount);
 
     // Write equipped items
-    for (ItemEquipmentSlot slot = 0; slot < EQSLOT_COUNT; slot++) {
+    for (ItemEquipmentSlot_t slot = 0; slot < EQSLOT_COUNT; slot++) {
         if (self->equippedItems[slot] != NULL) {
-            itemSerializeSPacket((Item *) self->equippedItems[slot], slot, stream);
+            itemSerializeSPacket((Item *) self->equippedItems[slot], stream);
         }
     }
 
-    size_t itemsCount = inventoryGetItemsCount(self);
+    typeof_struct_member(InventorySPacket, itemsCount) itemsCount;
+    itemsCount = inventoryGetItemsCount(self);
     packetStreamIn(stream, &itemsCount);
 
-    // Write inventory items
-    for (Item *item = zhash_first(self->items); item != NULL; item = zhash_next(self->items)) {
-        itemSerializeSPacket(item, -1, stream);
+    // Write inventory items in each bag
+    for (ItemCategory_t cat = 0; cat < ITEM_CAT_COUNT; cat++) {
+        zlist_t *bag = self->bags[cat];
+        for (ItemHandle *itemHandle = zlist_first(bag); itemHandle != NULL; itemHandle = zlist_next(bag)) {
+            itemSerializeSPacket(*itemHandle, stream);
+        }
     }
+
+    packetStreamDebugEnd(stream);
 }
 
 bool inventoryUnserializeSPacket(Inventory *self, PacketStream *stream) {
 
+    packetStreamDebugStart(stream, inventoryGetSPacketSize(self));
+
+    typeof_struct_member(InventorySPacket, equipmentCount) equipmentCount;
+    packetStreamOut(stream, &equipmentCount);
+
+    // Free the old equipped items
+    for (ItemEquipmentSlot_t slot = 0; slot < EQSLOT_COUNT; slot++) {
+        itemEquipableDestroy(&self->equippedItems[slot]);
+    }
+
+    // Read equipped items
+    for (size_t i = 0; i < equipmentCount; i++) {
+        ItemEquipable *itemEq = NULL;
+
+        if (!(itemUnserializeSPacket((Item **) &itemEq, stream))) {
+            error("Cannot unserialize equipped item.");
+            return false;
+        }
+
+        self->equippedItems[itemEq->slot] = itemEq;
+    }
+
+    typeof_struct_member(InventorySPacket, itemsCount) itemsCount;
+    packetStreamOut(stream, &itemsCount);
+
+    // Free the old inventory
+    zhash_purge(self->items);
+    for (size_t cat = 0; cat < sizeof_array(self->bags); cat++) {
+        zlist_t *bag = self->bags[cat];
+        zlist_purge(bag);
+    }
+
+    for (size_t i = 0; i < itemsCount; i++) {
+        Item *item = NULL;
+
+        if (!(itemUnserializeSPacket(&item, stream))) {
+            error("Cannot unserialize inventory item.");
+            return false;
+        }
+
+        ItemHandle *itemHandle = itemHandleNew(item);
+        zlist_t *bag = self->bags[item->category];
+        zlist_append(bag, itemHandle);
+    }
+
+    packetStreamDebugEnd(stream);
 
     return true;
 }

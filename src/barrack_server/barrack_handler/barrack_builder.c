@@ -328,7 +328,7 @@ void barrackBuilderCommanderList(
     BarrackBuilderCommanderListCPacket replyPacket;
 
     PacketStream packetStream;
-    packetStreamInit(&packetStream, &replyPacket);
+    packetStreamInit(&packetStream, &replyPacket, sizeof(replyPacket));
 
     // Now fill it
     PacketType packetType = BC_COMMANDER_LIST;
@@ -501,7 +501,7 @@ void barrackBuilderZoneTraffics(MapId_t mapId, zmsg_t *replyMsg) {
 
     // construct the packet
     PacketStream stream;
-    packetStreamInit(&stream, (uint8_t *)stackBuffer);
+    packetStreamInit(&stream, (uint8_t *)stackBuffer, outPacketSize);
 
     packetStreamAppend(&stream, &zoneMaxPcCount, sizeof_struct_member(ZoneTrafficsPacket, zoneMaxPcCount));
     packetStreamAppend(&stream, &mapAvailableCount, sizeof_struct_member(ZoneTrafficsPacket, mapAvailableCount));

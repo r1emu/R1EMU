@@ -73,7 +73,7 @@ const char *redisGameSessionsStr [] = {
     // Equipment session
     [REDIS_GAME_SESSION_EQSLOT_HAT] = REDIS_SESSION_EQSLOT_HAT_str,
     [REDIS_GAME_SESSION_EQSLOT_HAT_L] = REDIS_SESSION_EQSLOT_HAT_L_str,
-    [REDIS_GAME_SESSION_EQSLOT_UNKOWN1] = REDIS_SESSION_EQSLOT_UNKOWN1_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKNOWN1] = REDIS_SESSION_EQSLOT_UNKNOWN1_str,
     [REDIS_GAME_SESSION_EQSLOT_BODY_ARMOR] = REDIS_SESSION_EQSLOT_BODY_ARMOR_str,
     [REDIS_GAME_SESSION_EQSLOT_GLOVES] = REDIS_SESSION_EQSLOT_GLOVES_str,
     [REDIS_GAME_SESSION_EQSLOT_BOOTS] = REDIS_SESSION_EQSLOT_BOOTS_str,
@@ -82,12 +82,12 @@ const char *redisGameSessionsStr [] = {
     [REDIS_GAME_SESSION_EQSLOT_WEAPON] = REDIS_SESSION_EQSLOT_WEAPON_str,
     [REDIS_GAME_SESSION_EQSLOT_SHIELD] = REDIS_SESSION_EQSLOT_SHIELD_str,
     [REDIS_GAME_SESSION_EQSLOT_COSTUME] = REDIS_SESSION_EQSLOT_COSTUME_str,
-    [REDIS_GAME_SESSION_EQSLOT_UNKOWN3] = REDIS_SESSION_EQSLOT_UNKOWN3_str,
-    [REDIS_GAME_SESSION_EQSLOT_UNKOWN4] = REDIS_SESSION_EQSLOT_UNKOWN4_str,
-    [REDIS_GAME_SESSION_EQSLOT_UNKOWN5] = REDIS_SESSION_EQSLOT_UNKOWN5_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKNOWN3] = REDIS_SESSION_EQSLOT_UNKNOWN3_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKNOWN4] = REDIS_SESSION_EQSLOT_UNKNOWN4_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKNOWN5] = REDIS_SESSION_EQSLOT_UNKNOWN5_str,
     [REDIS_GAME_SESSION_EQSLOT_LEG_ARMOR] = REDIS_SESSION_EQSLOT_LEG_ARMOR_str,
-    [REDIS_GAME_SESSION_EQSLOT_UNKOWN6] = REDIS_SESSION_EQSLOT_UNKOWN6_str,
-    [REDIS_GAME_SESSION_EQSLOT_UNKOWN7] = REDIS_SESSION_EQSLOT_UNKOWN7_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKNOWN6] = REDIS_SESSION_EQSLOT_UNKNOWN6_str,
+    [REDIS_GAME_SESSION_EQSLOT_UNKNOWN7] = REDIS_SESSION_EQSLOT_UNKNOWN7_str,
     [REDIS_GAME_SESSION_EQSLOT_RING_LEFT] = REDIS_SESSION_EQSLOT_RING_LEFT_str,
     [REDIS_GAME_SESSION_EQSLOT_RING_RIGHT] = REDIS_SESSION_EQSLOT_RING_RIGHT_str,
     [REDIS_GAME_SESSION_EQSLOT_NECKLACE] = REDIS_SESSION_EQSLOT_NECKLACE_str
@@ -200,7 +200,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         // Equipment
         " " REDIS_SESSION_EQSLOT_HAT_str
         " " REDIS_SESSION_EQSLOT_HAT_L_str
-        " " REDIS_SESSION_EQSLOT_UNKOWN1_str
+        " " REDIS_SESSION_EQSLOT_UNKNOWN1_str
         " " REDIS_SESSION_EQSLOT_BODY_ARMOR_str
         " " REDIS_SESSION_EQSLOT_GLOVES_str
         " " REDIS_SESSION_EQSLOT_BOOTS_str
@@ -209,12 +209,12 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
         " " REDIS_SESSION_EQSLOT_WEAPON_str
         " " REDIS_SESSION_EQSLOT_SHIELD_str
         " " REDIS_SESSION_EQSLOT_COSTUME_str
-        " " REDIS_SESSION_EQSLOT_UNKOWN3_str
-        " " REDIS_SESSION_EQSLOT_UNKOWN4_str
-        " " REDIS_SESSION_EQSLOT_UNKOWN5_str
+        " " REDIS_SESSION_EQSLOT_UNKNOWN3_str
+        " " REDIS_SESSION_EQSLOT_UNKNOWN4_str
+        " " REDIS_SESSION_EQSLOT_UNKNOWN5_str
         " " REDIS_SESSION_EQSLOT_LEG_ARMOR_str
-        " " REDIS_SESSION_EQSLOT_UNKOWN6_str
-        " " REDIS_SESSION_EQSLOT_UNKOWN7_str
+        " " REDIS_SESSION_EQSLOT_UNKNOWN6_str
+        " " REDIS_SESSION_EQSLOT_UNKNOWN7_str
         " " REDIS_SESSION_EQSLOT_RING_LEFT_str
         " " REDIS_SESSION_EQSLOT_RING_RIGHT_str
         " " REDIS_SESSION_EQSLOT_NECKLACE_str
@@ -302,7 +302,7 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
 
             GET_REDIS_EQUIPMENT(EQSLOT_HAT);
             GET_REDIS_EQUIPMENT(EQSLOT_HAT_L);
-            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN1);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKNOWN1);
             GET_REDIS_EQUIPMENT(EQSLOT_BODY_ARMOR);
             GET_REDIS_EQUIPMENT(EQSLOT_GLOVES);
             GET_REDIS_EQUIPMENT(EQSLOT_BOOTS);
@@ -311,12 +311,12 @@ bool redisGetGameSession(Redis *self, RedisGameSessionKey *key, GameSession *gam
             GET_REDIS_EQUIPMENT(EQSLOT_WEAPON);
             GET_REDIS_EQUIPMENT(EQSLOT_SHIELD);
             GET_REDIS_EQUIPMENT(EQSLOT_COSTUME);
-            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN3);
-            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN4);
-            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN5);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKNOWN3);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKNOWN4);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKNOWN5);
             GET_REDIS_EQUIPMENT(EQSLOT_LEG_ARMOR);
-            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN6);
-            GET_REDIS_EQUIPMENT(EQSLOT_UNKOWN7);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKNOWN6);
+            GET_REDIS_EQUIPMENT(EQSLOT_UNKNOWN7);
             GET_REDIS_EQUIPMENT(EQSLOT_RING_LEFT);
             GET_REDIS_EQUIPMENT(EQSLOT_RING_RIGHT);
             GET_REDIS_EQUIPMENT(EQSLOT_NECKLACE);
@@ -462,7 +462,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
             "HMSET zone%x:map%x:acc%llx"
             " " REDIS_SESSION_EQSLOT_HAT_str " %x"
             " " REDIS_SESSION_EQSLOT_HAT_L_str " %x"
-            " " REDIS_SESSION_EQSLOT_UNKOWN1_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKNOWN1_str " %x"
             " " REDIS_SESSION_EQSLOT_BODY_ARMOR_str " %x"
             " " REDIS_SESSION_EQSLOT_GLOVES_str " %x"
             " " REDIS_SESSION_EQSLOT_BOOTS_str " %x"
@@ -471,12 +471,12 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
             " " REDIS_SESSION_EQSLOT_WEAPON_str " %x"
             " " REDIS_SESSION_EQSLOT_SHIELD_str " %x"
             " " REDIS_SESSION_EQSLOT_COSTUME_str " %x"
-            " " REDIS_SESSION_EQSLOT_UNKOWN3_str " %x"
-            " " REDIS_SESSION_EQSLOT_UNKOWN4_str " %x"
-            " " REDIS_SESSION_EQSLOT_UNKOWN5_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKNOWN3_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKNOWN4_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKNOWN5_str " %x"
             " " REDIS_SESSION_EQSLOT_LEG_ARMOR_str " %x"
-            " " REDIS_SESSION_EQSLOT_UNKOWN6_str " %x"
-            " " REDIS_SESSION_EQSLOT_UNKOWN7_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKNOWN6_str " %x"
+            " " REDIS_SESSION_EQSLOT_UNKNOWN7_str " %x"
             " " REDIS_SESSION_EQSLOT_RING_LEFT_str " %x"
             " " REDIS_SESSION_EQSLOT_RING_RIGHT_str " %x"
             " " REDIS_SESSION_EQSLOT_NECKLACE_str " %x"
@@ -485,7 +485,7 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
             // Equipment
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT]),
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT_L]),
-            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN1]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN1]),
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BODY_ARMOR]),
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_GLOVES]),
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BOOTS]),
@@ -494,12 +494,12 @@ bool redisUpdateGameSession(Redis *self, RedisGameSessionKey *key, uint8_t *sock
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_WEAPON]),
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_SHIELD]),
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_COSTUME]),
-            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN3]),
-            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN4]),
-            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN5]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN3]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN4]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN5]),
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_LEG_ARMOR]),
-            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN6]),
-            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN7]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN6]),
+            itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN7]),
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_LEFT]),
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_RIGHT]),
             itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_NECKLACE])

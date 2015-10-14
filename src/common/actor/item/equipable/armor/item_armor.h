@@ -60,6 +60,7 @@ typedef struct
 
 }   ItemArmor;
 
+#pragma pack(push, 1)
 typedef struct
 {
     PropertyFloatSPacket def[0];
@@ -69,6 +70,7 @@ typedef struct
     PropertyStringSPacket customName[0];
     PropertyStringSPacket maker[0];
 }   ItemArmorSPacket;
+#pragma pack(pop)
 
 // ----------- Functions ------------
 

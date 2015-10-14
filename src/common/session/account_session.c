@@ -76,10 +76,11 @@ bool accountSessionGetCommanderByIndex(AccountSession *self, int commanderIndex,
         goto cleanup;
     }
 
-    *commander = self->commanders[commanderIndex];
-    if (!commander) {
+    if (!self->commanders[commanderIndex]) {
         goto cleanup;
     }
+
+    *commander = self->commanders[commanderIndex];
 
     status = true;
 
@@ -148,9 +149,7 @@ void accountSessionFree (AccountSession *self) {
 }
 
 
-
-
-size_t accountSessionGetPacketSize(AccountSession *self) {
+size_t accountSessionGetSPacketSize(AccountSession *self) {
     size_t packetSize = 0;
 
     packetSize += sizeof(AccountSessionSPacket);
@@ -164,8 +163,9 @@ size_t accountSessionGetPacketSize(AccountSession *self) {
     return packetSize;
 }
 
-void accountSessionSerialize(AccountSession *self, PacketStream *stream) {
+void accountSessionSerializeSPacket(AccountSession *self, PacketStream *stream) {
 
+    packetStreamDebugStart(stream, accountSessionGetSPacketSize(self));
     packetStreamIn(stream, self->accountName);
     packetStreamIn(stream, self->familyName);
     packetStreamIn(stream, self->sessionKey);
@@ -185,10 +185,12 @@ void accountSessionSerialize(AccountSession *self, PacketStream *stream) {
             // commanderSerialize(self->commanders[i], stream);
         }
     }
+    packetStreamDebugEnd(stream);
 }
 
 bool accountSessionUnserialize(AccountSession *self, PacketStream *stream) {
 
+    packetStreamDebugStart(stream, accountSessionGetSPacketSize(self));
     packetStreamOut(stream, self->accountName);
     packetStreamOut(stream, self->familyName);
     packetStreamOut(stream, self->sessionKey);
@@ -210,5 +212,6 @@ bool accountSessionUnserialize(AccountSession *self, PacketStream *stream) {
         //}
     }
 
+    packetStreamDebugEnd(stream);
     return true;
 }

@@ -121,12 +121,11 @@ bool mySqlGetCommanders(MySQL *self, char *familyName, Commander **commanders) {
 
         // load equipped items
 
-        for (int i = 0; i < EQSLOT_COUNT; i++) {
-            MySqlCommanderEnumField field = MYSQL_COMMANDER_eqslot_head_top + i;
+        for (ItemEquipmentSlot_t slot = 0; slot < EQSLOT_COUNT; slot++) {
+            MySqlCommanderEnumField field = MYSQL_COMMANDER_eqslot_head_top + slot;
             ItemId_t itemId = strtol(row[field], NULL, 10);
-            curCommander->inventory.equippedItems[i] = (ItemEquipable *) itemFactoryCreate(itemId, 1);
+            curCommander->inventory.equippedItems[slot] = itemFactoryCreateEquipable(itemId, 1, slot);
         }
-
     }
 
     return true;
@@ -215,7 +214,7 @@ bool mySqlCommanderUpdate(MySQL *self, CommanderId_t commanderId, Commander *com
         commander->currentSP,
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT_L]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN1]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN1]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BODY_ARMOR]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_GLOVES]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BOOTS]),
@@ -224,12 +223,12 @@ bool mySqlCommanderUpdate(MySQL *self, CommanderId_t commanderId, Commander *com
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_WEAPON]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_SHIELD]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_COSTUME]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN3]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN4]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN5]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN3]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN4]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN5]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_LEG_ARMOR]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN6]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN7]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN6]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN7]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_LEFT]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_RIGHT]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_NECKLACE]),
@@ -291,7 +290,7 @@ bool mySqlCommanderInsert(MySQL *self, Commander *commander) {
         commander->currentSP,
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_HAT_L]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN1]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN1]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BODY_ARMOR]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_GLOVES]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_BOOTS]),
@@ -300,12 +299,12 @@ bool mySqlCommanderInsert(MySQL *self, Commander *commander) {
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_WEAPON]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_SHIELD]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_COSTUME]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN3]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN4]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN5]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN3]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN4]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN5]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_LEG_ARMOR]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN6]),
-        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKOWN7]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN6]),
+        itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_UNKNOWN7]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_LEFT]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_RING_RIGHT]),
         itemGetId((Item *) commander->inventory.equippedItems[EQSLOT_NECKLACE])))

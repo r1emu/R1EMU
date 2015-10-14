@@ -70,10 +70,14 @@ size_t itemEquipableGetSPacketSize(ItemEquipable *self) {
 }
 
 void itemEquipableSerializeSPacket(ItemEquipable *self, PacketStream *stream) {
+    packetStreamDebugStart(stream, itemEquipableGetSPacketSize(self));
     packetStreamIn(stream, &self->slot);
+    packetStreamDebugEnd(stream);
 }
 
 bool itemEquipableUnserializeSPacket(ItemEquipable *self, PacketStream *stream) {
+    packetStreamDebugStart(stream, itemEquipableGetSPacketSize(self));
     packetStreamOut(stream, &self->slot);
+    packetStreamDebugEnd(stream);
     return true;
 }

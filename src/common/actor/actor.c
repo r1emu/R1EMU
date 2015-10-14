@@ -68,10 +68,14 @@ size_t actorGetSPacketSize(Actor *self) {
 }
 
 void actorSerializeSPacket(Actor *self, PacketStream *stream) {
+    packetStreamDebugStart(stream, actorGetSPacketSize(self));
     packetStreamIn(stream, &self->uid);
+    packetStreamDebugEnd(stream);
 }
 
 bool actorUnserializeSPacket(Actor *self, PacketStream *stream) {
+    packetStreamDebugStart(stream, actorGetSPacketSize(self));
     packetStreamOut(stream, &self->uid);
+    packetStreamDebugEnd(stream);
     return true;
 }

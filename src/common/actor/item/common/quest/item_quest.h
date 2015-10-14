@@ -43,9 +43,11 @@ typedef struct {
     float *cooldown;
 }   ItemQuest;
 
+#pragma pack(push, 1)
 typedef struct {
     PropertyFloatSPacket cooldown[0];
 }   ItemQuestSPacket;
+#pragma pack(pop)
 
 // ----------- Functions ------------
 

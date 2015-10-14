@@ -70,7 +70,7 @@ typedef enum {
     EMPTYEQSLOT_NoWeapon_Shotsword = 9999997,
     EMPTYEQSLOT_NoWeapon_Mace = 9999998,
     EMPTYEQSLOT_NoWeapon_THStaff = 9999999,
-} EmptyItemEquipmentSlot;
+} EmptyItemEquipmentSlot_t;
 
 // ------ Structure declaration -------
 
@@ -86,15 +86,17 @@ struct Inventory
     ItemEquipable *equippedItems[EQSLOT_COUNT];
 };
 
+#pragma pack(push, 1)
 typedef struct InventorySPacket
 {
-    size_t equippedItemsCount;
-    ItemSPacket equippedItems[0]; // Size : equippedItemsCount
+    uint32_t equipmentCount;
+    ItemSPacket equippedItems[0]; // Size : equipmentCount
 
-    size_t itemsCount;
+    uint32_t itemsCount;
     ItemSPacket items[0]; // Size : itemsCount
 
 }   InventorySPacket;
+#pragma pack(pop)
 
 // ----------- Functions ------------
 /**
@@ -130,17 +132,17 @@ void inventoryDestroy(Inventory **self);
 bool inventoryAddItem(Inventory *self, Item *itemToAdd);
 bool inventoryRemoveItem(Inventory *self, Item *itemToRemove);
 
-Item *inventoryGetFirstItem(Inventory *self, ItemCategory category);
-Item *inventoryGetNextItem(Inventory *self, ItemCategory category);
+Item *inventoryGetFirstItem(Inventory *self, ItemCategory_t category);
+Item *inventoryGetNextItem(Inventory *self, ItemCategory_t category);
 
-bool inventoryEquipItem(Inventory *self, ActorId_t actorId, ItemEquipmentSlot eqSlot);
+bool inventoryEquipItem(Inventory *self, ActorId_t actorId, ItemEquipmentSlot_t eqSlot);
 void inventoryPrintEquipment(Inventory *self);
-uint32_t inventoryGetEquipmentEmptySlot(ItemEquipmentSlot slot);
-void inventoryPrintBag(Inventory *self, ItemCategory category);
+uint32_t inventoryGetEquipmentEmptySlot(ItemEquipmentSlot_t slot);
+void inventoryPrintBag(Inventory *self, ItemCategory_t category);
 bool inventoryGetItemByActorId(Inventory *self, ActorId_t actorId, Item **_item);
 bool inventorySwapItems(Inventory *self, ActorId_t actorId1, ActorId_t actorId2);
 void itemGenActorKey(Item *self, ActorKey key);
-int inventoryGetBagIndexByActorId(Inventory *self, ItemCategory category, ActorId_t actorId);
+int inventoryGetBagIndexByActorId(Inventory *self, ItemCategory_t category, ActorId_t actorId);
 
 /**
  * @brief Get the count of items equipped
