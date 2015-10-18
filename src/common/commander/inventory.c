@@ -381,9 +381,10 @@ size_t inventoryGetSPacketSize(Inventory *self) {
     size += sizeof(InventorySPacket);
 
     // Get size of equipped items
-    for (size_t i = 0; i < EQSLOT_COUNT; i++) {
-        if (self->equippedItems[i] != NULL) {
-            size += itemGetSPacketSize((Item *) self->equippedItems[i]);
+    for (ItemEquipmentSlot_t slot = 0; slot < EQSLOT_COUNT; slot++) {
+        if (self->equippedItems[slot] != NULL) {
+            itemPrint((Item *) self->equippedItems[slot]);
+            size += itemGetSPacketSize((Item *) self->equippedItems[slot]);
         }
     }
 
@@ -392,6 +393,7 @@ size_t inventoryGetSPacketSize(Inventory *self) {
         zlist_t *bag = self->bags[cat];
 
         for (ItemHandle *itemHandle = zlist_first(bag); itemHandle != NULL; itemHandle = zlist_next(bag)) {
+            itemPrint(*itemHandle);
             size += itemGetSPacketSize(*itemHandle);
         }
     }
@@ -431,7 +433,7 @@ void inventorySerializeSPacket(Inventory *self, PacketStream *stream) {
 
 bool inventoryUnserializeSPacket(Inventory *self, PacketStream *stream) {
 
-    packetStreamDebugStart(stream, inventoryGetSPacketSize(self));
+    packetStreamDebugStart(stream, stream->size);
 
     typeof_struct_member(InventorySPacket, equipmentCount) equipmentCount;
     packetStreamOut(stream, &equipmentCount);

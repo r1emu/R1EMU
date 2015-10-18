@@ -23,7 +23,7 @@
 /**
  * @brief : Decide which admin commands is going to be executed based on the command line
  */
-void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *replyMsg);
+bool adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *replyMsg);
 
 /**
  * @brief : Spawn a commander at the place of the current commander.

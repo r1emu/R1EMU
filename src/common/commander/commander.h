@@ -136,6 +136,10 @@ typedef struct
 #pragma pack(push, 1)
 typedef struct
 {
+    /**
+     * ! Don't change the order of these structure fields !
+     */
+
     /** Appearance */
     uint8_t commanderName[COMMANDER_NAME_SIZE+1];
     uint8_t familyName[COMMANDER_FAMILY_NAME_SIZE];
@@ -293,3 +297,10 @@ Commander *commanderDup(Commander *src);
  */
 void commanderFree(Commander *self);
 void commanderDestroy(Commander **_self);
+
+/**
+ * Serialization / Unserialization
+ */
+size_t commanderGetSPacketSize(Commander *self);
+void commanderSerializeSPacket(Commander *self, PacketStream *stream);
+bool commanderUnserializeSPacket(Commander *self, PacketStream *stream);

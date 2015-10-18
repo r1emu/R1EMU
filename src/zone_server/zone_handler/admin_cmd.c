@@ -49,22 +49,26 @@ bool adminCmdInit(void) {
     return true;
 }
 
-void adminCmdProcess(Worker *self, char *command, Session *session, zmsg_t *replyMsg) {
+bool adminCmdProcess(Worker *self, char *_command, Session *session, zmsg_t *replyMsg) {
 
     void (*handler) (Worker *self, Session *session, char *args, zmsg_t *replyMsg);
+    char command[strlen(_command) + 1];
+    strncpy(command, _command, sizeof(command));
+
     char *commandName = strtok(command, " ");
     if (!commandName) {
         warning ("Cannot read command '%s'", command);
-        return;
+        return false;
     }
 
     handler = zhash_lookup(adminCommands, commandName);
     if (!handler) {
         warning ("No admin command '%s' found. (entire command : '%s')", commandName, command);
-        return;
+        return false;
     }
 
     handler(self, session, command + strlen (commandName) + 1, replyMsg);
+    return true;
 }
 
 void adminCmdSetSpeed(Worker *self, Session *session, char *args, zmsg_t *replyMsg) {

@@ -156,7 +156,7 @@ size_t accountSessionGetSPacketSize(AccountSession *self) {
 
     for (size_t i = 0; i < self->commandersCountMax; i++) {
         if (self->commanders[i] != NULL) {
-            // packetSize += commanderGetPacketSize(self->commanders[i]);
+            packetSize += commanderGetSPacketSize(self->commanders[i]);
         }
     }
 
@@ -182,7 +182,7 @@ void accountSessionSerializeSPacket(AccountSession *self, PacketStream *stream) 
 
     for (size_t i = 0; i < self->commandersCountMax; i++) {
         if (self->commanders[i] != NULL) {
-            // commanderSerialize(self->commanders[i], stream);
+            commanderSerializeSPacket(self->commanders[i], stream);
         }
     }
     packetStreamDebugEnd(stream);
@@ -205,11 +205,16 @@ bool accountSessionUnserialize(AccountSession *self, PacketStream *stream) {
     size_t commandersCount;
     packetStreamOut(stream, &commandersCount);
 
+    if (!(self->commanders = malloc(sizeof(Commander *) * commandersCount))) {
+        error("Cannot allocate commanders array.");
+        return false;
+    }
+
     for (size_t i = 0; i < commandersCount; i++) {
-        //if (!(commanderUnserialize(self->commanders[i], stream))) {
-        //    error("Cannot unserialize the commander %d.", i);
-        //    return false;
-        //}
+        if (!(commanderUnserializeSPacket(self->commanders[i], stream))) {
+            error("Cannot unserialize the commander %d.", i);
+            return false;
+        }
     }
 
     packetStreamDebugEnd(stream);

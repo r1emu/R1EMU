@@ -74,8 +74,15 @@ void actorSerializeSPacket(Actor *self, PacketStream *stream) {
 }
 
 bool actorUnserializeSPacket(Actor *self, PacketStream *stream) {
+
+    if (!(actorInit(self, -1))) {
+        error("Cannot initialize an actor to unserialize.");
+        return false;
+    }
+
     packetStreamDebugStart(stream, actorGetSPacketSize(self));
     packetStreamOut(stream, &self->uid);
     packetStreamDebugEnd(stream);
+
     return true;
 }

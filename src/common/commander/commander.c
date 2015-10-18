@@ -216,3 +216,82 @@ void commanderDestroy(Commander **_self) {
     }
 }
 
+size_t commanderGetSPacketSize(Commander *self) {
+    size_t size = 0;
+    size += sizeof(CommanderSPacket);
+    size += inventoryGetSPacketSize(&self->inventory);
+    return size;
+}
+
+void commanderSerializeSPacket(Commander *self, PacketStream *stream) {
+
+    packetStreamDebugStart(stream, commanderGetSPacketSize(self));
+    packetStreamIn(stream, self->commanderName);
+    packetStreamIn(stream, self->familyName);
+    packetStreamIn(stream, &self->gender);
+    packetStreamIn(stream, &self->hairId);
+    packetStreamIn(stream, &self->pose);
+    packetStreamIn(stream, &self->pos);
+    packetStreamIn(stream, &self->dir);
+    packetStreamIn(stream, &self->classId);
+    packetStreamIn(stream, &self->jobId);
+    packetStreamIn(stream, &self->accountId);
+    packetStreamIn(stream, &self->pcId);
+    packetStreamIn(stream, &self->socialInfoId);
+    packetStreamIn(stream, &self->commanderId);
+    packetStreamIn(stream, &self->mapId);
+    packetStreamIn(stream, &self->level);
+    packetStreamIn(stream, &self->currentXP);
+    packetStreamIn(stream, &self->maxXP);
+    packetStreamIn(stream, &self->currentHP);
+    packetStreamIn(stream, &self->maxHP);
+    packetStreamIn(stream, &self->currentSP);
+    packetStreamIn(stream, &self->maxSP);
+    packetStreamIn(stream, &self->currentStamina);
+    packetStreamIn(stream, &self->maxStamina);
+    inventorySerializeSPacket(&self->inventory, stream);
+    packetStreamDebugEnd(stream);
+}
+
+bool commanderUnserializeSPacket(Commander *self, PacketStream *stream) {
+
+    packetStreamDebugStart(stream, stream->size);
+
+    if (!commanderInit(self)) {
+        error("Cannot initialize a commander to unserialize.");
+        return false;
+    }
+
+    packetStreamOut(stream, self->commanderName);
+    packetStreamOut(stream, self->familyName);
+    packetStreamOut(stream, &self->gender);
+    packetStreamOut(stream, &self->hairId);
+    packetStreamOut(stream, &self->pose);
+    packetStreamOut(stream, &self->pos);
+    packetStreamOut(stream, &self->dir);
+    packetStreamOut(stream, &self->classId);
+    packetStreamOut(stream, &self->jobId);
+    packetStreamOut(stream, &self->accountId);
+    packetStreamOut(stream, &self->pcId);
+    packetStreamOut(stream, &self->socialInfoId);
+    packetStreamOut(stream, &self->commanderId);
+    packetStreamOut(stream, &self->mapId);
+    packetStreamOut(stream, &self->level);
+    packetStreamOut(stream, &self->currentXP);
+    packetStreamOut(stream, &self->maxXP);
+    packetStreamOut(stream, &self->currentHP);
+    packetStreamOut(stream, &self->maxHP);
+    packetStreamOut(stream, &self->currentSP);
+    packetStreamOut(stream, &self->maxSP);
+    packetStreamOut(stream, &self->currentStamina);
+    packetStreamOut(stream, &self->maxStamina);
+
+    if (!(inventoryUnserializeSPacket(&self->inventory, stream))) {
+        error("Cannot unserialize inventory.");
+        return false;
+    }
+
+    packetStreamDebugEnd(stream);
+
+    return true;
+}

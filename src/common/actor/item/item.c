@@ -260,8 +260,12 @@ void itemPrint(Item *self) {
         dbg("ItemID = %d (%#x)", self->id, self->id);
         dbg("Amount = %d (%#x)", self->amount, self->amount);
         dbg("Category = %d (%#x)", self->category, self->category);
+        if (self->commonData) {
+            itemCommonDataPrint(self->commonData);
+        } else {
+            dbg("CommonData : None.");
+        }
         actorPrint(&self->actor);
-        itemCommonDataPrint(self->commonData);
     }
 }
 

@@ -77,7 +77,6 @@ bool mySqlGetCommanders(MySQL *self, char *familyName, Commander **commanders) {
     MYSQL_ROW row;
 
     for (int i = 0; (row = mysql_fetch_row(self->result)); i++) {
-
         Commander *curCommander = commanders[i];
         commanderInit(curCommander);
 

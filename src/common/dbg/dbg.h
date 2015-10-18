@@ -118,7 +118,7 @@ typedef enum {
 
 /** Structure dissection debug function. */
 #define PRINT_STRUCTURE \
-    for (int __disassDbg = 0; dbgTabulations += 1, __disassDbg == 0; dbgTabulations -= 1, __disassDbg = 1)
+    for (int __disassDbg = 0; dbgTabulations++, __disassDbg == 0; dbgTabulations -= 2, __disassDbg = 1)
 
 /** Info level debug function. Not a debug information */
 #define info(format, ...)                                          \

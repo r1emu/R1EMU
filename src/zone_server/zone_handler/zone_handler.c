@@ -150,16 +150,19 @@ static PacketHandlerState zoneHandlerChat(
     // Check for custom admin commands
     if (session->game.accountSession.privilege <= ACCOUNT_SESSION_PRIVILEGES_ADMIN
     && (strncmp(clientPacket->msgText, "/", strlen("/")) == 0)) {
-        adminCmdProcess(self, clientPacket->msgText + strlen("/"), session, replyMsg);
+        if (adminCmdProcess(self, clientPacket->msgText + strlen("/"), session, replyMsg)) {
+            // OK
+            return PACKET_HANDLER_UPDATE_SESSION;
+        }
     }
-    else {
-        // normal message : Dispatch a GameEventChat
-        DECLARE_GameEventChat(msgSize);
-        GameEventChat event;
-        memcpy(&event.commander, session->game.commanderSession.currentCommander, sizeof(event.commander));
-        memcpy(event.chatText, clientPacket->msgText, msgSize);
-        workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_CHAT, &event, sizeof(event));
-    }
+
+    // normal message : Dispatch a GameEventChat
+    DECLARE_GameEventChat(msgSize);
+    GameEventChat event;
+    memcpy(&event.commander, session->game.commanderSession.currentCommander, sizeof(event.commander));
+    memcpy(event.chatText, clientPacket->msgText, msgSize);
+    workerDispatchEvent(self, session->socket.sessionKey, EVENT_TYPE_CHAT, &event, sizeof(event));
+
 
     return PACKET_HANDLER_UPDATE_SESSION;
 }
