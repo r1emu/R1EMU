@@ -46,11 +46,11 @@ void *dumpToMem (
     while ((dumpPos = strGetLine (dump, buffer, sizeof(buffer) - 1, dumpPos)) != -1)
     {
         char *strPos = buffer;
-        if ((strPos = strstr (buffer, "]  ")) != NULL) {
-            strPos += strlen("]  ");
+        if ((strPos = strstr (buffer, "] >  ")) != NULL) {
+            strPos += strlen("] >  ");
         }
-        else if ((strPos = strstr (buffer, "] ")) != NULL) {
-            strPos += strlen("] ");
+        else if ((strPos = strstr (buffer, "]  ")) != NULL) {
+            strPos += strlen("]  ");
         }
 
         char *end = strstr (strPos, " | ");

@@ -125,6 +125,7 @@ bool accountSessionIsCommanderSlotEmpty(AccountSession *self, int commanderIndex
 
     // Check if slot is occupied
     if (self->commanders[commanderIndex]) {
+        error ("The slot %d is occupied.", commanderIndex);
         goto cleanup;
     }
 

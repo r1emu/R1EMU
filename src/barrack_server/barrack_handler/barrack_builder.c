@@ -59,6 +59,7 @@ void barrackBuilderLoginOk(
         uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
         uint32_t accountPrivileges;
         uint8_t sessionKey[GAME_SESSION_KEY_MAXSIZE];
+        uint32_t unk2;
     } replyPacket;
     #pragma pack(pop)
 
@@ -175,6 +176,7 @@ void barrackBuilderIesModifyList(zmsg_t *replyMsg) {
     // CHECK_SERVER_PACKET_SIZE (replyPacket, packetType);
     // BUILD_REPLY_PACKET(replyPacket, replyMsg)
     {
+        /*
         size_t memSize;
 
         void *memory = dumpToMem(
@@ -202,6 +204,7 @@ void barrackBuilderIesModifyList(zmsg_t *replyMsg) {
         );
 
         zmsg_add(replyMsg, zframe_new(memory, memSize));
+        */
     }
 }
 

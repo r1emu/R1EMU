@@ -27,25 +27,27 @@
 #include "common/mysql/fields/mysql_commander.h"
 
 /** Read the passport and accepts or refuse the authentification */
-static PacketHandlerState barrackHandlerLoginByPassport  (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerLoginByPassport       (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Read the login / password and accepts or refuse the authentification */
-static PacketHandlerState barrackHandlerLogin            (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerLogin                 (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Start the barrack : call other handlers that initializes the barrack */
-static PacketHandlerState barrackHandlerStartBarrack     (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerStartBarrack          (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Once the commander list has been received, request to start the barrack */
-static PacketHandlerState barrackHandlerCurrentBarrack   (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerCurrentBarrack        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Change a barrack name */
-static PacketHandlerState barrackHandlerBarrackNameChange(Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerBarrackNameChange     (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Create a commander */
-static PacketHandlerState barrackHandlerCommanderCreate  (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerCommanderCreate       (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Send a list of zone servers */
-static PacketHandlerState barrackHandlerCommanderDestroy (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerCommanderDestroy      (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Change the commander position in the barrack */
-static PacketHandlerState barrackHandlerCommanderMove    (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerCommanderMove         (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Request for the player to enter in game */
-static PacketHandlerState barrackHandlerStartGame        (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerStartGame             (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 /** Request for the player to logout */
-static PacketHandlerState barrackHandlerLogout           (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+static PacketHandlerState barrackHandlerLogout                (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
+/** Check for client integrity */
+static PacketHandlerState barrackHandlerCheckClientIntegrity  (Worker *self, Session *session, uint8_t *packet, size_t packetSize, zmsg_t *reply);
 
 /**
  * @brief barrackHandlers is a global table containing all the barrack handlers.
@@ -54,20 +56,56 @@ const PacketHandler barrackHandlers[PACKET_TYPE_COUNT] = {
     #define REGISTER_PACKET_HANDLER(packetName, handler) \
        [packetName] = {handler, STRINGIFY(packetName)}
 
-    REGISTER_PACKET_HANDLER(CB_LOGIN,              barrackHandlerLogin),
-    REGISTER_PACKET_HANDLER(CB_LOGIN_BY_PASSPORT,  barrackHandlerLoginByPassport),
-    REGISTER_PACKET_HANDLER(CB_START_BARRACK,      barrackHandlerStartBarrack),
-    REGISTER_PACKET_HANDLER(CB_CURRENT_BARRACK,    barrackHandlerCurrentBarrack),
-    REGISTER_PACKET_HANDLER(CB_BARRACKNAME_CHANGE, barrackHandlerBarrackNameChange),
-    REGISTER_PACKET_HANDLER(CB_COMMANDER_CREATE,   barrackHandlerCommanderCreate),
-    REGISTER_PACKET_HANDLER(CB_COMMANDER_DESTROY,  barrackHandlerCommanderDestroy),
-    REGISTER_PACKET_HANDLER(CB_COMMANDER_MOVE,     barrackHandlerCommanderMove),
-    // REGISTER_PACKET_HANDLER(CB_JUMP,            barrackHandlerJump),
-    REGISTER_PACKET_HANDLER(CB_START_GAME,         barrackHandlerStartGame),
-    REGISTER_PACKET_HANDLER(CB_LOGOUT,             barrackHandlerLogout),
+    REGISTER_PACKET_HANDLER(CB_LOGIN,                   barrackHandlerLogin),
+    REGISTER_PACKET_HANDLER(CB_LOGIN_BY_PASSPORT,       barrackHandlerLoginByPassport),
+    REGISTER_PACKET_HANDLER(CB_START_BARRACK,           barrackHandlerStartBarrack),
+    REGISTER_PACKET_HANDLER(CB_CURRENT_BARRACK,         barrackHandlerCurrentBarrack),
+    REGISTER_PACKET_HANDLER(CB_BARRACKNAME_CHANGE,      barrackHandlerBarrackNameChange),
+    REGISTER_PACKET_HANDLER(CB_COMMANDER_CREATE,        barrackHandlerCommanderCreate),
+    REGISTER_PACKET_HANDLER(CB_COMMANDER_DESTROY,       barrackHandlerCommanderDestroy),
+    REGISTER_PACKET_HANDLER(CB_COMMANDER_MOVE,          barrackHandlerCommanderMove),
+    // REGISTER_PACKET_HANDLER(CB_JUMP,                 barrackHandlerJump),
+    REGISTER_PACKET_HANDLER(CB_START_GAME,              barrackHandlerStartGame),
+    REGISTER_PACKET_HANDLER(CB_LOGOUT,                  barrackHandlerLogout),
+    REGISTER_PACKET_HANDLER(CB_CHECK_CLIENT_INTEGRITY,  barrackHandlerCheckClientIntegrity),
 
     #undef REGISTER_PACKET_HANDLER
 };
+
+static PacketHandlerState barrackHandlerCheckClientIntegrity(
+    Worker *self,
+    Session *session,
+    uint8_t *packet,
+    size_t packetSize,
+    zmsg_t *reply)
+{
+    PacketHandlerState status = PACKET_HANDLER_ERROR;
+
+    #pragma pack(push, 1)
+    struct {
+        // TODO
+    } *clientPacket = (void *) packet;
+    (void) clientPacket;
+    #pragma pack(pop)
+
+    size_t memSize;
+    void *memory = dumpToMem (
+			"[15:41:52][main.c:57 in HookRecvPacket] >  4F 00 FF FF FF FF 1D 00 04 00 00 00 4B 0A 0F 06 | O...........K...\n"
+			"[15:41:52][main.c:57 in HookRecvPacket] >  01 00 10 01 0C 00 00 00 00 00 00 00 00          | .............\n"
+        , NULL, &memSize);
+
+    zmsg_addmem(reply, memory, memSize);
+
+    if (!(barrackHandlerStartBarrack(self, session, packet, packetSize, reply))) {
+        error ("Cannot start barrack correctly.");
+        goto cleanup;
+    }
+
+    status = PACKET_HANDLER_UPDATE_SESSION;
+
+cleanup:
+    return status;
+}
 
 static PacketHandlerState barrackHandlerLogin(
     Worker *self,
@@ -85,8 +123,6 @@ static PacketHandlerState barrackHandlerLogin(
         uint8_t unk1[6]; // Game version?
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
-
-    buffer_print(packet, packetSize, "login = ");
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_LOGIN);
 
@@ -573,6 +609,7 @@ static PacketHandlerState barrackHandlerCommanderCreate(
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_COMMANDER_CREATE);
 
     if (!accountSessionIsCommanderSlotEmpty(accountSession, commanderIndex)) {
+        error ("The current slot is not empty (%d). Chose another.", commanderIndex);
         goto cleanup;
     }
 
