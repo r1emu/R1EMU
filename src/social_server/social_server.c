@@ -44,6 +44,13 @@ SocialServer *socialServerNew(Server *server) {
 
 bool socialServerInit(SocialServer *self, Server *server) {
     self->server = server;
+
+    // Initialize packets manager
+    if (!(packetTypeInit())) {
+        error("Cannot initialize packet manager.");
+        return false;
+    }
+
     return true;
 }
 

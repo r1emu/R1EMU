@@ -542,13 +542,13 @@ workerHandlePacket(
     if (!(handler = packetHandlers [header.type].handler)) {
         error("Cannot find handler for the requested packet type : %s",
             (header.type < PACKET_TYPES_MAX_INDEX) ?
-               packetTypeInfo.packets[header.type].string : "UNKNOWN"
+               packetTypeInfo.packets[header.type].name : "UNKNOWN"
         );
         goto cleanup;
     }
 
     // Call the handler
-    special("Calling [%s] handler", packetTypeInfo.packets[header.type].string);
+    special("Calling [%s] handler", packetTypeInfo.packets[header.type].name);
     status = handler(self, session, packet, packetSize, reply);
 
 cleanup:

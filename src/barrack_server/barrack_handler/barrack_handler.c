@@ -82,9 +82,11 @@ static PacketHandlerState barrackHandlerLogin(
     struct {
         uint8_t accountName[ACCOUNT_SESSION_ACCOUNT_NAME_MAXSIZE];
         uint8_t md5Password[17];
-        uint8_t unk1[5]; // Game version?
+        uint8_t unk1[6]; // Game version?
     } *clientPacket = (void *) packet;
     #pragma pack(pop)
+
+    buffer_print(packet, packetSize, "login = ");
 
     CHECK_CLIENT_PACKET_SIZE(*clientPacket, packetSize, CB_LOGIN);
 

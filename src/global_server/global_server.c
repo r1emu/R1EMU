@@ -18,6 +18,7 @@
 #include "barrack_server/barrack_event_server.h"
 #include "social_server/social_server.h"
 #include "common/server/server_factory.h"
+#include "common/packet/packet_type.h"
 #include <jansson.h>
 
 /**
@@ -76,6 +77,12 @@ bool globalServerInit(GlobalServer *self, GlobalServerInfo *info) {
 
     if (!(redisConnection(self->redis))) {
         error("Cannot connect to Redis.");
+        return false;
+    }
+
+    // Initialize packets manager
+    if (!(packetTypeInit())) {
+        error("Cannot initialize packet manager.");
         return false;
     }
 

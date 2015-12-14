@@ -171,7 +171,7 @@ void adminCmdAddSkill(Worker *self, Session *session, char *args, zmsg_t *replyM
     skillId = skillId ? skillId : 40001; // Heal
     level = level ? level : 1;
 
-    SkillsManager *skillsManager = &session->game.commanderSession.currentCommander->skillsManager;
+    // SkillsManager *skillsManager = &session->game.commanderSession.currentCommander->skillsManager;
 
     /*
     Item *newItem = itemFactoryCreate(itemId, amount);

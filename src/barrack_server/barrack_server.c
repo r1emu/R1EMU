@@ -60,6 +60,12 @@ bool barrackServerInit(BarrackServer *self, Server *server) {
         return false;
     }
 
+    // Initialize packets manager
+    if (!(packetTypeInit())) {
+        error("Cannot initialize packet manager.");
+        return false;
+    }
+
     return true;
 }
 
