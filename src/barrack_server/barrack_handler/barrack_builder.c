@@ -264,12 +264,13 @@ void barrackBuilderCommanderList(
         float creditsAmount3;                               \
                                                             \
         uint8_t commandersBarrackInfoPacket[x];             \
+        uint16_t unk2;                                      \
     }   BarrackBuilderCommanderListCPacket;
 
     #define DEFINE_CommanderBarrackInfoCPacket(x)     \
         typedef struct {                              \
-            CommanderAppearanceCPacket appearance;           \
-            SocialInfoId_t socialInfoId;                    \
+            CommanderAppearanceCPacket appearance;    \
+            SocialInfoId_t socialInfoId;              \
             uint16_t commanderPosition;               \
             MapId_t mapId;                            \
             uint32_t unk4;                            \
@@ -283,6 +284,7 @@ void barrackBuilderCommanderList(
             uint32_t unk8;                            \
             uint8_t propertiesPacket[x];              \
             uint16_t unk9;                            \
+            uint16_t jobId;                           \
         } CommanderBarrackInfoCPacket;
 
     // Keep sizes in memory
@@ -342,16 +344,17 @@ void barrackBuilderCommanderList(
         // Fill replyPacket
         variableSizePacketHeaderInit(&replyPacket.variableSizeHeader, packetType, sizeof(replyPacket));
         replyPacket.accountId = accountId;
-        replyPacket.unk1 = 1; // ICBT - equal to 1 or 4
+        replyPacket.unk1 = 0; // ICBT - equal to 1 or 4
+        replyPacket.unk2 = 0; // ?
         replyPacket.commandersCount = commandersCount;
         strncpy(replyPacket.familyName, gameSession->accountSession.familyName, sizeof(replyPacket.familyName));
 
         replyPacket.accountInfoBytesLength = 0x12; // 3 sets
-        replyPacket.typeCredits = SWAP_UINT16(0x940e); // 94 0E = Medal (iCoin)
+        replyPacket.typeCredits = SWAP_UINT16(0x9c18); // 94 0E = Medal (iCoin)
         replyPacket.creditsAmount = gameSession->accountSession.credits;
-        replyPacket.typeCredits2 = SWAP_UINT16(0x970e); // 94 0E = Medal (iCoin)
+        replyPacket.typeCredits2 = SWAP_UINT16(0x9e18); // 94 0E = Medal (iCoin)
         replyPacket.creditsAmount2 = 0;
-        replyPacket.typeCredits3 = SWAP_UINT16(0x950e); // 94 0E = Medal (iCoin)
+        replyPacket.typeCredits3 = SWAP_UINT16(0xa018); // 94 0E = Medal (iCoin)
         replyPacket.creditsAmount3 = 0;
 
         // we want to start writing at the offset of commandersBarrackInfoPacket
@@ -392,7 +395,8 @@ void barrackBuilderCommanderList(
             curCommandersBarrackInfoPacket->pos2 = curCommandersBarrackInfoPacket->pos;
             curCommandersBarrackInfoPacket->dir2 = curCommandersBarrackInfoPacket->dir;
             curCommandersBarrackInfoPacket->unk8 = 0;
-            curCommandersBarrackInfoPacket->unk9 = 0;
+            curCommandersBarrackInfoPacket->unk9 = SWAP_UINT16(0x0100);
+            curCommandersBarrackInfoPacket->jobId = curCommander->jobId;
 
             // fill properties
             size_t offset = offsetof(CommanderBarrackInfoCPacket, propertiesPacket);
@@ -425,6 +429,7 @@ void barrackBuilderCommanderList(
             }
 
             packetStreamAddOffset(&packetStream, sizeof_struct_member(CommanderBarrackInfoCPacket, unk9));
+            packetStreamAddOffset(&packetStream, sizeof_struct_member(CommanderBarrackInfoCPacket, jobId));
         }
     }
 
